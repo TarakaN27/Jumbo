@@ -15,14 +15,23 @@ use yii\helpers\Console;
 
 class UserController extends AbstractConsoleController {
 
+    /**
+     * Show all commands
+     */
     public function actionIndex()
     {
         echo 'yii users/create' . PHP_EOL;
         echo 'yii users/remove' . PHP_EOL;
         echo 'yii users/activate' . PHP_EOL;
+        echo 'yii users/diactivate' . PHP_EOL;
         echo 'yii users/change-password' . PHP_EOL;
+        echo 'yii users/change-role' . PHP_EOL;
     }
 
+    /**
+     * Add new user
+     * @return int
+     */
     public function actionCreate()
     {
         $model = new User();
@@ -38,8 +47,8 @@ class UserController extends AbstractConsoleController {
     }
 
     /**
+     * Change password
      * @return int
-     * Меняем пароль
      */
     public function actionChangePassword()
     {
@@ -54,33 +63,33 @@ class UserController extends AbstractConsoleController {
     }
 
     /**
+     * Set active status for user
      * @return int
-     * Активируем пользователя
      */
     public function actionActivate()
     {
         $username = $this->prompt('Username:', ['required' => true]);
         $model = $this->findModel($username);
         $model->status = User::STATUS_ACTIVE;
-        $model->removeEmailConfirmToken();
         return $this->log($model->save());
     }
 
     /**
+     * Set blocked status for user
      * @return int
-     * Активируем пользователя
      */
     public function actionDiactivate()
     {
         $username = $this->prompt('Username:', ['required' => true]);
         $model = $this->findModel($username);
         $model->status = User::STATUS_BLOCKED;
-        $model->removeEmailConfirmToken();
         return $this->log($model->save());
     }
 
-
-
+    /**
+     * @param $success
+     * @return int
+     */
     private function log($success)
     {
         if ($success) {
@@ -124,6 +133,10 @@ class UserController extends AbstractConsoleController {
         return $model;
     }
 
+    /**
+     * Change user role
+     * @return int
+     */
     public function actionChangeRole()
     {
         $username = $this->prompt('Username:', ['required' => true]);
@@ -139,8 +152,8 @@ class UserController extends AbstractConsoleController {
     }
 
     /**
+     * Delete user
      * @return int
-     * удаляем пользователя
      */
     public function actionRemove()
     {
