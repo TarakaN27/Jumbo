@@ -29,32 +29,10 @@ use yii\helpers\ArrayHelper;
 class CUser extends AbstractUser
 {
     CONST
-        TYPE_CLIENT = 5,
-        TYPE_USUAL = 10,
         SCENARIO_REGISTER = 'register';
 
     public
         $password;
-
-    /**
-     * @return array
-     */
-    public static function getTypeArr()
-    {
-        return [
-            self::TYPE_USUAL => Yii::t('app/users','Type_usual'),
-            self::TYPE_CLIENT => Yii::t('app/users','Type_client')
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getTypeStr()
-    {
-        $arType = self::getTypeArr();
-        return isset($arType[$this->type]) ? $arType[$this->type] : 'N/A';
-    }
 
     /**
      * @return array
@@ -118,8 +96,10 @@ class CUser extends AbstractUser
             ['role', 'default', 'value' => self::ROLE_USER],
             ['role', 'in', 'range' => array_keys(self::getRoleArr())],
 
-            ['type', 'default', 'value' => self::TYPE_USUAL],
-            ['type', 'in', 'range' => array_keys(self::getTypeArr())],
+            [['type'],'required'],
+            [['type'],'integer'],
+            //['type', 'default', 'value' => self::TYPE_U_PERSON],
+            //['type', 'in', 'range' => array_keys(self::getTypeArr())],
         ];
     }
 
@@ -164,6 +144,13 @@ class CUser extends AbstractUser
         return $this->hasOne(BUser::className(), ['id' => 'manager_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserType()
+    {
+        return $this->hasOne(CUserTypes::className(), ['id' => 'type']);
+    }
 
     /**
      * @return array

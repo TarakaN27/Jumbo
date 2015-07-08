@@ -4,12 +4,12 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\CUser */
+/* @var $model common\models\CUserTypes */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class = "x_content">
-    <br />
+<div class="cuser-types-form">
+
     <?php $form = ActiveForm::begin([
         'options' => [
             'class' => 'form-horizontal form-label-left'
@@ -20,27 +20,14 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'name')->textInput() ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'ext_id')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'manager_id')->dropDownList(\backend\models\BUser::getListManagers(),[
-        'prompt' => Yii::t('app/users','Choose_manager')
-    ]) ?>
-
-    <?= $form->field($model, 'status')->dropDownList(\common\models\CUser::getStatusArr()) ?>
-
-    <?= $form->field($model, 'type')->dropDownList(\common\models\CUserTypes::getUserTypesMap(),[
-        'prompt' => Yii::t('app/users','Choose_user_type')
-    ]) ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/users', 'Create') : Yii::t('app/users', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-        </div>
-        </div>
+    </div></div>
 
     <?php ActiveForm::end(); ?>
 

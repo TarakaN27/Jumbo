@@ -47,9 +47,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                             [
                                                 'attribute' => 'type',
                                                 'value' => function($model){
-                                                        return $model->getTypeStr();
+                                                        return is_object($obType = $model->userType) ? $obType->name : 'N/A';
                                                     },
-                                                'filter' => \common\models\CUser::getTypeArr()
+                                                'filter' => \common\models\CUserTypes::getUserTypesMap()
                                             ],
                                             [
                                                 'attribute' => 'manager_id',

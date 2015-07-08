@@ -42,6 +42,18 @@ return [
     'Password' => 'Пароль',
     'Update Cuser: ' => 'Обновление контрагента',
     'Type_usual' => 'Общий',
-    'Type_client' => 'Клиент'
+    'Type_client' => 'Клиент',
+    'Choose_manager' => 'Выберите менеджера',
+    'Type_j_person' => 'Юр. лицо',
+    'Type_f_person' => 'Физ.лицо',
+    'Choose_user_type' => 'Выберите тип пользователя',
+    'USER_cuser_types' => 'Типы контрагентов',
+    'Create Cuser Types' => 'Добавить тип пользователя',
+    'Name' => 'Название',
+    'Description' => 'Описание',
+    'Update Cuser Types: ' => 'Обновить тип пользователя: ',
+    'Create' => 'Добавить'
+
+
 
 ];

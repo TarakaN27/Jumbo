@@ -5,12 +5,12 @@ namespace common\models\search;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\CUser;
+use common\models\CUserTypes;
 
 /**
- * CUserSearch represents the model behind the search form about `common\models\CUser`.
+ * CUserTypesSearch represents the model behind the search form about `common\models\CUserTypes`.
  */
-class CUserSearch extends CUser
+class CUserTypesSearch extends CUserTypes
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class CUserSearch extends CUser
     public function rules()
     {
         return [
-            [['id', 'ext_id', 'type', 'manager_id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email'], 'safe'],
+            [['id',  'created_at', 'updated_at'], 'integer'],
+            [['name','description'], 'safe'],
         ];
     }
 
@@ -41,13 +41,10 @@ class CUserSearch extends CUser
      */
     public function search($params)
     {
-        $query = CUser::find()->with('manager','userType');
+        $query = CUserTypes::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
         ]);
 
         $this->load($params);
@@ -60,20 +57,12 @@ class CUserSearch extends CUser
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'ext_id' => $this->ext_id,
-            'type' => $this->type,
-            'manager_id' => $this->manager_id,
-            'role' => $this->role,
-            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
-            ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
-            ->andFilterWhere(['like', 'email', $this->email]);
+        $query->andFilterWhere(['like', 'description', $this->description]);
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

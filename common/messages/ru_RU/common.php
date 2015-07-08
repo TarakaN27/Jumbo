@@ -7,5 +7,6 @@
  */
 return [
     'Published' => 'Опубликовано',
-    'Unpublished' => 'Не опубликовано'
+    'Unpublished' => 'Не опубликовано',
+    'Welcome' => 'Добропожаловать'
 ];

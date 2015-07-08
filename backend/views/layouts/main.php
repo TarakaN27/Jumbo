@@ -39,7 +39,7 @@ AppAsset::register($this);
                             <?php echo Html::img('@web/images/defaultUserAvatar.jpg',['class' => 'img-circle profile_img']);?>
                         </div>
                         <div class="profile_info">
-                            <span>Welcome,</span>
+                            <span><?php echo Yii::t('app/common','Welcome') ?>,</span>
                             <h2><?php echo Yii::$app->user->identity->username;?></h2>
                         </div>
                     </div>
@@ -58,6 +58,8 @@ AppAsset::register($this);
                                         <li><a href="<?= Url::to(['/users/default/index'])?>"><?php echo Yii::t('app/users','USER_staf');?></a>
                                         </li>
                                         <li><a href="<?= Url::to(['/users/contractor/index'])?>"><?php echo Yii::t('app/users','USER_contractor');?></a>
+                                        </li>
+                                        <li><a href="<?= Url::to(['/users/user-types/index'])?>">&minus;&minus;<?php echo Yii::t('app/users','USER_cuser_types');?></a>
                                         </li>
                                     </ul>
                                 </li>
