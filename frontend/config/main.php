@@ -10,8 +10,24 @@ return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'name' => 'Front wmc',
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        'request' => [
+            'baseUrl' => '',
+            'csrfParam' => '_frontendCSRF',
+            'csrfCookie' => [
+                'httpOnly' => true,
+                //    'path' => '/',
+            ],
+
+        ],
+        'session' => [
+            'name' => 'FRONTENDSESSID',
+            'cookieParams' => [
+                //   'path' => '/',
+            ],
+        ],
         'user' => [
             'identityClass' => 'common\models\CUser',
             'enableAutoLogin' => true,
@@ -27,6 +43,10 @@ return [
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
+        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
         ],
     ],
     'params' => $params,
