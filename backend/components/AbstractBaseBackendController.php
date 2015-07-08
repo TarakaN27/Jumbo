@@ -1,0 +1,37 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * Corp: Webmart Soft
+ * User: E. Motuz
+ * Date: 06.07.15
+ */
+
+namespace backend\components;
+
+
+use yii\web\Controller;
+use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+
+abstract class AbstractBaseBackendController extends Controller{
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+} 

@@ -1,0 +1,10 @@
+# prevent directory listings
+Options -Indexes
+IndexIgnore */*
+
+#follow symbolic links
+#Options FollowSymlinks
+RewriteEngine on
+RewriteRule ^service(/.+)?$ /backend/web/$1 [L,PT]
+RewriteRule ^(service)/$ /$1 [L,R=301]
+RewriteRule ^(.+)?$ /frontend/web/$1
