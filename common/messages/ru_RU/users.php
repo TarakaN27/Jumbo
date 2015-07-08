@@ -46,13 +46,14 @@ return [
     'Choose_manager' => 'Выберите менеджера',
     'Type_j_person' => 'Юр. лицо',
     'Type_f_person' => 'Физ.лицо',
-    'Choose_user_type' => 'Выберите тип пользователя',
+    'Choose_user_type' => 'Выберите тип контрагента',
     'USER_cuser_types' => 'Типы контрагентов',
-    'Create Cuser Types' => 'Добавить тип пользователя',
+    'Create Cuser Types' => 'Добавить тип контрагента',
     'Name' => 'Название',
     'Description' => 'Описание',
-    'Update Cuser Types: ' => 'Обновить тип пользователя: ',
-    'Create' => 'Добавить'
+    'Update Cuser Types: ' => 'Обновить тип контрагента: ',
+    'Create' => 'Добавить',
+    'Cuser Types' => 'Типы контрагентов'
 
 
 
