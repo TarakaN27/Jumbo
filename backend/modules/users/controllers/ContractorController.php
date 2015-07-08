@@ -49,8 +49,6 @@ class ContractorController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new CUser();
-        $model->setScenario(CUser::SCENARIO_REGISTER);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {

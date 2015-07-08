@@ -48,9 +48,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'manager_id',
                 'value' => is_object($obMng) ? $obMng->username : NULL
             ],
+            /*
             'auth_key',
             'password_hash',
             'password_reset_token',
+            */
             'email:email',
             [
                 'attribute' => 'status',

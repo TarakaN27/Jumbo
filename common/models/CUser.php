@@ -120,10 +120,6 @@ class CUser extends AbstractUser
 
             ['type', 'default', 'value' => self::TYPE_USUAL],
             ['type', 'in', 'range' => array_keys(self::getTypeArr())],
-
-            ['password', 'required','on'=>[self::SCENARIO_REGISTER]],
-            ['password', 'string', 'min' => 6],
-
         ];
     }
 
@@ -156,10 +152,6 @@ class CUser extends AbstractUser
      */
     public function beforeSave($insert)
     {
-        if($insert && $this->scenario == self::SCENARIO_REGISTER)
-        {
-            $this->setPassword($this->password);
-        }
         return parent::beforeSave($insert);
     }
 
