@@ -27,16 +27,16 @@ return [
         //------------------разделение сессий, csrf -ключей, пользоватлей
         'request' => [
             'csrfParam' => '_backendCSRF',
-            'baseUrl' => '/admin',
+            'baseUrl' => '/service',
             'csrfCookie' => [
                 'httpOnly' => true,
-                'path' => '/admin',
+                'path' => '/service',
             ],
         ],
         'session' => [
             'name' => 'BACKENDSESSID',
             'cookieParams' => [
-                'path' => '/admin',
+                'path' => '/service',
             ],
         ],
         'user' => [
@@ -44,7 +44,7 @@ return [
             'enableAutoLogin' => true,
             'identityCookie' => [
                 'name' => '_backendEndUser', // unique for frontend
-                'path' => '/admin' // correct path for backend app.
+                'path' => '/service' // correct path for backend app.
             ]
         ],
         //роли
