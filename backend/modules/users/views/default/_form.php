@@ -27,7 +27,11 @@ use yii\widgets\ActiveForm;
         'maxlength' => TRUE,
     ]) ?>
 
-    <? if($model->isNewRecord) echo $form->field($model, 'password')->textInput(['maxlength' => TRUE]); ?>
+    <?php
+    /*
+    if($model->isNewRecord) echo $form->field($model, 'password')->textInput(['maxlength' => TRUE]);
+    */
+    ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => TRUE]) ?>
 

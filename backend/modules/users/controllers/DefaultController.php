@@ -50,6 +50,7 @@ class DefaultController extends AbstractBaseBackendController
     {
         $model = new BUser();
         $model->setScenario(BUser::SCENARIO_REGISTER);
+        $model->password = '123456'; //@todo после добавления инвайтов УДАЛИТЬ!!!!!
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
