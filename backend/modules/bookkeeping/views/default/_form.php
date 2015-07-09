@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
+use kartik\select2\Select2;
 /* @var $this yii\web\View */
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
@@ -22,7 +23,13 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         ],
     ]); ?>
 
-    <?= $form->field($model, 'cuser_id')->dropDownList(\common\models\CUser::getContractorMap(),['prompt' => Yii::t('app/book','BOOK_choose_cuser')]) ?>
+    <?php  echo $form->field($model, 'cuser_id')->widget(Select2::classname(), [
+        'data' => \common\models\CUser::getContractorMap(),
+        'options' => ['placeholder' => Yii::t('app/book','BOOK_choose_cuser')],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        ]); ?>
 
     <?= $form->field($model, 'pay_date')->widget(DatePicker::className(),[
         'dateFormat' => 'dd-MM-yyyy',
