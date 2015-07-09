@@ -173,7 +173,7 @@ class ContractorController extends AbstractBaseBackendController
         if($model->load(Yii::$app->request->post()) && $model->save())
         {
             try{
-                $model->link('requisites',$modelU);
+                $modelU->link('requisites',$model);
                 $transaction->commit();
                 Yii::$app->session->set('success',Yii::t('app/users','Requisites_successfully_saved'));
             }catch (\Exception $e)
