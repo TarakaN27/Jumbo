@@ -94,7 +94,8 @@ return [
     'Inn' => 'ИНН',
     'Kpp' => 'КПП',
     'Ogrn' => 'ОГРН',
-    'addRequisites' => 'Добавить реквизиты'
+    'addRequisites' => 'Добавить реквизиты',
+
 
 
 

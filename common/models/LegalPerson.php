@@ -78,7 +78,7 @@ class LegalPerson extends AbstractActiveRecord
     {
         $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
         $models = self::getDb()->cache(function ($db) {
-            return LegalPerson::find()->all($db);
+            return LegalPerson::find()->orderBy(['id' => SORT_ASC])->all($db);
         },86400,$dep);
 
         return $models;

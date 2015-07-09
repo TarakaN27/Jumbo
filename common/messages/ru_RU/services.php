@@ -40,6 +40,8 @@ return [
     'Nbrb Rate' => 'Курс НБРБ',
     'Cbr Rate' => 'Курс ЦБРФ',
     'Update Exchange Rates: ' => 'Обновление валюты: ',
-    'Update_rates_now' => 'Обновить курсы валют'
+    'Update_rates_now' => 'Обновить курсы валют',
+    'Auto update' => 'Обновлять автоматически',
+    'Is default' => 'Валюта по-умолчанию'
 
 ];

@@ -51,6 +51,8 @@ class DefaultController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new Payments();
+        if(empty($model->pay_date))
+            $model->pay_date = time();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

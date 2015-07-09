@@ -2,29 +2,17 @@
 
 namespace backend\modules\users\controllers;
 
+use backend\components\AbstractBaseBackendController;
 use Yii;
 use common\models\CUserTypes;
 use common\models\search\CUserTypesSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * UserTypesController implements the CRUD actions for CUserTypes model.
  */
-class UserTypesController extends Controller
+class UserTypesController extends AbstractBaseBackendController
 {
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Lists all CUserTypes models.

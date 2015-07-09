@@ -6,6 +6,8 @@ use yii\jui\DatePicker;
 /* @var $this yii\web\View */
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
+$fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+//$labelOptions = ['class' => 'control-label'];
 ?>
 
 <div class="payments-form">
@@ -15,7 +17,7 @@ use yii\jui\DatePicker;
             'class' => 'form-horizontal form-label-left'
         ],
         'fieldConfig' => [
-            'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+            'template' => '{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
             'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
         ],
     ]); ?>
@@ -32,13 +34,24 @@ use yii\jui\DatePicker;
         ]
     ]) ?>
 
-    <?= $form->field($model, 'pay_summ')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'currency_id')->dropDownList(\common\models\ExchangeRates::getRatesCodes(),['prompt' => Yii::t('app/book','BOOK_choose_currency')]) ?>
-
+    <div class="form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="payments-service_id"><?php echo Html::activeLabel($model,'pay_summ');?></label>
+        <div class='col-md-6 col-sm-6 col-xs-12'>
+            <?= $form->field($model, 'pay_summ',['template' => $fieldTpl,'options' => [
+                'class' => 'col-md-8 col-sm-8 col-xs-12',
+                'style' => 'padding-left:0px;'
+            ]])
+                ->textInput(['maxlength' => true])->label(false) ?>
+            <?= $form->field($model, 'currency_id',['template' => $fieldTpl,'options' => [
+                'class' => 'col-md-4 col-sm-4 col-xs-12',
+                'style' => 'padding-right:0px;'
+            ]])
+                ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
+        </div>
+    </div>
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),['prompt' => Yii::t('app/book','BOOK_choose_service')]) ?>
 
-    <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap(),['prompt' => Yii::t('app/book','BOOK_choose_legal_person')]) ?>
+    <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap()) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 

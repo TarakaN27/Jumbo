@@ -32,6 +32,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'cbr_rate')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'need_upd')->dropDownList(\common\models\ExchangeRates::getYesNo()) ?>
+
+    <?= $form->field($model, 'is_default')->dropDownList(\common\models\ExchangeRates::getYesNo()) ?>
+
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/services', 'Create') : Yii::t('app/services', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

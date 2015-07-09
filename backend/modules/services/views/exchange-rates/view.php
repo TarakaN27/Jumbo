@@ -45,6 +45,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'nbrb_rate',
             'cbr_rate',
             [
+                'attribute' => 'is_default',
+                'value' => $model->getIsDefaultStr()
+            ],
+            [
+                'attribute' => 'need_upd',
+                'value' => $model->getNeedUpdateStr()
+            ],
+            [
                 'attribute' => 'create_at',
                 'value' => $model->getFormatedCreatedAt()
             ],
