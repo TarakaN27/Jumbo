@@ -16,26 +16,6 @@ use yii\web\NotFoundHttpException;
  */
 class ExchangeRatesController extends AbstractBaseBackendController
 {
-
-    /**
-     * Переопределим поведение
-     * @return array
-     */
-    /*
-    public function behaviors()
-    {
-        $arTmp = parent::behaviors();
-        $arTmp['verbs'] = [
-            'class' => VerbFilter::className(),
-            'actions' => [
-                'delete' => ['post'],
-                'exchange-rates' => ['post']
-            ],
-        ];
-        return $arTmp;
-    }
-*/
-
     /**
      * Lists all ExchangeRates models.
      * @return mixed
@@ -136,13 +116,23 @@ class ExchangeRatesController extends AbstractBaseBackendController
     public function actionUpdateRates($id)
     {
         $model = $this->findModel($id);
-        $nbrb = new ExchangeRatesNBRB($model->nbrb);
-        $nbrbRate = $nbrb->makeRequest();
 
-        $crb = new ExchangeRatesCBRF($model->cbr);
-        $crbRate = $crb->makeRequest();
+        if($model->nbrb != 0)
+        {
+            $nbrb = new ExchangeRatesNBRB($model->nbrb);
+            $nbrbRate = $nbrb->makeRequest();
+        }else{
+            $nbrbRate = $model->nbrb_rate;
+        }
+        if($model->cbr != 0)
+        {
+            $crb = new ExchangeRatesCBRF($model->cbr);
+            $crbRate = $crb->makeRequest();
+        }else{
+            $crbRate = $model->cbr_rate;
+        }
 
-        if((!empty($nbrbRate) || $model->code == 0) && (!empty($crbRate) || $model->code == 0))
+        if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
         {
             $model->cbr_rate = $crbRate;
             $model->nbrb_rate= $nbrbRate;
