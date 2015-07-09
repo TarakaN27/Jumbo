@@ -28,10 +28,10 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         <h4>Лицо, уполномоченное на заключение договора</h4>
         <div class="form-group">
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?= $form->field($model,'j_fname',['template'=>$fieldTempl])->textInput(['maxlength' => true])?>
+                <?= $form->field($model,'j_lname',['template'=>$fieldTempl])->textInput(['maxlength' => true])?>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?= $form->field($model,'j_lname',['template'=>$fieldTempl])->textInput(['maxlength' => true])?>
+                <?= $form->field($model,'j_fname',['template'=>$fieldTempl])->textInput(['maxlength' => true])?>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12">
                 <?= $form->field($model,'j_mname',['template'=>$fieldTempl])->textInput(['maxlength' => true])?>

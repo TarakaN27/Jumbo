@@ -76,11 +76,11 @@ $("#cuser-is_resident").on("change",modeResident);
 
         <h4>Лицо, уполномоченное на заключение договора</h4>
         <div class="form-group">
-            <div class="col-md-4 col-sm-4 col-xs-12">
-                <?= $form->field($modelR,'j_fname',['template'=>$fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => true])?>
+             <div class="col-md-4 col-sm-4 col-xs-12">
+                <?= $form->field($modelR,'j_lname',['template'=>$fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => true])?>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?= $form->field($modelR,'j_lname',['template'=>$fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => true])?>
+                <?= $form->field($modelR,'j_fname',['template'=>$fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => true])?>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12">
                 <?= $form->field($modelR,'j_mname',['template'=>$fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => true])?>
