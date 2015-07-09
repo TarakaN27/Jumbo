@@ -3,6 +3,7 @@
 namespace backend\modules\users\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\CUserRequisites;
 use Yii;
 use common\models\CUser;
 use common\models\search\CUserSearch;
@@ -36,8 +37,11 @@ class ContractorController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $modelR = $model->requisites;
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'modelR' => $modelR
         ]);
     }
 
@@ -49,11 +53,34 @@ class ContractorController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new CUser();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $modelR = new CUserRequisites();
+        if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
+
+            if($model->validate() && $modelR->validate())
+            {
+                $transaction = Yii::$app->db->beginTransaction(); //транзакция для того чтобы при ошибках сохранения не создавалось лишних записей
+                try{
+                    if($modelR->save() && $model->save())
+                    {
+                        $model->link('requisites',$modelR);
+                        $transaction->commit();
+                        Yii::$app->session->set('success',Yii::t('app/users','Contractor_successfully_added'));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }else{
+                       $transaction->rollBack();
+                    }
+                }catch (\Exception $e)
+                {
+                    $transaction->rollBack();
+                    Yii::$app->session->set('error',$e->getMessage());
+                }
+            }else{
+                Yii::$app->session->set('error',Yii::t('app/users','Contractor_validate_error'));
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'modelR' => $modelR
             ]);
         }
     }
@@ -104,5 +131,63 @@ class ContractorController extends AbstractBaseBackendController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $id
+     * @param $userID
+     * @return string|\yii\web\Response
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionEditRequisites($id,$userID)
+    {
+        $modelU = $this->findModel($userID);
+        $model = CUserRequisites::findOne($id);
+        if(empty($model))
+            throw new NotFoundHttpException('Requisites not found.');
+
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            Yii::$app->session->set('success',Yii::t('app/users','Requisites_successfully_saved'));
+            return $this->redirect(['view','id'=>$userID]);
+        }
+
+        return $this->render('edit_requisites',[
+            'model' => $model,
+            'userID' => $userID,
+            'modelU' => $modelU
+        ]);
+
+    }
+
+    /**
+     * @param $userID
+     * @return string|\yii\web\Response
+     */
+    public function actionAddRequisites($userID)
+    {
+        $modelU = $this->findModel($userID);
+
+        $model = new CUserRequisites();
+        $transaction = Yii::$app->db->beginTransaction();
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            try{
+                $model->link('requisites',$modelU);
+                $transaction->commit();
+                Yii::$app->session->set('success',Yii::t('app/users','Requisites_successfully_saved'));
+            }catch (\Exception $e)
+            {
+                Yii::$app->session->set('error',$e->getMessage());
+                $transaction->rollBack();
+            }
+            return $this->redirect(['view','id'=>$userID]);
+        }
+
+        return $this->render('add_requisites',[
+            'model' => $model,
+            'userID' => $userID,
+            'modelU' => $modelU
+        ]);
     }
 }

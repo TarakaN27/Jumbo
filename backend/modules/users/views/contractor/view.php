@@ -18,7 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2>Контрагенты</h2>
                                     <section class="pull-right">
+
                                     <?= Html::a(Yii::t('app/users', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
+                                    <?php if(is_object($modelR)):?>
+                                        <?= Html::a(Yii::t('app/users', 'Edit requisites'), ['edit-requisites','id'=>$modelR->id,'userID' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                    <?php else:?>
+                                        <?= Html::a(Yii::t('app/users', 'Add requisites'), ['add-requisites','userID' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                    <?php endif;?>
                                     <?= Html::a(Yii::t('app/users','Add_new_contractor'),['create'],['class'=>'btn btn-primary']);?>
                                     <?= Html::a(Yii::t('app/users', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                                     <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [
@@ -55,6 +61,11 @@ $this->params['breadcrumbs'][] = $this->title;
             */
             'email:email',
             [
+                'attribute' => 'is_resident',
+                'value' => $model->getIsResidentStr()
+            ],
+            'r_country',
+            [
                 'attribute' => 'status',
                 'value' => $model->getStatusStr()
             ],
@@ -69,6 +80,44 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+
+    <h4><?php echo Yii::t('app/users','Requisites')?></h4>
+    <div class="ln_solid"></div>
+    <?php if(is_object($modelR)):?>
+        <?= DetailView::widget([
+            'model' => $modelR,
+            'attributes' => [
+                'id',
+                'corp_name',
+                'j_fname',
+                'j_lname',
+                'j_mname',
+                'j_post',
+                'j_doc',
+                'reg_number',
+                'reg_auth',
+                'ch_account',
+                'b_name',
+                'b_code',
+                'c_fname',
+                'c_lname',
+                'c_mname',
+                'c_email',
+                'c_phone',
+                'c_fax',
+                'ynp',
+                'okpo',
+                'inn',
+                'kpp',
+                'ogrn',
+                'j_address',
+                'p_address'
+            ],
+        ]) ?>
+
+    <?php else:?>
+        <?php echo Yii::t('app/users','Requisites not found')?>
+    <?php endif;?>
                                 </div>
                             </div>
                         </div>

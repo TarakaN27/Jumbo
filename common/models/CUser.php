@@ -21,18 +21,43 @@ use yii\helpers\ArrayHelper;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
+ * @property string $r_country
  * @property integer $role
  * @property integer $status
+ * @property integer $is_resident
+ * @property integer $requisites_id
  * @property integer $created_at
  * @property integer $updated_at
  */
 class CUser extends AbstractUser
 {
     CONST
+        RESIDENT_YES = 1,
+        RESIDENT_NO = 0,
         SCENARIO_REGISTER = 'register';
 
     public
         $password;
+
+    /**
+     * @return array
+     */
+    public static function getResidentArr()
+    {
+        return [
+            self::RESIDENT_YES => Yii::t('app/users','Resident_yes'),
+            self::RESIDENT_NO => Yii::t('app/users','Resident_no'),
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsResidentStr()
+    {
+        $tmp = self::getResidentArr();
+        return array_key_exists($this->is_resident,$tmp) ? $tmp[$this->is_resident] : 'N/A';
+    }
 
     /**
      * @return array
@@ -98,8 +123,11 @@ class CUser extends AbstractUser
 
             [['type'],'required'],
             [['type'],'integer'],
-            //['type', 'default', 'value' => self::TYPE_U_PERSON],
-            //['type', 'in', 'range' => array_keys(self::getTypeArr())],
+
+            [['requisites_id','is_resident'],'integer'],
+            ['is_resident', 'in', 'range' => array_keys(self::getResidentArr())],
+            ['r_country', 'string'],
+            ['addRequisites','safe']
         ];
     }
 
@@ -123,6 +151,9 @@ class CUser extends AbstractUser
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'password' => Yii::t('app/users', 'Password'),
+            'is_resident' => Yii::t('app/users', 'Is resident'),
+            'requisites_id' => Yii::t('app/users', 'Requisites'),
+            'r_country' => Yii::t('app/users', 'Resident country'),
         ];
     }
 
@@ -150,6 +181,14 @@ class CUser extends AbstractUser
     public function getUserType()
     {
         return $this->hasOne(CUserTypes::className(), ['id' => 'type']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRequisites()
+    {
+        return $this->hasOne(CUserRequisites::className(),['id'=>'requisites_id']);
     }
 
     /**

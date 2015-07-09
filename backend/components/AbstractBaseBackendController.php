@@ -34,4 +34,18 @@ abstract class AbstractBaseBackendController extends Controller{
             ],
         ];
     }
+
+    protected function convertErrorToStr($model)
+    {
+        if(!is_object($model) || empty($arErrors = $model->getErrors()))
+            return '';
+
+        $str = '';
+        foreach($arErrors as $key=>$val)
+        {
+            $str.= $key.' - '.$val.'<br>';
+        }
+
+        return $str;
+    }
 } 
