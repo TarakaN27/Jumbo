@@ -55,7 +55,6 @@ class DefaultController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            print_r($model->getErrors());
             return $this->render('create', [
                 'model' => $model,
             ]);

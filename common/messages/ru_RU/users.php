@@ -79,7 +79,7 @@ return [
     'Reg Number' => 'Регистрационный номер',
     'Reg Auth' => 'Регистрирующий орган',
     'Ch Account' => 'Рассчетный счет',
-    'B Name' =>'Название банка',
+    'B Name' => 'Название банка',
     'B Code' => 'Код банка',
     'J Address' => 'Юридический адрес',
     'P Address' => 'Почтовый адрес',
@@ -95,9 +95,16 @@ return [
     'Kpp' => 'КПП',
     'Ogrn' => 'ОГРН',
     'addRequisites' => 'Добавить реквизиты',
-
-
-
-
-
+    'Create Buser' => 'Добавить сотрудника',
+    'Update Buser: ' => 'Обновить сотрудника',
+    'Type_id' => 'Тип реквизитов:',
+    'Type_i_person' => 'ИП',
+    'Birthday' => 'День Рождения',
+    'Passport_date' => 'Дата выдачи паспорта',
+    'Passport_series' => 'Серия паспорта',
+    'Passport_number' => 'Номер паспорта',
+    'Passport_auth' => 'Орган выдавший паспорт',
+    'Passport_identity_number' => 'Идентификационный номер',
+    'Contractor_successfully_updated' => 'Контрагент успешно обновлен',
+    'FIO' => 'ФИО'
 ];

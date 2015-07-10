@@ -8,7 +8,6 @@ use kartik\select2\Select2;
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
-//$labelOptions = ['class' => 'control-label'];
 ?>
 
 <div class="payments-form">

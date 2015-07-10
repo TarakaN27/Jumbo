@@ -20,11 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <section class="pull-right">
 
                                     <?= Html::a(Yii::t('app/users', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-                                    <?php if(is_object($modelR)):?>
-                                        <?= Html::a(Yii::t('app/users', 'Edit requisites'), ['edit-requisites','id'=>$modelR->id,'userID' => $model->id], ['class' => 'btn btn-primary']) ?>
-                                    <?php else:?>
-                                        <?= Html::a(Yii::t('app/users', 'Add requisites'), ['add-requisites','userID' => $model->id], ['class' => 'btn btn-primary']) ?>
-                                    <?php endif;?>
                                     <?= Html::a(Yii::t('app/users','Add_new_contractor'),['create'],['class'=>'btn btn-primary']);?>
                                     <?= Html::a(Yii::t('app/users', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                                     <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [
@@ -43,9 +38,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+            //'id',
             'username',
-            'ext_id',
+            //'ext_id',
             [
                 'attribute' => 'type',
                 'value' => is_object($obType = $model->userType) ? $obType->name : 'N/A'
@@ -83,36 +78,112 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h4><?php echo Yii::t('app/users','Requisites')?></h4>
     <div class="ln_solid"></div>
-    <?php if(is_object($modelR)):?>
+    <?php if(is_object($modelR)):
+
+        switch ($modelR->type_id) {
+            case \common\models\CUserRequisites::TYPE_J_PERSON:
+                $dvConfig = [
+                    'id',
+                    [
+                        'attribute' => 'type_id',
+                        'value' => $modelR->getTypeStr()
+                    ],
+                    'corp_name',
+                    'j_fname',
+                    'j_lname',
+                    'j_mname',
+                    'j_post',
+                    'j_doc',
+                    'reg_number',
+                    'reg_auth',
+                    'ch_account',
+                    'b_name',
+                    'b_code',
+                    'c_fname',
+                    'c_lname',
+                    'c_mname',
+                    'c_email',
+                    'c_phone',
+                    'c_fax',
+                    'j_address',
+                    'p_address',
+                ];
+                if($model->is_resident == \common\models\CUser::RESIDENT_YES)
+                {
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['ynp','okpo']);
+                }else{
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['inn','kpp','ogrn']);
+                }
+                break;
+            case \common\models\CUserRequisites::TYPE_I_PERSON:
+                $dvConfig = [
+                    'id',
+                    [
+                        'attribute' => 'type_id',
+                        'value' => $modelR->getTypeStr()
+                    ],
+                    'j_fname',
+                    'j_lname',
+                    'j_mname',
+                    'reg_number',
+                    'reg_auth',
+                    'ch_account',
+                    'b_name',
+                    'b_code',
+                    'c_fname',
+                    'c_lname',
+                    'c_mname',
+                    'c_email',
+                    'c_phone',
+                    'c_fax',
+                    'p_address',
+                    'birthday',
+                    'pasp_series',
+                    'pasp_number',
+                    'pasp_ident',
+                    'pasp_auth',
+                    'pasp_date'
+                ];
+                if($model->is_resident == \common\models\CUser::RESIDENT_YES)
+                {
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['ynp','okpo']);
+                }else{
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['inn','kpp','ogrn']);
+                }
+                break;
+            case \common\models\CUserRequisites::TYPE_F_PERSON:
+                $dvConfig = [
+                    'id',
+                    [
+                        'attribute' => 'type_id',
+                        'value' => $modelR->getTypeStr()
+                    ],
+                    'j_fname',
+                    'j_lname',
+                    'j_mname',
+                    'c_fname',
+                    'c_lname',
+                    'c_mname',
+                    'c_email',
+                    'c_phone',
+                    'c_fax',
+                    'p_address',
+                    'birthday',
+                    'pasp_series',
+                    'pasp_number',
+                    'pasp_ident',
+                    'pasp_auth',
+                    'pasp_date'
+                ];
+                break;
+            default:
+                $dvConfig = [];
+
+        }
+        ?>
         <?= DetailView::widget([
             'model' => $modelR,
-            'attributes' => [
-                'id',
-                'corp_name',
-                'j_fname',
-                'j_lname',
-                'j_mname',
-                'j_post',
-                'j_doc',
-                'reg_number',
-                'reg_auth',
-                'ch_account',
-                'b_name',
-                'b_code',
-                'c_fname',
-                'c_lname',
-                'c_mname',
-                'c_email',
-                'c_phone',
-                'c_fax',
-                'ynp',
-                'okpo',
-                'inn',
-                'kpp',
-                'ogrn',
-                'j_address',
-                'p_address'
-            ],
+            'attributes' => $dvConfig
         ]) ?>
 
     <?php else:?>

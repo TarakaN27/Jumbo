@@ -20,7 +20,8 @@
         "yiisoft/yii2-swiftmailer": "*",
         "devgroup/yii2-tag-dependency-helper": "0.0.3.*",
         "yiisoft/yii2-jui": "~2.0",
-        "kartik-v/yii2-widget-select2": "@dev"
+        "kartik-v/yii2-widget-select2": "@dev",
+        "kartik-v/yii2-widget-datepicker": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

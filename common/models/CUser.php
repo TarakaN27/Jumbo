@@ -127,7 +127,6 @@ class CUser extends AbstractUser
             [['requisites_id','is_resident'],'integer'],
             ['is_resident', 'in', 'range' => array_keys(self::getResidentArr())],
             ['r_country', 'string'],
-            ['addRequisites','safe']
         ];
     }
 
@@ -139,7 +138,7 @@ class CUser extends AbstractUser
         return [
             'id' => Yii::t('app/users', 'ID'),
             'username' => Yii::t('app/users', 'Username'),
-            'ext_id' => Yii::t('app/users', 'Ext ID'),
+            'ext_id' => Yii::t('app/users', 'Ext ID'), //Внешний код для связки с другой CRM
             'type' => Yii::t('app/users', 'Type'),
             'manager_id' => Yii::t('app/users', 'Manager ID'),
             'auth_key' => Yii::t('app/users', 'Auth Key'),
@@ -230,5 +229,31 @@ class CUser extends AbstractUser
     {
         $tmp = self::getAllContractor();
         return ArrayHelper::map($tmp,'id','username');
+    }
+
+    /**
+     * Устанавливаем заглушки
+     */
+    public function setDummyFields()
+    {
+        $this->username = $this->getUniqID();
+        $this->email = $this->getUniqID().'@webmart.by';
+    }
+
+    /**
+     * Уникальный ID
+     * @return string
+     */
+    protected function getUniqID()
+    {
+        return md5(uniqid('dummy').microtime());
+    }
+
+    public function afterDelete()
+    {
+        $obR = CUserRequisites::findOne($this->requisites_id);
+        if(!empty($obR))
+            $obR->delete();
+        return parent::afterDelete();
     }
 }

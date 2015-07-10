@@ -5,9 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\BUser */
 
-$this->title = Yii::t('app/users', 'Update {modelClass}: ', [
-    'modelClass' => 'Buser',
-]) . ' ' . $model->id;
+$this->title = Yii::t('app/users', 'Update Buser: ');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Busers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app/users', 'Update');

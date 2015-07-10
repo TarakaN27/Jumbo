@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use common\models\CUserRequisites;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\CUserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -10,9 +10,6 @@ use yii\grid\GridView;
 $this->title = Yii::t('app/users', 'Cusers');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-
-
 <div class = "page-title">
     <div class = "title_left">
          <h3><?php $this->title?> <small><?php echo Yii::t('app/users','USER_contractors_list');?></small></h3>
@@ -40,10 +37,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'filterModel' => $searchModel,
                                         'columns' => [
                                             ['class' => 'yii\grid\SerialColumn'],
-
                                             'id',
-                                            'username',
-                                            'ext_id',
+                                            [
+                                                'attribute' => 'fio',
+                                                'label' => Yii::t('app/users','FIO'),
+                                                'value' => function($model){
+                                                        /** @var CUserRequisites $obR */
+                                                        $obR = $model->requisites;
+                                                        if(empty($obR))
+                                                            return 'N/A';
+                                                        return $obR->j_fname.' '.$obR->j_mname.' '.$obR->j_lname;
+                                                    }
+                                            ],
                                             [
                                                 'attribute' => 'type',
                                                 'value' => function($model){
@@ -58,10 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         return is_object($manager) ? $manager->username : NULL;
                                                     },
                                                 'filter' => \backend\models\BUser::getListManagers()
-
                                             ],
-                                            'email:email',
-                                            // 'role',
                                             [
                                                 'attribute' => 'status',
                                                 'value' => function($model){
@@ -69,9 +71,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     },
                                                 'filter' => \common\models\CUser::getStatusArr()
                                             ],
-                                            // 'created_at',
-                                            // 'updated_at',
-
                                             ['class' => 'yii\grid\ActionColumn'],
                                         ],
                                     ]); ?>

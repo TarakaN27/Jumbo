@@ -18,12 +18,12 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-       // 'css/site.css',
        'css/normalize.css',
        'css/custom.css',
        'fonts/css/font-awesome.min.css',
        'css/animate.min.css',
-       'css/icheck/flat/green.css'
+       'css/icheck/flat/green.css',
+       'css/site.css',
     ];
     public $js = [
         'js/gauge/gauge.min.js',

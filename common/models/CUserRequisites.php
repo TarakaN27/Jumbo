@@ -35,9 +35,25 @@ use Yii;
  * @property string $ogrn
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $type_id
+ * @property string $birthday
+ * @property string $pasp_series
+ * @property integer $pasp_number
+ * @property string $pasp_ident
+ * @property string $pasp_auth
+ * @property string $pasp_date
  */
 class CUserRequisites extends AbstractActiveRecord
 {
+
+    CONST
+        TYPE_J_PERSON  = 5, // Юр. лицо
+        TYPE_F_PERSON = 10, // Физ. лицо
+        TYPE_I_PERSON = 15; // ИП
+
+    public
+        $isResident = true;
+
     /**
      * @inheritdoc
      */
@@ -47,26 +63,112 @@ class CUserRequisites extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public static function getTypeArr()
+    {
+        return [
+            self::TYPE_F_PERSON => Yii::t('app/users', 'Type_f_person'),
+            self::TYPE_J_PERSON => Yii::t('app/users', 'Type_j_person'),
+            self::TYPE_I_PERSON => Yii::t('app/users', 'Type_i_person')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeStr()
+    {
+        $tmp = self::getTypeArr();
+        return isset($tmp[$this->type_id]) ? $tmp[$this->type_id] : 'N/A';
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [[
-                 'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
-                 'j_address', 'p_address', 'c_fname', 'c_lname', 'c_mname'
-             ], 'required'],
+            [['j_fname', 'j_lname', 'j_mname','type_id'], 'required'],
+
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at','type_id','pasp_number'], 'integer'],
             [[
                  'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
                  'reg_number', 'reg_auth', 'ch_account', 'b_name', 'b_code',
                  'c_fname', 'c_lname', 'c_mname', 'c_email', 'c_phone', 'c_fax',
-                 'ynp', 'okpo', 'inn', 'kpp', 'ogrn'
+                 'ynp', 'okpo', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident'
              ], 'string', 'max' => 255],
+            [['pasp_series'], 'string', 'max' => 4],
             ['c_email', 'email'],
-            ['reg_date', 'date', 'format' => 'yyyy-m-d'],
+            [['reg_date','birthday','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
+
+            // обязательные поля для физика
+            [[
+                 'pasp_date','pasp_auth','pasp_ident',
+                 'pasp_number','pasp_series','p_address',
+             ],
+             'required',
+             'when' => function($model) {
+                    return $model->type_id == CUserRequisites::TYPE_F_PERSON;
+             },
+             'whenClient' => "function (attribute, value) {
+                    return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_F_PERSON."';
+                }"
+            ],
+            // обязательные поля для юриков
+            [['corp_name', 'j_post', 'j_doc','reg_number', 'reg_auth','reg_date', 'ch_account', 'b_name',
+              'b_code','j_address', 'p_address'],
+             'required',
+             'when' => function($model) {
+                    return $model->type_id == CUserRequisites::TYPE_J_PERSON;
+            },
+             'whenClient' => "function (attribute, value) {
+                    return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."';
+                }"
+            ],
+            // юрик или ИП резидент
+            [['ynp', 'okpo'],
+             'required',
+             'when' => function($model) {
+                    return (
+                        $model->type_id == CUserRequisites::TYPE_J_PERSON ||
+                        $model->type_id == CUserRequisites::TYPE_I_PERSON
+                    ) && $this->isResident;
+                },
+             'whenClient' => "function (attribute, value) {
+                    return ($('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."'
+                    || $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."') && $('#cuserrequisites-isresident').val() == 'true';
+                }"
+
+            ],
+            // юрик или ИП не резидент
+            [['inn', 'kpp', 'ogrn'],
+             'required',
+             'when' => function($model) {
+                    return (
+                        $model->type_id == CUserRequisites::TYPE_J_PERSON ||
+                        $model->type_id == CUserRequisites::TYPE_I_PERSON
+                    ) && !$this->isResident;
+                },
+             'whenClient' => "function (attribute, value) {
+                    return ($('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."'
+                    || $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."') && $('#cuserrequisites-isresident').val() != 'true';
+                }"
+            ],
+            // ИП
+            [['pasp_date','pasp_auth','pasp_ident','reg_auth','pasp_number','reg_date',
+              'pasp_series','reg_number', 'ch_account', 'b_name','b_code', 'p_address'
+             ],
+             'required',
+             'when' => function($model) {
+                    return $model->type_id == CUserRequisites::TYPE_I_PERSON;
+             },
+             'whenClient' => "function (attribute, value) {
+                    return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."';
+                }"
+            ],
         ];
     }
 
@@ -104,6 +206,13 @@ class CUserRequisites extends AbstractActiveRecord
             'ogrn' => Yii::t('app/users', 'Ogrn'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'type_id' => Yii::t('app/users', 'Type_id'),
+            'birthday' => Yii::t('app/users', 'Birthday'),
+            'pasp_date' => Yii::t('app/users', 'Passport_date'),
+            'pasp_series' => Yii::t('app/users', 'Passport_series'),
+            'pasp_number' => Yii::t('app/users', 'Passport_number'),
+            'pasp_auth' => Yii::t('app/users', 'Passport_auth'),
+            'pasp_ident' => Yii::t('app/users', 'Passport_identity_number')
         ];
     }
 }

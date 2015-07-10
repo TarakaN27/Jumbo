@@ -12,10 +12,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Cusers'), 'url
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app/users', 'Update');
 ?>
-<div class="page-title">
-
-                    </div>
-                    <div class="clearfix"></div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
@@ -28,6 +24,7 @@ $this->params['breadcrumbs'][] = Yii::t('app/users', 'Update');
                                 </div>
     <?= $this->render('_form', [
         'model' => $model,
+        'modelR' => $modelR
     ]) ?>
 
 </div></div></div>

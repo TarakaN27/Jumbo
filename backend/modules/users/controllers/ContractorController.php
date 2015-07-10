@@ -53,8 +53,12 @@ class ContractorController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new CUser();
+        $model->setDummyFields(); //@todo утановлены заглушки на имя пользователя и емаил. При необходимости убрать!
         $modelR = new CUserRequisites();
         if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
+
+            if($model->is_resident != CUser::RESIDENT_YES)
+                $modelR->isResident = FALSE;
 
             if($model->validate() && $modelR->validate())
             {
@@ -77,12 +81,17 @@ class ContractorController extends AbstractBaseBackendController
             }else{
                 Yii::$app->session->set('error',Yii::t('app/users','Contractor_validate_error'));
             }
-        } else {
-            return $this->render('create', [
+        }
+
+        if(empty($modelR->type_id))
+            $modelR->type_id = CUserRequisites::TYPE_F_PERSON;
+
+
+        return $this->render('create', [
                 'model' => $model,
                 'modelR' => $modelR
             ]);
-        }
+
     }
 
     /**
@@ -94,14 +103,46 @@ class ContractorController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $modelR = $model->requisites;
+        if(empty($modelR))
+            $modelR = new CUserRequisites();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
+
+            if($model->is_resident != CUser::RESIDENT_YES)
+                $modelR->isResident = FALSE;
+
+            if($model->validate() && $modelR->validate())
+            {
+                $transaction = Yii::$app->db->beginTransaction(); //транзакция для того чтобы при ошибках сохранения не создавалось лишних записей
+                try{
+                    if($modelR->save() && $model->save())
+                    {
+                        $model->link('requisites',$modelR);
+                        $transaction->commit();
+                        Yii::$app->session->set('success',Yii::t('app/users','Contractor_successfully_updated'));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }else{
+                        $transaction->rollBack();
+                    }
+                }catch (\Exception $e)
+                {
+                    $transaction->rollBack();
+                    Yii::$app->session->set('error',$e->getMessage());
+                }
+            }else{
+                Yii::$app->session->set('error',Yii::t('app/users','Contractor_validate_error'));
+            }
         }
+
+        if(empty($modelR->type_id))
+            $modelR->type_id = CUserRequisites::TYPE_F_PERSON;
+
+        return $this->render('update', [
+                'model' => $model,
+                'modelR' => $modelR
+            ]);
+
     }
 
     /**
@@ -133,61 +174,4 @@ class ContractorController extends AbstractBaseBackendController
         }
     }
 
-    /**
-     * @param $id
-     * @param $userID
-     * @return string|\yii\web\Response
-     * @throws \yii\web\NotFoundHttpException
-     */
-    public function actionEditRequisites($id,$userID)
-    {
-        $modelU = $this->findModel($userID);
-        $model = CUserRequisites::findOne($id);
-        if(empty($model))
-            throw new NotFoundHttpException('Requisites not found.');
-
-        if($model->load(Yii::$app->request->post()) && $model->save())
-        {
-            Yii::$app->session->set('success',Yii::t('app/users','Requisites_successfully_saved'));
-            return $this->redirect(['view','id'=>$userID]);
-        }
-
-        return $this->render('edit_requisites',[
-            'model' => $model,
-            'userID' => $userID,
-            'modelU' => $modelU
-        ]);
-
-    }
-
-    /**
-     * @param $userID
-     * @return string|\yii\web\Response
-     */
-    public function actionAddRequisites($userID)
-    {
-        $modelU = $this->findModel($userID);
-
-        $model = new CUserRequisites();
-        $transaction = Yii::$app->db->beginTransaction();
-        if($model->load(Yii::$app->request->post()) && $model->save())
-        {
-            try{
-                $modelU->link('requisites',$model);
-                $transaction->commit();
-                Yii::$app->session->set('success',Yii::t('app/users','Requisites_successfully_saved'));
-            }catch (\Exception $e)
-            {
-                Yii::$app->session->set('error',$e->getMessage());
-                $transaction->rollBack();
-            }
-            return $this->redirect(['view','id'=>$userID]);
-        }
-
-        return $this->render('add_requisites',[
-            'model' => $model,
-            'userID' => $userID,
-            'modelU' => $modelU
-        ]);
-    }
 }

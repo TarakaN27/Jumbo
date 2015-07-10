@@ -2,16 +2,21 @@
 
 namespace common\models\search;
 
+use common\models\CUserRequisites;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\CUser;
+use yii\helpers\ArrayHelper;
 
 /**
  * CUserSearch represents the model behind the search form about `common\models\CUser`.
  */
 class CUserSearch extends CUser
 {
+    public
+        $fio;
+
     /**
      * @inheritdoc
      */
@@ -19,8 +24,18 @@ class CUserSearch extends CUser
     {
         return [
             [['id', 'ext_id', 'type', 'manager_id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email'], 'safe'],
+            [['fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email'], 'safe'],
         ];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        $arPLabel = parent::attributeLabels();
+        return ArrayHelper::merge($arPLabel,['fio' => Yii::t('app/users', 'FIO'),]);
     }
 
     /**
@@ -41,8 +56,8 @@ class CUserSearch extends CUser
      */
     public function search($params)
     {
-        $query = CUser::find()->with('manager','userType');
-
+        $query = CUser::find()->with('manager','userType','requisites');
+        $query->joinWith('requisites');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -59,14 +74,14 @@ class CUserSearch extends CUser
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'ext_id' => $this->ext_id,
+            CUser::tableName().'.id' => $this->id,
+            CUser::tableName().'.ext_id' => $this->ext_id,
             'type' => $this->type,
             'manager_id' => $this->manager_id,
             'role' => $this->role,
             'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            CUser::tableName().'created_at' => $this->created_at,
+            CUser::tableName().'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'username', $this->username])
@@ -74,7 +89,11 @@ class CUserSearch extends CUser
             ->andFilterWhere(['like', 'password_hash', $this->password_hash])
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'email', $this->email]);
-
+        if(!empty($this->fio))
+            $query->andWhere(' ( '.CUserRequisites::tableName().'.j_lname LIKE "'.$this->fio.'%" OR '.
+                CUserRequisites::tableName().'.j_fname LIKE "'.$this->fio.'%" OR '.
+                CUserRequisites::tableName().'.j_mname LIKE "'.$this->fio.'%" ) ');
+        //$query->andFilterWhere(['like',CUserRequisites::tableName().'.j_lname',$this->fio]);
         return $dataProvider;
     }
 }
