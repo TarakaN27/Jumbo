@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            //'id',
+            'id',
             'username',
             //'ext_id',
             [
@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
         switch ($modelR->type_id) {
             case \common\models\CUserRequisites::TYPE_J_PERSON:
                 $dvConfig = [
-                    'id',
+                    //'id',
                     [
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 break;
             case \common\models\CUserRequisites::TYPE_I_PERSON:
                 $dvConfig = [
-                    'id',
+                    //'id',
                     [
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
@@ -153,7 +153,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 break;
             case \common\models\CUserRequisites::TYPE_F_PERSON:
                 $dvConfig = [
-                    'id',
+                    //'id',
                     [
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
