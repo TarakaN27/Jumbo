@@ -31,20 +31,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2><?php echo Html::encode($this->title);?></h2>
                                     <section class="pull-right">
                                     <?php echo \yii\helpers\Html::a(Yii::t('app/users','Add_new_user'),['/users/default/create'],['class'=>'btn btn-primary']);?>
+                                    <?php echo \yii\helpers\Html::a(Yii::t('app/users','Add_invite'),['/users/default/add-invite'],['class'=>'btn btn-warning']);?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
-
-
-
                                     <?= GridView::widget([
                                         'dataProvider' => $dataProvider,
                                         'filterModel' => $searchModel,
                                         'columns' => [
                                             ['class' => 'yii\grid\SerialColumn'],
-                                            'id',
+                                            //'id',
                                             'username',
+                                            [
+                                                'attribute' => 'fio',
+                                                'label' => Yii::t('app/users','Fio'),
+                                                'value' => function($model){
+                                                        return $model->getFio();
+                                                    }
+                                            ],
                                             'email:email',
                                             [
                                                 'attribute' => 'role',

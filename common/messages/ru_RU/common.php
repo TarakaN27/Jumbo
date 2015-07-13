@@ -10,5 +10,11 @@ return [
     'Unpublished' => 'Не опубликовано',
     'Welcome' => 'Добропожаловать',
     'Yes' => 'Да',
-    'No' => 'Нет'
+    'No' => 'Нет',
+    'User with this email already registered.' => 'Пользователь с такой электронной почтой уже зарегистрирован в системе. Выберите другую почту',
+    'Thank you! Invite was successfully send' => 'Приглашение отправлено пользователю!',
+    'Sorry! We have same error, please try again!' => 'При отправке приглашения произошла ошибка!',
+    'You are not allowed to perform this action.' => 'Вам не разрешено выполнять данное действие. Возможно истек срок действия ключа.',
+    'To home' => 'На главную',
+    'Logout' => 'Выход'
 ];

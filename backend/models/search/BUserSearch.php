@@ -12,6 +12,10 @@ use backend\models\BUser;
  */
 class BUserSearch extends BUser
 {
+
+    public
+        $fio;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +23,7 @@ class BUserSearch extends BUser
     {
         return [
             [['id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email'], 'safe'],
+            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email','fio'], 'safe'],
         ];
     }
 
@@ -72,6 +76,11 @@ class BUserSearch extends BUser
             ->andFilterWhere(['like', 'password_hash', $this->password_hash])
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'email', $this->email]);
+
+        if(!empty($this->fio))
+            $query->andWhere(' ( lname LIKE "'.$this->fio.'%" OR '.
+                'fname LIKE "'.$this->fio.'%" OR '.
+                'mname LIKE "'.$this->fio.'%" ) ');
 
         return $dataProvider;
     }

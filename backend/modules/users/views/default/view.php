@@ -39,6 +39,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'username',
+            [
+                'label' => Yii::t('app/users','Fio'),
+                'value' => $model->getFio()
+            ],
             'auth_key',
             'password_hash',
             'password_reset_token',

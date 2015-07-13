@@ -33,6 +33,10 @@ use yii\widgets\ActiveForm;
     */
     ?>
 
+    <?= $form->field($model, 'lname')->textInput(['maxlength' => TRUE]) ?>
+    <?= $form->field($model, 'fname')->textInput(['maxlength' => TRUE]) ?>
+    <?= $form->field($model, 'mname')->textInput(['maxlength' => TRUE]) ?>
+
     <?= $form->field($model, 'email')->textInput(['maxlength' => TRUE]) ?>
 
     <?= $form->field($model, 'role')->dropDownList(\backend\models\BUser::getRoleArr()) ?>

@@ -16,7 +16,11 @@ use yii\widgets\ActiveForm;
                                 <div class="x_title">
                                     <h2>Изменение пароля</h2>
                                     <section class="pull-right">
-                                    <?php echo \yii\helpers\Html::a(Yii::t('app/users','Back'),['view','id'=> $id],['class'=>'btn btn-primary']);?>
+                                        <?if(isset($isProfile)):?>
+                                            <?php echo \yii\helpers\Html::a(Yii::t('app/users','To profile'),['profile'],['class'=>'btn btn-primary']);?>
+                                        <?php else:?>
+                                            <?php echo \yii\helpers\Html::a(Yii::t('app/users','Back'),['view','id'=> $id],['class'=>'btn btn-primary']);?>
+                                        <?php endif;?>
                                     </section>
                                     <div class="clearfix"></div>
                                 </div>

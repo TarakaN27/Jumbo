@@ -4,16 +4,44 @@ namespace backend\modules\users\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\modules\users\models\ChangePasswordBUserForm;
+use common\models\BuserInviteCode;
 use Yii;
 use backend\models\BUser;
 use backend\models\search\BUserSearch;
 use yii\web\NotFoundHttpException;
-
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 /**
  * DefaultController implements the CRUD actions for BUser model.
  */
 class DefaultController extends AbstractBaseBackendController
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['profile', 'edit-profile','change-own-password'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
     /**
      * Lists all BUser models.
      * @return mixed
@@ -109,6 +137,10 @@ class DefaultController extends AbstractBaseBackendController
         }
     }
 
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     */
     public function actionChangePassword($id)
     {
         $model = new ChangePasswordBUserForm(['userID' => $id]);
@@ -118,11 +150,79 @@ class DefaultController extends AbstractBaseBackendController
             Yii::$app->session->setFlash('success',Yii::t('app/users','Password_successfully_changed'));
             return $this->redirect(['view','id'=>$id]);
         }
-        print_r($model->getErrors());
-
         return $this->render('change_password',[
             'model' => $model,
             'id' => $id
         ]);
     }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionAddInvite()
+    {
+        $uID = Yii::$app->user->id;
+        $model = new BuserInviteCode(['buser_id' => $uID]);
+
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            if($model->sendEmail())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/common','Thank you! Invite was successfully send'));
+                return $this->redirect(['index']);
+            }else
+            {
+                Yii::$app->session->setFlash('error',Yii::t('app/common','Sorry! We have same error, please try again!'));
+            }
+        }
+        return $this->render('add_invite',[
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionProfile()
+    {
+        return $this->render('profile',[
+            'model' => $this->findModel(Yii::$app->user->id)
+        ]);
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionEditProfile()
+    {
+        $model = $this->findModel(Yii::$app->user->id);
+
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            Yii::$app->session->setFlash('success',Yii::t('app/users','Profile successfully changed'));
+            return $this->redirect(['profile']);
+        }
+        return $this->render('edit_profile',[
+            'model' => $model
+        ]);
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionChangeOwnPassword()
+    {
+        $model = new ChangePasswordBUserForm(['userID' => Yii::$app->user->id]);
+
+        if($model->load(Yii::$app->request->post()) && $model->makeRequest())
+        {
+            Yii::$app->session->setFlash('success',Yii::t('app/users','Password_successfully_changed'));
+            return $this->redirect(['profile']);
+        }
+        return $this->render('change_password',[
+            'model' => $model,
+            'isProfile' => true
+        ]);
+    }
+
 }

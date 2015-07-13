@@ -18,7 +18,7 @@ return [
     'USER_role_bookkeeper' => 'Бухгалтер',
     'USER_role_user' => 'Пользователь',
     'USER_users_list' => 'Список сотрудников',
-    'Username' => 'Имя пользователя',
+    'Username' => 'Имя пользователя(login)',
     'Ext ID' => 'Внешний код',
     'Type' => 'Тип',
     'Manager ID' => 'Менеджер',
@@ -106,5 +106,17 @@ return [
     'Passport_auth' => 'Орган выдавший паспорт',
     'Passport_identity_number' => 'Идентификационный номер',
     'Contractor_successfully_updated' => 'Контрагент успешно обновлен',
-    'FIO' => 'ФИО'
+    'FIO' => 'ФИО',
+    'Add_invite' => 'Отправить приглашение',
+    'User Type' => 'Роль пользователя',
+    'Send' => 'Отправить',
+    'First name' => 'Имя',
+    'Last name' => 'Фамилия',
+    'Midle name' => 'Отчество',
+    'Fio' => 'Ф.И.О',
+    'Profile' => 'Профайл',
+    'Edit_profile' => 'Редактировать профайл',
+    'To profile' => 'Назад к профайлу',
+    'Password_repeat' => 'Повторите пароль',
+    'Password_successfully_changed' => 'Пароль успешно изменен'
 ];

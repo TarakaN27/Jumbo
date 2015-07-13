@@ -13,13 +13,10 @@ $this->title = $name;
             <div class="col-md-12">
                 <div class="col-middle">
                     <div class="text-center text-center">
-                        <h1 class="error-number">404</h1>
-                        <h2>Sorry but we couldnt find this page</h2>
-                        <p>This page you are looking for does not exsist
-                        </p>
-                        <div class="mid_center">
-                           <p><?= nl2br(Html::encode($message)) ?></p>
-                        </div>
+                        <h1 class="error-number" style="margin-top: -18px;"><?=$name?></h1>
+                        <p><?= nl2br(Html::encode($message)) ?></p>
+                        <br/>
+                        <?=Html::a(Yii::t('app/common','To home'),Yii::$app->getHomeUrl())?>
                     </div>
                 </div>
             </div>

@@ -20,6 +20,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $fname
+ * @property string $lname
+ * @property string $mname
  */
 class BUser extends AbstractUser
 {
@@ -36,8 +39,6 @@ class BUser extends AbstractUser
 
     public
         $password;
-
-
 
     /**
      * вернем массив со всеми ролями
@@ -104,6 +105,8 @@ class BUser extends AbstractUser
             ['password', 'required','on'=>[self::SCENARIO_REGISTER]],
             ['password', 'string', 'min' => 6],
 
+            [['fname','lname','mname'], 'string', 'min' => 2, 'max' => 255],
+
         ];
     }
 
@@ -124,6 +127,9 @@ class BUser extends AbstractUser
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'password' => Yii::t('app/users', 'Password'),
+            'fname' => Yii::t('app/users', 'First name'),
+            'lname' => Yii::t('app/users', 'Last name'),
+            'mname' => Yii::t('app/users', 'Midle name')
         ];
     }
 
@@ -153,5 +159,13 @@ class BUser extends AbstractUser
             return [];
         else
             return ArrayHelper::map($arMng,'id','username');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFio()
+    {
+        return $this->lname.' '.$this->fname.' '.$this->mname;
     }
 }
