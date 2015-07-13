@@ -39,12 +39,12 @@ class SiteController extends Controller
                     ],
                 ],
             ],
-          //  'verbs' => [
-          //      'class' => VerbFilter::className(),
-          //      'actions' => [
-          //          'logout' => ['post'],
-          //      ],
-           // ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
         ];
     }
 
@@ -103,6 +103,13 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
                 if (Yii::$app->getUser()->login($user)) {
+                    $infoEmail = Yii::$app->params['infoEmail'];
+                    \Yii::$app->mailer->compose('sendBUserInfo-text',['user' => $user])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                        ->setTo($infoEmail)
+                        ->setSubject('Registered new user ' . \Yii::$app->name)
+                        ->send();
+
                     BuserInviteCode::updateAll(['status' => BuserInviteCode::BROKEN],'code = :code',[':code' => $code]);
                     return $this->goHome();
                 }

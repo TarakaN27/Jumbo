@@ -15,6 +15,15 @@ $this->title = Yii::t('app/users','Signup');
         <?= $form->field($model, 'username') ?>
     </div>
     <div>
+        <?= $form->field($model, 'lname')->textInput() ?>
+    </div>
+    <div>
+        <?= $form->field($model, 'fname')->textInput() ?>
+    </div>
+    <div>
+        <?= $form->field($model, 'mname')->textInput() ?>
+    </div>
+    <div>
         <?= $form->field($model, 'password')->passwordInput() ?>
     </div>
     <div>
