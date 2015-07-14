@@ -32,4 +32,19 @@ class AbstractConsoleController extends Controller{
         */
         return parent::beforeAction($action);
     }
+
+    /**
+     * @param $success
+     * @return int
+     */
+    protected function log($success)
+    {
+        if ($success) {
+            $this->stdout('Success!'. PHP_EOL, Console::FG_GREEN, Console::BOLD);
+            return self::EXIT_CODE_NORMAL;
+        } else {
+            $this->stderr('Error!'. PHP_EOL, Console::FG_RED, Console::BOLD);
+            return self::EXIT_CODE_ERROR;
+        }
+    }
 } 

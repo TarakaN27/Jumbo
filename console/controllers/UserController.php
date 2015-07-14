@@ -87,21 +87,6 @@ class UserController extends AbstractConsoleController {
     }
 
     /**
-     * @param $success
-     * @return int
-     */
-    private function log($success)
-    {
-        if ($success) {
-            $this->stdout('Success!'. PHP_EOL, Console::FG_GREEN, Console::BOLD);
-            return self::EXIT_CODE_NORMAL;
-        } else {
-            $this->stderr('Error!'. PHP_EOL, Console::FG_RED, Console::BOLD);
-            return self::EXIT_CODE_ERROR;
-        }
-    }
-
-    /**
      * @param Model $model
      * @param string $attribute
      */

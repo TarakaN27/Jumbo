@@ -15,14 +15,11 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
         $date,
         $codeID;
 
-    private
-        $url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req=';
-
     public function __construct($codeID = NULL)
     {
         $time = time(); //текущая дата
         $this->codeID = $codeID;
-        $this->url .= date('d', $time) . '/' . date('m', $time) . '/' . date('Y', $time);
+        $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $time) . '/' . date('m', $time) . '/' . date('Y', $time);
     }
 
     /**
@@ -31,7 +28,7 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     public function makeRequest()
     {
         try{
-            $sxml = simplexml_load_file($this->url, NULL, TRUE);
+            $sxml = $this->loadFile();
 
             if(!is_object($sxml)) {
                 return NULL;
@@ -47,6 +44,32 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
         }
     }
 
+
+    /**
+     * @return array|null
+     */
+    public function getAllCurrency()
+    {
+        $result = [];
+        //try{
+            $sxml = $this->loadFile();
+            if(!is_object($sxml)) {
+                return NULL;
+            }
+            foreach($sxml->Valute as $ar) {
+                $result[(int)$ar->NumCode] = round($this->convertValue($ar->Value)/$ar->Nominal,4);
+            }
+        //}catch (\Exception $e)
+       // {
+
+        //}
+        return $result;
+    }
+
+    /**
+     * @param $val
+     * @return float
+     */
     public function convertValue($val)
     {
         return round(str_replace(',','.',$val),4);

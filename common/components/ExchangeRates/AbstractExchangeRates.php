@@ -10,5 +10,13 @@ namespace common\components\ExchangeRates;
 
 
 abstract class AbstractExchangeRates {
-
+    protected
+        $url;
+    /**
+     * @return \SimpleXMLElement
+     */
+    protected function loadFile()
+    {
+        return simplexml_load_file($this->url, NULL, TRUE);
+    }
 } 

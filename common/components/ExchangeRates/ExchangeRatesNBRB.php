@@ -12,9 +12,6 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
         $codeID,
         $date = NULL;
 
-    private
-        $url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate=';
-
     /**
      * @param $codeID
      */
@@ -22,7 +19,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     {
         $time = time(); //текущая дата
         $this->codeID = $codeID;
-        $this->url .= date('m', $time) . '/' . date('d', $time) . '/' . date('Y', $time);
+        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('m', $time) . '/' . date('d', $time) . '/' . date('Y', $time);
     }
 
     /**
@@ -31,7 +28,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     public function makeRequest()
     {
         try{
-            $sxml = simplexml_load_file($this->url, NULL, TRUE);
+            $sxml = $this->loadFile();
             if(!is_object($sxml)) {
                 return NULL;
             }
@@ -45,4 +42,27 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
             return NULL;
         }
     }
+
+    /**
+     * @return array|null
+     */
+    public function getAllCurrency()
+    {
+        $result = [];
+       // try{
+            $sxml = $this->loadFile();
+            if(!is_object($sxml)) {
+                return NULL;
+            }
+            foreach($sxml->Currency as $ar) {
+                $result[(int)$ar->NumCode] = (int) $ar->Rate;
+            }
+      //  }catch (\Exception $e)
+      //  {
+
+      //  }
+        return $result;
+    }
+
+
 } 
