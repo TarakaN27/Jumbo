@@ -1,3 +1,33 @@
 .h4_ml_10{
  margin-left: 10px;
 }
+.green_tag{
+    background: #1ABB9C ;
+}
+.red_tag{
+    background: #90111A ;
+}
+.blue_tag{
+    background: #34495E;
+}
+.yellow_tag{
+    background: rgba(243, 156, 18, 0.88);
+}
+.green_tag:after {
+    border-left: 11px solid #1ABB9C;
+}
+
+.red_tag:after {
+    border-left: 11px solid #90111A;
+}
+
+.blue_tag:after {
+    border-left: 11px solid #34495E;
+}
+
+.yellow_tag:after {
+    border-left: 11px solid rgba(243, 156, 18, 0.88);
+}
+.inner_dialog_section_msg{
+    padding-bottom: 10px;
+}

@@ -7,6 +7,7 @@ use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -249,11 +250,30 @@ class CUser extends AbstractUser
         return md5(uniqid('dummy').microtime());
     }
 
+    /**
+     *
+     */
     public function afterDelete()
     {
         $obR = CUserRequisites::findOne($this->requisites_id);
         if(!empty($obR))
             $obR->delete();
         return parent::afterDelete();
+    }
+
+
+}
+
+/**
+ * Класс для работы с запросами
+ * Тут добавляем scopes
+ * Class CUserQuery
+ * @package common\models
+ */
+class CUserQuery extends ActiveQuery
+{
+    public function active($state = CUser::STATUS_ACTIVE)
+    {
+        return $this->andWhere(['status' => $state]);
     }
 }

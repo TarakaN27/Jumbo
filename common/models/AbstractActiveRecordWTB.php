@@ -61,4 +61,34 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         $arSts = self::getStatusArr();
         return isset($arSts[$this->status]) ? $arSts[$this->status] : 'N/A';
     }
+
+    /**
+     * Переопределим стандартный метод find,чтобы можно было ипользовать scopes.
+     * Как использовать в модели создаем класс с названием modelNameQuery()
+     * в нем определяем scopes.
+     * пример.
+     * файл CUser.php
+     * class CUser extends ...{
+        ........
+     * }
+     * определяем класс query для модели
+     * class CUserQuery extends ActiveQuery
+     *   {
+     *      //определяем scope для модели
+     *      public function active($state = CUser::STATUS_ACTIVE)
+     *      {
+     *          return $this->andWhere(['status' => $state]);
+     *      }
+     *   }
+     * использование
+     * $model = CUser::find()->active()->all(); //выберем всех пользователей у которых статус = CUser::STATUS_ACTIVE
+     * @return object|\yii\db\ActiveQuery
+     */
+    public static function find()
+    {
+        if(class_exists($className = self::className().'Query'))
+            return Yii::createObject($className, [get_called_class()]);
+        else
+            return parent::find();
+    }
 } 

@@ -21,7 +21,8 @@ return [
                         'app/users' => 'users.php',
                         'app/services' => 'services.php',
                         'app/common' => 'common.php',
-                        'app/book' => 'bookkeeping.php'
+                        'app/book' => 'bookkeeping.php',
+                        'app/reports' => 'reports.php'
                     ]
                 ]
             ]
@@ -29,6 +30,11 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+        ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'dateFormat' => 'medium',
+           'datetimeFormat' => 'medium'
         ],
     ],
 ];

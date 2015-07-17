@@ -32,7 +32,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         unset($obCBRF,$obNBRB);
 
         $bHasError = FALSE;
-        
+
         foreach($arCurrency as $model)
         {
             if($model->nbrb != 0)

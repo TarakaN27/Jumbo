@@ -21,7 +21,8 @@
         "devgroup/yii2-tag-dependency-helper": "0.0.3.*",
         "yiisoft/yii2-jui": "~2.0",
         "kartik-v/yii2-widget-select2": "@dev",
-        "kartik-v/yii2-widget-datepicker": "@dev"
+        "kartik-v/yii2-widget-datepicker": "@dev",
+        "vova07/yii2-imperavi-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

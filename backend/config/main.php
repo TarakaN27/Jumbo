@@ -21,6 +21,9 @@ return [
         'bookkeeping' => [
             'class' => 'backend\modules\bookkeeping\Module',
         ],
+        'reports' => [
+            'class' => 'backend\modules\reports\Module',
+        ],
     ],
     'components' => [
 

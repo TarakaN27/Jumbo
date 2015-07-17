@@ -16,5 +16,9 @@ return [
     'Sorry! We have same error, please try again!' => 'При отправке приглашения произошла ошибка!',
     'You are not allowed to perform this action.' => 'Вам не разрешено выполнять данное действие. Возможно истек срок действия ключа.',
     'To home' => 'На главную',
-    'Logout' => 'Выход'
+    'Logout' => 'Выход',
+    'Live feed' => 'Живая лента',
+    'Add comment' => 'Новый комментарий',
+    'Dialog' => 'Диалог',
+    'Send comment' => 'Добавить'
 ];

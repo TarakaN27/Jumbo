@@ -29,7 +29,11 @@ class BrbacController extends AbstractConsoleController {
 		return Controller::EXIT_CODE_NORMAL;
 	}
 
-	public function actionCreate()
+    /**
+     * Create user rules and rights
+     * @return int
+     */
+    public function actionCreate()
 	{
 		$this->stdout('Start!'. PHP_EOL, Console::FG_BLUE, Console::BOLD);
 		$this->stdout('Init authManager'. PHP_EOL, Console::FG_YELLOW);

@@ -31,6 +31,18 @@ class AbstractUser extends ActiveRecord implements IdentityInterface
     CONST ROLE_USER = 5;
 
     /**
+     * Переопределим стандартный метод find,чтобы можно было ипользовать scopes
+     * @return object|\yii\db\ActiveQuery
+     */
+    public static function find()
+    {
+        if(class_exists($className = self::className().'Query'))
+            return Yii::createObject($className, [get_called_class()]);
+        else
+            return parent::find();
+    }
+
+    /**
      * Получаем статусы массивом
      * @return array
      */
