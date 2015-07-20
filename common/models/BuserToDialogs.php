@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
+use yii\helpers\ArrayHelper;
+use backend\models\BUser;
 
 /**
  * This is the model class for table "{{%buser_to_dialogs}}".
@@ -59,5 +62,21 @@ class BuserToDialogs extends \yii\db\ActiveRecord
     public function getBuser()
     {
         return $this->hasOne(BUser::className(), ['id' => 'buser_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => ActiveRecordHelper::className(),
+                    'cache' => 'cache', // optional option - application id of cache component
+                ]
+            ]);
     }
 }

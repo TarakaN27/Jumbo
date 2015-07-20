@@ -2,11 +2,36 @@
  * Webmart Soft
  * Created by zhenya on 17.07.15.
  */
+/**
+ * Устанавливаем default состояние
+ */
 function initDefaultState() {
     $(".dialog_section").fadeOut();
     $(".redactor_panel").fadeOut();
+    $(".msgBoxAll").fadeOut();
 }
 
+function bindEventsToBlock()
+{
+    $(".open_dialog_button").on("click",function(){         //открытие/закрытие диалога
+        fadeDialogBlock(this,"dialog_section");
+    });
+    $(".dialog_add_comment_btn").on("click",function(){     //открытие/закрытие формы
+        fadeDialogBlock(this,"redactor_panel");
+    });
+    $(".btn-msg-for-all").on("click",function(){     //открытие/закрытие формы нового диалога
+        fadeDialogBlock(this,"msgBoxAll");
+    });
+    $(".sendComment").on("click",function(){ //добавление комментария
+        sendComment(this,true);
+    });
+}
+
+/**
+ * Скрытие/открытие блоков
+ * @param $this
+ * @param blockName
+ */
 function fadeDialogBlock($this, blockName) {
     var
         tagI = $($this).find("i"),
@@ -23,8 +48,12 @@ function fadeDialogBlock($this, blockName) {
         $(tagI).addClass("fa-chevron-up");
     }
 }
-
-function sendComment($this) {
+/**
+ * Добавляем новый комментарий.
+ * @param $this
+ * @returns {boolean}
+ */
+function sendComment($this,updateComment) {
     var
         id = $($this).attr("data");
 
@@ -34,14 +63,15 @@ function sendComment($this) {
     }
 
     var
-        content = $(".msgBox[data-id=\'" + id + "\'] textarea").redactor("code.get"),
-        formData = $(".msgBox[data-id=\'" + id + "\']").serialize();
+        content = $(".msgBox[data-id='" + id + "'] textarea").redactor("code.get"),
+        formData = $(".msgBox[data-id='" + id + "']").serialize();
 
     if (content == "" || content == undefined) {
         addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_EMPTY_MSG_TEXT);
         return false;
     }
 
+    $(".msgBox[data-id='" + id + "'] textarea").redactor('code.set', '');   //сбрасываем редактор
     $.ajax({
         type: "POST",
         cache: false,
@@ -49,22 +79,31 @@ function sendComment($this) {
         dataType: "json",
         data: formData,
         success: function(msg){
-            console.log(msg);
+            if(msg.status)
+            {
+                if(msg.newDialog)
+                {
+                    $('.msgBoxList').prepend(msg.content);
+                    $(".msgBox[data-id='" + msg.dialogID + "'] textarea").redactor();
+                    initDefaultState();
+                    bindEventsToBlock();
+                }else{
+                    $(".dialog_section[data-id='"+msg.dialogID+"'] div.block_content").append(msg.content);
+                }
+                addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_COMMENT);
+            }else{
+                addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADDCOMMENT);
+                return false;
+            }
         },
         error: function(msg){
-
+            addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADDCOMMENT);
+            return false;
         }
     });
 }
 
 //****** Вешаем обработчики *******//
-initDefaultState();                                     //инициализируем состояние по умолчанию
-$(".open_dialog_button").on("click",function(){         //открытие/закрытие диалога
-    fadeDialogBlock(this,"dialog_section");
-});
-$(".dialog_add_comment_btn").on("click",function(){     //открытие/закрытие формы
-    fadeDialogBlock(this,"redactor_panel");
-});
-$(".sendComment").on("click",function(){
-    sendComment(this);
-});
+initDefaultState();             //инициализируем состояние по умолчанию
+bindEventsToBlock();
+

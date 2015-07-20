@@ -10,16 +10,6 @@ use yii\grid\GridView;
 $this->title = Yii::t('app/book', 'Payments');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class = "page-title">
-    <div class = "title_left">
-         <h3><?php $this->title?></h3>
-    </div>
-
-    <div class = "title_right">
-
-    </div>
-</div>
-<div class = "clearfix"></div>
 <div class = "row">
 
 <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -28,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/book', 'Create Payments'), ['create'], ['class' => 'btn btn-success']) ?>
+                                    <?= Html::a(Yii::t('app/book', 'Create payment request'), ['create-payment-request'], ['class' => 'btn btn-success']) ?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>

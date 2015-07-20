@@ -4,4 +4,4 @@
 $this->title = 'My Yii Application';
 
 ?>
-<?=\common\components\widgets\lifeFeed\LifeFeedWidget::widget(['userID' => Yii::$app->user->id]);?>
+<?=\common\components\widgets\liveFeed\LiveFeedWidget::widget(['userID' => Yii::$app->user->id]);?>

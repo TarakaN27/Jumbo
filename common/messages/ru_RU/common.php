@@ -20,5 +20,15 @@ return [
     'Live feed' => 'Живая лента',
     'Add comment' => 'Новый комментарий',
     'Dialog' => 'Диалог',
-    'Send comment' => 'Добавить'
+    'Send comment' => 'Добавить',
+    'Add message' => 'Добавить сообщение',
+    'DIALOG_ERROR_ADDCOMMENT' => 'Не удалось добавить комментарий.',
+    'DIALOG_SUCCESS_TITLE' => 'Действие успешно завершено',
+    'DIALOG_SUCCESS_ADD_COMMENT' => 'Комментарий добавлен!',
+    'DIALOG_message' => 'Сообщение',
+    'DIALOG_request' => 'Запрос',
+    'For users' => 'Отправить пользователям',
+    'Message' => 'Сообщение',
+    'Select users' => 'Выбрать пользователей',
+
 ];

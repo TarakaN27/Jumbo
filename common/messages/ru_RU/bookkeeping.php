@@ -36,6 +36,7 @@ return [
     'Expenses' => 'Затраты',
     'Update Expense: ' => 'Обновить затраты: ',
     'Create expense' => 'Добавить затраты',
+    'Create payment request' => 'Запрос на платеж'
 
 
 

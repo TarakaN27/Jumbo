@@ -2,9 +2,13 @@
 
 namespace common\models;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use backend\models\BUser;
+use yii\caching\TagDependency;
+use yii\db\ActiveQuery;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%dialogs}}".
@@ -25,6 +29,7 @@ class Dialogs extends AbstractActiveRecord
 {
 
     CONST
+        ROW_LIMIT = 10,
         TYPE_MSG = 5,
         TYPE_REQUEST = 10;
 
@@ -37,6 +42,18 @@ class Dialogs extends AbstractActiveRecord
             self::TYPE_MSG => Yii::t('app/common','DIALOG_message'),
             self::TYPE_REQUEST => Yii::t('app/common','DIALOG_request')
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTagClass()
+    {
+        $arTmp = [
+            self::TYPE_MSG => 'green_tag',
+            self::TYPE_REQUEST => 'red_tag'
+        ];
+        return array_key_exists($this->type,$arTmp) ? $arTmp[$this->type] : 'N/A';
     }
 
     /**
@@ -110,6 +127,22 @@ class Dialogs extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => ActiveRecordHelper::className(),
+                    'cache' => 'cache', // optional option - application id of cache component
+                ]
+            ]);
+    }
+
+    /**
      * @return int
      */
     public function countDialogMessages()
@@ -118,15 +151,50 @@ class Dialogs extends AbstractActiveRecord
         return (int)$tmp;
     }
 
-
-    public function getDialogsForLive()
+    /**
+     * @param $userID
+     * @param int $rowLimit
+     * @return mixed
+     */
+    public static function getDialogsForLive($userID,$rowLimit = self::ROW_LIMIT )
     {
-        $query = (new Query())
-            ->select('d.id,d.b')
-            ->from(self::tableName().' d')
-            ->leftJoin(Messages::tableName().' as m','d.id = m.dialog_id')
-           ;
-        return $query->createCommand()->queryAll();
-    }
+        $obDep = new TagDependency([
+            'tags' => [
+                ActiveRecordHelper::getCommonTag(self::className()),
+                ActiveRecordHelper::getCommonTag(BuserToDialogs::className())
+            ]
+        ]);
 
+        $arDlg = self::getDb()->cache(function($db) use ($userID,$rowLimit){
+            return Dialogs::find()
+                ->joinWith('busers')
+                ->with([
+                      'busers' => function ($query) use ($userID)  {
+                             $query->andWhere(BUser::tableName().'.id is NULL OR '.
+                                 BUser::tableName().'.id = '.$userID
+                             );
+                         }
+                  ])
+                ->where([self::tableName().'.status' => self::PUBLISHED])
+                ->orWhere([Dialogs::tableName().'.buser_id' => $userID])
+                ->limit($rowLimit)
+                ->orderBy('id DESC')
+                ->all();
+        },86400,$obDep);
+        return $arDlg;
+    }
+}
+
+/**
+ * Класс для работы с запросами
+ * Тут добавляем scopes
+ * Class DialogsQuery
+ * @package common\models
+ */
+class DialogsQuery extends ActiveQuery
+{
+    public function active($state = Dialogs::PUBLISHED)
+    {
+        return $this->andWhere(['status' => $state]);
+    }
 }

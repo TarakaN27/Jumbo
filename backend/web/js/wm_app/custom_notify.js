@@ -20,3 +20,53 @@ function addErrorNotify(title,errorText)
         }
     });
 }
+/**
+ * @param title
+ * @param text
+ */
+function addSuccessNotify(title,text)
+{
+    new PNotify({
+        title: title,
+        text: text,
+        type: "success",
+        nonblock: {
+            nonblock: true,
+            nonblock_opacity: .2
+        }
+    });
+}
+
+/**
+ * @param title
+ * @param text
+ */
+function addWarningNotify(title,text)
+{
+    new PNotify({
+        title: title,
+        text: text,
+        type: "warning",
+        nonblock: {
+            nonblock: true,
+            nonblock_opacity: .2
+        }
+    });
+}
+
+/**
+ * @param title
+ * @param text
+ */
+function addInfoNotify(title,text)
+{
+    new PNotify({
+        title: title,
+        text: text,
+        type: "info",
+        nonblock: {
+            nonblock: true,
+            nonblock_opacity: .2
+        }
+    });
+}

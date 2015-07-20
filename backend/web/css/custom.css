@@ -3575,7 +3575,9 @@ ul.timeline li {
     display: block;
     height: 30px;
     font-size: 13px;
-    padding: 8px;
+
+
+    padding: 8px 2px 8px 4px;
 }
 
 .timeline .tag span {

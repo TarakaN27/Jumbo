@@ -2,8 +2,15 @@
 
 namespace common\models;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use backend\models\BUser;
+use yii\caching\DbDependency;
+use yii\db\ActiveQuery;
+use yii\db\QueryBuilder;
+use yii\helpers\ArrayHelper;
+use yii\swiftmailer\Message;
+
 /**
  * This is the model class for table "{{%messages}}".
  *
@@ -21,6 +28,7 @@ use backend\models\BUser;
  * @property Files[] $files
  * @property Dialogs $dialog
  * @property BUser $buser
+ * @todo добавить соббытие отправлено сообщение! подписаться на собьытие и сделать рассылку извещений для всплывающих оповещений
  */
 class Messages extends AbstractActiveRecord
 {
@@ -84,5 +92,83 @@ class Messages extends AbstractActiveRecord
     public function getBuser()
     {
         return $this->hasOne(BUser::className(), ['id' => 'buser_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => ActiveRecordHelper::className(),
+                    'cache' => 'cache', // optional option - application id of cache component
+                ]
+            ]);
+    }
+
+    /**
+     * Получаем все сообщения для диалогов
+     * @param array $arDID
+     * @return mixed
+     */
+    public static function getMessagesForDialogs(array $arDID)
+    {
+        if(empty($arDID))
+            return [];
+        //получаем сообщения для диалогов. зависимость SQL потому что при тегиррованой зависимости, слишком часто будет сбрасываться кеш.
+        $obDep = new DbDependency(['sql' => 'Select MAX(updated_at) FROM '.self::tableName().' WHERE dialog_id IN ('.implode(',',$arDID).')']);
+        $arMsg = self::getDb()->cache(function($db) use ($arDID){
+            return Messages::find()
+                ->where(['dialog_id' => $arDID,'status' => Messages::PUBLISHED])
+                ->with('buser')
+                ->orderBy(self::tableName().'.id ASC')
+                ->all($db);
+        },86400,$obDep);
+
+        //соберем сообщения по диалогам
+        $arRst = [];
+        foreach($arMsg as $msg)
+            $arRst[$msg->dialog_id][] = $msg;
+
+        return $arRst;
+    }
+
+    /**
+     * Получаем сообщения для диалога
+     * @param $iDId
+     * @return mixed
+     */
+    public static function getMessagesForDialog($iDId)
+    {
+        //получаем сообщения для диалогов. зависимость SQL потому что при тегиррованой зависимости, слишком часто будет сбрасываться кеш.
+        $obDep = new DbDependency(['sql' => 'Select MAX(updated_at) FROM '.self::tableName().' WHERE dialog_id  = '.$iDId]);
+        $arMsg = self::getDb()->cache(function($db) use ($iDId){
+            return Messages::find()
+                ->where(['dialog_id' => $iDId,'status' => Messages::PUBLISHED])
+                ->with('buser')
+                ->all($db);
+        },86400,$obDep);
+
+        return $arMsg;
+    }
+
+}
+
+/**
+ * Класс для работы с запросами
+ * Тут добавляем scopes
+ * Class MessagesQuery
+ * @package common\models
+ */
+class MessagesQuery extends ActiveQuery
+{
+
+    public function active($state = Messages::PUBLISHED)
+    {
+        return $this->andWhere(['status' => $state]);
     }
 }

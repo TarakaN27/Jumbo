@@ -3,8 +3,10 @@
 namespace backend\models;
 
 use common\models\AbstractUser;
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use yii\caching\DbDependency;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -151,14 +153,44 @@ class BUser extends AbstractUser
      */
     public static function getListManagers()
     {
-        $dependency = new DbDependency(['sql' => 'SELECT MAX(updated_at) FROM '.self::tableName().' WHERE role = '.self::ROLE_MANAGER]);
+        $dependency = new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
         $arMng = self::getDb()->cache(function ($db) {
-            return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all();
+            return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all($db);
         }, 3600*24, $dependency);
         if(empty($arMng))
             return [];
         else
             return ArrayHelper::map($arMng,'id','username');
+    }
+
+    /**
+     * Get all members. Return full activeRecord Objects.
+     * @return mixed
+     */
+    public static function getAllMembersObj()
+    {
+        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $models = self::getDb()->cache(function ($db) {
+            return BUser::find()->all($db);
+        },86400,$dep);
+
+        return $models;
+    }
+
+    /**
+     * Get map of all members
+     * @param null $exeptID
+     * @return array
+     */
+    public static function getAllMembersMap($exeptID = NULL)
+    {
+        $tmp = self::getAllMembersObj();
+        if(is_array($tmp) && !is_null($exeptID))
+            foreach($tmp as $key => $item)
+                if($item->id == $exeptID)
+                    unset($tmp[$key]);
+
+        return !is_array($tmp) ? [] : ArrayHelper::map($tmp,'id','username');
     }
 
     /**
