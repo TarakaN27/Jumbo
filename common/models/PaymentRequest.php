@@ -70,7 +70,7 @@ class PaymentRequest extends AbstractActiveRecord
             [['owner_id','pay_date', 'currency_id', 'legal_id'],'required'],
             [[
                  'cntr_id', 'manager_id', 'owner_id', 'is_unknown',
-                 'pay_date', 'currency_id', 'legal_id', 'dialog_id',
+                  'currency_id', 'legal_id', 'dialog_id',
                  'status', 'created_at', 'updated_at'
              ], 'integer'],
             [['pay_date', 'pay_summ', 'currency_id', 'legal_id'], 'required'],
@@ -119,5 +119,21 @@ class PaymentRequest extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
         ];
+    }
+
+
+    public function beforeValidate()
+    {
+        if(!is_numeric($this->pay_date))
+            $this->pay_date = strtotime($this->pay_date);
+
+        return parent::beforeValidate();
+    }
+
+    public function beforeSave($insert)
+    {
+        if(!is_numeric($this->pay_date))
+            $this->pay_date = strtotime($this->pay_date);
+        return parent::beforeSave($insert);
     }
 }

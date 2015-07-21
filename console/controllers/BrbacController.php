@@ -59,11 +59,14 @@ class BrbacController extends AbstractConsoleController {
 		$onlyBookkeeper = $auth->createPermission('only_bookkeeper');
         $onlyBookkeeper->description = 'Только для бухгалтера';
 
+        $rightdForAll = $auth->createPermission('forAll');
+        $rightdForAll->description = 'Права для всех';
 
 		$auth->add($onlyBookkeeper);
 		$auth->add($adminRights);
 		$auth->add($superRights);
 		$auth->add($onlyManager);
+        $auth->add($rightdForAll);
 
 		$this->stdout('OK'. PHP_EOL, Console::FG_GREEN);
 
@@ -106,26 +109,27 @@ class BrbacController extends AbstractConsoleController {
 		$sadmin->ruleName = $rule->name;
 		$auth->add($sadmin);
 
-
-
 		//Добавляем разрешения для ролей
 
         //bookkeeper
         $auth->addChild($bookkeeper, $user);
         $auth->addChild($bookkeeper, $onlyBookkeeper);
+        $auth->addChild($bookkeeper, $rightdForAll);
 
 		//moder
 		$auth->addChild($moder, $user);
 		$auth->addChild($moder, $onlyManager);
-		//$auth->addChild($moder, $onlyBookkeeper);
+		$auth->addChild($moder, $rightdForAll);
 
 		//admin
 		$auth->addChild($admin, $user);
 		$auth->addChild($admin, $adminRights);
+        $auth->addChild($admin, $rightdForAll);
 
 		//superAdmin
 		$auth->addChild($sadmin, $admin);
 		$auth->addChild($sadmin, $superRights);
+        $auth->addChild($sadmin,$rightdForAll);
 
 		$this->stdout('OK'. PHP_EOL, Console::FG_GREEN);
 		$this->stdout('Success!'. PHP_EOL, Console::FG_GREEN, Console::BOLD);

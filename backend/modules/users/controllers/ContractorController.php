@@ -7,6 +7,7 @@ use common\models\CUserRequisites;
 use Yii;
 use common\models\CUser;
 use common\models\search\CUserSearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -14,6 +15,25 @@ use yii\web\NotFoundHttpException;
  */
 class ContractorController extends AbstractBaseBackendController
 {
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['moder','bookkeeper','admin']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
 
     /**
      * Lists all CUser models.

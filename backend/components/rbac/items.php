@@ -16,6 +16,10 @@ return [
         'type' => 2,
         'description' => 'Только для менеджера',
     ],
+    'forAll' => [
+        'type' => 2,
+        'description' => 'Права для всех',
+    ],
     'user' => [
         'type' => 1,
         'description' => 'Пользователь',
@@ -28,6 +32,7 @@ return [
         'children' => [
             'user',
             'only_manager',
+            'forAll',
         ],
     ],
     'bookkeeper' => [
@@ -37,6 +42,7 @@ return [
         'children' => [
             'user',
             'only_bookkeeper',
+            'forAll',
         ],
     ],
     'admin' => [
@@ -46,6 +52,7 @@ return [
         'children' => [
             'user',
             'adminRights',
+            'forAll',
         ],
     ],
     'superadmin' => [
@@ -55,6 +62,7 @@ return [
         'children' => [
             'admin',
             'superRights',
+            'forAll',
         ],
     ],
 ];

@@ -208,4 +208,20 @@ class BUser extends AbstractUser
     {
         return $this->lname.' '.$this->fname.' '.$this->mname;
     }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => ActiveRecordHelper::className(),
+                    'cache' => 'cache', // optional option - application id of cache component
+                ]
+            ]);
+    }
 }

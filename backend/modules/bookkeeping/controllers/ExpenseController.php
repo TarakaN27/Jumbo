@@ -6,6 +6,7 @@ use backend\components\AbstractBaseBackendController;
 use Yii;
 use common\models\Expense;
 use common\models\search\ExpenseSearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -13,6 +14,26 @@ use yii\web\NotFoundHttpException;
  */
 class ExpenseController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
     /**
      * Lists all Expense models.
      * @return mixed

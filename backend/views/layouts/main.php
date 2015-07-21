@@ -78,19 +78,26 @@ unset($subItems);
                                         </li>
                                         <li><a href = "<?= Url::to(['/users/contractor/index']) ?>"><?php echo Yii::t('app/users', 'USER_contractor'); ?></a>
                                         </li>
-                                        <li><a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <li>
+                                            <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
                                         </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
                                 <li><a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
-                                        <li>
-                                            <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_services'); ?></a>
-                                        </li>
-                                        <li>
-                                            <a href = "<?= Url::to(['/services/expense/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_expense_categories'); ?></a>
-                                        </li>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_services'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/services/expense/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_expense_categories'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
                                         <li>
                                             <a href = "<?= Url::to(['/services/legal-person/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_legal_person'); ?></a>
                                         </li>
@@ -102,12 +109,16 @@ unset($subItems);
                                 <li><a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
-                                        <li>
-                                            <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>
-                                        </li>
-                                        <li>
-                                            <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
-                                        </li>
+                                        <?php if(Yii::$app->user->can('forAll')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
+                                            </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
                                 <!--li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
