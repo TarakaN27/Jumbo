@@ -24,7 +24,7 @@ use \vova07\imperavi\Widget as ImperaviWidget;
                         </h2>
 
                         <p class = "excerpt">
-                            <?php echo $dialog['firstMsg'];?>
+                            <?php echo $dialog['dialog']->theme;?>
                         </p>
                         <button class = "btn btn-info btn-xs open_dialog_button" data = "<?php echo $dialog['dialog']->id;?>"><?= Yii::t('app/common', 'Dialog'); ?>
                             <i class = "fa fa-chevron-down"></i>

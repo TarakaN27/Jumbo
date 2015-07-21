@@ -36,8 +36,14 @@ return [
     'Expenses' => 'Затраты',
     'Update Expense: ' => 'Обновить затраты: ',
     'Create expense' => 'Добавить затраты',
-    'Create payment request' => 'Запрос на платеж'
-
-
-
+    'Create payment request' => 'Запрос на платеж',
+    'New payment request' => 'Запрос на платеж по клиенту',
+    'New payment request successfully added' => 'Новый запрос на платеж успешно создан',
+    'Cntr ID' => 'Контрагент',
+    'Manager ID' => 'Менеджер',
+    'Owner ID' => 'Кто добавил запрос',
+    'Is Unknown' => 'Неизвестный контрагент',
+    'User Name' => 'ФИО Неизвестного контрагента',
+    'Dialog ID' => 'Диалог',
+    'Status' => 'Статус',
 ];

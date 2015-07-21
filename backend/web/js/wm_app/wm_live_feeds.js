@@ -87,10 +87,11 @@ function sendComment($this,updateComment) {
                     $(".msgBox[data-id='" + msg.dialogID + "'] textarea").redactor();
                     initDefaultState();
                     bindEventsToBlock();
+                    addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_DIALOG);
                 }else{
                     $(".dialog_section[data-id='"+msg.dialogID+"'] div.block_content").append(msg.content);
+                    addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_COMMENT);
                 }
-                addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_COMMENT);
             }else{
                 addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADDCOMMENT);
                 return false;

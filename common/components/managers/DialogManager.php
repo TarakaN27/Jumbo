@@ -58,11 +58,10 @@ class DialogManager extends Component{
         $obDlg->status = Dialogs::PUBLISHED;
         $obDlg->type = Dialogs::TYPE_MSG;
         $obDlg->buser_id = $this->iAthID;
+        $obDlg->theme = $this->sMsg;
         $transaction = \Yii::$app->db->beginTransaction();
         if($obDlg->save())
         {
-            if($obMsg = $this->newMessage($obDlg->id,$this->sMsg,$this->iAthID))
-            {
                 try{
                     if(!empty($this->arUsers))
                     {
@@ -74,7 +73,7 @@ class DialogManager extends Component{
                     }
                     $transaction->commit();
 
-                    $arDialogs [] = ['dialog' => $obDlg,'msg' => [],'firstMsg' => $obMsg->msg];
+                    $arDialogs [] = ['dialog' => $obDlg,'msg' => []];
 
                     $arRtn = [
                         'status' => TRUE,
@@ -87,9 +86,6 @@ class DialogManager extends Component{
                 {
                     $transaction->rollBack();
                 }
-            }else{
-                $transaction->rollBack();
-            }
         }else{
             $transaction->rollBack();
         }

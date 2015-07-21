@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cuser_requisites}}".
@@ -214,5 +216,21 @@ class CUserRequisites extends AbstractActiveRecord
             'pasp_auth' => Yii::t('app/users', 'Passport_auth'),
             'pasp_ident' => Yii::t('app/users', 'Passport_identity_number')
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => ActiveRecordHelper::className(),
+                    'cache' => 'cache', // optional option - application id of cache component
+                ]
+            ]);
     }
 }

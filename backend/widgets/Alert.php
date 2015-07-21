@@ -6,6 +6,7 @@
  */
 
 namespace backend\widgets;
+use yii\web\View;
 
 /**
  * Alert widget renders a message from session flash. All flash messages are displayed
@@ -50,30 +51,37 @@ class Alert extends \yii\bootstrap\Widget
     public function init()
     {
         parent::init();
-
         $session = \Yii::$app->getSession();
         $flashes = $session->getAllFlashes();
-        $appendCss = isset($this->options['class']) ? ' ' . $this->options['class'] : '';
-
         foreach ($flashes as $type => $data) {
             if (isset($this->alertTypes[$type])) {
                 $data = (array) $data;
                 foreach ($data as $i => $message) {
-                    /* initialize css class for each alert box */
-                    $this->options['class'] = $this->alertTypes[$type] . $appendCss;
-
-                    /* assign unique id to each alert box */
-                    $this->options['id'] = $this->getId() . '-' . $type . '-' . $i;
-
-                    echo \yii\bootstrap\Alert::widget([
-                        'body' => $message,
-                        'closeButton' => $this->closeButton,
-                        'options' => $this->options,
-                    ]);
+                    $this->getView()->registerJs($this->getNotify($type,$message),View::POS_READY);
                 }
-
                 $session->removeFlash($type);
             }
         }
+    }
+
+    protected function getNotify($type,$msg)
+    {
+        $arT = array_keys($this->alertTypes);
+        if(!in_array($type,$arT))
+            $type = 'dark';
+
+        if($type == "danger")
+            $type = 'error';
+
+        return "
+               new PNotify({
+                    text: '".$msg."',
+                    type: '".$type."',
+                    nonblock: {
+                        nonblock: true,
+                        nonblock_opacity: .2
+                    }
+                });
+        ";
     }
 }

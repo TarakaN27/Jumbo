@@ -3,6 +3,9 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
+use common\models\Dialogs;
+use common\models\PaymentRequest;
 use Yii;
 use common\models\Payments;
 use common\models\search\PaymentsSearch;
@@ -113,10 +116,40 @@ class DefaultController extends AbstractBaseBackendController
 
     public function actionCreatePaymentRequest()
     {
+        $model = new PaymentRequest();
+        $model->owner_id = Yii::$app->user->id;
+        $model->status = PaymentRequest::STATUS_NEW;
 
-
-
-
-
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+                $obDlg = new Dialogs();
+                $obDlg->type = Dialogs::TYPE_REQUEST;
+                $obDlg->buser_id = Yii::$app->user->id;
+                $obDlg->status = Dialogs::PUBLISHED;
+                $obDlg->theme = Yii::t('app/book','New payment request').'<br>'.$model->description;
+                if($obDlg->save())
+                {
+                    if(!empty($model->manager_id))
+                    {
+                        $obManager = BUser::findOne($model->manager_id);
+                        if(empty($obManager))
+                            throw new NotFoundHttpException('Manager not found');
+                        $obDlg->link('busers',$obManager);
+                    }else{
+                        $obManagers = BUser::getManagersArr();
+                        if(!empty($obManagers))
+                            foreach($obManagers as $obMan)
+                                $obDlg->link('busers',$obMan);
+                    }
+                    Yii::$app->session->setFlash('success',Yii::t('app/common','DIALOG_SUCCESS_ADD_DIALOG'));
+                }else{
+                    Yii::$app->session->setFlash('error',Yii::t('app/common','DIALOG_ERROR_ADD_DIALOG'));
+                }
+            Yii::$app->session->setFlash('success',Yii::t('app/book','New payment request successfully added'));
+            return $this->redirect(['index']);
+        }
+        return $this->render('create_payment_request',[
+            'model' => $model
+        ]);
     }
 }

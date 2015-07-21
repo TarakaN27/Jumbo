@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $type
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $theme
  *
  * @property BuserToDialogs[] $buserToDialogs
  * @property BUser[] $busers
@@ -80,7 +81,8 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id', 'status', 'type', 'created_at', 'updated_at'], 'integer']
+            [['buser_id', 'status', 'type', 'created_at', 'updated_at'], 'integer'],
+            [['theme'],'string']
         ];
     }
 
@@ -96,6 +98,7 @@ class Dialogs extends AbstractActiveRecord
             'type' => Yii::t('app/dialogs', 'Type'),
             'created_at' => Yii::t('app/dialogs', 'Created At'),
             'updated_at' => Yii::t('app/dialogs', 'Updated At'),
+            'theme' => Yii::t('app/dialogs', 'Theme'),
         ];
     }
 

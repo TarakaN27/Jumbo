@@ -30,5 +30,6 @@ return [
     'For users' => 'Отправить пользователям',
     'Message' => 'Сообщение',
     'Select users' => 'Выбрать пользователей',
-
+    'DIALOG_SUCCESS_ADD_DIALOG' => 'Диалог успешно создан',
+    'DIALOG_ERROR_ADD_DIALOG' => 'Не удалось создать диалог'
 ];

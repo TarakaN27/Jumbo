@@ -149,14 +149,22 @@ class BUser extends AbstractUser
     }
 
     /**
+     * @return mixed
+     */
+    public static function getManagersArr()
+    {
+        $dependency = new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        return self::getDb()->cache(function ($db) {
+            return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all($db);
+        }, 3600*24, $dependency);
+    }
+
+    /**
      * @return array
      */
     public static function getListManagers()
     {
-        $dependency = new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
-        $arMng = self::getDb()->cache(function ($db) {
-            return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all($db);
-        }, 3600*24, $dependency);
+        $arMng = self::getManagersArr();
         if(empty($arMng))
             return [];
         else

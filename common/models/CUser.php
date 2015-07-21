@@ -214,9 +214,14 @@ class CUser extends AbstractUser
      */
     public static function getAllContractor()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $dep =  new TagDependency([
+            'tags' => [
+                ActiveRecordHelper::getCommonTag(self::className()),
+                ActiveRecordHelper::getCommonTag(CUserRequisites::className())
+            ]
+        ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->all($db);
+            return CUser::find()->with('requisites')->all($db);
         },86400,$dep);
 
         return $models;
@@ -228,9 +233,28 @@ class CUser extends AbstractUser
      */
     public static function getContractorMap()
     {
-        $tmp = self::getAllContractor();
-        return ArrayHelper::map($tmp,'id','username');
+        //$tmp = self::getAllContractor();
+        //return ArrayHelper::map($tmp,'id','username');
+
+        $tmp =self::getAllContractor();
+        $result = [];
+        foreach($tmp as $t)
+        {
+            $obR = $t->requisites;
+            if(is_object($obR))
+                $result[$t->id] = $t->requisites->corp_name.' '.
+                    $t->requisites->j_lname.' '.
+                    $t->requisites->j_fname.' '.
+                    $t->requisites->j_mname;
+            else
+                $result[$t->id] = $t->username;
+        }
+
+        return $result;
     }
+
+
+
 
     /**
      * Устанавливаем заглушки

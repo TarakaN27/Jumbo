@@ -46,20 +46,9 @@ class LiveFeedWidget extends Widget{
         $arDialogs = [];    //собираем результирующий массив
         foreach($arDlgs as $dlg)
         {
-            $tmpMsg = array_key_exists($dlg->id,$arMsg) ? $arMsg[$dlg->id] : [];
-
-            if(!empty($tmpMsg))
-            {
-                $firstMsg =  $tmpMsg[0]->msg;
-                unset($tmpMsg[0]);
-            }
-            else
-                $firstMsg = 'N/A';
-
             $arDialogs [] = [
                 'dialog' => $dlg,
-                'msg' => is_array($tmpMsg) ? $tmpMsg : [],
-                'firstMsg' => $firstMsg
+                'msg' => array_key_exists($dlg->id,$arMsg) ? $arMsg[$dlg->id] : [],
             ];
             unset($tmpMsg);
         }

@@ -17,6 +17,7 @@ class m150715_132216_add_messanger_tables extends Migration
             'id' => Schema::TYPE_PK,
             'buser_id' => Schema::TYPE_INTEGER . ' NOT NULL',
             'status' => Schema::TYPE_SMALLINT . ' DEFAULT 0',
+            'theme' => Schema::TYPE_TEXT.' NOT NULL ',
             'type' => Schema::TYPE_SMALLINT . ' DEFAULT 0',
             'created_at' => Schema::TYPE_INTEGER ,
             'updated_at' => Schema::TYPE_INTEGER ,
