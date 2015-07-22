@@ -9,6 +9,7 @@ use common\models\PaymentRequest;
 use Yii;
 use common\models\Payments;
 use common\models\search\PaymentsSearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -17,6 +18,30 @@ use yii\filters\VerbFilter;
  */
 class DefaultController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'actions' => ['index','view','create','update'],
+                    'allow' => true,
+                    'roles' => ['moder']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
 
     /**
      * Lists all Payments models.

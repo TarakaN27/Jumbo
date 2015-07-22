@@ -58,6 +58,25 @@ class BUser extends AbstractUser
     }
 
     /**
+     * @return array
+     */
+    public static function getRoleArrWithRights()
+    {
+        $tmp = self::getRoleArr();
+        if(!Yii::$app->user->can('superRights')) //только супер админ может создавать админов
+        {
+            if(isset($tmp[self::ROLE_ADMIN]))
+                unset($tmp[self::ROLE_ADMIN]);
+
+            if(isset($tmp[self::ROLE_SUPERADMIN]))
+                unset($tmp[self::ROLE_SUPERADMIN]);
+        }
+
+        return $tmp;
+    }
+
+
+    /**
      * вернем роль строкой
      * @return string
      */

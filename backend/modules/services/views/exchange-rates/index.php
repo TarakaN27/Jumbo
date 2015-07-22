@@ -27,13 +27,28 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
-                                    <?= Html::a(Yii::t('app/services', 'Create Exchange Rates'), ['create'], ['class' => 'btn btn-success']) ?>
+                                    <?php if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?= Html::a(Yii::t('app/services', 'Create Exchange Rates'), ['create'], ['class' => 'btn btn-success']) ?>
+                                    <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
 
-    <?= GridView::widget([
+    <?php
+
+    $tpl = '';
+    if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
+    {
+        $tpl = '{view}{update}{delete}';
+    }elseif(Yii::$app->user->can('only_manager')){
+        $tpl = '{view}';
+    }
+
+
+
+
+    echo GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -53,7 +68,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=> $tpl
+            ],
         ],
     ]); ?>
 

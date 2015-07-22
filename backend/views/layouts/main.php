@@ -101,9 +101,11 @@ unset($subItems);
                                         <li>
                                             <a href = "<?= Url::to(['/services/legal-person/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_legal_person'); ?></a>
                                         </li>
-                                         <li>
-                                            <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>
-                                        </li>
+                                        <?php if(Yii::$app->user->can('forAll')):?>
+                                             <li>
+                                                <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>
+                                             </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
                                 <li><a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>

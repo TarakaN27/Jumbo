@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use backend\models\BUser;
 /* @var $this yii\web\View */
 /* @var $model backend\models\BUser */
 
@@ -19,9 +19,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2>Сотрудники</h2>
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/users', 'To users list'), ['index', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
-                                    <?= Html::a(Yii::t('app/users','Add_new_user'),['/users/default/create'],['class'=>'btn btn-primary']);?>
-                                    <?= Html::a(Yii::t('app/users', 'Change_password'), ['change-password', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                                    <?= Html::a(Yii::t('app/users', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                    <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <?= Html::a(Yii::t('app/users','Add_new_user'),['/users/default/create'],['class'=>'btn btn-primary']);?>
+                                        <?= Html::a(Yii::t('app/users', 'Change_password'), ['change-password', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                        <?= Html::a(Yii::t('app/users', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                    <?php endif;?>
+                                    <?php if((Yii::$app->user->can('adminRights') &&
+                                            in_array($model->role,[BUser::ROLE_MANAGER,BUser::ROLE_BOOKKEEPER,BUser::ROLE_USER])) ||
+                                        Yii::$app->user->can('superRights')
+                                    ): ?>
                                     <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [
                                         'class' => 'btn btn-danger',
                                         'data' => [
@@ -29,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'method' => 'post',
                                         ],
                                     ]) ?>
-
+                                    <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>

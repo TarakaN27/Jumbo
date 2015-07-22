@@ -39,7 +39,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => TRUE]) ?>
 
-    <?= $form->field($model, 'role')->dropDownList(\backend\models\BUser::getRoleArr()) ?>
+    <?= $form->field($model, 'role')->dropDownList(\backend\models\BUser::getRoleArrWithRights()) ?>
 
     <?= $form->field($model, 'status')->dropDownList(\backend\models\BUser::getStatusArr()) ?>
     <div class = "form-group">

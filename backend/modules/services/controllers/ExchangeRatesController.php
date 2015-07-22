@@ -8,6 +8,7 @@ use common\components\ExchangeRates\ExchangeRatesNBRB;
 use Yii;
 use common\models\ExchangeRates;
 use common\models\search\ExchangeRatesSearch;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 
@@ -16,6 +17,31 @@ use yii\web\NotFoundHttpException;
  */
 class ExchangeRatesController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'actions' => ['index','view'],
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper','moder']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
     /**
      * Lists all ExchangeRates models.
      * @return mixed

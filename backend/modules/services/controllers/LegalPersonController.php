@@ -6,6 +6,7 @@ use backend\components\AbstractBaseBackendController;
 use Yii;
 use common\models\LegalPerson;
 use common\models\search\LegalPersonSearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -13,6 +14,30 @@ use yii\web\NotFoundHttpException;
  */
 class LegalPersonController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'actions' => ['index','view'],
+                    'allow' => true,
+                    'roles' => ['admin','moder']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['superadmin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
 
     /**
      * Lists all LegalPerson models.

@@ -10,57 +10,57 @@ use yii\grid\GridView;
 $this->title = Yii::t('app/services', 'Legal People');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class = "page-title">
-    <div class = "title_left">
-         <h3><?php $this->title?></h3>
-    </div>
-
-    <div class = "title_right">
-
-    </div>
-</div>
-<div class = "clearfix"></div>
 <div class = "row">
+    <div class = "col-md-12 col-sm-12 col-xs-12">
+        <div class = "x_panel">
+            <div class = "x_title">
+                <h2><?php echo $this->title?></h2>
+                <section class="pull-right">
+                <?php if(Yii::$app->user->can('only_bookkeeper') || Yii::$app->user->can('superRights')):?>
+                    <?= Html::a(Yii::t('app/services', 'Create Legal Person'), ['create'], ['class' => 'btn btn-success']) ?>
+                <?php endif;?>
+                </section>
+                <div class = "clearfix"></div>
+            </div>
+            <div class = "x_content">
+                <?php
 
-<div class = "col-md-12 col-sm-12 col-xs-12">
-                            <div class = "x_panel">
-                                <div class = "x_title">
-                                    <h2><?php echo $this->title?></h2>
-                                    <section class="pull-right">
-                                    <?= Html::a(Yii::t('app/services', 'Create Legal Person'), ['create'], ['class' => 'btn btn-success']) ?>
-                                    </section>
-                                    <div class = "clearfix"></div>
-                                </div>
-                                <div class = "x_content">
+                    $tpl = '';
+                    if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper'))
+                        $tpl = '{view}{update}{delete}';
+                    elseif(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
+                        $tpl = '{view}';
 
+                    echo GridView::widget([
+                        'dataProvider' => $dataProvider,
+                        'filterModel' => $searchModel,
+                        'columns' => [
+                            ['class' => 'yii\grid\SerialColumn'],
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+                            'id',
+                            'name',
+                            'description:ntext',
+                            [
+                                'attribute' => 'status',
+                                'value' => function($model){
+                                        return $model->getStatusStr();
+                                    },
+                                'filter' => \common\models\LegalPerson::getStatusArr()
+                            ],
+                            [
+                                'attribute' => 'created_at',
+                                'value' => function($model){
+                                        return $model->getFormatedCreatedAt();
+                                    }
+                            ],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => $tpl
+                            ],
+                        ],
+                    ]); ?>
 
-            'id',
-            'name',
-            'description:ntext',
-            [
-                'attribute' => 'status',
-                'value' => function($model){
-                        return $model->getStatusStr();
-                    },
-                'filter' => \common\models\LegalPerson::getStatusArr()
-            ],
-            [
-                'attribute' => 'created_at',
-                'value' => function($model){
-                        return $model->getFormatedCreatedAt();
-                    }
-            ],
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
-
-                                </div>
-                            </div>
-                        </div>
+            </div>
+        </div>
+    </div>
 </div>

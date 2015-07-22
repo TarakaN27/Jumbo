@@ -33,7 +33,7 @@ $this->title = Yii::t('app/users', 'Add_invite');
 
                 <?= $form->field($model, 'email')->textInput(['maxlength' => TRUE]) ?>
 
-                <?= $form->field($model, 'user_type')->dropDownList(\backend\models\BUser::getRoleArr()) ?>
+                <?= $form->field($model, 'user_type')->dropDownList(\backend\models\BUser::getRoleArrWithRights()) ?>
 
                 <div class = "form-group">
                     <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

@@ -16,30 +16,34 @@ use yii\filters\VerbFilter;
  */
 class DefaultController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
     public function behaviors()
     {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'actions' => ['profile', 'edit-profile','change-own-password'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['admin'],
-                    ],
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'actions' => ['profile', 'edit-profile','change-own-password'],
+                    'allow' => true,
+                    'roles' => ['@'],
                 ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
+                [
+                    'actions' => ['index','view'],
+                    'allow' => true,
+                    'roles' => ['moder','bookkeeper']
                 ],
-            ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin']
+                ]
+            ]
         ];
+        return $tmp;
     }
 
     /**
