@@ -5,7 +5,6 @@ namespace common\models;
 use backend\models\BUser;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
-use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -285,6 +284,31 @@ class CUser extends AbstractUser
         return parent::afterDelete();
     }
 
+    /**
+     * @param $model_id
+     * @return mixed
+     */
+    public static function findOneByIDCached($model_id)
+    {
+        $obDep = new TagDependency([
+            'tags' => [
+                ActiveRecordHelper::getObjectTag(self::className(),$model_id),
+            ]
+        ]);
+        return self::getDb()->cache(function() use ($model_id){
+            return self::findOne($model_id);
+        },3600*24,$obDep);
+    }
+
+    public function getInfo()
+    {
+        /** @var CUserRequisites $obRq */
+        $obRq = $this->requisites;
+        if($obRq)
+            return trim($obRq->corp_name.' '.$obRq->j_lname.' '.$obRq->j_fname.' '.$obRq->j_mname);
+
+        return NULL;
+    }
 
 }
 

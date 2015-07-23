@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\BUser;
 use Yii;
 
 /**
@@ -135,5 +136,53 @@ class PaymentRequest extends AbstractActiveRecord
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(), ['id' => 'currency_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCuser()
+    {
+        return $this->hasOne(CUser::className(), ['id' => 'cntr_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(BUser::className(), ['id' => 'owner_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getManager()
+    {
+        return $this->hasOne(BUser::className(), ['id' => 'manager_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLegal()
+    {
+        return $this->hasOne(LegalPerson::className(), ['id' => 'legal_id']);
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getFormatedPayDate()
+    {
+        return date('d.m.Y H:i',$this->pay_date);
     }
 }

@@ -31,5 +31,7 @@ return [
     'Message' => 'Сообщение',
     'Select users' => 'Выбрать пользователей',
     'DIALOG_SUCCESS_ADD_DIALOG' => 'Диалог успешно создан',
-    'DIALOG_ERROR_ADD_DIALOG' => 'Не удалось создать диалог'
+    'DIALOG_ERROR_ADD_DIALOG' => 'Не удалось создать диалог',
+    'Error' => 'Ошибка',
+    'Can not load manager for contractor' => 'Не удалось загрузить менеджера для контрагента'
 ];

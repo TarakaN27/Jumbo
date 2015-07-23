@@ -4,6 +4,7 @@ namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use common\models\CUser;
 use common\models\Dialogs;
 use common\models\PaymentRequest;
 use Yii;
@@ -12,6 +13,7 @@ use common\models\search\PaymentsSearch;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * DefaultController implements the CRUD actions for Payments model.
@@ -40,6 +42,13 @@ class DefaultController extends AbstractBaseBackendController
                 ]
             ]
         ];
+        $tmp['verbs'] = [
+            'class' => VerbFilter::className(),
+            'actions' => [
+                'delete' => ['post','get-manager'],
+            ],
+        ];
+
         return $tmp;
     }
 
@@ -144,6 +153,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = new PaymentRequest();
         $model->owner_id = Yii::$app->user->id;
         $model->status = PaymentRequest::STATUS_NEW;
+        $model->pay_date = date('Y-m-d',time());
 
         if($model->load(Yii::$app->request->post()) && $model->save())
         {
@@ -176,5 +186,22 @@ class DefaultController extends AbstractBaseBackendController
         return $this->render('create_payment_request',[
             'model' => $model
         ]);
+    }
+
+    /**
+     * @return array
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionGetManager()
+    {
+        $cID = Yii::$app->request->post('cID');
+        /** @var CUser $obCtr */
+        $obCtr = CUser::findOneByIDCached($cID);
+        if(empty($obCtr))
+            throw new NotFoundHttpException("Contractor ID not found");
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return ['mID' => $obCtr->manager_id];
     }
 }

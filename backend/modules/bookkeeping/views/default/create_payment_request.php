@@ -13,7 +13,23 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 $this->title = Yii::t('app/book','Add new payment request');
 
 $this->registerJs('
+$("#paymentrequest-cntr_id").on("change",function(){
+    var
+        cID = $(this).val();
 
+   if(cID != "" && cID !=  undefined)
+    {
+        $.post( "'.\yii\helpers\Url::to(['get-manager']).'", { cID: cID }, function( data ) {
+           if(data.mID)
+                $("#paymentrequest-manager_id").select2("val", data.mID);
+           else
+                $("#paymentrequest-manager_id").select2("val", "");
+        }, "json")
+        .fail(function() {
+            addErrorNotify("'.Yii::t('app/common','Error').'","'.Yii::t('app/common','Can not load manager for contractor').'")
+        });
+    }
+});
 ',\yii\web\View::POS_READY);
 
 
