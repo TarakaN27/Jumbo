@@ -17,6 +17,7 @@ use Yii;
  * @property string $description
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $prequest_id
  *
  * @property ExchangeRates $currency
  * @property CUser $cuser
@@ -40,7 +41,7 @@ class Payments extends AbstractActiveRecord
     {
         return [
             [['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id'], 'required'],
-            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
+            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id'], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string']
         ];
@@ -85,6 +86,7 @@ class Payments extends AbstractActiveRecord
             'description' => Yii::t('app/book', 'Description'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'prequest_id' => Yii::t('app/book', 'Payment request'),
         ];
     }
 

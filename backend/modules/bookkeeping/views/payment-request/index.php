@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use \common\models\PaymentRequest;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PaymentRequestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -79,7 +79,38 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'created_at',
             // 'updated_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}{process}',
+                'buttons' => [
+                    'process' =>function ($url, $model, $key) {
+                        if(empty($model->manager_id) && $model->is_unknown == PaymentRequest::YES)
+                        {
+                            $options = [
+                                'title' => Yii::t('yii', 'Make mine payment'),
+                                'aria-label' => Yii::t('yii', 'Make mine payment'),
+                            ];
+                            return Html::a(
+                                '<span class="glyphicon glyphicon-pushpin"></span>',
+                                \yii\helpers\Url::to(['pin-payment-to-manager','pID' => $model->id]),
+                                $options);
+                        }
+                        elseif(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
+                            $options = [
+                                'title' => Yii::t('yii', 'Add payments'),
+                                'aria-label' => Yii::t('yii', 'Add payments'),
+                            ];
+                            return Html::a(
+                                '<span class="glyphicon glyphicon-credit-card"></span>',
+                                \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                $options);
+                        }
+
+                        return '';
+                    }
+                ]
+
+            ],
         ],
     ]); ?>
 

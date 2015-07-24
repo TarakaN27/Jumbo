@@ -31,3 +31,12 @@
 .inner_dialog_section_msg{
     padding-bottom: 10px;
 }
+.red{
+    color: #90111A;
+}
+.green{
+    color: #1ABB9C ;
+}
+.yellow{
+    color: rgba(243, 156, 18, 0.88);
+}

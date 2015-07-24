@@ -5,8 +5,10 @@ namespace common\models;
 use backend\models\BUser;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
+use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -206,7 +208,6 @@ class CUser extends AbstractUser
             ]);
     }
 
-
     /**
      * Вернем всех контрагентов
      * @return mixed
@@ -232,28 +233,14 @@ class CUser extends AbstractUser
      */
     public static function getContractorMap()
     {
-        //$tmp = self::getAllContractor();
-        //return ArrayHelper::map($tmp,'id','username');
-
         $tmp =self::getAllContractor();
         $result = [];
         foreach($tmp as $t)
         {
-            $obR = $t->requisites;
-            if(is_object($obR))
-                $result[$t->id] = $t->requisites->corp_name.' '.
-                    $t->requisites->j_lname.' '.
-                    $t->requisites->j_fname.' '.
-                    $t->requisites->j_mname;
-            else
-                $result[$t->id] = $t->username;
+            $result[$t->id] = $t->getInfo();
         }
-
         return $result;
     }
-
-
-
 
     /**
      * Устанавливаем заглушки
@@ -300,16 +287,38 @@ class CUser extends AbstractUser
         },3600*24,$obDep);
     }
 
+    /**
+     * @return null|string
+     */
     public function getInfo()
     {
         /** @var CUserRequisites $obRq */
         $obRq = $this->requisites;
         if($obRq)
             return trim($obRq->corp_name.' '.$obRq->j_lname.' '.$obRq->j_fname.' '.$obRq->j_mname);
-
-        return NULL;
+        else
+            return $this->username;
     }
 
+    /**
+     * @param $iMngID
+     * @return array
+     */
+    public static function getContractorForManager($iMngID)
+    {
+        $dep = new DbDependency(['sql' =>
+            'SELECT (MAX(c.updated_at) + MAX(r.updated_at)) as control '.
+            'FROM '.CUser::tableName().' c '.
+            'LEFT JOIN '.CUserRequisites::tableName().' as r ON r.id = c.requisites_id '.
+            'WHERE c.manager_id = '.$iMngID
+        ]);
+       return self::getDb()->cache(function($db) use ($iMngID){
+            return self::find()
+                ->with('requisites')
+                ->where(['manager_id' => $iMngID])
+                ->all($db);
+        },3600*24,$dep);
+    }
 }
 
 /**

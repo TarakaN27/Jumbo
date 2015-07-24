@@ -121,6 +121,9 @@ unset($subItems);
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
+                                            </li>
                                     </ul>
                                 </li>
                                 <!--li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
@@ -192,7 +195,7 @@ unset($subItems);
             </div>
 
             <!-- top navigation -->
-            <div class = "top_nav">
+            <div class = "top_nav no-print">
 
                 <div class = "nav_menu">
                     <nav class = "navbar" role = "navigation">
@@ -217,7 +220,7 @@ unset($subItems);
                 <?= \backend\widgets\Alert::widget(); ?>
                 <?= $content ?>
                 <!-- footer content -->
-                <footer>
+                <footer class="no-print">
                     <div class = "">
                         <p class = "pull-right">Webmart Group corp! <?= Yii::powered() ?> <a>Webmart Group</a>. |
                             <span class = "lead"><?php echo Html::img('@web/images/logo.png', ['alt' => 'Webmart Logo']); ?>
@@ -232,7 +235,7 @@ unset($subItems);
 
         </div>
     </div>
-    <div id = "custom_notifications" class = "custom-notifications dsp_none">
+    <div id = "custom_notifications" class = "custom-notifications dsp_none no-print">
         <ul class = "list-unstyled notifications clearfix" data-tabbed_notifications = "notif-group">
         </ul>
         <div class = "clearfix"></div>

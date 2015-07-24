@@ -9,6 +9,7 @@ use wbraganca\dynamicform\DynamicFormWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 $this->title  = Yii::t('app/book','Add payment');
+$sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
 $this->registerJs('
 function countASumm()
 {
@@ -25,7 +26,29 @@ function countASumm()
             tmpSumm+=parseInt(val);
     });
 
-    aSummDispl.html(aSumm.val() - tmpSumm);
+    $tmp = aSumm.val() - tmpSumm;
+    aSummDispl.html((aSumm.val() - tmpSumm)+" '.$sCurrn.'");
+    if($tmp < 0)
+    {
+        aSummDispl.removeClass("green");
+        aSummDispl.removeClass("yellow");
+        if(!aSummDispl.hasClass("red"))
+            aSummDispl.addClass("red");
+    }
+    if($tmp == 0)
+    {
+        aSummDispl.removeClass("red");
+        aSummDispl.removeClass("yellow");
+        if(!aSummDispl.hasClass("green"))
+            aSummDispl.addClass("green");
+    }
+    if($tmp > 0)
+    {
+        aSummDispl.removeClass("red");
+        aSummDispl.removeClass("green");
+        if(!aSummDispl.hasClass("yellow"))
+            aSummDispl.addClass("yellow");
+    }
 }
 function initBehavior()
 {
@@ -115,7 +138,6 @@ $(document).on("submit", "form#dynamic-form", validateFormLogic);
                     <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
                              <?php
-                                $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
                                 echo \yii\widgets\DetailView::widget([
                                      'model' => $modelP,
                                      'options' => [

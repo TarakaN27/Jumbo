@@ -12,6 +12,10 @@ use common\models\PaymentRequest;
  */
 class PaymentRequestSearch extends PaymentRequest
 {
+
+    public
+        $managerID;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +23,7 @@ class PaymentRequestSearch extends PaymentRequest
     {
         return [
             [['id', 'cntr_id', 'manager_id', 'owner_id', 'is_unknown',  'currency_id', 'legal_id', 'dialog_id', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['pay_date','user_name', 'description'], 'safe'],
+            [['pay_date','user_name', 'description','managerID'], 'safe'],
             [['pay_summ'], 'number'],
         ];
     }
@@ -55,6 +59,9 @@ class PaymentRequestSearch extends PaymentRequest
             // $query->where('0=1');
             return $dataProvider;
         }
+
+        if(!empty($this->managerID))
+            $query->andWhere('( manager_id IS NULL OR manager_id = :manID )',[':manID' => $this->managerID]);
 
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");

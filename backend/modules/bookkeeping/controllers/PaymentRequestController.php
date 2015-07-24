@@ -11,20 +11,56 @@ namespace backend\modules\bookkeeping\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
 use backend\modules\bookkeeping\form\AddPaymentForm;
+use backend\modules\bookkeeping\form\SetManagerContractorForm;
 use common\models\AbstractModel;
+use common\models\CUser;
+use common\models\CUserRequisites;
 use common\models\PaymentRequest;
+use common\models\Payments;
 use common\models\search\PaymentRequestSearch;
 use Yii;
 use yii\base\Exception;
+use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class PaymentRequestController extends AbstractBaseBackendController{
 
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+               // [
+               //     'actions' => ['index','view','create','update'],
+               //     'allow' => true,
+               //     'roles' => ['moder']
+               // ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper','moder']
+                ]
+            ]
+        ];
+
+
+        return $tmp;
+    }
+
+
     public function actionIndex()
     {
         $searchModel = new PaymentRequestSearch();
+        $searchModel->managerID = Yii::$app->user->id;
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
@@ -40,8 +76,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
 
-        //if($modelP->manager_id !== Yii::$app->user->id)
-        //    throw new ForbiddenHttpException('You are not allowed to perform this action')
+        if($modelP->manager_id != Yii::$app->user->id)
+            throw new ForbiddenHttpException('You are not allowed to perform this action');
+
         if(!Yii::$app->request->post('AddPaymentForm'))
             $model = [new AddPaymentForm(['fullSumm' => $modelP->pay_summ])];
         else
@@ -49,14 +86,56 @@ class PaymentRequestController extends AbstractBaseBackendController{
             $model = AbstractModel::createMultiple(AddPaymentForm::classname());
             AbstractModel::loadMultiple($model,Yii::$app->request->post());
             $valid = AbstractModel::validateMultiple($model);
+            $validSumm = FALSE;
+            $tmpSumm = 0;
+            foreach($model as $m)
+            {
+                $tmpSumm+=$m->summ;
+            }
 
-            if($valid)
+            if($tmpSumm != $modelP->pay_summ)
+                Yii::$app->session->setFlash('error',Yii::t('app/book','You have to spend all amout'));
+            else
+                $validSumm = TRUE;
+
+            if($valid &&  $validSumm)
             {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
+                        $bError = FALSE;
+                        foreach($model as $p)
+                        {
+                            $obPay = new Payments([
+                                'cuser_id' => $modelP->cntr_id,
+                                'pay_date' => $modelP->pay_date,
+                                'pay_summ' => $p->summ,
+                                'currency_id' => $modelP->currency_id,
+                                'service_id' => $p->service,
+                                'legal_id' => $modelP->legal_id,
+                                'description' => $p->comment
+                            ]);
 
+                            if(!$obPay->save())
+                            {
+                                $bError = TRUE;
+                                break;
+                            }
+                            unset($obPay);
+                        }
+
+                        if(!$bError)
+                        {
+                            $modelP->status = PaymentRequest::STATUS_FINISHED;
+                            $modelP->save();
+                            $transaction->commit();
+                            Yii::$app->session->set('success',Yii::t('app/book','Payments added successfully!'));
+                            return $this->redirect(['/bookkeeping/default/index']);
+                        }
+                        $transaction->rollBack();
+                        Yii::$app->session->set('error',Yii::t('app/book','Can not add payments!'));
                 }catch(Exception $e){
                     $transaction->rollBack();
+                    Yii::$app->session->set('error',Yii::t('app/book','Can not add payments!'));
                 }
             }
         }
@@ -64,6 +143,56 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $this->render('add_payment',[
             'model' => $model,
             'modelP' => $modelP
+        ]);
+    }
+
+    /**
+     * @param $pID
+     * @return \yii\web\Response
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionPinPaymentToManager($pID)
+    {
+        $modelP = PaymentRequest::find()
+            ->where(['id' => $pID])
+            ->one();
+        if(empty($modelP))
+            throw new NotFoundHttpException('Payment request not found');
+
+        if(!empty($modelP->cntr_id))
+        {
+            $obCUser = CUser::findOne($modelP->cntr_id);
+            if(empty($obCUser))
+                throw new NotFoundHttpException('Contractor not found');
+            if($obCUser->manager_id == Yii::$app->user->id)
+            {
+                $modelP->manager_id = Yii::$app->user->id;
+                if($modelP->save())
+                    Yii::$app->session->setFlash('success',Yii::t('app/book','Payment successfully pined'));
+                else
+                    Yii::$app->session->setFlash('error',Yii::t('app/book','Error. Cant save the model;'));
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/book','Error. Contractor has another manager. Please tell about this payment another manager;'));
+            }
+            return $this->redirect(['index']);
+        }
+
+        $arContr = CUser::getContractorForManager(Yii::$app->user->id);
+        $arContrMap = [];
+        foreach($arContr as $ac)
+        {
+            $arContrMap[$ac->id] = $ac->getInfo();
+        }
+
+        $model = new SetManagerContractorForm(['obPR' => $modelP,'contractorMap' => $arContrMap]);
+        if($model->load(Yii::$app->request->post()) && $model->makeRequest())
+        {
+            Yii::$app->session->setFlash('success',Yii::t('app/book','Payment successfully pined'));
+            return $this->redirect(['index']);
+        }
+        return $this->render('pin_payment_to_manager',[
+            'model' => $model,
+            'arContrMap' => $arContrMap
         ]);
     }
 
