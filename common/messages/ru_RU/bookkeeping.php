@@ -56,4 +56,5 @@ return [
     'No description' => 'Нет описания',
     'Payment is not processed' => 'Запрос на платеж не обработан',
     'Payment request is canceled' => 'Запрос на платеж отменен',
+    'BOOK_payment_request' => 'Запросы на платеж'
 ];

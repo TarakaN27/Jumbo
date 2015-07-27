@@ -33,5 +33,10 @@ return [
     'DIALOG_SUCCESS_ADD_DIALOG' => 'Диалог успешно создан',
     'DIALOG_ERROR_ADD_DIALOG' => 'Не удалось создать диалог',
     'Error' => 'Ошибка',
-    'Can not load manager for contractor' => 'Не удалось загрузить менеджера для контрагента'
+    'Can not load manager for contractor' => 'Не удалось загрузить менеджера для контрагента',
+    'MSG_messages' => 'Сообщения',
+    'MSG_dialogs' => 'Диалоги',
+    'DIALOG_ERROR_TITLE' => 'Ошибка диалога',
+    'DIALOG_ERROR_LOAD_CONTENT' => 'Не удалось загрузить диалог',
+    'DIALOG_EMPTY_MSG_TEXT' => 'Вы пытаетесь отправить пустое сообщение'
 ];

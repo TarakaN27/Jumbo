@@ -164,14 +164,14 @@ class DefaultController extends AbstractBaseBackendController
                 $obDlg->theme = Yii::t('app/book','New payment request').'<br>'.$model->description;
                 if($obDlg->save())
                 {
-                    if(!empty($model->manager_id))
+                    if(!empty($model->manager_id))//если указан менеджер, то добавляем его к диалогу
                     {
                         $obManager = BUser::findOne($model->manager_id);
                         if(empty($obManager))
                             throw new NotFoundHttpException('Manager not found');
                         $obDlg->link('busers',$obManager);
                     }else{
-                        $obManagers = BUser::getManagersArr();
+                        $obManagers = BUser::getManagersArr(); //иначе добавляем всех менеджеров к диалогу
                         if(!empty($obManagers))
                             foreach($obManagers as $obMan)
                                 $obDlg->link('busers',$obMan);

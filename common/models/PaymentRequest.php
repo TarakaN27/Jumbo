@@ -179,6 +179,14 @@ class PaymentRequest extends AbstractActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments()
+    {
+        return $this->hasMany(Payments::className(),['prequest_id' => 'id']);
+    }
+
+    /**
      * @return bool|string
      */
     public function getFormatedPayDate()

@@ -13,6 +13,8 @@ use common\models\Dialogs;
 use common\models\Messages;
 use yii\base\Component;
 use yii\base\Exception;
+use yii\caching\DbDependency;
+use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
 class DialogManager extends Component{
@@ -133,6 +135,37 @@ class DialogManager extends Component{
             throw new NotFoundHttpException('Author ID is empty');
 
         return $this->iDId == 0 ? $this->addNewDialog() : $this->addNewComment();
+    }
+
+    /**
+     * @param int $page
+     * @return array
+     */
+    public function loadDialog($page = 0)
+    {
+        $iDId = $this->iDId;
+        //получаем сообщения для диалогов. зависимость SQL потому что при тегиррованой зависимости, слишком часто будет сбрасываться кеш.
+        $obDep = new DbDependency(['sql' => 'Select MAX(updated_at) FROM '.Messages::tableName().' WHERE dialog_id  = '.$iDId]);
+
+       return Messages::getDb()->cache(function() use ($iDId,$page){
+            $query = Messages::find()->where(['dialog_id' => $this->iDId]);
+            $countQuery = clone $query;
+            $pages = new Pagination([
+                'totalCount' => $countQuery->count(),
+
+            ]);
+            $pages->setPageSize(10);
+            $pages->setPage($page);
+            $models = $query->offset($pages->offset)
+                ->limit($pages->limit)
+                ->orderBy('id DESC ')
+                ->all();
+
+            return [
+                'models' => array_reverse($models),
+                'pages' =>$pages,
+            ];
+        },3600*24,$obDep);
     }
 
 } 

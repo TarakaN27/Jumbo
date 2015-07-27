@@ -61,48 +61,39 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php if($model->status == \common\models\PaymentRequest::STATUS_CANCELED):?>
                                 <?php echo Yii::t('app/book','Payment request is canceled');?>
                             <?php elseif($model->status == \common\models\PaymentRequest::STATUS_FINISHED):?>
-                                <table class = "table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Qty</th>
-                                            <th>Product</th>
-                                            <th>Serial #</th>
-                                            <th style = "width: 59%">Description</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Call of Duty</td>
-                                            <td>455-981-221</td>
-                                            <td>El snort testosterone trophy driving gloves handsome gerry Richardson helvetica tousled street art master testosterone trophy driving gloves handsome gerry Richardson
-                                            </td>
-                                            <td>$64.50</td>
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Need for Speed IV</td>
-                                            <td>247-925-726</td>
-                                            <td>Wes Anderson umami biodiesel</td>
-                                            <td>$50.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Monsters DVD</td>
-                                            <td>735-845-642</td>
-                                            <td>Terry Richardson helvetica tousled street art master, El snort testosterone trophy driving gloves handsome letterpress erry Richardson helvetica tousled</td>
-                                            <td>$10.70</td>
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Grown Ups Blue Ray</td>
-                                            <td>422-568-642</td>
-                                            <td>Tousled lomo letterpress erry Richardson helvetica tousled street art master helvetica tousled street art master, El snort testosterone</td>
-                                            <td>$25.99</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <?php
+                                    $payments = $model->payments;
+                                    if(!empty($payments)){
+                                        echo \yii\grid\GridView::widget([
+                                            'dataProvider' => new \yii\data\ArrayDataProvider([
+                                                    'allModels' => $payments,
+                                                    'pagination' => [
+                                                      'pageSize' => 0,
+                                                    ],
+                                                ]),
+                                            'tableOptions' => ['class' => 'table table-striped'],
+                                            'columns' => [
+                                                ['class' => 'yii\grid\SerialColumn'],
+                                                'id',
+                                                [
+                                                    'attribute' => 'service_id',
+                                                    'value' => function($model){
+                                                            return is_object($obServ = $model->service) ? $obServ->name : 'N/A';
+                                                        }
+                                                ],
+                                                'pay_summ',
+                                                [
+                                                    'attribute' => 'currency_id',
+                                                    'value' => function($model){
+                                                            return is_object($obCurr = $model->currency) ? $obCurr->code : 'N/A';
+                                                        }
+                                                ],
+                                                'description'
+                                            ]
+                                        ]);
+                                    }else{
+                                       echo Yii::t('app/book','Payment is not found');
+                                    }?>
                                 <?php else:?>
                                     <?php echo Yii::t('app/book','Payment is not processed')?>
                                 <?php endif;?>
@@ -112,12 +103,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class = "col-xs-12">
                              <button class = "btn btn-default" onclick = "window.print();">
                                  <i class = "fa fa-print"></i> Print
-                             </button>
-                             <button class = "btn btn-success pull-right">
-                                 <i class = "fa fa-credit-card"></i> Submit Payment
-                             </button>
-                             <button class = "btn btn-primary pull-right" style = "margin-right: 5px;">
-                                 <i class = "fa fa-download"></i> Generate PDF
                              </button>
                         </div>
                     </div>

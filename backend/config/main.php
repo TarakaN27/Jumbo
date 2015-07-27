@@ -24,6 +24,9 @@ return [
         'reports' => [
             'class' => 'backend\modules\reports\Module',
         ],
+        'messenger' => [
+            'class' => 'backend\modules\messenger\Module',
+        ],
     ],
     'components' => [
 

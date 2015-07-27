@@ -121,19 +121,19 @@ unset($subItems);
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
+                                        <?php if(Yii::$app->user->can('only_moder')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
                                             </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
-                                <!--li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
+                                <li><a><i class="fa fa-envelope"></i> <?php echo Yii::t('app/common', 'MSG_dialogs'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
-                                        <li><a href="tables.html">Tables</a>
-                                        </li>
-                                        <li><a href="tables_dynamic.html">Table Dynamic</a>
+                                        <li><a href="<?= Url::to(['/messenger/default/index']); ?>"><?php echo Yii::t('app/common', 'MSG_messages'); ?></a>
                                         </li>
                                     </ul>
-                                </li-->
+                                </li>
 
                                 <!--li><a><i class="fa fa-bar-chart-o"></i> Data Presentation <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
