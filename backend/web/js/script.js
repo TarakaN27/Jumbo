@@ -14,7 +14,7 @@ var cWidth=64;
 var cHeight=64;
 var cTotalFrames=13;
 var cFrameWidth=64;
-var cImageSrc='images/sprites.gif';
+var cImageSrc='../../images/sprites.gif';
 
 var cImageTimeout=false;
 var cIndex=0;
@@ -24,6 +24,7 @@ var SECONDS_BETWEEN_FRAMES=0;
 
 function startAnimation(){
 
+    console.log(document.getElementById('loaderImage'));
     document.getElementById('loaderImage').style.backgroundImage='url('+cImageSrc+')';
     document.getElementById('loaderImage').style.width=cWidth+'px';
     document.getElementById('loaderImage').style.height=cHeight+'px';

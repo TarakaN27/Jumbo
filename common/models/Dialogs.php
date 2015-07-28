@@ -181,6 +181,7 @@ class Dialogs extends AbstractActiveRecord
                 ->where([self::tableName().'.status' => self::PUBLISHED])
                 ->orWhere([Dialogs::tableName().'.buser_id' => $userID])
                 ->limit($rowLimit)
+                ->groupBy(Dialogs::tableName().'.id ')
                 ->orderBy('id DESC')
                 ->all();
         },86400,$obDep);
