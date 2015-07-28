@@ -48,6 +48,7 @@ function fadeDialogBlock($this, blockName) {
         $(tagI).addClass("fa-chevron-up");
     }
 }
+
 /**
  * Добавляем новый комментарий.
  * @param $this

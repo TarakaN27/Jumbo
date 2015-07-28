@@ -15,6 +15,8 @@ var
     DIALOG_ERROR_LOAD_CONTENT = '". Yii::t('app/common', 'DIALOG_ERROR_LOAD_CONTENT') ."',
     DIALOG_ADD_MSG_URL = '".\yii\helpers\Url::to(['/ajax-service/add-new-message'])."',
     DIALOG_EMPTY_MSG_TEXT = '" . Yii::t('app/common', 'DIALOG_EMPTY_MSG_TEXT') . "',
+    DIALOG_ADD_DIALOG_URL = '".\yii\helpers\Url::to(['/ajax-service/add-dialog'])."',
+    DIALOG_SUCCESS_ADD_DIALOG = '" . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_DIALOG') . "',
     DIALOG_LOAD_MSG_URL = '".\yii\helpers\Url::to(['/ajax-service/load-dialog'])."';
 ",\yii\web\View::POS_HEAD);
 
@@ -38,7 +40,7 @@ $this->registerCss("
             <div class = "x_title">
                 <h2><?php echo $this->title?></h2>
                 <section class="pull-right">
-                    <?php echo \yii\helpers\Html::button(Yii::t('app/msg','Add new dialog').'<i class = "fa fa-chevron-down"></i>',['id' => 'add_new_dialog_id'])?>
+                    <?php echo \yii\helpers\Html::button(Yii::t('app/msg','Add new dialog').' '.'<i class = "fa fa-chevron-down"></i>',['id' => 'add_new_dialog_id'])?>
                 </section>
                 <div class = "clearfix"></div>
             </div>
@@ -73,7 +75,7 @@ $this->registerCss("
                         ]);?>
                         <br />
                         <div class = "form-group">
-                            <button class = "btn btn-success btn-sm sendComment" data = "0" type = "button">
+                            <button class = "btn btn-success btn-sm addNewDialog" data = "0" type = "button">
                                 <?= Yii::t('app/common', 'Send comment') ?>
                             </button>
                         </div>
@@ -88,23 +90,7 @@ $this->registerCss("
                 <div class="row">
                                         <div class="col-sm-3 mail_list_column">
                                             <?php foreach($models as $model):?>
-                                                <div class="mail_list" data-id="<?=$model->id;?>">
-                                                    <a href="#nogo" data-id="<?php echo $model->id;?>" class="dialog-mail">
-                                                        <div class="left">
-                                                            <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
-                                                        </div>
-                                                        <div class="right">
-                                                            <h3><?php echo is_object($obBuser = $model->owner) ? $obBuser->getFio() : 'N/A';?>
-                                                                <small><?php echo Yii::$app->formatter->asDatetime($model->created_at);?></small>
-                                                            </h3>
-                                                            <p><?=$model->theme;?></p>
-                                                        </div>
-                                                        <?php echo Html::hiddenInput('theme',$model->theme,['data-id' => $model->id]);?>
-                                                        <?php echo Html::hiddenInput('owner',is_object($obOwner = $model->owner) ? $obOwner->getFio() : 'N/A');?>
-                                                        <?php echo Html::hiddenInput('date',Yii::$app->formatter->asDatetime($model->created_at))?>
-
-                                                    </a>
-                                                </div>
+                                                <?= $this->render('_dialog_left_part', ['model' => $model]) ?>
                                             <?php endforeach;?>
                                         </div>
                                         <!-- /MAIL LIST -->
@@ -136,11 +122,11 @@ $this->registerCss("
 
                                                 </div>
                                                 <div class="compose-btn pull-left">
-                                                    <button class="btn btn-sm "><i class="fa fa-reply"></i> Add comment</button>
+                                                    <button class="btn btn-sm btn-add-comment"><i class="fa fa-reply"></i> Add comment</button>
                                                     </button>
                                                 </div>
                                                  <div class = "clearfix"></div>
-                                                    <div id="redactorBlock">
+                                                    <div id="redactorBlock" class="blockRedactor">
                                                         <?php echo Html::label(Yii::t('app/common','Message'))?>
                                                         <?php echo ImperaviWidget::widget([
                                                             'name' => 'redactor',

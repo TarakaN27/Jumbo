@@ -168,4 +168,34 @@ class DialogManager extends Component{
         },3600*24,$obDep);
     }
 
+    public function addDialog()
+    {
+        $obDlg = new Dialogs();
+        $obDlg->status = Dialogs::PUBLISHED;
+        $obDlg->type = Dialogs::TYPE_MSG;
+        $obDlg->buser_id = $this->iAthID;
+        $obDlg->theme = $this->sMsg;
+        $transaction = \Yii::$app->db->beginTransaction();
+        if($obDlg->save())
+        {
+            try{
+                if(!empty($this->arUsers))
+                {
+                    $arUsers = BUser::find()->where(['id' => $this->arUsers])->all();
+                    foreach($arUsers as $obUser)
+                    {
+                        $obDlg->link('busers',$obUser);
+                    }
+                }
+                $transaction->commit();
+                return $obDlg;
+            }catch(Exception $e)
+            {
+                $transaction->rollBack();
+            }
+        }else{
+            $transaction->rollBack();
+        }
+        return NULL;
+    }
 } 

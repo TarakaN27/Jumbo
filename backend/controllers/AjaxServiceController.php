@@ -88,5 +88,26 @@ class AjaxServiceController extends AbstractBaseBackendController{
         ];
     }
 
+    public function actionAddDialog()
+    {
+        $obDlgMng = new DialogManager([
+            'iDId' => \Yii::$app->request->post('dialog_id'),
+            'sMsg' => \Yii::$app->request->post('redactor'),
+            'iAthID' => \Yii::$app->request->post('author_id'),
+            'arUsers' => \Yii::$app->request->post('for_users')
+        ]);
+
+        if($obDlg = $obDlgMng->addDialog())
+        {
+            return [
+                'content' => $this->renderPartial('@backend/modules/messenger/views/default/_dialog_left_part.php',[
+                        'model' => $obDlg
+                    ])
+            ];
+        }
+
+        throw new ServerErrorHttpException("Can't create dialog");
+    }
+
 
 } 

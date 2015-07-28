@@ -52,6 +52,7 @@ class DefaultController extends AbstractBaseBackendController
         $models = $query->offset($pages->offset)
             ->limit($pages->limit)
             ->groupBy(Dialogs::tableName().'.id')
+            ->orderBy(Dialogs::tableName().'.id DESC ')
             ->all();
 
         return $this->render('index', [

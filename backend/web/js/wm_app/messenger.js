@@ -3,22 +3,36 @@
  * Created by zhenya on 27.07.15.
  */
 $(".msgBoxAll").fadeOut();
+$(".blockRedactor").fadeOut();
 
-$("#add_new_dialog_id").on('click',function(){
+/**
+ * Скрытие/открытие блоков
+ * @param $this
+ * @param blockName
+ */
+function fadeDialogBlock($this, blockName) {
     var
-        tagI = $(this).find("i");
-    if($(this).hasClass("open"))
-    {
-        $(this).removeClass("open");
+        tagI = $($this).find("i");
+
+    if ($($this).hasClass("open")) {
+        $("." + blockName ).fadeOut(500);
+        $($this).removeClass("open");
         $(tagI).removeClass("fa-chevron-up");
         $(tagI).addClass("fa-chevron-down");
-        $(".msgBoxAll").fadeOut();
-    }else{
-        $(this).addClass("open");
-        $(tagI).addClass("fa-chevron-up");
+    } else {
+        $("." + blockName).fadeIn(500);
+        $($this).addClass("open");
         $(tagI).removeClass("fa-chevron-down");
-        $(".msgBoxAll").fadeIn();
+        $(tagI).addClass("fa-chevron-up");
     }
+}
+
+$("#add_new_dialog_id").on('click',function(){
+    fadeDialogBlock(this, 'msgBoxAll');
+});
+
+$(".btn-add-comment").on("click",function(){
+    fadeDialogBlock(this, 'blockRedactor');
 });
 
 /**
@@ -135,10 +149,41 @@ function sendComment()
             return false;
         }
     });
-
-
-
 }
 
+function addNewDialogs()
+{
+    var
+       ID = $(this).attr("data"),
+       content = $(".msgBox[data-id='"+ID+"'] textarea").redactor("code.get");
 
+    if(content == undefined || content == '')
+    {
+        addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_EMPTY_MSG_TEXT);
+        return false;
+    }
 
+    var
+        formData = $(".msgBox[data-id='" + ID + "']").serialize();
+    $(".msgBox[data-id='" + ID + "'] textarea").redactor('code.set', '');   //сбрасываем редактор
+    $(".msgBox[data-id='" + ID + "'] select").select2("val", "");
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: DIALOG_ADD_DIALOG_URL,
+        dataType: "json",
+        data: formData,
+        success: function(msg){
+            $(".mail_list_column").prepend(msg.content);
+            $(".dialog-mail").on("click",loadDialogContent);
+            $($(".mail_list:first a")).click();
+            addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_DIALOG);
+        },
+        error: function(msg){
+            addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADD_CONTENT);
+            return false;
+        }
+    });
+}
+
+$('.addNewDialog').on("click",addNewDialogs);
