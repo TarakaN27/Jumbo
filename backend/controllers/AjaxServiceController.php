@@ -13,12 +13,42 @@ use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
 use common\models\Dialogs;
 use common\models\Messages;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
 class AjaxServiceController extends AbstractBaseBackendController{
 
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+                'verbs' => [
+                    'class' => VerbFilter::className(),
+                    'actions' => [
+                        'add-comment' => ['post'],
+                        'add-message' => ['post'],
+                        'load-dialog' => ['post'],
+                        'add-new-message' => ['post'],
+                        'add-dialog' => ['post']
+                    ],
+                ],
+            ]
+        ];
+        return $tmp;
+    }
     /**
      * Контроллер по умолчанию всегда возвращает json!!!!
      */

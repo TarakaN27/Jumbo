@@ -19,6 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2>Сотрудники</h2>
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/users', 'To users list'), ['index', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+
+                                    <?php if(Yii::$app->user->can('superRights')):?>
+                                        <?= HTML::a(Yii::t('app/users','Bind_members'),
+                                            ['/users/default/bind-members','id' => $model->id],
+                                            ['class' => 'btn btn-primary']
+                                        )?>
+                                    <?php endif;?>
                                     <?php if(Yii::$app->user->can('adminRights')):?>
                                         <?= Html::a(Yii::t('app/users','Add_new_user'),['/users/default/create'],['class'=>'btn btn-primary']);?>
                                         <?= Html::a(Yii::t('app/users', 'Change_password'), ['change-password', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>

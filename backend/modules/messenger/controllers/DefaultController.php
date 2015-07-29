@@ -45,7 +45,6 @@ class DefaultController extends AbstractBaseBackendController
             ->orWhere([Dialogs::tableName().'.buser_id' => $userID,'type' => Dialogs::TYPE_MSG]);
         $countQuery = clone $query;
         $pages = new Pagination([
-            //'defaultPageSize' => 10,
             'totalCount' => $countQuery->count(' DISTINCT '.Dialogs::tableName().'.id')
         ]);
         $pages->setPageSize(10);

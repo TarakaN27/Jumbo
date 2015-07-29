@@ -3,6 +3,7 @@
 namespace backend\modules\users\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use backend\modules\users\form\BindMembersForm;
 use backend\modules\users\models\ChangePasswordBUserForm;
 use common\models\BuserInviteCode;
 use Yii;
@@ -31,6 +32,11 @@ class DefaultController extends AbstractBaseBackendController
                     'actions' => ['profile', 'edit-profile','change-own-password'],
                     'allow' => true,
                     'roles' => ['@'],
+                ],
+                [
+                    'actions' => ['bind-members'],
+                    'allow' => true,
+                    'roles' => ['superadmin']
                 ],
                 [
                     'actions' => ['index','view'],
@@ -226,6 +232,21 @@ class DefaultController extends AbstractBaseBackendController
         return $this->render('change_password',[
             'model' => $model,
             'isProfile' => true
+        ]);
+    }
+
+    public function actionBindMembers($id)
+    {
+        $model = new BindMembersForm(['userID' => $id]);
+
+        if($model->load(Yii::$app->request->post()) && $model->makeRequest())
+        {
+            Yii::$app->session->setFlash('success',Yii::t('app/users','Members successfully binded'));
+            return $this->redirect(['view','id' => $id]);
+        }
+
+        return $this->render('bind_members',[
+            'model' => $model
         ]);
     }
 

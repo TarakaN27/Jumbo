@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use app\models\BindBuser;
 use common\models\AbstractUser;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
@@ -242,5 +243,13 @@ class BUser extends AbstractUser
                     'cache' => 'cache', // optional option - application id of cache component
                 ]
             ]);
+    }
+
+    /**
+     * @return static
+     */
+    public function getBindMembers()
+    {
+        return $this->hasMany(self::className(), ['id' => 'member_id'])->viaTable(BindBuser::tableName(), ['buser_id' => 'id']);
     }
 }
