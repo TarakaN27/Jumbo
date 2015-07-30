@@ -121,9 +121,14 @@ unset($subItems);
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
-                                        <?php if(Yii::$app->user->can('only_moder')):?>
+                                        <?php if(Yii::$app->user->can('only_manager')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
+                                            </li>
+                                        <?php endif;?>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/payment-condition/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_condition'); ?></a>
                                             </li>
                                         <?php endif;?>
                                     </ul>
@@ -136,7 +141,7 @@ unset($subItems);
                                     </ul>
                                 </li>
 
-                                <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
+                                <li><a><i class="fa fa-bar-chart-o"></i> <span style="color:gray;"><?php echo Yii::t('app/common', 'Reports'); ?></span> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/reports/default/index']); ?>"><?php echo Yii::t('app/common', 'MSG_messages'); ?></a>

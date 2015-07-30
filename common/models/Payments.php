@@ -26,6 +26,11 @@ use Yii;
  */
 class Payments extends AbstractActiveRecord
 {
+
+    public
+        $updateWithNewCondition,
+        $condition_id;
+
     /**
      * @inheritdoc
      */
@@ -40,8 +45,8 @@ class Payments extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id'], 'required'],
-            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id'], 'integer'],
+            [['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
+            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id'], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string']
         ];
@@ -87,6 +92,8 @@ class Payments extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'prequest_id' => Yii::t('app/book', 'Payment request'),
+            'condition_id' => Yii::t('app/book', 'Condition'),
+            'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition')
         ];
     }
 
@@ -123,10 +130,19 @@ class Payments extends AbstractActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCalculate()
+    {
+        return $this->hasOne(PaymentsCalculations::className(),['payment_id' => 'id']);
+    }
+
+    /**
      * @return bool|string
      */
     public function getFormatedPayDate()
     {
         return date('d.m.Y H:i',$this->pay_date);
     }
+
 }

@@ -82,17 +82,53 @@ function validateFormLogic()
     return true;
 }
 
+function findCondition($this){
+    var
+        serviceID = $($this).val(),
+        lineID = $($this).attr("id"),
+        lPID = "'.$modelP->legal_id.'"
+        contrID = "'.$modelP->cntr_id.'",
+        condID = lineID.replace(/-service/gi,"-condid");
+
+    if(serviceID == "")
+    {
+        $("#"+condID).val("");
+        return false;
+    }
+
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: "'.\yii\helpers\Url::to(['find-condition']).'",
+        dataType: "json",
+        data: {iServID:serviceID,iContrID:contrID,lPID:lPID},
+        success: function(msg){
+            if(msg.cID)
+              {
+                $("#"+condID).val(msg.cID);
+                addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
+              }else{
+                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
+              }
+        },
+        error: function(msg){
+            addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+            return false;
+        }
+    });
+}
+
 ',\yii\web\View::POS_END);
 $this->registerJs('
-countASumm();
-initBehavior();
-$(".dynamicform_wrapper").on("afterInsert", function(e, item) {
-    initBehavior();
-});
-$(".dynamicform_wrapper").on("afterDelete", function(e) {
     countASumm();
-});
-$(document).on("submit", "form#dynamic-form", validateFormLogic);
+    initBehavior();
+    $(".dynamicform_wrapper").on("afterInsert", function(e, item) {
+        initBehavior();
+    });
+    $(".dynamicform_wrapper").on("afterDelete", function(e) {
+        countASumm();
+    });
+    $(document).on("submit", "form#dynamic-form", validateFormLogic);
 ',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
@@ -175,9 +211,17 @@ $(document).on("submit", "form#dynamic-form", validateFormLogic);
                                 <div class="x_content">
                                     <div class="panel-body">
                                         <?= $form->field($m, "[{$i}]service")->dropDownList(
-                                            \common\models\Services::getServicesMap()) ?>
+                                            \common\models\Services::getServicesMap(),[
+                                            'prompt' => Yii::t('app/book','Choose service'),
+                                            'onchange' => 'findCondition(this);',
+                                            'data-service-id' => $i
+                                        ]) ?>
                                         <?= $form->field($m, "[{$i}]summ")->textInput(['maxlength' => true,'class' => 'form-control psumm']) ?>
                                         <?= $form->field($m, "[{$i}]comment")->textarea() ?>
+                                        <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
+                                            'prompt' => Yii::t('app/book','Choose condition'),
+                                            'data-cond-id' => $i
+                                        ]) ?>
                                     </div>
                                 </div>
                             </div>

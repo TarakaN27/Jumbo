@@ -4,9 +4,12 @@ namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use common\components\payment\PaymentOperations;
 use common\models\CUser;
 use common\models\Dialogs;
+use common\models\PaymentCondition;
 use common\models\PaymentRequest;
+use common\models\PaymentsCalculations;
 use Yii;
 use common\models\Payments;
 use common\models\search\PaymentsSearch;
@@ -91,8 +94,51 @@ class DefaultController extends AbstractBaseBackendController
         if(empty($model->pay_date))
             $model->pay_date = time();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $trans = Yii::$app->db->beginTransaction();
+            try{
+                if($model->save())
+                {
+                    /** @var PaymentCondition $obCond */
+                    $obCond = PaymentCondition::findOne($model->condition_id);
+                    if(empty($obCond))
+                        throw new NotFoundHttpException("Condition not found");
+
+                    $obPOp = new PaymentOperations(
+                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                    );
+
+                    $arCount = $obPOp->getFullCalculate();
+
+                    $obClc = new PaymentsCalculations([
+                        'payment_id' => $model->id,
+                        'pay_cond_id' => $obCond->id,
+                        'tax' => $arCount['tax'],
+                        'profit' => $arCount['profit'],
+                        'production' => $arCount['production'],
+                        'cnd_corr_factor' => $obCond->corr_factor,
+                        'cnd_commission' => $obCond->commission,
+                        'cnd_sale' => $obCond->sale,
+                        'cnd_tax' => $obCond->tax,
+                    ]);
+
+                    if($obClc->save())
+                    {
+                        $trans->commit();
+                        Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully added"));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }else{
+                        $trans->rollBack();
+                        Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
+                    }
+                }
+            }catch (\Exception $e)
+            {
+                $trans->rollBack();
+                Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
+            }
+            $trans->rollBack();
+            Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -109,6 +155,15 @@ class DefaultController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        /** @var PaymentsCalculations $obCalc */
+        $obCalc = $model->calculate;
+
+        if(is_object($obCalc))
+            $model->condition_id = $obCalc->pay_cond_id;
+        else
+            $obCalc = new PaymentsCalculations();
+
+        //@todo сделать перерасчет
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

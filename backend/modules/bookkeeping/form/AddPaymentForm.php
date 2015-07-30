@@ -18,13 +18,14 @@ class AddPaymentForm extends AbstractModel{
         $fullSumm,
         $comment,
         $service,
+        $condID,
         $summ;
 
     public function rules()
     {
         return [
-            [['summ','service'],'required'],
-            [['service'], 'integer'],
+            [['summ','service','condID'],'required'],
+            [['service','condID'], 'integer'],
             [['summ','fullSumm'], 'number'],
             [['comment'], 'string']
         ];

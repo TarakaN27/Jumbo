@@ -14,11 +14,14 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bookkeeping\form\AddPaymentForm;
 use backend\modules\bookkeeping\form\SetManagerContractorForm;
+use common\components\payment\PaymentOperations;
 use common\models\AbstractModel;
 use common\models\CUser;
 use common\models\CUserRequisites;
+use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
+use common\models\PaymentsCalculations;
 use common\models\search\PaymentRequestSearch;
 use Yii;
 use yii\base\Exception;
@@ -26,6 +29,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class PaymentRequestController extends AbstractBaseBackendController{
 
@@ -102,8 +106,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
             {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
+
                         $bError = FALSE;
-                        foreach($model as $p)
+                        foreach($model as $p) // добавляем патежи
                         {
                             $obPay = new Payments([
                                 'cuser_id' => $modelP->cntr_id,
@@ -112,15 +117,45 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'currency_id' => $modelP->currency_id,
                                 'service_id' => $p->service,
                                 'legal_id' => $modelP->legal_id,
-                                'description' => $p->comment
+                                'description' => $p->comment,
+                                'prequest_id' => $modelP->id
+
                             ]);
+
 
                             if(!$obPay->save())
                             {
                                 $bError = TRUE;
                                 break;
                             }
-                            unset($obPay);
+                            //производим рассчет по каждому платежу исходя из условия
+                            /** @var PaymentCondition $obCond */
+                            $obCond = PaymentCondition::findOne($p->condID);
+                            if(empty($obCond))
+                                throw new NotFoundHttpException("Condition not found");
+
+                            $obOp = new PaymentOperations($p->summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale);
+                            $arCount = $obOp->getFullCalculate();
+
+                            $obPayCalc = new PaymentsCalculations([
+                                'payment_id' => $obPay->id,
+                                'pay_cond_id' => $obCond->id,
+                                'tax' => $arCount['tax'],
+                                'profit' => $arCount['profit'],
+                                'production' => $arCount['production'],
+                                'cnd_corr_factor' => $obCond->corr_factor,
+                                'cnd_commission' => $obCond->commission,
+                                'cnd_sale' => $obCond->sale,
+                                'cnd_tax' => $obCond->tax,
+                            ]);
+
+                            if(!$obPayCalc->save())
+                            {
+                                $bError = TRUE;
+                                break;
+                            }
+
+                            unset($obPay,$obPayCalc,$obCond,$obOp);
                         }
 
                         if(!$bError)
@@ -206,6 +241,34 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $this->render('view',[
             'model' => $model
         ]);
+    }
+
+    /**
+     * @return array
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionFindCondition()
+    {
+        $iServID = Yii::$app->request->post('iServID');
+        $iContrID = Yii::$app->request->post('iContrID');
+        $lPID = Yii::$app->request->post('lPID');
+
+        $obCntrID = CUser::findOneByIDCached($iContrID);
+
+        if(empty($obCntrID))
+            throw new NotFoundHttpException('Contractor not found');
+
+        $obCond = PaymentCondition::find()
+            ->select('id')
+            ->where([
+                'service_id' => (int)$iServID,
+                'l_person_id' => (int)$lPID,
+                'is_resident' => (int)$obCntrID->is_resident
+            ])
+            ->orderBy('id DESC')
+            ->one();
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ['cID' => empty($obCond) ? FALSE : $obCond->id];
     }
 
 } 

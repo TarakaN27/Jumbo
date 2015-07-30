@@ -8,6 +8,48 @@ use kartik\select2\Select2;
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+$this->registerJs('
+function findCondition()
+{
+    var
+       iServ = $("#payments-service_id").val(),
+       iCuser = $("#payments-cuser_id").val(),
+       iLP = $("#payments-legal_id").val();
+
+    if(iServ == "" || iLP == "" || iCuser == "")
+    {
+        $("#payments-condition_id").val("");
+        return false;
+    }
+
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: "'.\yii\helpers\Url::to(['/bookkeeping/payment-request/find-condition']).'",
+        dataType: "json",
+        data: {iServID:iServ,iContrID:iCuser,lPID:iLP},
+        success: function(msg){
+            if(msg.cID)
+              {
+                $("#payments-condition_id").val(msg.cID);
+                addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
+              }else{
+                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
+              }
+        },
+        error: function(msg){
+            addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+            return false;
+        }
+    });
+}
+
+',\yii\web\View::POS_END);
+
+$this->registerJs('
+$("#payments-cuser_id").on("change",findCondition);
+',\yii\web\View::POS_READY);
+
 ?>
 
 <div class="payments-form">
@@ -24,7 +66,9 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 
     <?php  echo $form->field($model, 'cuser_id')->widget(Select2::classname(), [
         'data' => \common\models\CUser::getContractorMap(),
-        'options' => ['placeholder' => Yii::t('app/book','BOOK_choose_cuser')],
+        'options' => [
+            'placeholder' => Yii::t('app/book','BOOK_choose_cuser')
+        ],
         'pluginOptions' => [
             'allowClear' => true
         ],
@@ -55,9 +99,18 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
                 ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
         </div>
     </div>
-    <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),['prompt' => Yii::t('app/book','BOOK_choose_service')]) ?>
+    <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
+        'prompt' => Yii::t('app/book','BOOK_choose_service'),
+        'onchange' => 'findCondition()'
+    ]) ?>
 
-    <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap()) ?>
+    <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap(),[
+        'onchange' => 'findCondition();'
+    ]) ?>
+
+    <?= $form->field($model, 'condition_id')->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
+        'prompt' => Yii::t('app/book','BOOK_choose_payment_condition')
+    ]) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
