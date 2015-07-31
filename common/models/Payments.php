@@ -46,7 +46,7 @@ class Payments extends AbstractActiveRecord
     {
         return [
             [['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
-            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id'], 'integer'],
+            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id','updateWithNewCondition'], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string']
         ];

@@ -112,10 +112,14 @@ $("#payments-cuser_id").on("change",findCondition);
         'prompt' => Yii::t('app/book','BOOK_choose_payment_condition')
     ]) ?>
 
+
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+            <?php if(!$model->isNewRecord):?>
+                <?=$form->field($model,'updateWithNewCondition')->checkbox();?>
+            <?php endif;?>
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div></div>
 

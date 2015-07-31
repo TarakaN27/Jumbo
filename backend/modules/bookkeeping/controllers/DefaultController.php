@@ -149,12 +149,15 @@ class DefaultController extends AbstractBaseBackendController
     /**
      * Updates an existing Payments model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     * @return string|Response
+     * @throws \yii\web\NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $oldSumm = $model->pay_summ;
+
         /** @var PaymentsCalculations $obCalc */
         $obCalc = $model->calculate;
 
@@ -163,10 +166,95 @@ class DefaultController extends AbstractBaseBackendController
         else
             $obCalc = new PaymentsCalculations();
 
-        //@todo сделать перерасчет
+        if ($model->load(Yii::$app->request->post()) ) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $trans = Yii::$app->db->beginTransaction();
+
+            if($model->save())
+            {   //перерасчет
+                if($obCalc->isNewRecord)
+                {
+                    /** @var PaymentCondition $obCond */
+                    $obCond = PaymentCondition::findOne($model->condition_id);
+                    if(empty($obCond))
+                        throw new NotFoundHttpException("Condition not found");
+
+                    $obPOp = new PaymentOperations(
+                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                    );
+
+                    $arCount = $obPOp->getFullCalculate();
+
+                    $obClc = new PaymentsCalculations([
+                        'payment_id' => $model->id,
+                        'pay_cond_id' => $obCond->id,
+                        'tax' => $arCount['tax'],
+                        'profit' => $arCount['profit'],
+                        'production' => $arCount['production'],
+                        'cnd_corr_factor' => $obCond->corr_factor,
+                        'cnd_commission' => $obCond->commission,
+                        'cnd_sale' => $obCond->sale,
+                        'cnd_tax' => $obCond->tax,
+                    ]);
+
+                    if($obClc->save())
+                    {
+                        $trans->commit();
+                        Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully updated"));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }elseif($obCalc->pay_cond_id != $model->condition_id || $model->updateWithNewCondition){
+                    //die();
+                    /** @var PaymentCondition $obCond */
+                    $obCond = PaymentCondition::findOne($model->condition_id);
+                    if(empty($obCond))
+                        throw new NotFoundHttpException("Condition not found");
+
+                    $obPOp = new PaymentOperations(
+                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                    );
+
+                    $arCount = $obPOp->getFullCalculate();
+
+                    $obCalc -> pay_cond_id = $obCond->id;
+                    $obCalc -> tax = $arCount['tax'];
+                    $obCalc -> profit = $arCount['profit'];
+                    $obCalc -> production = $arCount['production'];
+                    $obCalc -> cnd_corr_factor = $obCond->corr_factor;
+                    $obCalc -> cnd_commission = $obCond->commission;
+                    $obCalc -> cnd_sale = $obCond->sale;
+                    $obCalc -> cnd_tax = $obCond->tax;
+
+                    if($obCalc->save())
+                    {
+                        $trans->commit();
+                        Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully updated"));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }elseif($oldSumm != $model->pay_summ){
+                    $obPOp = new PaymentOperations(
+                        $model->pay_summ,$obCalc->cnd_tax,$obCalc->cnd_commission,$obCalc->cnd_corr_factor,$obCalc->cnd_sale
+                    );
+
+                    $arCount = $obPOp->getFullCalculate();
+
+                    $obCalc -> tax = $arCount['tax'];
+                    $obCalc -> profit = $arCount['profit'];
+                    $obCalc -> production = $arCount['production'];
+                    if($obCalc->save())
+                    {
+                        $trans->commit();
+                        Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully updated"));
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }else{
+                    $trans->commit();
+                    Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully updated"));
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            }
+            $trans->rollBack();
+            Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't update payment"));
         } else {
             return $this->render('update', [
                 'model' => $model,
