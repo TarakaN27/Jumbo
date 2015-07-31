@@ -56,7 +56,7 @@ class PaymentsCalculations extends AbstractActiveRecord
             'id' => Yii::t('app/book', 'ID'),
             'payment_id' => Yii::t('app/book', 'Payment ID'),
             'pay_cond_id' => Yii::t('app/book', 'Pay Cond ID'),
-            'tax' => Yii::t('app/book', 'Tax'),
+            'tax' => Yii::t('app/book', 'Tax value'),
             'profit' => Yii::t('app/book', 'Profit'),
             'production' => Yii::t('app/book', 'Production'),
             'cnd_corr_factor' => Yii::t('app/book', 'Cnd Corr Factor'),
