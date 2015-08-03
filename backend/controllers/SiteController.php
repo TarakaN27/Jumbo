@@ -9,7 +9,7 @@ use yii\web\Controller;
 use backend\models\LoginForm;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
-
+use yii\web\NotFoundHttpException;
 /**
  * Site controller
  */
@@ -33,7 +33,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index','get-document'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -119,8 +119,72 @@ class SiteController extends Controller
         return $this->render('signup', [
             'model' => $model,
         ]);
+    }
 
+    /**
+     * @param $name
+     * @param $hidfold
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
+    public function actionGetDocument($name,$hidfold)
+    {
+        $fileName = Yii::getAlias('@backend/web/').$hidfold.'/'.$name;
 
+        // если файла нет
+        if (!file_exists($fileName)) {
+            throw new NotFoundHttpException('File not found');
+        }
 
+        // получим размер файла
+        $fsize = filesize($fileName);
+        // дата модификации файла для кеширования
+        $ftime = date("D, d M Y H:i:s T", filemtime($fileName));
+
+        // смещение от начала файла
+        $range = 0;
+        // пробуем открыть
+        $handle = @fopen($fileName, "rb");
+
+        // если не удалось
+        if (!$handle){
+            throw new ForbiddenHttpException('Access denied');
+        }
+
+        // Если запрашивающий агент поддерживает докачку
+        if (isset($_SERVER["HTTP_RANGE"]) && $_SERVER["HTTP_RANGE"]) {
+            $range = $_SERVER["HTTP_RANGE"];
+            $range = str_replace("bytes=", "", $range);
+            $range = str_replace("-", "", $range);
+            // смещаемся по файлу на нужное смещение
+            if ($range) fseek($handle, $range);
+        }
+
+        // если есть смещение
+        if ($range) {
+            header("HTTP/1.1 206 Partial Content");
+        } else {
+            header("HTTP/1.1 200 OK");
+        }
+
+        header("Content-Disposition: attachment; filename=\"{$name}\"");
+        header("Last-Modified: {$ftime}");
+        header("Content-Length: ".($fsize-$range));
+        header("Accept-Ranges: bytes");
+        header("Content-Range: bytes {$range}-".($fsize - 1)."/".$fsize);
+
+        // подправляем под IE что б не умничал
+        if(isset($_SERVER['HTTP_USER_AGENT']) and strpos($_SERVER['HTTP_USER_AGENT'],'MSIE'))
+            Header('Content-Type: application/force-download');
+        else
+            Header('Content-Type: application/octet-stream');
+
+        while(!feof($handle)) {
+            $buf = fread($handle,512);
+            print($buf);
+        }
+
+        fclose($handle);
+        Yii::$app->end(200);
     }
 }

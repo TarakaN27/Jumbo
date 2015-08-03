@@ -23,7 +23,10 @@
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-datepicker": "@dev",
         "vova07/yii2-imperavi-widget": "*",
-        "wbraganca/yii2-dynamicform": "*"
+        "wbraganca/yii2-dynamicform": "*",
+        "miloschuman/yii2-highcharts-widget": "*",
+        "phpoffice/phpexcel": "~1.8",
+        "phpoffice/phpword": "0.12.*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

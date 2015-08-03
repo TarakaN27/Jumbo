@@ -93,7 +93,8 @@ return [
     'Cnd Commission' => 'Величина коммисии %',
     'Cnd Sale' => 'Величина скидки %',
     'Cnd Tax' => 'Величина налога %',
-    'Tax value' => 'Налог'
+    'Tax value' => 'Налог',
+    'Add new payment request' => 'Добавить запрос на платеж'
 
 
 ];
