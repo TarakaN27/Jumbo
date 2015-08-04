@@ -38,5 +38,6 @@ return [
     'MSG_dialogs' => 'Диалоги',
     'DIALOG_ERROR_TITLE' => 'Ошибка диалога',
     'DIALOG_ERROR_LOAD_CONTENT' => 'Не удалось загрузить диалог',
-    'DIALOG_EMPTY_MSG_TEXT' => 'Вы пытаетесь отправить пустое сообщение'
+    'DIALOG_EMPTY_MSG_TEXT' => 'Вы пытаетесь отправить пустое сообщение',
+    'Payments reports' => 'Отчеты по платежам'
 ];
