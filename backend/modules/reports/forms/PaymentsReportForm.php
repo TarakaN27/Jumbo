@@ -8,12 +8,7 @@
 
 namespace backend\modules\reports\forms;
 
-
-use common\models\CUser;
-use common\models\LegalPerson;
 use common\models\Payments;
-use common\models\PaymentsCalculations;
-use common\models\Services;
 use yii\base\Model;
 use Yii;
 
@@ -119,6 +114,10 @@ class PaymentsReportForm extends Model{
         return $arResult;
     }
 
+    /**
+     * @param $data
+     * @return null|string
+     */
     protected function generateExcelDocument($data)
     {
         if(empty($data))
@@ -184,10 +183,13 @@ class PaymentsReportForm extends Model{
         return $sFileName;
     }
 
-
-    protected function generateDocxDocument()
+    /**
+     * @param $data
+     * @return null|string
+     */
+    protected function generateDocxDocument($data)
     {
-        $template = \Yii::getAlias('@common/php_office_tmpl/').'google_report_tpl_1.docx';
+        $template = \Yii::getAlias('@common/php_office_tmpl/').'payment_report_tpl.docx';
         $sFileName = 'payments-report-'.uniqid(time()).'.docx';
         try{
 
@@ -198,58 +200,47 @@ class PaymentsReportForm extends Model{
             //гланая страница
             $doc->setValue('Year',date('Y'));
 
-
-
             //страница с общей статистикой
-
             $doc->setValue('startDay',$this->dateFrom);
             $doc->setValue('endDay',$this->dateTo);
             $doc->setValue('currentDay',date('Y-m-d'));
-            $doc->setValue('campStat',Yii::t('app/gadws',$camp['campaignState']));
-            $doc->setValue('sumValue',$camp['budget']);
-            $doc->setValue('restValue',$camp['cost']);
-            $doc->setValue('shows',$camp['impressions']);
-            $doc->setValue('clicks',$camp['clicks']);
-            $doc->setValue('ctr',$camp['ctr']);
+            $doc->setValue('iSumTotal',$data['iSumTotal']);
+            $doc->setValue('iTaxTotal',$data['iTaxTotal']);
+            $doc->setValue('iProdTotal',$data['iProdTotal']);
+            $doc->setValue('iProfTotal',$data['iProfitTotal']);
 
-            $campStat = $this->statAdverts;
+            $iCount = 0;
+            foreach($data['data'] as $dt)
+                if(is_array($dt))
+                    $iCount+=count($dt);
 
             //таблица Рекламная сеть Яндекса
-            $doc->cloneRow('cDate',count($campStat));
+            $doc->cloneRow('cDate',$iCount);
 
-            $totalCClicks = 0;
-            $totalCShows = 0;
-            $totalcSum = 0;
+            $iter = 1;
+            foreach($data['data'] as $key=>$dt)
+                foreach($dt as $item)
+                {
+                    $doc->setValue('cDate#'.$iter, $key);
+                    $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
+                    $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
+                    $doc->setValue('service#'.$iter,is_object($serv=$item->service) ? $serv->name : 'N/A');
+                    $doc->setValue('iSum#'.$iter,$item->pay_summ);
+                    $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
+                    $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? $calc->production : 'N/A');
+                    $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
 
-            foreach($campStat as $key => $item)
-            {
-                $iter = $key+1;
-                $doc->setValue('cDate#'.$iter, $item['day']);
-                $doc->setValue('cShows#'.$iter,$item['impressions']);
-                $doc->setValue('cClicks#'.$iter,$item['clicks']);
-                $doc->setValue('cCTR#'.$iter,$item['ctr']);
-                $doc->setValue('cSum#'.$iter,$item['cost']);
-                $doc->setValue('cAverage#'.$iter, ($item['clicks'] > 0 ? round($item['cost']/$item['clicks'],2) : 0));
-                $doc->setValue('cPosition#'.$iter,$item['avgPosition']);
-                $doc->setValue('cTimeOnSite#'.$iter,$item['avgVisitDurationSeconds']);
-
-                $totalCClicks+=$item['clicks'];
-                $totalCShows+=$item['impressions'];
-                $totalcSum+=$item['cost'];
-            }
-
-            $doc->setValue('totalCShows',$totalCShows);
-            $doc->setValue('totalCClicks',$totalCClicks);
-            $doc->setValue('totalCSum',$totalcSum);
+                    $iter++;
+                }
 
             $doc->saveAs(Yii::getAlias('@backend/web/reports/').$sFileName);
             if(file_exists(Yii::getAlias('@backend/web/reports/').$sFileName))
-                return TRUE;
+                return $sFileName;
 
         }catch (\Exception $e)
         {
         }
-        return FALSE;
+        return NULL;
     }
 
 } 
