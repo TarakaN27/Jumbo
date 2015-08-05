@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\loggingUserBehavior\LogModelBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use yii\caching\TagDependency;
@@ -134,5 +135,23 @@ class PaymentCondition extends AbstractActiveRecord
         return ArrayHelper::map($arTemp,'id','name');
     }
 
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => LogModelBehavior::className(),
+                    'ignored' => ['created_at','updated_at']
+                ],
+                [
+                    'class' => ActiveRecordHelper::className(),
+                ]
+            ]);
+    }
 
 }

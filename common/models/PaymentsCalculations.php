@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use common\components\loggingUserBehavior\LogModelBehavior;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%payments_calculations}}".
@@ -82,5 +84,21 @@ class PaymentsCalculations extends AbstractActiveRecord
     public function getPayment()
     {
         return $this->hasOne(Payments::className(), ['id' => 'payment_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arBhvrs = parent::behaviors();
+        return ArrayHelper::merge(
+            $arBhvrs,
+            [
+                [
+                    'class' => LogModelBehavior::className(),
+                    'ignored' => ['created_at','updated_at']
+                ]
+            ]);
     }
 }

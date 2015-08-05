@@ -67,7 +67,17 @@ return [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
+                    'levels' => ['info','error', 'warning'],
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info'],
+                    'logVars' => [],
+                    'categories' => ['pushUserBehaviors'],
+                    'logFile' => '@app/runtime/logs/users/users_behaviors.log',
+                    'maxFileSize' => 1024 * 2,
+                    'maxLogFiles' => 50,
+                    'enabled' => TRUE           //Установить FALSE если не нужно логирование действий с моделями
                 ],
             ],
         ],
