@@ -94,7 +94,6 @@ class CUser extends AbstractUser
     public function rules()
     {
         return [
-            [['email'],'required'],
             [['role','status','created_at','updated_at','manager_id'],'integer'],
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],

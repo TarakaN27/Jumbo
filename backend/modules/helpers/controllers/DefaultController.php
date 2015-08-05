@@ -2,11 +2,11 @@
 
 namespace backend\modules\helpers\controllers;
 
-use backend\modules\helpers\LoadXmlFileForm;
-use yii\web\Controller;
+use backend\components\AbstractBaseBackendController;
+use backend\modules\helpers\forms\LoadXmlFileForm;
 use yii\web\UploadedFile;
 
-class DefaultController extends Controller
+class DefaultController extends AbstractBaseBackendController
 {
     public function actionIndex()
     {
