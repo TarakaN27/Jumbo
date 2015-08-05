@@ -35,7 +35,9 @@ class LegalPerson extends AbstractActiveRecord
         return [
             [['description'], 'string'],
             [['status', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'string', 'max' => 255]
+            [['name'], 'string', 'max' => 255],
+            [['name'],'unique','targetClass' => self::className(),
+             'message' => Yii::t('app/services','This name has already been taken.')],
         ];
     }
 

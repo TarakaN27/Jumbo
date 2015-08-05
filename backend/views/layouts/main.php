@@ -25,6 +25,18 @@ $menuItems[] = [
     ]
 ];
 unset($subItems);
+
+$menuItems[] = [
+    'label' => '<i class="fa fa-envelope-o"></i> '.Yii::t('app/common','Messages'),
+    'url' => ['/messenger/default/index']
+];
+
+//должен всегда идти последним
+$menuItems[] = [
+    'label' => '<i class="fa fa-university"></i> '.Yii::t('app/common','To dashboard'),
+    'url' => Yii::$app->homeUrl
+];
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -133,13 +145,13 @@ unset($subItems);
                                         <?php endif;?>
                                     </ul>
                                 </li>
-                                <li><a><i class="fa fa-envelope"></i> <?php echo Yii::t('app/common', 'MSG_dialogs'); ?> <span class="fa fa-chevron-down"></span></a>
+                                <!--li><a><i class="fa fa-envelope"></i> <?php echo Yii::t('app/common', 'MSG_dialogs'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/messenger/default/index']); ?>"><?php echo Yii::t('app/common', 'MSG_messages'); ?></a>
                                         </li>
                                     </ul>
-                                </li>
+                                </li-->
 
                                 <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">

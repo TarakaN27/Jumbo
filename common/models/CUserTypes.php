@@ -33,6 +33,8 @@ class CUserTypes extends AbstractActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['name'],'unique','targetClass' => self::className(),
+             'message' => Yii::t('app/users','This name has already been taken.')],
             [['created_at', 'updated_at'], 'integer'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 128]

@@ -51,6 +51,8 @@ class PaymentCondition extends AbstractActiveRecord
                  'l_person_id', 'summ_from', 'summ_to',
                  'corr_factor', 'sale','currency_id','commission', 'tax'
              ], 'required'],
+            [['name'],'unique','targetClass' => self::className(),
+                'message' => Yii::t('app/book','This name has already been taken.')],
             [['description'], 'string'],
             [['service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id'], 'integer'],
             //[['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],

@@ -40,6 +40,8 @@ class ExpenseCategories extends AbstractActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['name'],'unique','targetClass' => self::className(),
+             'message' => Yii::t('app/services','This name has already been taken.')],
             [['parent_id', 'status', 'created_at', 'updated_at'], 'integer'],
             ['parent_id', 'default', 'value' => 0],
             [['name'], 'string', 'max' => 255],
