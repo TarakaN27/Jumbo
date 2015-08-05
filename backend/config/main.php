@@ -27,6 +27,9 @@ return [
         'messenger' => [
             'class' => 'backend\modules\messenger\Module',
         ],
+        'helpers' => [ //модуль с помощниками
+            'class' => 'backend\modules\helpers\Module',
+        ],
     ],
     'components' => [
 
