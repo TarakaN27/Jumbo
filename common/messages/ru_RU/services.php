@@ -20,14 +20,14 @@ return [
     'Created At' => 'Создано',
     'Updated At' => 'Обновлено',
     'Create' => 'Добавить',
-    'Update' => 'Обновить',
+    'Update' => 'Редактировать',
     'To list' => 'Вернуться к списку',
-    'Update services: ' => 'Обновление услуги: ',
+    'Update services: ' => 'Редактирование услуги: ',
     'Delete' => 'Удалить',
     'Expense Categories' => 'Категории затрат',
     'Parent ID' => 'Родительская категория',
     'Create Expense Categories' => 'Добавить категорию',
-    'Update Expense Categories: ' => 'Обновление категории затрат: ',
+    'Update Expense Categories: ' => 'Редактирование категории затрат: ',
     'Legal People' => 'Юридические лица',
     'Create Legal Person' => 'Добавить юридическое лицо',
     'Create At' => 'Добавлено',
@@ -42,6 +42,7 @@ return [
     'Update Exchange Rates: ' => 'Обновление валюты: ',
     'Update_rates_now' => 'Обновить курсы валют',
     'Auto update' => 'Обновлять автоматически',
-    'Is default' => 'Валюта по-умолчанию'
+    'Is default' => 'Валюта по-умолчанию',
+    'Update btn' => 'Сохранить изменения'
 
 ];

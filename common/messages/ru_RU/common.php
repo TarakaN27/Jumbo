@@ -41,5 +41,6 @@ return [
     'DIALOG_EMPTY_MSG_TEXT' => 'Вы пытаетесь отправить пустое сообщение',
     'Payments reports' => 'Отчеты по платежам',
     'To dashboard' => 'На главную',
-    'Messages' => 'Сообщения'
+    'Messages' => 'Сообщения',
+    'Update btn' => 'Сохранить изменения'
 ];

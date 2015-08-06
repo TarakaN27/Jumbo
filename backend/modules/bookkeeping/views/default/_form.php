@@ -120,7 +120,7 @@ $("#payments-cuser_id").on("change",findCondition);
             <?php if(!$model->isNewRecord):?>
                 <?=$form->field($model,'updateWithNewCondition')->checkbox();?>
             <?php endif;?>
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div></div>
 
     <?php ActiveForm::end(); ?>

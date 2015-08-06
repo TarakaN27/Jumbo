@@ -27,5 +27,6 @@ return [
     'iProfitTotal' => 'Суммарная прибыль',
     'iTaxTotal' => 'Сумарный налог',
     'iProdTotal' => 'Сумарные произв. затраты',
-    'Payments date' => 'Дата платежа'
+    'Payments date' => 'Дата платежа',
+    'Update btn' => 'Сохранить изменения'
 ];

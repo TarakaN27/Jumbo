@@ -13,7 +13,7 @@ return [
     'BOOK_choose_service' => 'Выберите услугу',
     'BOOK_choose_legal_person' => 'Выберите Юр. лицо',
     'Create' => 'Добавить',
-    'Update' => 'Обновить',
+    'Update' => 'Редактировать',
     'Delete' => 'Удалить',
     'BOOK_expense' => 'Затраты',
     'BOOK_choose_expense_category' => 'Выберите категорию затрат',
@@ -29,12 +29,12 @@ return [
     'Created At' => 'Добавлено',
     'Updated At' => 'Обновлено',
     'To list' => 'Вернуться к списку',
-    'Update Payments: ' => 'Обновить платеж: ',
+    'Update Payments: ' => 'Редактировать платеж: ',
     'Create payment' => 'Добавить платеж',
     'Cat ID' => 'Категория затрат',
     'Create Expense' => 'Добавить затраты',
     'Expenses' => 'Затраты',
-    'Update Expense: ' => 'Обновить затраты: ',
+    'Update Expense: ' => 'Редактировать затраты: ',
     'Create expense' => 'Добавить затраты',
     'Create payment request' => 'Запрос на платеж',
     'New payment request' => 'Запрос на платеж по клиенту',
@@ -94,7 +94,9 @@ return [
     'Cnd Sale' => 'Величина скидки %',
     'Cnd Tax' => 'Величина налога %',
     'Tax value' => 'Налог',
-    'Add new payment request' => 'Добавить запрос на платеж'
+    'Add new payment request' => 'Добавить запрос на платеж',
+    'Update btn' => 'Сохранить изменения'
+
 
 
 ];

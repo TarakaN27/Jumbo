@@ -245,7 +245,7 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
         <!--END contact info -->
     <div class = "form-group">
         <div class = "pull-right">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app/users', 'Create') : Yii::t('app/users', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? Yii::t('app/users', 'Create') : Yii::t('app/users', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>
         </div>
 

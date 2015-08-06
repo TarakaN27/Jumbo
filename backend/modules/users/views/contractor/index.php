@@ -10,16 +10,7 @@ use common\models\CUserRequisites;
 $this->title = Yii::t('app/users', 'Cusers');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class = "page-title">
-    <div class = "title_left">
-         <h3><?php $this->title?> <small><?php echo Yii::t('app/users','USER_contractors_list');?></small></h3>
-    </div>
 
-    <div class = "title_right">
-
-    </div>
-</div>
-<div class = "clearfix"></div>
 <div class = "row">
 
 <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -45,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         /** @var CUserRequisites $obR */
                                                         $obR = $model->requisites;
                                                         if(empty($obR))
-                                                            return Html::a('N/A',['update'],['class'=>'link-upd']);
+                                                            return Html::a('N/A',['update','id' => $model->id],['class'=>'link-upd']);
                                                         return Html::a(
                                                             $obR->getCorpName(),
                                                             ['update','id' => $model->id],
