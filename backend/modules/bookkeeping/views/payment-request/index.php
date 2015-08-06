@@ -126,6 +126,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             ];
                             if($model->owner_id == Yii::$app->user->id)
                                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                            else
+                                return '';
+                        }
+                ]
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => function ($url, $model, $key) {
+                            if($model->owner_id == Yii::$app->user->id)
+                                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url);
+                            else
+                                return '';
                         }
                 ]
             ]

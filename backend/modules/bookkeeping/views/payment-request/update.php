@@ -6,7 +6,7 @@
  * Date: 21.07.15
  */
 use yii\helpers\Html;
-$this->title = Yii::t('app/book','Add new payment request');
+$this->title = Yii::t('app/book','Update payment request');
 ?>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -19,7 +19,7 @@ $this->title = Yii::t('app/book','Add new payment request');
                  <div class="clearfix"></div>
             </div>
 
-            <?= $this->render('_payment_request_form', [
+            <?= $this->render('/default/_payment_request_form', [
                 'model' => $model,
             ]) ?>
         </div>

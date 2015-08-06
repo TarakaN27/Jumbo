@@ -73,6 +73,10 @@ class Payments extends AbstractActiveRecord
     {
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
+
+
+
+
         return parent::beforeSave($insert);
     }
 

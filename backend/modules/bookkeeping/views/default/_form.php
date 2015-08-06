@@ -91,7 +91,11 @@ $("#payments-cuser_id").on("change",findCondition);
                 'class' => 'col-md-8 col-sm-8 col-xs-12',
                 'style' => 'padding-left:0px;'
             ]])
-                ->textInput(['maxlength' => true])->label(false) ?>
+                ->textInput(['maxlength' => true])->label(false)
+               // ->widget(\yii\widgets\MaskedInput::className(),[
+               //     'mask' => '000.000.000.000.000,00',
+               // ])
+            ?>
             <?= $form->field($model, 'currency_id',['template' => $fieldTpl,'options' => [
                 'class' => 'col-md-4 col-sm-4 col-xs-12',
                 'style' => 'padding-right:0px;'

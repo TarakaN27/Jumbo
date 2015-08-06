@@ -286,4 +286,24 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $this->redirect(['index']);
     }
 
+    public function actionUpdate($id)
+    {
+        $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
+        if(empty($model))
+            throw new NotFoundHttpException('Payment request not found');
+
+        if($model->owner_id != Yii::$app->user->id)
+            throw new ForbiddenHttpException('You are not allowed to perform this action.');
+
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            Yii::$app->session->setFlash('success',Yii::t('app/book','Payments request successfully updated'));
+            return $this->redirect(['index']);
+        }
+
+        return $this->render('update',[
+            'model' => $model
+        ]);
+    }
+
 } 
