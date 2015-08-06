@@ -15,6 +15,7 @@ use yii\helpers\ArrayHelper;
 class CUserSearch extends CUser
 {
     public
+        $corp_name,
         $fio;
 
     /**
@@ -24,7 +25,7 @@ class CUserSearch extends CUser
     {
         return [
             [['id', 'ext_id', 'type', 'manager_id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email'], 'safe'],
+            [['fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email','corp_name'], 'safe'],
         ];
     }
 
@@ -35,7 +36,10 @@ class CUserSearch extends CUser
     public function attributeLabels()
     {
         $arPLabel = parent::attributeLabels();
-        return ArrayHelper::merge($arPLabel,['fio' => Yii::t('app/users', 'FIO'),]);
+        return ArrayHelper::merge($arPLabel,[
+            'fio' => Yii::t('app/users', 'FIO'),
+            'corp_name' => Yii::t('app/users', 'Corp Name'),
+        ]);
     }
 
     /**
@@ -93,6 +97,14 @@ class CUserSearch extends CUser
             $query->andWhere(' ( '.CUserRequisites::tableName().'.j_lname LIKE "'.$this->fio.'%" OR '.
                 CUserRequisites::tableName().'.j_fname LIKE "'.$this->fio.'%" OR '.
                 CUserRequisites::tableName().'.j_mname LIKE "'.$this->fio.'%" ) ');
+
+        if(!empty($this->corp_name))
+            $query->andWhere('( '.
+                CUserRequisites::tableName().'.corp_name LIKE "%'.$this->corp_name.'%" OR '.
+                CUserRequisites::tableName().'.j_lname LIKE "%'.$this->corp_name.'%" OR '.
+                CUserRequisites::tableName().'.j_fname LIKE "%'.$this->corp_name.'%" OR '.
+                CUserRequisites::tableName().'.j_mname LIKE "%'.$this->corp_name.'%")');
+
         //$query->andFilterWhere(['like',CUserRequisites::tableName().'.j_lname',$this->fio]);
         return $dataProvider;
     }

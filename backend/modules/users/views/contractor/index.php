@@ -39,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             ['class' => 'yii\grid\SerialColumn'],
                                             [
                                                 'attribute' => 'corp_name',
+                                                'label' => Yii::t('app/users', 'Corp Name'),
                                                 'value' => function($model){
                                                         /** @var CUserRequisites $obR */
                                                         $obR = $model->requisites;
