@@ -26,17 +26,34 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_content">
                                     <?php
                                         $tpl = '';
+                                        $viewTpl = '';
                                         if(Yii::$app->user->can('adminRights'))
-                                            $tpl = '{view}{update}{delete}';
+                                        {
+                                            $tpl = '{delete}';
+                                            $viewTpl = '{view}';
+                                        }
                                         elseif(Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper'))
-                                            $tpl = '{view}';
+                                        {
+                                            $viewTpl = '{view}';
+                                        }
                                         echo GridView::widget([
                                             'dataProvider' => $dataProvider,
                                             'filterModel' => $searchModel,
                                             'columns' => [
                                                 ['class' => 'yii\grid\SerialColumn'],
-                                                //'id',
-                                                'username',
+                                                [
+                                                    'attribute' => 'username',
+                                                    'format' => 'html',
+                                                    'value' => function($model){
+                                                            if(Yii::$app->user->can('adminRights'))
+                                                                return Html::a(
+                                                                    $model->username,
+                                                                    ['update','id' => $model->id],
+                                                                    ['class'=>'link-upd']);
+                                                            else
+                                                                return $model->username;
+                                                        }
+                                                ],
                                                 [
                                                     'attribute' => 'fio',
                                                     'label' => Yii::t('app/users','Fio'),
@@ -65,6 +82,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'value' => function($model){
                                                             return $model->getFormatedCreatedAt();
                                                         }
+                                                ],
+                                                [
+                                                    'class' => 'yii\grid\ActionColumn',
+                                                    'template' => $viewTpl,
                                                 ],
                                                 [
                                                     'class' => 'yii\grid\ActionColumn',

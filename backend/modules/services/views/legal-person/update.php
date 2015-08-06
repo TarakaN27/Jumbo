@@ -12,7 +12,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app/services', 'Legal Peopl
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app/services', 'Update');
 ?>
-?>
 <div class="clearfix"></div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">

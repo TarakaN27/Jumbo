@@ -26,10 +26,16 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class = "x_content">
                 <?
                 $tpl = '';
+                $viewTpl = '';
                     if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'))
-                        $tpl = '{view}{update}{delete}';
+                    {
+                        $tpl = '{delete}';
+                        $viewTpl = '{view}';
+                    }
                     elseif(Yii::$app->user->can('only_manager'))
-                        $tpl = '{view}{update}';
+                    {
+                        $viewTpl = '{view}';
+                    }
 
                     echo GridView::widget([
                         'dataProvider' => $dataProvider,
@@ -38,8 +44,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
                             [
                                 'attribute' => 'cuser_id',
+                                'format' => 'html',
                                 'value' => function($model){
-                                        return is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
+                                        $name = is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
+                                        if(
+                                            Yii::$app->user->can('adminRights') ||
+                                            Yii::$app->user->can('only_bookkeeper') ||
+                                            Yii::$app->user->can('only_manager')
+                                        )
+                                            return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
+                                        else
+                                            return $name;
                                     },
                                 'filter' => \common\models\CUser::getContractorMap()
                             ],
@@ -83,6 +98,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ],
                                     ]),
                                 'format' => 'raw',
+                            ],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => $viewTpl
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',

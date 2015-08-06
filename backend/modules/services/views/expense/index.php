@@ -38,9 +38,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'html',
+                'value' => function($model)
+                    {
+                            return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                    }
+            ],
             'description',
             [
                 'attribute' => 'parent_id',
@@ -57,7 +62,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 'filter' => \common\models\ExpenseCategories::getStatusArr()
             ],
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}'
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{delete}'
+            ],
         ],
     ]); ?>
                                 </div>

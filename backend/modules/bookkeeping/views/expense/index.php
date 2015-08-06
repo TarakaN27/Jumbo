@@ -27,12 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
             [
                 'attribute' => 'cuser_id',
+                'format' => 'html',
                 'value' => function($model){
-                        return is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
+                        $name =  is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
+                        return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
                     },
                 'filter' => \common\models\CUser::getContractorMap()
             ],
@@ -77,7 +77,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]),
                 'format' => 'raw',
             ],
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}'
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{delete}'
+            ],
         ],
     ]); ?>
                              </div>

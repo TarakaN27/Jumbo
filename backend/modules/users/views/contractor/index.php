@@ -40,12 +40,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                             [
                                                 'attribute' => 'corp_name',
                                                 'label' => Yii::t('app/users', 'Corp Name'),
+                                                'format' => 'html',
                                                 'value' => function($model){
                                                         /** @var CUserRequisites $obR */
                                                         $obR = $model->requisites;
                                                         if(empty($obR))
-                                                            return 'N/A';
-                                                        return $obR->getCorpName();
+                                                            return Html::a('N/A',['update'],['class'=>'link-upd']);
+                                                        return Html::a(
+                                                            $obR->getCorpName(),
+                                                            ['update','id' => $model->id],
+                                                            ['class'=>'link-upd']);
                                                     }
                                             ],
                                             [
@@ -81,7 +85,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     },
                                                 'filter' => \common\models\CUser::getStatusArr()
                                             ],
-                                            ['class' => 'yii\grid\ActionColumn'],
+                                            [
+                                                'class' => 'yii\grid\ActionColumn',
+                                                'template' => '{view}'
+                                            ],
+                                            [
+                                                'class' => 'yii\grid\ActionColumn',
+                                                'template' => '{delete}'
+                                            ],
                                         ],
                                     ]); ?>
 

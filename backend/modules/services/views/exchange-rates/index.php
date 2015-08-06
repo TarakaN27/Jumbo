@@ -38,11 +38,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
 
     $tpl = '';
+    $viewTpl = '';
     if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
     {
-        $tpl = '{view}{update}{delete}';
+        $tpl = '{delete}';
+        $viewTpl = '{view}';
     }elseif(Yii::$app->user->can('only_manager')){
-        $tpl = '{view}';
+        $viewTpl = '{view}';
     }
 
 
@@ -53,9 +55,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'html',
+                'value' => function($model)
+                    {
+                        if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
+                            return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                        else
+                            $model->name;
+                    }
+            ],
             'code',
             'nbrb',
             'cbr',
@@ -67,7 +77,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         return $model->getFormatedUpdatedAt();
                     }
             ],
-
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=> $viewTpl
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template'=> $tpl

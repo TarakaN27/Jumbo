@@ -26,19 +26,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
 
                     $tpl = '';
+                    $viewTpl = '';
                     if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper'))
-                        $tpl = '{view}{update}{delete}';
+                    {
+                        $tpl = '{delete}';
+                        $viewTpl = '{view}';
+                    }
                     elseif(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
-                        $tpl = '{view}';
+                        $viewTpl = '{view}';
 
                     echo GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
-
-                            'id',
-                            'name',
+                            [
+                                'attribute' => 'name',
+                                'format' => 'html',
+                                'value' => function($model)
+                                    {
+                                        if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
+                                            return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                                        else
+                                            $model->name;
+                                    }
+                            ],
                             'description:ntext',
                             [
                                 'attribute' => 'status',
@@ -52,6 +64,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => function($model){
                                         return $model->getFormatedCreatedAt();
                                     }
+                            ],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => $viewTpl
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',

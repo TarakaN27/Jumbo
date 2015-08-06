@@ -29,7 +29,7 @@ return [
     'Create Expense Categories' => 'Добавить категорию',
     'Update Expense Categories: ' => 'Обновление категории затрат: ',
     'Legal People' => 'Юридические лица',
-    'Create Legal Person' => 'Добавить юридический лицо',
+    'Create Legal Person' => 'Добавить юридическое лицо',
     'Create At' => 'Добавлено',
     'Update At' => 'Обновлено',
     'Exchange Rates' => 'Валюта и курсы валют',

@@ -27,19 +27,31 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_content">
     <?php
         $tpl = '';
+        $viewTpl = '';
         if(Yii::$app->user->can('adminRights'))
-            $tpl = '{view}{update}{delete}';
+        {
+            $tpl = '{delete}';
+            $viewTpl = '{view}';
+        }
         elseif(Yii::$app->user->can('only_manager'))
-            $tpl = '{view}';
+            $viewTpl = '{view}';
 
         echo GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-
-                'id',
-                'name',
+                [
+                    'attribute' => 'name',
+                    'format' => 'html',
+                    'value' => function($model)
+                        {
+                            if(Yii::$app->user->can('adminRights'))
+                                return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                            else
+                                $model->name;
+                        }
+                ],
                 'description',
                 [
                     'attribute' => 'status',
@@ -53,6 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'value' => function($model){
                             return $model->getFormatedCreatedAt();
                         }
+                ],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template'=>$viewTpl
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',

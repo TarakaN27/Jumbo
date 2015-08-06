@@ -28,8 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-                        'id',
-                        'name',
+                        [
+                            'attribute' => 'name',
+                            'format' => 'html',
+                            'value' => function($model)
+                                {
+                                    return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                                }
+                        ],
                         [
                             'attribute' => 'service_id',
                             'value' => function($model){
@@ -60,7 +66,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         // 'created_at',
                         // 'updated_at',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{view}'
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{delete}'
+                        ],
                     ],
                 ]); ?>
             </div>
