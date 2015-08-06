@@ -133,7 +133,7 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
-                                        <?php if(Yii::$app->user->can('only_manager')):?>
+                                        <?php if(Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
                                             </li>

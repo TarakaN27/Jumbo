@@ -63,7 +63,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
     public function actionIndex()
     {
         $searchModel = new PaymentRequestSearch();
-        $searchModel->managerID = Yii::$app->user->id;
+        if(Yii::$app->user->can('only_manager'))
+            $searchModel->managerID = Yii::$app->user->id;
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))

@@ -100,10 +100,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'title' => Yii::t('yii', 'Add payments'),
                                 'aria-label' => Yii::t('yii', 'Add payments'),
                             ];
-                            return Html::a(
-                                '<span class="glyphicon glyphicon-credit-card"></span>',
-                                \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
-                                $options);
+                            if(Yii::$app->user->can('only_manager'))
+                                return Html::a(
+                                    '<span class="glyphicon glyphicon-credit-card"></span>',
+                                    \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                    $options);
                         }
 
                         return '';
