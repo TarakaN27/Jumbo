@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         $obR = $model->requisites;
                                                         if(empty($obR))
                                                             return 'N/A';
-                                                        return $obR->j_fname.' '.$obR->j_mname.' '.$obR->j_lname;
+                                                        return $obR->j_lname.' '.$obR->j_fname.' '.$obR->j_mname;
                                                     }
                                             ],
                                             [
