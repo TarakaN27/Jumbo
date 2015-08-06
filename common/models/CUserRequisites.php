@@ -238,6 +238,9 @@ class CUserRequisites extends AbstractActiveRecord
     {
         if($this->type_id == self::TYPE_I_PERSON)
             return 'ИП '.$this->j_fname.' '.$this->j_mname.' '.$this->j_lname;
+
+        if($this->type_id == self::TYPE_F_PERSON)
+            return 'ФИЗ '.$this->j_fname.' '.$this->j_mname.' '.$this->j_lname;
         else
             return $this->corp_name;
     }
