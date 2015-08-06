@@ -272,4 +272,18 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return ['cID' => empty($obCond) ? FALSE : $obCond->id];
     }
 
+    public function actionDelete($id)
+    {
+        $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
+        if(empty($model))
+            throw new NotFoundHttpException('Payment request not found');
+
+        if($model->owner_id != Yii::$app->user->id)
+            throw new ForbiddenHttpException('You are not allowed to perform this action.');
+
+        $model->delete();
+
+        return $this->redirect(['index']);
+    }
+
 } 
