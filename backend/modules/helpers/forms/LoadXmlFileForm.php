@@ -83,12 +83,10 @@ class LoadXmlFileForm extends Model{
                     $arFio['fname'] = $arTMP[1];
                     $arFio['mname'] = $arTMP[2];
                 }else{
-                    $arFio['fname'] = str_replace("."," ",$arData[$i+1]['B']);
+                    $arFio['fname'] = str_replace("."," ",trim(preg_replace("/(ИП)\s|\s+?(ИП$)|\s(ИП)\W|^(ИП)\W/i"," ",$arData[$i+1]['B'])));
                 }
             }
 
-
-           // echo $arData[$i+1]['B'];
             $arContractor [] = [
                 'name' => trim($arData[$i+1]['B']),
                 'ynp' => empty(trim($arData[$i]['D'])) ? 'dummy' : trim($arData[$i]['D']),
@@ -101,11 +99,15 @@ class LoadXmlFileForm extends Model{
             $i++;
         }
 
-
+        $error = [];
         $trans = \Yii::$app->db->beginTransaction();
         try{
+            $bErr = false;
         foreach($arContractor as $contr)
         {
+
+            if(empty($contr['name']))
+                continue;
 
             /** @var Cuser $cM */
 
@@ -114,49 +116,85 @@ class LoadXmlFileForm extends Model{
             $cM->type = $this->type;
             $cM->manager_id = $this->manager;
             $cM->is_resident = $contr['resident'];
+            $cM -> status = CUser::STATUS_ACTIVE;
             if($cM->save())
             {
 
                 $modelR = new CUserRequisites();
+                if($contr['type'] == 5)
+                    $modelR -> corp_name = $contr['name'];
+
                 $modelR ->j_fname = $contr['fio']['fname'];
                 $modelR ->j_lname = $contr['fio']['lname'];
                 $modelR ->j_mname = $contr['fio']['mname'];
+                $modelR -> reg_date = '2015-07-09';
+                $modelR -> reg_number = 'dummy';
+                $modelR -> reg_auth = 'dummy';
+
+
                 $modelR -> type_id = $contr['type'];
+                $modelR -> inn = 'dummy';
+                $modelR -> kpp = 'dummy';
+                $modelR -> ogrn = 'dummy';
+                $modelR -> ynp = $contr['ynp'];
+                $modelR -> okpo = 'dummy';
+
+                if($contr['type'] == 15)
+                {
+                    $modelR -> pasp_auth = 'dummy';
+                    $modelR -> pasp_date = '2015-07-09';
+                    $modelR -> pasp_ident = 'dummy';
+                    $modelR -> pasp_number = '1111111111';
+                    $modelR -> pasp_series = 'mc';
+                }else{
+                    $modelR -> j_doc = 'dummy';
+                    $modelR -> j_post = 'dummy';
+                }
+                $modelR -> b_code = 'dummy';
+                $modelR -> b_name = 'dummy';
+                $modelR -> ch_account = 'dummy';
+
+                $modelR -> j_address = empty($contr['jaddress']) ? 'dummy' : $contr['jaddress'];
+                $modelR -> p_address = empty($contr['paddress']) ? 'dummy' : $contr['paddress'];
 
 
-                
+                $modelR -> c_fname = $contr['fio']['fname'];
+                $modelR -> c_lname = $contr['fio']['lname'];
+                $modelR -> c_mname = $contr['fio']['mname'];
 
+                $modelR -> c_phone = 'dummy';
+
+                if($modelR->save())
+                {
+                    $cM->link('requisites',$modelR);
+
+                }else{
+
+                    $bErr = TRUE;
+                    break;
+                }
 
             }else{
-                $trans->rollBack();
+                $bErr = TRUE;
+                $error ['cuser'][] = $cM->getErrors();
                 break;
+            }
+        }
+            if($bErr)
+            {
+                $trans ->rollBack();
+            }else{
+                $trans -> commit();
+                return TRUE;
             }
 
 
-
-            
-
-
-
-        }
         }catch (\Exception $e)
         {
             $trans->rollBack();
         }
 
-
-        echo '<pre>';
-        print_r($arContractor);
-        echo '</pre>';
-        die;
-
-        die;
-
-
-
-
-
-
+        return FALSE;
     }
 
 } 

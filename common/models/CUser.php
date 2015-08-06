@@ -294,7 +294,7 @@ class CUser extends AbstractUser
         /** @var CUserRequisites $obRq */
         $obRq = $this->requisites;
         if($obRq)
-            return trim($obRq->corp_name.' '.$obRq->j_lname.' '.$obRq->j_fname.' '.$obRq->j_mname);
+            return trim($obRq->getCorpName());
         else
             return $this->username;
     }

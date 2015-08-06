@@ -37,7 +37,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'filterModel' => $searchModel,
                                         'columns' => [
                                             ['class' => 'yii\grid\SerialColumn'],
-                                            'id',
+                                            [
+                                                'attribute' => 'corp_name',
+                                                'value' => function($model){
+                                                        /** @var CUserRequisites $obR */
+                                                        $obR = $model->requisites;
+                                                        if(empty($obR))
+                                                            return 'N/A';
+                                                        return $obR->getCorpName();
+                                                    }
+                                            ],
                                             [
                                                 'attribute' => 'fio',
                                                 'label' => Yii::t('app/users','FIO'),
