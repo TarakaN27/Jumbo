@@ -95,7 +95,9 @@ return [
     'Cnd Tax' => 'Величина налога %',
     'Tax value' => 'Налог',
     'Add new payment request' => 'Добавить запрос на платеж',
-    'Update btn' => 'Сохранить изменения'
+    'Update btn' => 'Сохранить изменения',
+    'Choose currency' => 'Выберите валюту',
+    'Condition currency' => 'Валюта условия'
 
 
 

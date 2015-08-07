@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $currency_id
+ * @property integer $cond_currency
  *
  * @property Services $service
  * @property LegalPerson $lPerson
@@ -54,7 +55,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['name'],'unique','targetClass' => self::className(),
                 'message' => Yii::t('app/book','This name has already been taken.')],
             [['description'], 'string'],
-            [['service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id'], 'integer'],
+            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id'], 'integer'],
             //[['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],
             [['name'], 'string', 'max' => 255],
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
@@ -84,6 +85,7 @@ class PaymentCondition extends AbstractActiveRecord
             'currency_id' => Yii::t('app/book', 'Currency id'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'cond_currency' => Yii::t('app/book', 'Condition currency'),
         ];
     }
 
@@ -111,7 +113,17 @@ class PaymentCondition extends AbstractActiveRecord
         return $this->hasOne(ExchangeRates::className(),['id' => 'currency_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCondCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(),['id' => 'cond_currency']);
+    }
 
+    /**
+     * @return mixed
+     */
     public static function getAllCondition()
     {
         $obDep = new TagDependency([

@@ -25,8 +25,6 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-
-
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
         'prompt' => Yii::t('app/book','Choose service')
     ]) ?>
@@ -70,6 +68,10 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
     <?= $form->field($model, 'sale')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'tax')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model,'cond_currency')->dropDownList(\common\models\ExchangeRates::getRatesCodes(),[
+        'prompt' => Yii::t('app/book','Choose currency')
+    ])?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
