@@ -68,11 +68,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->getNeedUpdateStr()
             ],
             [
-                'attribute' => 'create_at',
+                'attribute' => 'created_at',
                 'value' => $model->getFormatedCreatedAt()
             ],
             [
-                'attribute' => 'update_at',
+                'attribute' => 'updated_at',
                 'value' => $model->getFormatedUpdatedAt()
             ],
         ],
