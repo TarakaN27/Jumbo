@@ -51,10 +51,10 @@ class ExchangeRates extends AbstractActiveRecord
             [['name', 'code', 'nbrb', 'cbr', 'nbrb_rate', 'cbr_rate'], 'required'],
 
             ['name', 'unique', 'targetClass' => self::className(),
-             'message' => Yii::t('app/users','This name has already been taken.')],
+             'message' => Yii::t('app/services','This name has already been taken.')],
 
             ['code', 'unique', 'targetClass' => self::className(),
-             'message' => Yii::t('app/users','This code has already been taken.')],
+             'message' => Yii::t('app/services','This code has already been taken.')],
 
             [[
                  'nbrb', 'cbr', 'created_at', 'updated_at',
