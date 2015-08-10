@@ -19,7 +19,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'pay_summ',
+            [
+              'attribute' => 'pay_summ',
+              'format' => 'html',
+              'value' => function($model){
+                      if(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
+                          $options = [
+                              'title' => Yii::t('yii', 'Add payments'),
+                              'aria-label' => Yii::t('yii', 'Add payments'),
+                              'class' => 'link-upd'
+                          ];
+                          if(Yii::$app->user->can('only_manager'))
+                              return Html::a(
+                                  $model->pay_summ,
+                                  \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                  $options);
+                      }else{
+                          return $model->pay_summ;
+                      }
+                  }
+            ],
             [
                 'attribute' => 'currency_id',
                 'value' => function($model){
@@ -29,8 +48,22 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'cntr_id',
+                'format' => 'html',
                 'value' => function($model){
-                        return is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL;
+                        if(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
+                            $options = [
+                                'title' => Yii::t('yii', 'Add payments'),
+                                'aria-label' => Yii::t('yii', 'Add payments'),
+                                'class' => 'link-upd'
+                            ];
+                            if(Yii::$app->user->can('only_manager'))
+                                return Html::a(
+                                    is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL,
+                                    \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                    $options);
+                        }else{
+                            return is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL;
+                        }
                     }
             ],
             [

@@ -65,6 +65,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $searchModel = new PaymentRequestSearch();
         if(Yii::$app->user->can('only_manager'))
             $searchModel->managerID = Yii::$app->user->id;
+        $searchModel->status = PaymentRequest::STATUS_NEW;
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
@@ -119,7 +120,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'service_id' => $p->service,
                                 'legal_id' => $modelP->legal_id,
                                 'description' => $p->comment,
-                                'prequest_id' => $modelP->id
+                                'prequest_id' => $modelP->id,
+                                'condition_id' => $p->condID
 
                             ]);
 
