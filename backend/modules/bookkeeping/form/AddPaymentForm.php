@@ -32,6 +32,19 @@ class AddPaymentForm extends AbstractModel{
     }
 
 
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'summ' => Yii::t('app/book', 'Summ'),
+            'service' => Yii::t('app/book', 'Service'),
+            'condID' => Yii::t('app/book', 'Condition'),
+            'comment' => Yii::t('app/book', 'Comment'),
+        ];
+    }
+
 
 
 

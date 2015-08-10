@@ -117,18 +117,43 @@ function findCondition($this){
         }
     });
 }
+function initPayment()
+{
+    var
+        aSumm = $("#aSumm"),
+        count = 0,
+        pSumm = $(".psumm");
 
+
+    $.each( pSumm, function( key, value ) {
+        count++;
+    });
+
+    if(count == 1)
+    {
+        pSumm.val(aSumm.val());
+        countASumm();
+    }else{
+        if(pSumm.val() == aSumm.val())
+        {
+            pSumm.val("");
+            countASumm();
+        }
+    }
+}
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();
     initBehavior();
     $(".dynamicform_wrapper").on("afterInsert", function(e, item) {
         initBehavior();
+        initPayment();
     });
     $(".dynamicform_wrapper").on("afterDelete", function(e) {
         countASumm();
     });
     $(document).on("submit", "form#dynamic-form", validateFormLogic);
+    initPayment();
 ',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
@@ -164,7 +189,7 @@ $this->registerJs('
                 <div class="x_title">
                     <h2><?= Html::encode($this->title) ?></h2>
                     <section class="pull-right">
-                        <?= Html::button('<i class="glyphicon glyphicon-plus" ></i>'.Yii::t('app/book','Add new payment'),['class' => 'add-item btn btn-success'])?>
+                        <?= Html::button('<i class="glyphicon glyphicon-plus" ></i> '.Yii::t('app/book','Add new payment'),['class' => 'add-item btn btn-success'])?>
                         <?= Html::submitButton(Yii::t('app/book','Save'), ['class' => 'btn btn-primary']) ?>
                         <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                     </section>

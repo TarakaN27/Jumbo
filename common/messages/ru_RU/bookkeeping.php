@@ -97,8 +97,15 @@ return [
     'Add new payment request' => 'Добавить запрос на платеж',
     'Update btn' => 'Сохранить изменения',
     'Choose currency' => 'Выберите валюту',
-    'Condition currency' => 'Валюта условия'
-
-
+    'Condition currency' => 'Валюта условия',
+    'Add new payment' => 'Добавить новый платеж',
+    'AvailableSumm' => 'Доступная сумма',
+    'Add payment' => 'Добавить платеж(и)',
+    'Summ' => 'Сумма',
+    'Service' => 'Услуга',
+    'Condition' => 'Условие',
+    'Comment' => 'Комментарий',
+    'Save' => 'Сохранить',
+    'Payment' => 'Платеж'
 
 ];
