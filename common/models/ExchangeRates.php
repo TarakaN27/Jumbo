@@ -22,9 +22,18 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $need_upd
  * @property integer $is_default
+ * @property integer $base_id
+ * @property integer $use_base
+ * @property integer $use_exchanger
+ * @property integer $bank_id
+ * @property string $factor
  */
 class ExchangeRates extends AbstractActiveRecord
 {
+
+    protected
+        $_oldModelAttribute;
+
     /**
      * @inheritdoc
      */
@@ -40,9 +49,32 @@ class ExchangeRates extends AbstractActiveRecord
     {
         return [
             [['name', 'code', 'nbrb', 'cbr', 'nbrb_rate', 'cbr_rate'], 'required'],
-            [['nbrb', 'cbr', 'created_at', 'updated_at','need_upd','is_default'], 'integer'],
-            [['nbrb_rate', 'cbr_rate'], 'number'],
-            [['name', 'code'], 'string', 'max' => 255]
+            [[
+                 'nbrb', 'cbr', 'created_at', 'updated_at',
+                 'need_upd','is_default','use_base','base_id',
+                 'use_exchanger','bank_id'
+            ],'integer'],
+            [['nbrb_rate', 'cbr_rate','factor'], 'number'],
+            [['name', 'code'], 'string', 'max' => 255],
+            ['factor','number','min' => 0],
+            [['factor'],'default','value' => 1],
+            [['base_id', 'factor'],
+             'required',
+             'when' => function($model) {
+                     return $model->use_base ? TRUE : FALSE;
+                 },
+             'whenClient' => "function (attribute, value) {
+                    return $('#exchangerates-use_base').is(':checked');
+                }"
+            ],
+            [['bank_id','factor'],'required',
+             'when' => function($model) {
+                     return $model->use_exchanger ? TRUE : FALSE;
+                 },
+             'whenClient' => "function (attribute, value) {
+                    return $('#exchangerates-use_exchanger').is(':checked');
+                }"
+            ]
         ];
     }
 
@@ -63,6 +95,11 @@ class ExchangeRates extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'need_upd' => Yii::t('app/services', 'Auto update'),
             'is_default' => Yii::t('app/services', 'Is default'),
+            'use_base' => Yii::t('app/services', 'Use base'),
+            'base_id' => Yii::t('app/services', 'Base ID'),
+            'factor' => Yii::t('app/services', 'Factor'),
+            'bank_id' => Yii::t('app/services', 'Bank ID'),
+            'use_exchanger' => Yii::t('app/services', 'Use exchanger')
         ];
     }
 
@@ -97,11 +134,18 @@ class ExchangeRates extends AbstractActiveRecord
     }
 
     /**
+     * @param null $exept
      * @return array
      */
-    public static function getRatesCodes()
+    public static function getRatesCodes($exept = NULL)
     {
         $arTmp = self::getExchangeRates();
+
+        if(!is_null($exept))
+            foreach($arTmp as $key => $tmp)
+                if($tmp->id == $exept)
+                    unset($arTmp[$key]);
+
         return ArrayHelper::map($arTmp,'id','code');
     }
 
@@ -115,6 +159,7 @@ class ExchangeRates extends AbstractActiveRecord
         {
             self::updateAll(['is_default' => self::NO],'id != :id',[':id'=>$this->id]);
         }
+        $this->saveChangedValue();
         return parent::afterSave($insert, $changedAttributes);
     }
 
@@ -133,4 +178,63 @@ class ExchangeRates extends AbstractActiveRecord
     {
         return $this->getYesNoStr($this->is_default);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBase()
+    {
+        return $this->hasOne(self::className(),['id'=>'base_id']);
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(parent::beforeSave($insert))
+        {
+            $this->_oldModelAttribute = $this->oldAttributes;
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function saveChangedValue()
+    {
+        //получим старые значения аттрибутов
+        $old_rate_nbrb = isset($this->_oldModelAttribute['nbrb_rate']) ? $this->_oldModelAttribute['nbrb_rate'] : 0;
+        $old_rate_cbr = isset($this->_oldModelAttribute['cbr_rate']) ? $this->_oldModelAttribute['cbr_rate'] : 0;
+        if($old_rate_nbrb == $this->nbrb_rate && $old_rate_cbr == $this->cbr_rate)
+            return true;
+        //получим пользователя, который меняет. Если меняется из консоли, то userID = NULL
+        $userID = NULL;
+        $app = Yii::$app;
+        if(property_exists($app,'user') && !Yii::$app->user->isGuest)
+            $userID = Yii::$app->user->id;
+        //дата изменения
+        $date = date('Y-m-d',time());
+
+        //в один день может быть только один курс!
+        /** @var ExchangeCurrencyHistory $obH */
+        $obH = ExchangeCurrencyHistory::findOne(['currency_id' => $this->id,'date' => $date]);
+        if(empty($obH))
+            $obH = new ExchangeCurrencyHistory();
+
+        $obH->currency_id = $this->id;
+        $obH->date = $date;
+        $obH->user_id = $userID;
+        $obH->old_rate_nbrb = $old_rate_nbrb;
+        $obH->old_rate_cbr = $old_rate_cbr;
+        $obH->rate_nbrb = $this->nbrb_rate;
+        $obH->rate_cbr = $this->cbr_rate;
+        //сохраняем историю
+        return $obH->save();
+    }
+
+
 }

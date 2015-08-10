@@ -46,6 +46,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'nbrb_rate',
             'cbr_rate',
             [
+              'attribute' => 'use_base',
+              'value' => $model->getYesNoStr($model->use_base)
+            ],
+            [
+                'attribute' => 'base_id',
+                'value' => is_object($obBase = $model->base) ? $obBase->code : NULL
+            ],
+            'factor',
+            [
+                'attribute' => 'use_exchanger',
+                'value' => $model->getYesNoStr($model->use_exchanger)
+            ],
+            'bank_id',
+            [
                 'attribute' => 'is_default',
                 'value' => $model->getIsDefaultStr()
             ],

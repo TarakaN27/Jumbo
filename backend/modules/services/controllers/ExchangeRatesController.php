@@ -5,6 +5,7 @@ namespace backend\modules\services\controllers;
 use backend\components\AbstractBaseBackendController;
 use common\components\ExchangeRates\ExchangeRatesCBRF;
 use common\components\ExchangeRates\ExchangeRatesNBRB;
+use common\components\ExchangeRates\ExchangeRatesObmennikBY;
 use Yii;
 use common\models\ExchangeRates;
 use common\models\search\ExchangeRatesSearch;
@@ -138,30 +139,44 @@ class ExchangeRatesController extends AbstractBaseBackendController
     /**
      * @param $id
      * @return \yii\web\Response
+     * @throws \yii\web\NotFoundHttpException
      */
     public function actionUpdateRates($id)
     {
         $model = $this->findModel($id);
 
-        if($model->nbrb != 0)
-        {
-            $nbrb = new ExchangeRatesNBRB($model->nbrb);
-            $nbrbRate = $nbrb->makeRequest();
-        }else{
-            $nbrbRate = $model->nbrb_rate;
-        }
-        if($model->cbr != 0)
-        {
-            $crb = new ExchangeRatesCBRF($model->cbr);
-            $crbRate = $crb->makeRequest();
-        }else{
-            $crbRate = $model->cbr_rate;
-        }
 
-        if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
+        if($model->use_exchanger)
         {
-            $model->cbr_rate = $crbRate;
-            $model->nbrb_rate= $nbrbRate;
+            $obExch = new ExchangeRatesObmennikBY();
+            $obExch ->setBankID($model->bank_id);
+
+            $data = $obExch ->getCurrencyUSD();
+
+            if(empty($data))
+                throw new NotFoundHttpException('Cant get currency from obmennik.by');
+
+            $factor = empty($model->factor) ? 1 : $model->factor;
+
+            $model->cbr_rate = $data['rur']*$factor;
+            $model->nbrb_rate = $data['bur']*$factor;
+            if($model->save())
+            {
+                Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
+            }else{
+                Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
+            }
+        }
+        elseif($model->use_base)
+        {
+            /** @var ExchangeRates $obBase */
+            $obBase = ExchangeRates::findOne(['id' => $model->base_id]);
+            if(empty($obBase))
+                throw new NotFoundHttpException('Base currency not found');
+
+            $model->cbr_rate = round($obBase->cbr_rate*$model->factor,4);
+            $model->nbrb_rate = round($obBase->nbrb_rate*$model->factor,4);
+
             if($model->save())
             {
                 Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
@@ -169,7 +184,34 @@ class ExchangeRatesController extends AbstractBaseBackendController
                 Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
             }
         }else{
-            Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
+            if($model->nbrb != 0)
+            {
+                $nbrb = new ExchangeRatesNBRB($model->nbrb);
+                $nbrbRate = $nbrb->makeRequest();
+            }else{
+                $nbrbRate = $model->nbrb_rate;
+            }
+            if($model->cbr != 0)
+            {
+                $crb = new ExchangeRatesCBRF($model->cbr);
+                $crbRate = $crb->makeRequest();
+            }else{
+                $crbRate = $model->cbr_rate;
+            }
+
+            if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
+            {
+                $model->cbr_rate = $crbRate;
+                $model->nbrb_rate= $nbrbRate;
+                if($model->save())
+                {
+                    Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
+                }else{
+                    Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
+                }
+            }else{
+                Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
+            }
         }
 
         return $this->redirect(['view','id' => $id]);
