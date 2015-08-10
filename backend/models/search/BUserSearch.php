@@ -71,6 +71,8 @@ class BUserSearch extends BUser
             'updated_at' => $this->updated_at,
         ]);
 
+        $query->andWhere(['role' => array_keys(self::getRoleByPermission())]);
+
         $query->andFilterWhere(['like', 'username', $this->username])
             ->andFilterWhere(['like', 'auth_key', $this->auth_key])
             ->andFilterWhere(['like', 'password_hash', $this->password_hash])
@@ -84,4 +86,6 @@ class BUserSearch extends BUser
 
         return $dataProvider;
     }
+
+
 }

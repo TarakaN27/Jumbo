@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         {
                                                             return $model->getRoleStr();
                                                         },
-                                                    'filter' => \backend\models\BUser::getRoleArr()
+                                                    'filter' => \backend\models\BUser::getRoleByPermission()
                                                 ],
                                                 [
                                                     'attribute' => 'status',

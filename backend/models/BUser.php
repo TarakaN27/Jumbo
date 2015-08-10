@@ -252,4 +252,38 @@ class BUser extends AbstractUser
     {
         return $this->hasMany(self::className(), ['id' => 'member_id'])->viaTable(BindBuser::tableName(), ['buser_id' => 'id']);
     }
+
+    /**
+     * @return array
+     */
+    public static function getRoleByPermission()
+    {
+        if(Yii::$app->user->isGuest)
+            return [''];
+
+        switch(Yii::$app->user->identity->role)
+        {
+            case self::ROLE_SUPERADMIN:
+                $arRole = self::getRoleArr();
+                break;
+            case self::ROLE_ADMIN:
+                $arRole = self::getRoleArr();
+                if(array_key_exists(self::ROLE_SUPERADMIN,$arRole))
+                    unset($arRole[self::ROLE_SUPERADMIN]);
+                break;
+            case self::ROLE_MANAGER:
+            case self::ROLE_BOOKKEEPER:
+                $arRole = self::getRoleArr();
+                if(array_key_exists(self::ROLE_SUPERADMIN,$arRole))
+                    unset($arRole[self::ROLE_SUPERADMIN]);
+                if(array_key_exists(self::ROLE_ADMIN,$arRole))
+                    unset($arRole[self::ROLE_ADMIN]);
+                break;
+            default:
+                $arRole = [''];
+                break;
+        }
+
+        return $arRole;
+    }
 }
