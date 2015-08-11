@@ -34,6 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                   $model->pay_summ,
                                   \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
                                   $options);
+                          else
+                              return $model->pay_summ;
                       }else{
                           return $model->pay_summ;
                       }
@@ -61,6 +63,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL,
                                     \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
                                     $options);
+                                else
+                                    return is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL;
                         }else{
                             return is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL;
                         }
