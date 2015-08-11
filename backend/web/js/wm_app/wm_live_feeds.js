@@ -98,6 +98,7 @@ function sendComment($this,updateComment) {
                 {
                     $('.msgBoxList').prepend(msg.content);
                     $(".msgBox[data-id='" + msg.dialogID + "'] textarea").redactor();
+                    killEventsForBlock();
                     initDefaultState();
                     bindEventsToBlock();
                     addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_DIALOG);
