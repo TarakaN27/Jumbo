@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d1ce5be44c6503932b3b7b10d9ab750b",
+    "hash": "69b8377ff0f9bc1146fec1f208adf198",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -576,6 +576,51 @@
                 "yii2"
             ],
             "time": "2015-07-09 20:36:01"
+        },
+        {
+            "name": "nterms/yii2-pagesize-widget",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nterms/yii2-pagesize-widget.git",
+                "reference": "ddf3588fe2ede6ff42f3efe42e0399d009f1cd2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nterms/yii2-pagesize-widget/zipball/ddf3588fe2ede6ff42f3efe42e0399d009f1cd2f",
+                "reference": "ddf3588fe2ede6ff42f3efe42e0399d009f1cd2f",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "nterms\\pagesize\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Saranga Abeykoon",
+                    "email": "amisaranga@gmail.com",
+                    "homepage": "http://nterms.com/"
+                }
+            ],
+            "description": "Widget for enabling dynamic page size selection on GridView",
+            "homepage": "https://github.com/nterms/yii2-pagesize-widget",
+            "keywords": [
+                "extension",
+                "grid-view",
+                "page-size",
+                "widget",
+                "yii2"
+            ],
+            "time": "2014-11-14 04:41:18"
         },
         {
             "name": "phpoffice/phpexcel",

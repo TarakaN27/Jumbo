@@ -46,6 +46,10 @@ class PaymentConditionSearch extends PaymentCondition
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                'pageSizeLimit' => [1,200]
+            ],
         ]);
 
         $this->load($params);

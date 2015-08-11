@@ -36,10 +36,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     {
                         $viewTpl = '{view}';
                     }
-
+                    echo \nterms\pagesize\PageSize::widget([
+                        'options' => [
+                            'class' => 'form-control input-sm',
+                        ],
+                        'label' => 'Отображать по:',
+                        'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                        'template' => '<div class="col-md-1 col-sm-1 col-xs-12 pull-right per-page-select ">{label}{list}</div>'
+                    ]);
                     echo GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
+                        'filterSelector' => 'select[name="per-page"]',
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
                             [

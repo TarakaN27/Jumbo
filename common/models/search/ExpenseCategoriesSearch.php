@@ -46,7 +46,8 @@ class ExpenseCategoriesSearch extends ExpenseCategories
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 10,
+                'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                'pageSizeLimit' => [1,200]
             ],
         ]);
 
