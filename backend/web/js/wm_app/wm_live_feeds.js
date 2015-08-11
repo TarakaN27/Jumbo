@@ -10,7 +10,9 @@ function initDefaultState() {
     $(".redactor_panel").fadeOut();
     $(".msgBoxAll").fadeOut();
 }
-
+/**
+ * добавляем события кликов
+ */
 function bindEventsToBlock()
 {
     $(".open_dialog_button").on("click",function(){         //открытие/закрытие диалога
@@ -25,6 +27,16 @@ function bindEventsToBlock()
     $(".sendComment").on("click",function(){ //добавление комментария
         sendComment(this,true);
     });
+}
+/**
+ * eбиваем события кликов
+ */
+function killEventsForBlock()
+{
+    $(".open_dialog_button").off("click");
+    $(".dialog_add_comment_btn").off("click");
+    $(".btn-msg-for-all").off("click");
+    $(".sendComment").off("click");
 }
 
 /**
@@ -86,6 +98,7 @@ function sendComment($this,updateComment) {
                 {
                     $('.msgBoxList').prepend(msg.content);
                     $(".msgBox[data-id='" + msg.dialogID + "'] textarea").redactor();
+                    killEventsForBlock();
                     initDefaultState();
                     bindEventsToBlock();
                     addSuccessNotify(DIALOG_SUCCESS_TITLE,DIALOG_SUCCESS_ADD_DIALOG);
@@ -100,6 +113,32 @@ function sendComment($this,updateComment) {
         },
         error: function(msg){
             addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADDCOMMENT);
+            return false;
+        }
+    });
+}
+/**
+ *
+ * @param page
+ */
+function loadMoreLiveFeedDialogs(page)
+{
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: DIALOG_LOAD_MORE_LF_DIALOGS,
+        dataType: "json",
+        data: {page:page},
+        success: function(msg){
+            $('.loadMoreBlock').remove();
+            $('.msgBoxList').append(msg);
+            killEventsForBlock();
+            $(".msgBoxList ul[data-pages='"+page+"'] textarea").redactor();
+            initDefaultState();             //инициализируем состояние по умолчанию
+            bindEventsToBlock();
+        },
+        error: function(msg){
+            addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_LOAD_CONTENT);
             return false;
         }
     });

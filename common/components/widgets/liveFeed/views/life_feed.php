@@ -14,6 +14,7 @@ $this->registerCssFile('@web/css/editor/index.css');
 $this->registerJs('
 var
     DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['ajax-service/add-comment']) . '",
+    DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['ajax-service/load-lf-dialogs']) . '",
     DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
@@ -21,6 +22,7 @@ var
     DIALOG_SUCCESS_TITLE = "' . Yii::t('app/common', 'DIALOG_SUCCESS_TITLE') . '",
     DIALOG_SUCCESS_ADD_COMMENT = "' . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_COMMENT') . '",
     DIALOG_SUCCESS_ADD_DIALOG = "' . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_DIALOG') . '",
+    DIALOG_ERROR_LOAD_CONTENT = "' . Yii::t('app/common', 'DIALOG_ERROR_LOAD_CONTENT') . '",
     DIALOG_ERROR_ADDCOMMENT = "'. Yii::t('app/common', 'DIALOG_ERROR_ADDCOMMENT') .'";
 ', \yii\web\View::POS_HEAD);
 $this->registerJsFile('@web/js/wm_app/wm_live_feeds.js',
@@ -87,6 +89,6 @@ $this->registerJsFile('@web/js/wm_app/wm_live_feeds.js',
     </div>
                             <!-- -->
     <div class = "x_content msgBoxList">
-        <?= $this->render('_dialog_part', ['arDialogs' => $arDialogs]) ?>
+        <?= $this->render('_dialog_part', ['arDialogs' => $arDialogs,'pages' => isset($pages) ? $pages : NULL]) ?>
     </div>
 </div>

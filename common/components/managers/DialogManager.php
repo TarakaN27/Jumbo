@@ -9,11 +9,14 @@
 namespace common\components\managers;
 
 use backend\models\BUser;
+use common\models\BuserToDialogs;
 use common\models\Dialogs;
 use common\models\Messages;
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\caching\DbDependency;
+use yii\caching\TagDependency;
 use yii\data\Pagination;
 use yii\web\NotFoundHttpException;
 
@@ -23,7 +26,11 @@ class DialogManager extends Component{
         $iDId = NULL,
         $sMsg,
         $iAthID,
+        $userID,
         $arUsers;
+
+    protected
+        $pages;
 
     /**
      * @return array
@@ -198,4 +205,76 @@ class DialogManager extends Component{
         }
         return NULL;
     }
+
+    public function loadLiveFeedDialogs($page = 0)
+    {
+        if(empty($this->userID))    //проверяем чтобы был указан ID пользователя
+            throw new NotFoundHttpException('User ID is not defined!');
+        $userID = $this->userID;
+
+        $obDep = new TagDependency([
+            'tags' => [
+                ActiveRecordHelper::getCommonTag(Dialogs::className()),
+                ActiveRecordHelper::getCommonTag(BuserToDialogs::className())
+            ]
+        ]);
+
+        $arDialogs = Dialogs::getDb()->cache(function($db)use($userID,$page){
+            $query = Dialogs::find()
+                ->joinWith('busers')
+                ->with([
+                    'busers' => function ($query) use ($userID)  {
+                            $query->andWhere(BUser::tableName().'.id is NULL OR '.
+                                BUser::tableName().'.id = '.$userID
+                            );
+                        }
+                ])
+                ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED])
+                ->orWhere([Dialogs::tableName().'.buser_id' => $userID])
+                ->groupBy(Dialogs::tableName().'.id ');
+
+            $countQuery = clone $query;
+            $pages = new Pagination([
+                'totalCount' => $countQuery->count(),
+            ]);
+            $pages->setPageSize(\Yii::$app->params['liveFeedDialogsNumber']);
+            $pages->setPage($page);
+            $models = $query->offset($pages->offset)
+                ->limit($pages->limit)
+                ->orderBy('id DESC')
+                ->all();
+
+            return [
+                'models' => $models,
+                'pages' => $pages
+            ];
+        },3600*24,$obDep);//получаем диалоги для пользователя
+
+        $arDlgs = isset($arDialogs['models']) && !empty($arDialogs['models']) ? $arDialogs['models'] : [];
+        $this->pages = isset($arDialogs['pages']) && !empty($arDialogs['pages']) ? $arDialogs['pages'] : NULL;
+        $arDIDs = [];
+        foreach($arDlgs as $d)
+            $arDIDs[]= $d->id;
+
+        $arMsg = Messages::getMessagesForDialogs($arDIDs);  //получаем сообщения для диалогов
+
+        $arDialogs = [];    //собираем результирующий массив
+        foreach($arDlgs as $dlg)
+        {
+            $arDialogs [] = [
+                'dialog' => $dlg,
+                'msg' => array_key_exists($dlg->id,$arMsg) ? $arMsg[$dlg->id] : [],
+            ];
+            unset($tmpMsg);
+        }
+
+        return $arDialogs;
+    }
+
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+
 } 

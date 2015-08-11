@@ -7,10 +7,11 @@
  */
 use yii\helpers\Html;
 use \vova07\imperavi\Widget as ImperaviWidget;
+$page = isset($pages) && is_object($pages) ? $pages->getPage() : 0;
 ?>
 
 <?php foreach($arDialogs as $dialog):?>
-    <ul class = "list-unstyled timeline">
+    <ul class = "list-unstyled timeline" data-pages = "<?=$page?>">
             <li id="dialogBlockId_<?php echo $dialog['dialog']->id;?>">
                 <div class = "block">
                     <div class = "tags">
@@ -77,3 +78,16 @@ use \vova07\imperavi\Widget as ImperaviWidget;
             </li>
         </ul>
 <?php endforeach;?>
+
+<?php if(!empty($pages)):
+    $currPage = $pages->getPage();
+    $coutPage = $pages->getPageCount();
+    if($coutPage > $currPage+1):
+    ?>
+<div class="col-md-12 text-center loadMoreBlock">
+    <?=Html::button(Yii::t('app/common','Load more'),[
+        'class' => 'btn btn-default',
+        'onclick' => 'loadMoreLiveFeedDialogs("'.($currPage+1).'");',
+    ]);?>
+</div>
+<?php endif; endif;?>

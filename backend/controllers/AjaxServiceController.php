@@ -139,5 +139,20 @@ class AjaxServiceController extends AbstractBaseBackendController{
         throw new ServerErrorHttpException("Can't create dialog");
     }
 
+    public function actionLoadLfDialogs()
+    {
+        $page = \Yii::$app->request->post('page');
+        if(empty($page))
+            return NULL;
+
+        $obDMan = new DialogManager(['userID' => \Yii::$app->user->id]);
+        $arDialogs= $obDMan->loadLiveFeedDialogs((int)$page);
+
+        return $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_part.php',[
+            'arDialogs' => $arDialogs,
+            'pages' => $obDMan->getPages()
+        ]);
+    }
+
 
 } 
