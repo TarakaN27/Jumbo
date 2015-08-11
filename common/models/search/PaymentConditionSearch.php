@@ -48,7 +48,7 @@ class PaymentConditionSearch extends PaymentCondition
             'query' => $query,
             'pagination' => [
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
-                'pageSizeLimit' => [1,200]
+                'pageSizeLimit' => [1,1000]
             ],
         ]);
 

@@ -42,5 +42,6 @@ return [
     'Payments reports' => 'Отчеты по платежам',
     'To dashboard' => 'На главную',
     'Messages' => 'Сообщения',
-    'Update btn' => 'Сохранить изменения'
+    'Update btn' => 'Сохранить изменения',
+    'Show by' => 'Показывать по:'
 ];
