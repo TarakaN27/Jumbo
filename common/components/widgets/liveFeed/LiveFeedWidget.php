@@ -8,11 +8,8 @@
 
 namespace common\components\widgets\liveFeed;
 
-
-use common\models\Dialogs;
-use common\models\Messages;
+use common\components\managers\DialogManager;
 use yii\base\Widget;
-use yii\web\NotFoundHttpException;
 
 class LiveFeedWidget extends Widget{
 
@@ -33,28 +30,13 @@ class LiveFeedWidget extends Widget{
      */
     public function run()
     {
-        if(empty($this->userID))    //проверяем чтобы был указан ID пользователя
-            throw new NotFoundHttpException('User ID is not defined!');
-
-        $arDlgs = Dialogs::getDialogsForLive($this->userID,self::NUMBER_OF_FEED);    //получаем диалоги для пользователя
-        $arDIDs = [];
-        foreach($arDlgs as $d)
-            $arDIDs[]= $d->id;
-
-        $arMsg = Messages::getMessagesForDialogs($arDIDs);  //получаем сообщения для диалогов
-
-        $arDialogs = [];    //собираем результирующий массив
-        foreach($arDlgs as $dlg)
-        {
-            $arDialogs [] = [
-                'dialog' => $dlg,
-                'msg' => array_key_exists($dlg->id,$arMsg) ? $arMsg[$dlg->id] : [],
-            ];
-            unset($tmpMsg);
-        }
+        $obDMan = new DialogManager(['userID' => $this->userID]);
+        $arDialogs = $obDMan->loadLiveFeedDialogs(0);
+        $pages = $obDMan->getPages();
 
         return $this->render('life_feed',[
-            'arDialogs' => $arDialogs
+            'arDialogs' => $arDialogs,
+            'pages' => $pages
         ]);
     }
 
