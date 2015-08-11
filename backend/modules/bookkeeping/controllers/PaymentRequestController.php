@@ -50,7 +50,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                // ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper','moder']
+                    'roles' => ['superadmin','bookkeeper','moder']
                 ]
             ]
         ];

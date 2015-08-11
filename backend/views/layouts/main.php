@@ -133,7 +133,7 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
-                                        <?php if(Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
                                             </li>
@@ -152,7 +152,7 @@ $menuItems[] = [
                                         </li>
                                     </ul>
                                 </li-->
-
+                                <?php if(Yii::$app->user->can('adminRights')):?>
                                 <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                          <li>
@@ -160,6 +160,7 @@ $menuItems[] = [
                                         </li>
                                     </ul>
                                 </li>
+                                <?php endif;?>
                             </ul>
                         </div>
                         <!--div class="menu_section">
