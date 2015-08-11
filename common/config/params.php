@@ -1,7 +1,7 @@
 <?php
 return [
-    'adminEmail' => 'e.motuz@webmartsoft.com',
-    'supportEmail' => 'e.motuz@webmartsoft.com',
+    'adminEmail' => 'motuzdev@gmail.com',
+    'supportEmail' => 'motuzdev@gmail.com',
     'user.passwordResetTokenExpire' => 3600,
-    'infoEmail' => 'e.motuz@webmartsoft.com'
+    'infoEmail' => 'motuzdev@gmail.com'
 ];
