@@ -222,17 +222,11 @@ class DialogManager extends Component{
         $arDialogs = Dialogs::getDb()->cache(function($db)use($userID,$page){
             $query = Dialogs::find()
                 ->joinWith('busers')
-                ->with([
-                    'busers' => function ($query) use ($userID)  {
-                            $query->andWhere(BUser::tableName().'.id is NULL OR '.
-                                BUser::tableName().'.id = '.$userID
-                            );
-                        }
-                ])
-                ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED])
-                ->orWhere([Dialogs::tableName().'.buser_id' => $userID])
+                ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,Dialogs::tableName().'.buser_id' => $userID])
+                ->orWhere(
+                    Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.
+                    ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )')
                 ->groupBy(Dialogs::tableName().'.id ');
-
             $countQuery = clone $query;
             $pages = new Pagination([
                 'totalCount' => $countQuery->count(),
