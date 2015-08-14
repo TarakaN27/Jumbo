@@ -73,6 +73,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
             ],
             [
+                'attribute' => 'legal_id',
+                'format' => 'html',
+                'value' => function($model){
+                        return is_object($obLegal = $model->legal) ? $obLegal->name : NULL;
+                    }
+            ],
+            [
                 'attribute' => 'is_unknown',
                 'value' => function($model){
                         return $model->getYesNoStr($model->is_unknown);

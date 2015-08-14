@@ -210,9 +210,14 @@ $this->registerJs('
                                              'value' => is_object($obCuser = $modelP->cuser) ? $obCuser->getInfo() : 'N/A'
                                          ],
                                          [
+                                             'attribute' => 'legal_id',
+                                             'value' => is_object($obLegal = $modelP->legal) ? $obLegal->name : 'N/A'
+                                         ],
+                                         [
                                               'attribute' => 'pay_summ',
                                               'value' => $modelP->pay_summ.' '.$sCurrn
                                          ],
+
                                      ]
                                 ])?>
                         </div>
