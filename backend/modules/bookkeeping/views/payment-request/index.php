@@ -9,16 +9,47 @@ use \common\models\PaymentRequest;
 
 $this->title = Yii::t('app/book', 'Payment Requests');
 $this->params['breadcrumbs'][] = $this->title;
+
+$this->registerJs("
+function calculateTotalSumm()
+{
+    var
+        total= {},
+        currency = ".json_encode(\common\models\ExchangeRates::getRatesCodes())."
+        tr = $('tr.counters');
+
+     $.each(tr, function( index, value ) {
+        var
+            currID = $(value).attr('data-tr-currency_id');
+
+        if(total.hasOwnProperty(currID))
+            total[currID] = parseFloat(total[currID]) + parseFloat($(value).attr('data-tr-pay_summ'));
+        else
+            total[currID] = $(value).attr('data-tr-pay_summ');
+     });
+
+     $.each(total,function(index,value){
+        if(currency.hasOwnProperty(index))
+            $(totalPaySumm).append('<section>'+value+' '+currency[index]+'</section>');
+     });
+}
+",\yii\web\View::POS_END);
+
+$this->registerJs('calculateTotalSumm()',\yii\web\View::POS_READY);
 ?>
 <div class="payment-request-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();;?>
-    <?= GridView::widget([
+    <?= \common\components\customComponents\gridView\CustomGridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'filterSelector' => 'select[name="per-page"]',
+        'addTrData' => ['pay_summ','currency_id'],
+        'rowOptions' => [
+          'class' => 'counters'
+        ],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             [
@@ -120,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
                  'value' => function($model){
                         return $model->getStatusStr();
                      },
-                 'filter' => \common\models\PaymentRequest::getStatusArr()
+                 'filter' =>false
              ],
             // 'created_at',
             // 'updated_at',
@@ -192,5 +223,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         ]
     ]); ?>
-
+        <section id="totalPaySumm">
+            <h4><?=Yii::t('app/book', 'Total summ of payments requests:')?> </h4>
+        </section>
 </div>

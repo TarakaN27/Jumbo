@@ -106,6 +106,7 @@ return [
     'Condition' => 'Условие',
     'Comment' => 'Комментарий',
     'Save' => 'Сохранить',
-    'Payment' => 'Платеж'
+    'Payment' => 'Платеж',
+    'Total summ of payments requests:' => 'Общая сумма'
 
 ];
