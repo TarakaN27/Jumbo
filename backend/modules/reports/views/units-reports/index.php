@@ -80,7 +80,7 @@ $this->title = Yii::t('app/reports','Units reports');
                             </div>
                     </div>
                     <div class="form-group">
-                            <?= Html::submitButton(Yii::t('app/services', 'Get report'), ['class' => 'btn btn-success']) ?>
+                            <?= Html::submitButton(Yii::t('app/reports', 'Get report'), ['class' => 'btn btn-success']) ?>
                     </div>
                     <?php \yii\bootstrap\ActiveForm::end();?>
                     <hr/>

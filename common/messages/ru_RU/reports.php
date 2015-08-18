@@ -33,5 +33,12 @@ return [
     'Total units' => 'Всего юнитов',
     'Total cost' => 'Общая сумма',
     'Get report' => 'Получить отчет',
-    'Detail units table' => 'Детализированная статистика'
+    'Detail units table' => 'Детализированная статистика',
+    'Get docx report' => 'Получить docx',
+    'Get excel report' => 'Получить excel',
+    'Selected managers' => 'Выбранные менеджеры',
+    'Generate excel' => 'Сгенерировать Excel',
+    'Generate docx' => 'Сгенерировать Docx',
+    'No data' => 'Нет данных'
+
 ];
