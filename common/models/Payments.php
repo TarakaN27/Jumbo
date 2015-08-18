@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -73,10 +74,6 @@ class Payments extends AbstractActiveRecord
     {
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
-
-
-
-
         return parent::beforeSave($insert);
     }
 
@@ -114,8 +111,11 @@ class Payments extends AbstractActiveRecord
             $arBhvrs,
             [
                 [
-                    'class' => LogModelBehavior::className(),
+                    'class' => LogModelBehavior::className(),       //логирование платежей
                     'ignored' => ['created_at','updated_at']
+                ],
+                [
+                    'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
                 ]
             ]);
     }

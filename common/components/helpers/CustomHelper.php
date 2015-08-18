@@ -86,4 +86,53 @@ class CustomHelper {
     {
         return  86400 - 3600*date("H") - 60*date("i") - date("s");
     }
+
+    /**
+     * Unixtimestamp начала месяца
+     * @param null $time
+     * @return int
+     */
+    public static function getBeginMonthTime($time = NULL)
+    {
+        if(is_null($time))
+            $time = time();
+        return strtotime('1 '.date('M',$time).' '.date('Y',$time));
+    }
+
+    /**
+     * Unixtimestamp конец месяца
+     * @param null $time
+     * @return string
+     */
+    public static function getEndMonthTime($time = NULL)
+    {
+        if(is_null($time))
+            $time = time();
+        return strtotime('23:59:59 '.date('t',$time).'-'.date('M',$time).'-'.date('Y',$time));
+    }
+
+    /**
+     * Unixtimestamp начала дня
+     * @param null $time
+     * @return int
+     */
+    public static function getBeginDayTime($time = NULL)
+    {
+        if(is_null($time))
+            $time = time();
+
+        return  strtotime(date('d',$time).' '.date('M',$time).' '.date('Y',$time));
+    }
+
+    /**
+     * @param null $time
+     * @return int
+     */
+    public static function getEndDayTime($time = NULL)
+    {
+        if(is_null($time))
+            $time = time();
+
+        return strtotime('23:59:59 '.date('d',$time).'-'.date('M',$time).'-'.date('Y',$time));
+    }
 } 

@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use backend\models\forms\BUserSignupForm;
+use common\components\helpers\CustomHelper;
 use common\models\BuserInviteCode;
 use Yii;
 use yii\filters\AccessControl;

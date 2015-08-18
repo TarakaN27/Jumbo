@@ -28,5 +28,10 @@ return [
     'iTaxTotal' => 'Сумарный налог',
     'iProdTotal' => 'Сумарные произв. затраты',
     'Payments date' => 'Дата платежа',
-    'Update btn' => 'Сохранить изменения'
+    'Update btn' => 'Сохранить изменения',
+    'Units reports' => 'Отчеты по юнитам',
+    'Total units' => 'Всего юнитов',
+    'Total cost' => 'Общая сумма',
+    'Get report' => 'Получить отчет',
+    'Detail units table' => 'Детализированная статистика'
 ];

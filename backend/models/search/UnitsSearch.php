@@ -5,25 +5,21 @@ namespace backend\models\search;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\BUser;
+use app\models\Units;
 
 /**
- * BUserSearch represents the model behind the search form about `backend\models\BUser`.
+ * UnitsSearch represents the model behind the search form about `app\models\Units`.
  */
-class BUserSearch extends BUser
+class UnitsSearch extends Units
 {
-
-    public
-        $fio;
-
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email','fio'], 'safe'],
+            [['id', 'type', 'service_id', 'cost', 'cuser_id', 'multiple', 'created_at', 'updated_at'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
@@ -45,7 +41,7 @@ class BUserSearch extends BUser
      */
     public function search($params)
     {
-        $query = BUser::find();
+        $query = Units::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -53,7 +49,6 @@ class BUserSearch extends BUser
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
-
         ]);
 
         $this->load($params);
@@ -66,27 +61,17 @@ class BUserSearch extends BUser
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'role' => $this->role,
-            'status' => $this->status,
+            'type' => $this->type,
+            'service_id' => $this->service_id,
+            'cost' => $this->cost,
+            'cuser_id' => $this->cuser_id,
+            'multiple' => $this->multiple,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andWhere(['role' => array_keys(self::getRoleByPermission())]);
-
-        $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
-            ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
-            ->andFilterWhere(['like', 'email', $this->email]);
-
-        if(!empty($this->fio))
-            $query->andWhere(' ( lname LIKE "'.$this->fio.'%" OR '.
-                'fname LIKE "'.$this->fio.'%" OR '.
-                'mname LIKE "'.$this->fio.'%" ) ');
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }
-
-
 }

@@ -26,6 +26,28 @@ $menuItems[] = [
 ];
 unset($subItems);
 
+if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
+{
+    $subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
+    $subItems[] = ['label' => Yii::t('app/book', 'BOOK_payment_condition'), 'url' => ['/bookkeeping/payment-condition/index']];
+
+    $menuItems[] = [
+        'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),
+        'items' => $subItems,
+    ];
+
+    unset($subItems);
+}
+
+if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
+{
+    $menuItems[] = [
+        'label' => '<i class="fa fa-money"></i> '.Yii::t('app/common','Units'),
+        'url' => ['/units/units-manager/index']
+    ];
+}
+
+
 $menuItems[] = [
     'label' => '<i class="fa fa-envelope-o"></i> '.Yii::t('app/common','Messages'),
     'url' => ['/messenger/default/index']
@@ -36,7 +58,6 @@ $menuItems[] = [
     'label' => '<i class="fa fa-university"></i> '.Yii::t('app/common','To dashboard'),
     'url' => Yii::$app->homeUrl
 ];
-
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -157,6 +178,9 @@ $menuItems[] = [
                                     <ul class="nav child_menu" style="display: none">
                                          <li>
                                             <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
+                                        </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/reports/units-reports/index']); ?>"><?php echo Yii::t('app/common', 'Units reports'); ?></a>
                                         </li>
                                     </ul>
                                 </li>

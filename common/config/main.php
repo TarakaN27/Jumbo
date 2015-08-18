@@ -23,7 +23,8 @@ return [
                         'app/common' => 'common.php',
                         'app/book' => 'bookkeeping.php',
                         'app/reports' => 'reports.php',
-                        'app/msg' => 'messenger.php'
+                        'app/msg' => 'messenger.php',
+                        'app/units' => 'units.php'
                     ]
                 ]
             ]

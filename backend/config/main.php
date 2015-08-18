@@ -30,6 +30,9 @@ return [
         'helpers' => [ //модуль с помощниками
             'class' => 'backend\modules\helpers\Module',
         ],
+        'units' => [
+            'class' => 'backend\modules\units\Module',
+        ],
     ],
     'components' => [
 
