@@ -49,7 +49,7 @@ class UnitsPaymentsBehavior extends Behavior{
         $iService = $this->owner->service_id;   // ID услуги
 
         /** @var Units $obUnit */
-        $obUnit = Units::find()->where(['service_id' => $iService,'cuser_id' => $iCUserID])->one(); //ищем юнит
+        $obUnit = Units::find()->where(['service_id' => $iService,'type' => Units::TYPE_PAYMENT])->one(); //ищем юнит
         if(empty($obUnit))
             return TRUE;
 

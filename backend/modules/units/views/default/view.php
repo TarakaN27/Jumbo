@@ -46,10 +46,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => is_object($obServ = $model->service) ? $obServ->name : 'N/A'
                         ],
                         'cost',
+                        /*
                         [
                             'attribute' => 'cuser_id',
                             'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : 'N/A'
                         ],
+                        */
                         [
                             'attribute' => 'multiple',
                             'value' => $model->getYesNoStr($model->multiple)

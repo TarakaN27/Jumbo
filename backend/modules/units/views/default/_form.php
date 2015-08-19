@@ -32,7 +32,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'cost')->textInput() ?>
 
-    <?= $form->field($model, 'cuser_id')->widget(\kartik\select2\Select2::className(),[
+    <?
+    /*
+    $form->field($model, 'cuser_id')->widget(\kartik\select2\Select2::className(),[
         'data' => \common\models\CUser::getContractorMap(),
         'options' => [
             'placeholder' => Yii::t('app/book','BOOK_choose_cuser')
@@ -40,7 +42,9 @@ use yii\widgets\ActiveForm;
         'pluginOptions' => [
             'allowClear' => true
         ],
-    ]) ?>
+    ])
+    */
+    ?>
 
     <?= $form->field($model, 'multiple')->dropDownList(\app\models\Units::getYesNo()) ?>
 

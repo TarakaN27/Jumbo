@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \common\models\Services::getServicesMap()
                         ],
+                        /*
                         [
                             'attribute' => 'cuser_id',
                             'value' => function($model){
@@ -55,6 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \common\models\CUser::getContractorMap(),
                         ],
+                        */
                         [
                             'attribute' => 'type',
                             'value' => function($model){

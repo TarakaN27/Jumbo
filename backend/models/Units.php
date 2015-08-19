@@ -73,11 +73,12 @@ class Units extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['name', 'cost'], 'required'],
+            [['name', 'cost','service_id'], 'required'],
             [['type', 'service_id', 'cost', 'cuser_id', 'multiple', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique','targetClass' => self::className()],
             ['type', 'in', 'range' => array_keys(self::getTypeArr())],
+            [['service_id'], 'unique','targetClass' => self::className()],
         ];
     }
 
@@ -96,6 +97,7 @@ class Units extends AbstractActiveRecord
             'multiple' => Yii::t('app/units', 'Multiple'),
             'created_at' => Yii::t('app/units', 'Created At'),
             'updated_at' => Yii::t('app/units', 'Updated At'),
+
         ];
     }
 
