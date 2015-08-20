@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $doc_requisites
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -33,7 +34,7 @@ class LegalPerson extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['description'], 'string'],
+            [['description','doc_requisites'], 'string'],
             [['status', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
@@ -53,6 +54,7 @@ class LegalPerson extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
+            'doc_requisites' => Yii::t('app/services','Requisites for documents')
         ];
     }
 

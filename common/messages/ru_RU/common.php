@@ -48,5 +48,11 @@ return [
     'Units' => 'Юниты',
     'Total units' => 'Всего юнитов',
     'Total summ' => 'Общая сумма',
-    'Detail stat' => 'детальная статистика'
+    'Detail stat' => 'детальная статистика',
+    'Bill template' => 'Шаблоны счетов',
+    'Bill' => 'Счета',
+    'Add bill' => 'Добавить счет',
+    'Bill list' => 'Список счетов',
+    'Bill docx template' => 'Docx шаблоны счетов'
+
 ];

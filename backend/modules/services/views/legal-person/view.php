@@ -38,16 +38,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id',
                         'name',
                         'description:ntext',
+                        'doc_requisites:ntext',
                         [
                             'attribute' => 'status',
                             'value' => $model->getStatusStr()
                         ],
                         [
-                            'attribute' => 'create_at',
+                            'attribute' => 'created_at',
                             'value' => $model->getFormatedCreatedAt()
                         ],
                         [
-                            'attribute' => 'update_at',
+                            'attribute' => 'updated_at',
                             'value' => $model->getFormatedUpdatedAt()
                         ],
                     ],

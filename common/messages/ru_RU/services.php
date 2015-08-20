@@ -50,6 +50,7 @@ return [
     'Bank ID' => 'ID банка/обменника',
     'Use exchanger' => 'Использовать курс обменников',
     'This name has already been taken.' => 'Валюта с таким названием уже существует!',
-    'This code has already been taken.' => 'Валюта с таким кодом уже существует!'
+    'This code has already been taken.' => 'Валюта с таким кодом уже существует!',
+    'Requisites for documents' => 'Реквизиты для документов'
 
 ];

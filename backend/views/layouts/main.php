@@ -26,10 +26,25 @@ $menuItems[] = [
 ];
 unset($subItems);
 
+if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
+{
+    $subItems[] = ['label' => Yii::t('app/common', 'Add bill'), 'url' => ['/documents/bills/create']];
+    $subItems[] = ['label' => Yii::t('app/common', 'Bill list'), 'url' => ['/documents/bills/index']];
+
+    $menuItems[] = [
+        'label' => '<i class="fa fa-list-alt"></i> '.Yii::t('app/common','Bill'),
+        'items' => $subItems,
+    ];
+
+    unset($subItems);
+}
+
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
     $subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
     $subItems[] = ['label' => Yii::t('app/book', 'BOOK_payment_condition'), 'url' => ['/bookkeeping/payment-condition/index']];
+    $subItems[] = ['label' => Yii::t('app/common', 'Bill template'), 'url' => ['/documents/bill-template/index']];
+    $subItems[] = ['label' => Yii::t('app/common', 'Bill docx template'), 'url' => ['/documents/bill-docx-template/index']];
 
     $menuItems[] = [
         'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),

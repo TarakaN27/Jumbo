@@ -9,8 +9,11 @@
 namespace common\models;
 
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use Yii;
+use yii\web\NotFoundHttpException;
 
 abstract class AbstractActiveRecordWTB extends ActiveRecord{
 
@@ -90,5 +93,33 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
             return Yii::createObject($className, [get_called_class()]);
         else
             return parent::find();
+    }
+
+    /**
+     * @param $model_id
+     * @return mixed|null|static
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public static function findOneByIDCached($model_id)
+    {
+        $cacheKey = get_called_class().':' . $model_id;
+        if (false === $model = Yii::$app->cache->get($cacheKey)) {
+            if (null === $model = self::findOne($model_id)) {
+                throw new NotFoundHttpException;
+            }
+            Yii::$app->cache->set(
+                $cacheKey,
+                $model,
+                86400,
+                new TagDependency(
+                    [
+                        'tags' => [
+                            ActiveRecordHelper::getObjectTag(self::className(), $model_id),
+                        ]
+                    ]
+                )
+            );
+        }
+        return $model;
     }
 } 
