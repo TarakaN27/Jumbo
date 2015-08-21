@@ -52,13 +52,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'filter' => \common\models\Services::getServicesMap()
                         ],
                         [
-                            'attribute' => 'use_vat',
-                            'value' => function($model){
-                                    return $model->getYesNoStr($model->use_vat);
-                                }
-                        ],
-                        'vat_rate',
-                        [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'
                         ],

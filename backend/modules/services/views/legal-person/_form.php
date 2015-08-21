@@ -26,6 +26,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'doc_requisites')->textarea(['row' => 6])?>
 
+    <?= $form->field($model, 'doc_site')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'doc_email')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'use_vat')->dropDownList(\common\models\LegalPerson::getYesNo())?>
+
     <?= $form->field($model, 'status')->dropDownList(\common\models\LegalPerson::getStatusArr()) ?>
 
     <div class="form-group">

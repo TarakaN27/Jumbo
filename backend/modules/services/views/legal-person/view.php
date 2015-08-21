@@ -39,6 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'name',
                         'description:ntext',
                         'doc_requisites:ntext',
+                        'doc_email:email',
+                        'doc_site',
+                        [
+                            'attribute' => 'use_vat',
+                            'value' => $model->getYesNoStr($model->use_vat)
+                        ],
                         [
                             'attribute' => 'status',
                             'value' => $model->getStatusStr()
@@ -50,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'updated_at',
                             'value' => $model->getFormatedUpdatedAt()
-                        ],
+                        ]
                     ],
                 ]) ?>
             </div>

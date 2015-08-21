@@ -3,6 +3,7 @@
 namespace backend\modules\documents\controllers;
 
 use common\models\BillTemplate;
+use common\models\LegalPerson;
 use common\models\managers\BillsManager;
 use Yii;
 use common\models\Bills;
@@ -184,5 +185,14 @@ class BillsController extends AbstractBaseBackendController
         $model = BillsManager::findOneByIDCached($id);
         $model->getDocument($type);
         Yii::$app->end();
+    }
+
+    public function actionFindLegalPerson()
+    {
+        $lPID = Yii::$app->request->post('lPID');
+        $model = LegalPerson::findOneByIDCached($lPID);
+        if(empty($model))
+            throw new NotFoundHttpException('Legal person not found');
+        return $model->use_vat;
     }
 }

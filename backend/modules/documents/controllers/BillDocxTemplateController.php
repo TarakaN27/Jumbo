@@ -129,4 +129,14 @@ class BillDocxTemplateController extends AbstractBaseBackendController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    /**
+     * @param $id
+     */
+    public function actionDownload($id)
+    {
+        $model  = $this->findModel($id);
+        $model->downloadFile();
+        Yii::$app->end();
+    }
 }

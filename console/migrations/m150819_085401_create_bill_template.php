@@ -20,8 +20,6 @@ class m150819_085401_create_bill_template extends Migration
             'service_id' => Schema::TYPE_INTEGER.' NOT NULL ',
             'object_text' => Schema::TYPE_TEXT.' NOT NULL ',
             'description' => Schema::TYPE_TEXT,
-            'use_vat' => Schema::TYPE_BOOLEAN. ' DEFAULT 0',
-            'vat_rate' => Schema::TYPE_MONEY,
             'created_at' => Schema::TYPE_INTEGER ,
             'updated_at' => Schema::TYPE_INTEGER ,
         ], $tableOptions);

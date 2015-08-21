@@ -17,6 +17,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $doc_requisites
+ * @property string $doc_site
+ * @property string $doc_email
+ * @property integer $use_vat
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -35,10 +38,12 @@ class LegalPerson extends AbstractActiveRecord
     {
         return [
             [['description','doc_requisites'], 'string'],
-            [['status', 'created_at', 'updated_at'], 'integer'],
+            [['status', 'created_at', 'updated_at','use_vat'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
+            [['doc_site'],'url'],
+            [['doc_email'],'email']
         ];
     }
 
@@ -54,7 +59,8 @@ class LegalPerson extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
-            'doc_requisites' => Yii::t('app/services','Requisites for documents')
+            'doc_requisites' => Yii::t('app/services','Requisites for documents'),
+            'use_vat' => Yii::t('app/services', 'Use vat'),
         ];
     }
 

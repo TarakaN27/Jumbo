@@ -50,7 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{view}'
+                            'template' => '{view}{plus}',
+                            'buttons' => [
+                                'plus' => function($url, $model, $key){
+                                        return Html::a('<i class="fa fa-download"></i>',['download','id'=>$model->id]);
+                                    },
+                            ]
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',

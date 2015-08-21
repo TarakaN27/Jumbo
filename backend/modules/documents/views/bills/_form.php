@@ -88,10 +88,45 @@ function lPersonAndServiceState()
 
     }
 }
+
+function checkUseVat()
+{
+    var
+        lP = $('#bills-l_person_id');
+
+    $('#bills-vat_rate').val('');
+    if(lP.val() != '')
+    {
+        $.ajax({
+        type: 'POST',
+        cache: false,
+        url: '".\yii\helpers\Url::to(['find-legal-person'])."',
+        dataType: 'json',
+        data: {lPID:lP.val()},
+        success: function(msg){
+            if(msg)
+              {
+                    $('#bills-use_vat').val(msg);
+                    $('#bills-vat_rate').val('".\common\components\helpers\CustomHelper::getVat()."');
+                    addSuccessNotify('".Yii::t('app/book','Bill template request')."','".Yii::t('app/documents','Legal person found')."');
+              }else{
+                    $('#bills-use_vat').val('".\common\models\BillTemplate::NO."');
+
+                    addSuccessNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Legal person found')."');
+              }
+            },
+            error: function(msg){
+                addErrorNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Server error')."');
+                return false;
+            }
+        });
+    }
+}
 ",\yii\web\View::POS_END);
 $this->registerJs("
 $('#bills-l_person_id, #bills-service_id').on('change',lPersonAndServiceState);
 $('#bills-bill_template').on('change',getBillDetail);
+$('#bills-l_person_id').on('change',checkUseVat);
 ",\yii\web\View::POS_READY);
 ?>
 

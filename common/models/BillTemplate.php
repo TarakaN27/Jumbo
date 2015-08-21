@@ -16,8 +16,6 @@ use yii\helpers\ArrayHelper;
  * @property integer $service_id
  * @property string $object_text
  * @property string $description
- * @property integer $use_vat
- * @property string $vat_rate
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -41,20 +39,11 @@ class BillTemplate extends AbstractActiveRecord
     {
         return [
             [['name', 'l_person_id', 'service_id', 'object_text'], 'required'],
-            [['l_person_id', 'service_id', 'use_vat', 'created_at', 'updated_at'], 'integer'],
+            [['l_person_id', 'service_id',  'created_at', 'updated_at'], 'integer'],
             [['object_text', 'description'], 'string'],
-            [['vat_rate'], 'number','min' => 0],
-            [['vat_rate'], 'number','max' => 100],
             [['name'], 'string', 'max' => 255],
             ['name','unique'],
-            [['vat_rate'],'required',
-             'when' => function($model) {
-                     return $model->use_vat == self::YES;
-                 },
-             'whenClient' => "function (attribute, value) {
-                    return $('#billtemplate-use_vat').val() == '".self::YES."';
-                }"
-            ],
+
         ];
     }
 
@@ -70,8 +59,6 @@ class BillTemplate extends AbstractActiveRecord
             'service_id' => Yii::t('app/documents', 'Service ID'),
             'object_text' => Yii::t('app/documents', 'Object Text'),
             'description' => Yii::t('app/documents', 'Description'),
-            'use_vat' => Yii::t('app/documents', 'Use Vat'),
-            'vat_rate' => Yii::t('app/documents', 'Vat Rate'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
         ];

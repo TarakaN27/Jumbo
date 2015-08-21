@@ -46,11 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'object_text:ntext',
                         'description:ntext',
                         [
-                            'attribute' => 'use_vat',
-                            'value' => $model->getYesNoStr($model->use_vat)
-                        ],
-                        'vat_rate',
-                        [
                             'attribute' => 'created_at',
                             'value' => Yii::$app->formatter->asDatetime($model->created_at)
                         ],

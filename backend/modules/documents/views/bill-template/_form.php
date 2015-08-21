@@ -7,26 +7,6 @@ use yii\widgets\ActiveForm;
 /* @var $model common\models\BillTemplate */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->registerJs('
-function checkUseVatState()
-{
-    var
-        useVat = $("#billtemplate-use_vat"),
-        vatRate = $("#billtemplate-vat_rate");
-
-    if(useVat.val() == "'.\common\models\BillTemplate::YES.'")
-    {
-        vatRate.removeAttr("disabled");
-    }else{
-        vatRate.val("");
-        vatRate.attr("disabled","disabled");
-    }
-}
-',\yii\web\View::POS_END);
-$this->registerJs('
-    $("#billtemplate-use_vat").on("change",checkUseVatState);
-',\yii\web\View::POS_READY);
-
 ?>
 
 <div class="bill-template-form">
@@ -66,12 +46,6 @@ $this->registerJs('
         if($model->use_vat != \common\models\BillTemplate::YES)
             $arConf['disabled'] = 'disabled';
     ?>
-
-    <?= $form->field($model, 'use_vat')->dropDownList(
-        \common\models\BillTemplate::getYesNo()
-    ) ?>
-
-    <?= $form->field($model, 'vat_rate')->textInput($arConf) ?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

@@ -79,7 +79,7 @@ class BillDocxTemplate extends AbstractActiveRecord
                     'class' => UploadBehavior::className(),
                     'attribute' => 'src',
                     'scenarios' => ['insert', 'update'],
-                    'path' => self::FILE_PATH.'/{id}',
+                    'path' => self::FILE_PATH.'/',
                     'url' => '',
                 ],
             ]);
@@ -94,9 +94,21 @@ class BillDocxTemplate extends AbstractActiveRecord
         return $this->hasMany(Bills::className(), ['docx_tmpl_id' => 'id']);
     }
 
+    /**
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return Yii::getAlias(self::FILE_PATH).'/'.$this->src;
+    }
+
+    /**
+     *
+     */
     public function downloadFile()
     {
-        //CustomHelper::getDocument()
+        $ext = CustomHelper::getExtension($this->src);
+        CustomHelper::getDocument($this->getFilePath(),$this->name.'.'.$ext);
     }
 
     /**
@@ -134,4 +146,5 @@ class BillDocxTemplate extends AbstractActiveRecord
 
         return ArrayHelper::map($models,'id','name');
     }
+
 }

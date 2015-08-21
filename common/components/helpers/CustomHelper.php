@@ -220,7 +220,44 @@ class CustomHelper {
      */
     public static function ciRub($n)
     {
-        $arRuCi = ['руб','лей','ль','ля'];
-        return self::ci($n,$arRuCi);
+        //$arRuCi = ['руб','лей','ль','ля'];
+        //return self::ci($n,$arRuCi);
+        return self::format_by_count($n,'рубль','рубля','рублей');
+    }
+
+    /**
+     * Склонение существительных после числительных
+     * @param $count
+     * @param $form1
+     * @param $form2
+     * @param $form3
+     * @return mixed
+     */
+    protected static function format_by_count($count, $form1, $form2, $form3)
+    {
+        $count = abs($count) % 100;
+        $lcount = $count % 10;
+        if ($count >= 11 && $count <= 19) return($form3);
+        if ($lcount >= 2 && $lcount <= 4) return($form2);
+        if ($lcount == 1) return($form1);
+        return $form3;
+    }
+
+    /**
+     * @param $filename
+     * @return string
+     */
+    public static  function getExtension($filename) {
+        return substr(strrchr($filename, '.'), 1);
+    }
+
+    /**
+     * Возвращаем НДС
+     * @todo сделать глобальные настройки и изменять от туда
+     * @return float
+     */
+    public static function getVat()
+    {
+        return 20;
     }
 }
