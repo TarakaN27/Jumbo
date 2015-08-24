@@ -65,9 +65,6 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        echo CustomHelper::ciRub(205054564);
-        echo $this->format_by_count(205054564,'рубль','рубля','рублей');
-        die;
         $this->layout = 'main';
         return $this->render('index');
     }

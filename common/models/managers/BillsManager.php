@@ -23,6 +23,9 @@ class BillsManager extends Bills{
     CONST
         BILLS_PATH = '@common/upload/docx_bills';
 
+    protected
+        $_manError = [];
+
     public function getDocument($type)
     {
         if($type == self::TYPE_DOC_DOCX)
@@ -34,10 +37,73 @@ class BillsManager extends Bills{
         return NULL;
     }
 
+    /**
+     * @return string
+     */
+    protected function getBillName()
+    {
+        return 'СЧЕТ_№'.$this->bill_number.'_'.uniqid('wmc_');
+    }
 
+    /**
+     * @param $name
+     * @return string
+     */
+    protected function getTryPath($name)
+    {
+        return Yii::getAlias(self::BILLS_PATH).'/'.$name; //полный путь к отчету
+    }
 
+    /**
+     *
+     */
     protected function generateDocx()
     {
+        $name = $this->getBillName().'.docx';   //название
+        $tryPath = $this->getTryPath($name); //полный путь к отчету
+        if($this->generateDocument($name,$tryPath))
+            CustomHelper::getDocument($tryPath,$name);
+        else
+        {
+            echo $this->getManErrorsStr();
+            Yii::$app->end(500);
+        }
+    }
+
+    /**
+     *
+     */
+    protected function generatePDF()
+    {
+        $name = $this->getBillName();   //название
+        $tryPath = $this->getTryPath($name.'.docx'); //полный путь к отчету
+        if($this->generateDocument($name.'.docx',$tryPath))
+        {
+            $domPdfPath = realpath('/var/www/wmcorp.loc/vendor/dompdf/dompdf');
+            //define("DOMPDF_ENABLE_AUTOLOAD", false);
+            \PhpOffice\PhpWord\Settings::setPdfRendererPath($domPdfPath);
+            \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+            //Load temp file
+            $phpWord = \PhpOffice\PhpWord\IOFactory::load($tryPath);
+
+            $pdfTryPath = $this->getTryPath($name.'.pdf');
+            //Save it
+            $xmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'PDF');
+            $xmlWriter->save($pdfTryPath);
+
+            if(file_exists($pdfTryPath))
+            {
+                CustomHelper::getDocument($name.'.pdf',$pdfTryPath);
+            }
+        }
+        echo 'Ошибка формирования счета';
+        Yii::$app->end(500);
+    }
+
+
+    protected function generateDocument($name,$tryPath)
+    {
+
         /** @var BillDocxTemplate $docxTpl */
         $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
         if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
@@ -101,9 +167,6 @@ class BillsManager extends Bills{
                 CustomHelper::ciRub($billTotalSumVat) .' без НДС ' ;
         }
 
-        $name = 'СЧЕТ_№'.$this->bill_number.'_'.uniqid('wmc_').'.docx';
-        $tryPath = Yii::getAlias(self::BILLS_PATH).'/'.$name; //полный путь к отчету
-
         try{
 
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
@@ -135,27 +198,27 @@ class BillsManager extends Bills{
 
             $doc->saveAs($tryPath);
             if(file_exists($tryPath))
-                CustomHelper::getDocument($tryPath,$name);
+                return TRUE;
             else
-                throw new \Exception();
+            {
+                $this->_manError[] = 'Ошибка сохранения файла.';
+                return FALSE;
+            }
 
         }catch (\Exception $e)
         {
             $this->formError [] = 'Ошибка формирования .docx файла';
+            return FALSE;
         }
-        $this->formError []  = 'Ошибка сохранения файла';
-        return FALSE;
     }
 
-
-    protected function generatePDF()
+    /**
+     * @return string
+     */
+    public function getManErrorsStr()
     {
-
-
-
-
+        return is_array($this->_manError) ? implode(';',$this->_manError) : $this->_manError;
     }
-
 
 
 
