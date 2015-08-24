@@ -64,7 +64,7 @@ class BillTemplateSearch extends BillTemplate
             'id' => $this->id,
             'l_person_id' => $this->l_person_id,
             'service_id' => $this->service_id,
-           
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

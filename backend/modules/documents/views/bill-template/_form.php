@@ -40,13 +40,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-
-    <?php
-        $arConf =['maxlength' => true];
-        if($model->use_vat != \common\models\BillTemplate::YES)
-            $arConf['disabled'] = 'disabled';
-    ?>
-
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= Html::submitButton($model->isNewRecord ? Yii::t('app/documents', 'Create') : Yii::t('app/documents', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
