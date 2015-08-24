@@ -180,6 +180,10 @@ class BillsController extends AbstractBaseBackendController
         return empty($model) ? '' : $model;
     }
 
+    /**
+     * @param $id
+     * @param $type
+     */
     public function actionGetBill($id,$type)
     {
         $model = BillsManager::findOneByIDCached($id);
@@ -187,6 +191,10 @@ class BillsController extends AbstractBaseBackendController
         Yii::$app->end();
     }
 
+    /**
+     * @return int
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function actionFindLegalPerson()
     {
         $lPID = Yii::$app->request->post('lPID');

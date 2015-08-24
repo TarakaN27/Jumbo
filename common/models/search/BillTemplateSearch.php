@@ -18,9 +18,9 @@ class BillTemplateSearch extends BillTemplate
     public function rules()
     {
         return [
-            [['id', 'l_person_id', 'service_id', 'use_vat', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'l_person_id', 'service_id','created_at', 'updated_at'], 'integer'],
             [['name', 'object_text', 'description'], 'safe'],
-            [['vat_rate'], 'number'],
+
         ];
     }
 
@@ -64,8 +64,7 @@ class BillTemplateSearch extends BillTemplate
             'id' => $this->id,
             'l_person_id' => $this->l_person_id,
             'service_id' => $this->service_id,
-            'use_vat' => $this->use_vat,
-            'vat_rate' => $this->vat_rate,
+           
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
