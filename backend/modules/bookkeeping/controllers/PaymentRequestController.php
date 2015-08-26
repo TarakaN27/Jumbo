@@ -268,9 +268,18 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 'is_resident' => (int)$obCntrID->is_resident
             ])
             ->orderBy('id DESC')
-            ->one();
+            ->all();
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return ['cID' => empty($obCond) ? FALSE : $obCond->id];
+
+        if(empty($obCond))
+            return ['cID' =>  FALSE ];
+        elseif(count($obCond) == 1)
+            return ['cID' => $obCond[0]->id];
+        else
+        {
+            
+            return ['cID' => empty($obCond) ? FALSE : $obCond->id];
+        }
     }
 
     public function actionDelete($id)
