@@ -17,6 +17,7 @@ use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 use common\models\LegalPerson;
 use common\models\CUser;
+use Gears\Pdf;
 
 class BillsManager extends Bills{
 
@@ -77,23 +78,13 @@ class BillsManager extends Bills{
     {
         $name = $this->getBillName();   //название
         $tryPath = $this->getTryPath($name.'.docx'); //полный путь к отчету
-        if($this->generateDocument($name.'.docx',$tryPath))
+        if($this->generateDocument($name.'.docx',$tryPath)) //генерируем .docx
         {
-            $domPdfPath = realpath('/var/www/wmcorp.loc/vendor/dompdf/dompdf');
-            //define("DOMPDF_ENABLE_AUTOLOAD", false);
-            \PhpOffice\PhpWord\Settings::setPdfRendererPath($domPdfPath);
-            \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
-            //Load temp file
-            $phpWord = \PhpOffice\PhpWord\IOFactory::load($tryPath);
-
-            $pdfTryPath = $this->getTryPath($name.'.pdf');
-            //Save it
-            $xmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'PDF');
-            $xmlWriter->save($pdfTryPath);
-
+            $pdfTryPath = $this->getTryPath($name.'.pdf'); //путь к pdf
+            Pdf::convert($tryPath,$pdfTryPath); //конверитируем .docx => .pdf
             if(file_exists($pdfTryPath))
             {
-                CustomHelper::getDocument($name.'.pdf',$pdfTryPath);
+                CustomHelper::getDocument($pdfTryPath,$name.'.pdf');
             }
         }
         echo 'Ошибка формирования счета';
@@ -103,7 +94,6 @@ class BillsManager extends Bills{
 
     protected function generateDocument($name,$tryPath)
     {
-
         /** @var BillDocxTemplate $docxTpl */
         $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
         if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
@@ -148,13 +138,13 @@ class BillsManager extends Bills{
         {
             $billSumm = $this->amount;
             $billVatRate = $this->vat_rate;
-            $billVatSumm = round($this->amount/(1+CustomHelper::getVat()/100),-3);
-            $billPrice = $this->amount - $billVatSumm;
+            $billPrice = round($this->amount/(1+CustomHelper::getVat()/100),-3);
+            $billVatSumm = $this->amount - $billPrice;
             $billTotalSumVat = $this->amount;
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).' белорусских '.
+            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' c НДС ' ;
         }else{
             $billSumm = $this->amount;
@@ -163,7 +153,7 @@ class BillsManager extends Bills{
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).' белорусских '.
+            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' без НДС ' ;
         }
 
@@ -197,6 +187,7 @@ class BillsManager extends Bills{
 
 
             $doc->saveAs($tryPath);
+
             if(file_exists($tryPath))
                 return TRUE;
             else
@@ -207,7 +198,7 @@ class BillsManager extends Bills{
 
         }catch (\Exception $e)
         {
-            $this->formError [] = 'Ошибка формирования .docx файла';
+            $this->_manError [] = 'Ошибка формирования .docx файла';
             return FALSE;
         }
     }

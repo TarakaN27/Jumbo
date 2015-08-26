@@ -3,7 +3,9 @@
 namespace backend\modules\users\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
+use common\models\Services;
 use Yii;
 use common\models\CUser;
 use common\models\search\CUserSearch;
@@ -193,5 +195,64 @@ class ContractorController extends AbstractBaseBackendController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+
+    public function actionPreferCond($id)
+    {
+        $models = CuserPreferPayCond::find()->where([
+            'cuser_id' => $id
+        ])->all();
+
+        $arModels = [];
+        foreach($models as $item)
+        {
+            $arModels[$item->service_id] = $item->cond_id;
+        }
+
+        $services = Services::getServicesMap();
+        $arSelected = [];
+        foreach($services as $key => $serv)
+        {
+            $arSelected[$key] = isset($arModels[$key]) ? $arModels[$key] : NULL;
+        }
+
+        $arPostServ = Yii::$app->request->post('service');
+        if(!empty($arPostServ))
+        {
+            $trans = Yii::$app->db->beginTransaction();
+            $bError = false;
+            CuserPreferPayCond::deleteAll(['cuser_id' => $id]);
+            foreach($arPostServ as $key=>$cond)
+            {
+                $obCUPPC = new CuserPreferPayCond();
+                $obCUPPC->cond_id = (int)$cond;
+                $obCUPPC->service_id = (int)$key;
+                $obCUPPC->cuser_id = $id;
+                if(!$obCUPPC->save())
+                {
+                    $bError = TRUE;
+                    break;
+                }
+                unset($obCUPPC);
+            }
+
+            if(!$bError)
+            {
+                $trans->commit();
+                Yii::$app->session->setFlash('success','Изменения успешно сохранены');
+                return $this->redirect(['index']);
+            }else{
+
+                Yii::$app->session->setFlash('error','Ошибка');
+                $trans->rollBack();
+            }
+        }
+        return $this->render('prefer_cond',[
+            'models' => $models,
+            'services' => $services,
+            'arSelected' =>  $arSelected
+        ]);
+    }
+
 
 }

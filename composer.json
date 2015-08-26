@@ -28,9 +28,8 @@
         "phpoffice/phpexcel": "~1.8",
         "phpoffice/phpword": "0.12.*",
         "nterms/yii2-pagesize-widget": "*",
-        "dompdf/dompdf": "0.6.*",
-        "cinghie/yii2-tcpdf": "dev-master",
-        "tecnick.com/tcpdf": "~6.2"
+        "tecnick.com/tcpdf": "~6.2",
+        "gears/pdf": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

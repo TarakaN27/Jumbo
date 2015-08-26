@@ -79,6 +79,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     },
                                                 'filter' => \common\models\CUser::getStatusArr()
                                             ],
+
+                                            [
+                                                'label' => '',
+                                                'format' => 'raw',
+                                                'value' => function($model){
+                                                        return '
+                                                            <div class="btn-group">
+                                                <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
+                                                    '.Yii::t('app/book','Settings').' <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        '.Html::a(Yii::t('app/book','Prefer condition'),['prefer-cond','id' => $model->id]).'
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                                            ';
+                                                    }
+                                            ],
                                             [
                                                 'class' => 'yii\grid\ActionColumn',
                                                 'template' => '{view}'

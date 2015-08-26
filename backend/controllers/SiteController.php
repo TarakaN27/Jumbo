@@ -4,6 +4,7 @@ namespace backend\controllers;
 use backend\models\forms\BUserSignupForm;
 use common\components\helpers\CustomHelper;
 use common\models\BuserInviteCode;
+use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -60,8 +61,6 @@ class SiteController extends Controller
             ],
         ];
     }
-
-
 
     public function actionIndex()
     {

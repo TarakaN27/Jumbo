@@ -10,8 +10,6 @@ use yii\widgets\ActiveForm;
 $this->registerJs("
 function fillBillDetail(obD)
 {
-    $('#bills-use_vat').val(obD.use_vat);
-    $('#bills-vat_rate').val(obD.vat_rate);
     $('#bills-description').val(obD.description);
     $('#bills-object_text').val(obD.object_text);
 }

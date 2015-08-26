@@ -260,4 +260,13 @@ class CustomHelper {
     {
         return 20;
     }
+
+    /**
+     * @param $amount
+     * @return float
+     */
+    public static function getVatMountByAmount($amount)
+    {
+        return round($amount/(1+CustomHelper::getVat()/100),-3);
+    }
 }
