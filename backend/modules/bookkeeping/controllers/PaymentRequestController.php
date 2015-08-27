@@ -17,6 +17,7 @@ use backend\modules\bookkeeping\form\SetManagerContractorForm;
 use common\components\payment\PaymentOperations;
 use common\models\AbstractModel;
 use common\models\CUser;
+use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
@@ -277,8 +278,23 @@ class PaymentRequestController extends AbstractBaseBackendController{
             return ['cID' => $obCond[0]->id];
         else
         {
-            
-            return ['cID' => empty($obCond) ? FALSE : $obCond->id];
+            $obPPC = CuserPreferPayCond::find()->where([
+                'cuser_id' => $iContrID->id,
+                'service_id' => $iServID
+            ])->one();
+
+            if(empty($obPPC))
+                return ['cID' =>  FALSE ];
+
+            foreach($obCond as $cond)
+            {
+                if($cond->id = $obPPC->cond_id)
+                {
+                    return ['cID' => $cond->id];
+                }
+            }
+
+            return ['cID' => FALSE];
         }
     }
 
