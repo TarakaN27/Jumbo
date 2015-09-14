@@ -201,6 +201,11 @@ class BillsController extends AbstractBaseBackendController
         $model = LegalPerson::findOneByIDCached($lPID);
         if(empty($model))
             throw new NotFoundHttpException('Legal person not found');
-        return $model->use_vat;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return [
+            'use_vat' => $model->use_vat,
+            'docx_id' => $model->docx_id,
+            'id' => $model->id
+        ];
     }
 }

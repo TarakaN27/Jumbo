@@ -27,4 +27,4 @@ $this->params['breadcrumbs'][] = Yii::t('app/documents', 'Update');
             ]) ?>
         </div>
     </div>
-</div>>
+</div>

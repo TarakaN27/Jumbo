@@ -124,7 +124,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
                             ]);
 
-
                             if(!$obPay->save())
                             {
                                 $bError = TRUE;

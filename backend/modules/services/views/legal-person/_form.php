@@ -32,6 +32,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'use_vat')->dropDownList(\common\models\LegalPerson::getYesNo())?>
 
+    <?= $form->field($model,'docx_id')->dropDownList(\common\models\BillDocxTemplate::getBillDocxMap())?>
+
     <?= $form->field($model, 'status')->dropDownList(\common\models\LegalPerson::getStatusArr()) ?>
 
     <div class="form-group">

@@ -42,6 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'doc_email:email',
                         'doc_site',
                         [
+                            'attribute' => 'docx_id',
+                            'value' => is_object($obDocxID = $model->docx) ? $obDocxID->name : 'N/A'
+                        ],
+                        [
                             'attribute' => 'use_vat',
                             'value' => $model->getYesNoStr($model->use_vat)
                         ],

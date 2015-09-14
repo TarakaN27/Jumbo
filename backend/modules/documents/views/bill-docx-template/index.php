@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -32,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'name',
                             'format' => 'html',
                             'value' => function($model){
-                                    return Html::a($model->name,['update'],['class' => 'link-upd']);
+                                    return Html::a($model->name,['update','id' => $model->id],['class' => 'link-upd']);
                                 }
                         ],
                         [

@@ -67,7 +67,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
 
     /**
      * Переопределим стандартный метод find,чтобы можно было ипользовать scopes.
-     * Как использовать в модели создаем класс с названием modelNameQuery()
+     * Как использовать: в модели создаем класс с названием modelNameQuery()
      * в нем определяем scopes.
      * пример.
      * файл CUser.php
@@ -104,9 +104,8 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     {
         $cacheKey = get_called_class().':' . $model_id;
         if (false === $model = Yii::$app->cache->get($cacheKey)) {
-            if (null === $model = self::findOne($model_id)) {
+            if (null === $model = self::findOne($model_id))
                 throw new NotFoundHttpException;
-            }
             Yii::$app->cache->set(
                 $cacheKey,
                 $model,
