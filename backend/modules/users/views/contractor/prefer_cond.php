@@ -6,6 +6,7 @@
  * Date: 26.08.15
  */
 use yii\helpers\Html;
+$this->title = 'Условия по-умолчанию';
 ?>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -17,29 +18,39 @@ use yii\helpers\Html;
                 </section>
                 <div class="clearfix"></div>
             </div>
+            <div class = "x_content">
             <?$form = \yii\bootstrap\ActiveForm::begin([]);?>
+                <div class="row">
+                <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <table class="table table-bordered">
             <?php foreach($services as $key=>$serv):?>
-                <table class="table">
-                    <tr>
-                        <td><?=$serv;?></td>
-                        <td><?=Html::dropDownList(
-                                'service['.$key.']',
-                                $arSelected[$key],
-                                \common\models\PaymentCondition::getConditionMap(),
-                                [
-                                    'prompt' => Yii::t('app/book','Choose condition')
-                                ]
-                            )?></td>
-                    </tr>
-                </table>
-            <?php endforeach;?>
 
+                        <tr>
+                            <td><?=$serv;?></td>
+                            <td><?=Html::dropDownList(
+                                    'service['.$key.']',
+                                    $arSelected[$key],
+                                    \common\models\PaymentCondition::getConditionMap(),
+                                    [
+                                        'prompt' => Yii::t('app/book','Choose condition'),
+                                        'class' => 'form-control'
+                                    ]
+                                )?></td>
+                        </tr>
+
+            <?php endforeach;?>
+                    </table>
+                </div></div></div>
+                <div class="row">
             <div class="form-group">
-                <div class = "col-md-offset-8 pull-right">
-                    <?= Html::submitButton(Yii::t('app/users', 'Create'), ['class' =>'btn btn-success']) ?>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <?= Html::submitButton(Yii::t('app/users', 'save'), ['class' =>'btn btn-success']) ?>
                 </div>
             </div>
+                </div>
             <?\yii\bootstrap\ActiveForm::end()?>
+                </div>
         </div>
     </div>
 </div>

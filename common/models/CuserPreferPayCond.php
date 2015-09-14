@@ -16,7 +16,7 @@ use Yii;
  * @property PaymentCondition $cond
  * @property CUser $cuser
  */
-class CuserPreferPayCond extends \yii\db\ActiveRecord
+class CuserPreferPayCond extends AbstractActiveRecordWTB
 {
     /**
      * @inheritdoc
