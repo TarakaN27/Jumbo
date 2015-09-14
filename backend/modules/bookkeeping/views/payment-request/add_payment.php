@@ -11,136 +11,136 @@ use yii\helpers\Html;
 $this->title  = Yii::t('app/book','Add payment');
 $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
 $this->registerJs('
-function countASumm()
-{
-    var
-        aSumm = $("#aSumm"),
-        pSumm = $(".psumm"),
-        aSummDispl = $("#aSummDispl"),
-        tmpSumm = 0;
-
-    $.each( pSumm, function( key, value ) {
+    function countASumm()
+    {
         var
-            val = $(value).val();
-        if($.isNumeric(val))
-            tmpSumm+=parseInt(val);
-    });
+            aSumm = $("#aSumm"),
+            pSumm = $(".psumm"),
+            aSummDispl = $("#aSummDispl"),
+            tmpSumm = 0;
 
-    $tmp = aSumm.val() - tmpSumm;
-    aSummDispl.html((aSumm.val() - tmpSumm)+" '.$sCurrn.'");
-    if($tmp < 0)
-    {
-        aSummDispl.removeClass("green");
-        aSummDispl.removeClass("yellow");
-        if(!aSummDispl.hasClass("red"))
-            aSummDispl.addClass("red");
-    }
-    if($tmp == 0)
-    {
-        aSummDispl.removeClass("red");
-        aSummDispl.removeClass("yellow");
-        if(!aSummDispl.hasClass("green"))
-            aSummDispl.addClass("green");
-    }
-    if($tmp > 0)
-    {
-        aSummDispl.removeClass("red");
-        aSummDispl.removeClass("green");
-        if(!aSummDispl.hasClass("yellow"))
-            aSummDispl.addClass("yellow");
-    }
-}
-function initBehavior()
-{
-    $(".psumm").on("change",function(){
-        countASumm();
-    });
-    $(".psumm").on("keyup",function(){
-        countASumm();
-    });
-}
+        $.each( pSumm, function( key, value ) {
+            var
+                val = $(value).val();
+            if($.isNumeric(val))
+                tmpSumm+=parseInt(val);
+        });
 
-function validateFormLogic()
-{
-    var
-        aSumm = $("#aSumm"),
-        pSumm = $(".psumm"),
-        tmpSumm = 0;
+        $tmp = aSumm.val() - tmpSumm;
+        aSummDispl.html((aSumm.val() - tmpSumm)+" '.$sCurrn.'");
+        if($tmp < 0)
+        {
+            aSummDispl.removeClass("green");
+            aSummDispl.removeClass("yellow");
+            if(!aSummDispl.hasClass("red"))
+                aSummDispl.addClass("red");
+        }
+        if($tmp == 0)
+        {
+            aSummDispl.removeClass("red");
+            aSummDispl.removeClass("yellow");
+            if(!aSummDispl.hasClass("green"))
+                aSummDispl.addClass("green");
+        }
+        if($tmp > 0)
+        {
+            aSummDispl.removeClass("red");
+            aSummDispl.removeClass("green");
+            if(!aSummDispl.hasClass("yellow"))
+                aSummDispl.addClass("yellow");
+        }
+    }
+    function initBehavior()
+    {
+        $(".psumm").on("change",function(){
+            countASumm();
+        });
+        $(".psumm").on("keyup",function(){
+            countASumm();
+        });
+    }
 
-    $.each( pSumm, function( key, value ) {
+    function validateFormLogic()
+    {
         var
-            val = $(value).val();
-        if($.isNumeric(val))
-            tmpSumm+=parseInt(val);
-    });
+            aSumm = $("#aSumm"),
+            pSumm = $(".psumm"),
+            tmpSumm = 0;
 
-    if(aSumm.val() != tmpSumm)
-    {
-         addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You have to spend all amout').'");
-         return false;
-    }
-    return true;
-}
+        $.each( pSumm, function( key, value ) {
+            var
+                val = $(value).val();
+            if($.isNumeric(val))
+                tmpSumm+=parseInt(val);
+        });
 
-function findCondition($this){
-    var
-        serviceID = $($this).val(),
-        lineID = $($this).attr("id"),
-        lPID = "'.$modelP->legal_id.'"
-        contrID = "'.$modelP->cntr_id.'",
-        condID = lineID.replace(/-service/gi,"-condid");
-
-    if(serviceID == "")
-    {
-        $("#"+condID).val("");
-        return false;
+        if(aSumm.val() != tmpSumm)
+        {
+             addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You have to spend all amout').'");
+             return false;
+        }
+        return true;
     }
 
-    $.ajax({
-        type: "POST",
-        cache: false,
-        url: "'.\yii\helpers\Url::to(['find-condition']).'",
-        dataType: "json",
-        data: {iServID:serviceID,iContrID:contrID,lPID:lPID},
-        success: function(msg){
-            if(msg.cID)
-              {
-                $("#"+condID).val(msg.cID);
-                addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
-              }else{
-                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
-              }
-        },
-        error: function(msg){
-            addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+    function findCondition($this){
+        var
+            serviceID = $($this).val(),
+            lineID = $($this).attr("id"),
+            lPID = "'.$modelP->legal_id.'"
+            contrID = "'.$modelP->cntr_id.'",
+            condID = lineID.replace(/-service/gi,"-condid");
+
+        if(serviceID == "")
+        {
+            $("#"+condID).val("");
             return false;
         }
-    });
-}
-function initPayment()
-{
-    var
-        aSumm = $("#aSumm"),
-        count = 0,
-        pSumm = $(".psumm");
 
-
-    $.each( pSumm, function( key, value ) {
-        count++;
-    });
-
-    if(count == 1)
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['find-condition']).'",
+            dataType: "json",
+            data: {iServID:serviceID,iContrID:contrID,lPID:lPID},
+            success: function(msg){
+                if(msg.cID)
+                  {
+                    $("#"+condID).val(msg.cID);
+                    addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
+                  }else{
+                    addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
+                  }
+            },
+            error: function(msg){
+                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
+    }
+    function initPayment()
     {
-        pSumm.val(aSumm.val());
-        countASumm();
-    }else{
-        if(pSumm.val() == aSumm.val())
+        var
+            aSumm = $("#aSumm"),
+            count = 0,
+            pSumm = $(".psumm");
+
+
+        $.each( pSumm, function( key, value ) {
+            count++;
+        });
+
+        if(count == 1)
         {
-            pSumm.val("");
+            pSumm.val(aSumm.val());
             countASumm();
+        }else{
+            if(pSumm.val() == aSumm.val())
+            {
+                pSumm.val("");
+                countASumm();
+            }
         }
     }
-}
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();

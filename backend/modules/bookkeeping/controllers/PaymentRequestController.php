@@ -55,7 +55,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
             ]
         ];
 
-
         return $tmp;
     }
 
@@ -277,7 +276,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
             return ['cID' => $obCond[0]->id];
         else
         {
-            
             return ['cID' => empty($obCond) ? FALSE : $obCond->id];
         }
     }

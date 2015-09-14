@@ -196,7 +196,10 @@ class ContractorController extends AbstractBaseBackendController
         }
     }
 
-
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     */
     public function actionPreferCond($id)
     {
         $models = CuserPreferPayCond::find()->where([
@@ -253,6 +256,4 @@ class ContractorController extends AbstractBaseBackendController
             'arSelected' =>  $arSelected
         ]);
     }
-
-
 }
