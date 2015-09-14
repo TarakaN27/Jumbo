@@ -46,3 +46,7 @@
 .per-page-select{
     padding-bottom: 10px;
 }
+.error-summary{
+    color: #90111A;
+}
+.hideShowBtnClass{cursor: pointer;}

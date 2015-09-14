@@ -53,6 +53,8 @@ return [
     'Bill' => 'Счета',
     'Add bill' => 'Добавить счет',
     'Bill list' => 'Список счетов',
-    'Bill docx template' => 'Docx шаблоны счетов'
+    'Bill docx template' => 'Docx шаблоны счетов',
+    'Show detail' => 'Показать детали',
+    'Hide detail' => 'Спрятать детали'
 
 ];

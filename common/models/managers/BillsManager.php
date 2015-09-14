@@ -161,7 +161,6 @@ class BillsManager extends Bills{
 
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
 
-
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
@@ -210,7 +209,5 @@ class BillsManager extends Bills{
     {
         return is_array($this->_manError) ? implode(';',$this->_manError) : $this->_manError;
     }
-
-
 
 } 

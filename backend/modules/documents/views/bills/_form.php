@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\components\widgets\hideShowBlock\HideShowBlockWidget;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Bills */
@@ -69,7 +70,7 @@ function lPersonAndServiceState()
               {
                     $('#bills-bill_template').val(msg.id);
                     fillBillDetail(msg);
-                    addSuccessNotify('".Yii::t('app/book','Bill template request')."','".Yii::t('app/documents','Template found')."');
+                    addSuccessNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Template found')."');
               }else{
                     $('#bills-bill_template').val('');
                     addErrorNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Template not found')."');
@@ -80,7 +81,6 @@ function lPersonAndServiceState()
                 return false;
             }
         });
-
     }else{
 
     }
@@ -110,14 +110,14 @@ function checkUseVat()
                     }
                 if(msg.docx_id)
                     $('#bills-docx_tmpl_id').val(msg.docx_id);
-                addSuccessNotify('".Yii::t('app/book','Bill template request')."','".Yii::t('app/documents','Legal person found')."');
+                addSuccessNotify('".Yii::t('app/documents','Legal person request')."','".Yii::t('app/documents','Legal person found')."');
             }else{
                 $('#bills-use_vat').val('".\common\models\BillTemplate::NO."');
-                addSuccessNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Legal person found')."');
+                addSuccessNotify('".Yii::t('app/documents','Legal person request')."','".Yii::t('app/documents','Legal person not found')."');
             }
         },
         error: function(msg){
-            addErrorNotify('".Yii::t('app/documents','Bill template request')."','".Yii::t('app/documents','Server error')."');
+            addErrorNotify('".Yii::t('app/documents','Legal person request')."','".Yii::t('app/documents','Server error')."');
             return false;
         }
         });
@@ -187,28 +187,41 @@ $this->registerJs("
             ],
         ]) ?>
 
-    <?
-        $options = ['prompt' => Yii::t('app/documents','Choose bill template')];
-        if(empty($model->l_person_id) || empty($model->service_id))
-            $options['disabled'] = 'disabled';
-        echo $form->field($model, 'bill_template')->dropDownList(\common\models\BillTemplate::getBillTemplateMap(),
-            $options) ?>
-
-    <?= $form->field($model, 'docx_tmpl_id')->dropDownList(\common\models\BillDocxTemplate::getBillDocxMap()) ?>
-
     <?= $form->field($model, 'amount')->textInput() ?>
 
-    <?= $form->field($model, 'use_vat')->dropDownList(\common\models\Bills::getYesNo()) ?>
+    <?$hideBlock = HideShowBlockWidget::begin([
+        'btnTmpl' => '
+        <div class="form-group">
+            <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3" style="text-align: center;">
+            {btn}
+            </div>
+        </div>
+        '
+    ]);?>
+        <?
+            $options = ['prompt' => Yii::t('app/documents','Choose bill template')];
+            if(empty($model->l_person_id) || empty($model->service_id))
+                $options['disabled'] = 'disabled';
+            echo $form->field($model, 'bill_template')->dropDownList(\common\models\BillTemplate::getBillTemplateMap(),
+                $options) ?>
 
-    <?= $form->field($model, 'vat_rate')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'docx_tmpl_id')->dropDownList(\common\models\BillDocxTemplate::getBillDocxMap()) ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+        <?= $form->field($model, 'use_vat')->dropDownList(\common\models\Bills::getYesNo()) ?>
 
-    <?= $form->field($model, 'object_text')->textarea(['rows' => 6]) ?>
+        <?= $form->field($model, 'vat_rate')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'buy_target')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+
+        <?= $form->field($model, 'object_text')->textarea(['rows' => 6]) ?>
+
+        <?= $form->field($model, 'buy_target')->textInput(['maxlength' => true]) ?>
+    <?HideShowBlockWidget::end();?>
 
     <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+         <?= $form->errorSummary($model); ?>
+            </div>
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= Html::submitButton($model->isNewRecord ? Yii::t('app/documents', 'Create') : Yii::t('app/documents', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>

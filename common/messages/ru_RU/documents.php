@@ -37,7 +37,15 @@ return [
     'Bill Date' => 'Дата счета',
     'Bill Template' => 'Шаблон счета',
     'Buy Target' => 'Цель приобретения',
-    'DefaultBuytarget' => 'Для собственных нужд'
-
+    'DefaultBuytarget' => 'Для собственных нужд',
+    'Choose contractor' => 'Выберите контрагента',
+    'Choose bill template' => 'Выберите шаблон счета',
+    'Server error' => 'Ошибка сервера',
+    'Bill template request' => 'Запрос "шаблон счета"',
+    'Legal person request' => 'Запрос "юр. лицо"',
+    'Template found' => 'Шаблон найден',
+    'Template not found' => 'Шаблон не найден',
+    'Legal person found' => 'Юр. лицо найдено',
+    'Legal person not found' => 'Юр. лицо не найдено'
 
 ];
