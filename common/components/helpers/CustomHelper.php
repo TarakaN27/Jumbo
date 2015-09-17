@@ -269,4 +269,15 @@ class CustomHelper {
     {
         return round($amount/(1+CustomHelper::getVat()/100),-3);
     }
+
+    /**
+     * Подсветка слова $search в тексте $html
+     * @param $search
+     * @param $html
+     * @return mixed
+     */
+    public static function highlight($search,$html)
+    {
+        return preg_replace("#($search)#iu", "<span style='color:#FF0000; background:#FFFF00;'>$1</span>", $html);
+    }
 }

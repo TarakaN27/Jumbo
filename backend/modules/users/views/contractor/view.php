@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use common\components\helpers\CustomHelper;
 /* @var $this yii\web\View */
 /* @var $model common\models\CUser */
 
@@ -88,67 +88,290 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
                     ],
-                    'corp_name',
-                    'j_fname',
-                    'j_lname',
-                    'j_mname',
-                    'j_post',
-                    'j_doc',
-                    'reg_number',
-                    'reg_auth',
-                    'ch_account',
-                    'b_name',
-                    'b_code',
-                    'c_fname',
-                    'c_lname',
-                    'c_mname',
-                    'c_email',
-                    'c_phone',
-                    'c_fax',
-                    'j_address',
-                    'p_address',
+                    [
+                        'attribute' => 'corp_name',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->corp_name)
+                    ],
+
+                    [
+                        'attribute' => 'j_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_fname)
+                    ],
+                    [
+                        'attribute' => 'j_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_lname)
+                    ],
+                    [
+                        'attribute' => 'j_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_mname)
+                    ],
+                    [
+                        'attribute' => 'j_post',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_post)
+                    ],
+                    [
+                        'attribute' => 'j_doc',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_doc)
+                    ],
+                    [
+                        'attribute' => 'reg_number',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->reg_number)
+                    ],
+                    [
+                        'attribute' => 'reg_auth',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->reg_auth)
+                    ],
+                    [
+                        'attribute' => 'ch_account',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->ch_account)
+                    ],
+                    [
+                        'attribute' => 'b_name',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->b_name)
+                    ],
+                    [
+                        'attribute' => 'b_code',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->b_code)
+                    ],
+                    [
+                        'attribute' => 'c_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fname)
+                    ],
+
+                    [
+                        'attribute' => 'c_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_lname)
+                    ],
+                    [
+                        'attribute' => 'c_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_mname)
+                    ],
+                    [
+                        'attribute' => 'c_email',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_email)
+                    ],
+                    [
+                        'attribute' => 'c_phone',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_phone)
+                    ],
+                    [
+                        'attribute' => 'c_fax',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fax)
+                    ],
+                    [
+                        'attribute' => 'j_address',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_address)
+                    ],
+                    [
+                        'attribute' => 'p_address',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->p_address)
+                    ],
                 ];
                 if($model->is_resident == \common\models\CUser::RESIDENT_YES)
                 {
-                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['ynp','okpo']);
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
+
+                        [
+                            'attribute' => 'ynp',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->ynp)
+                        ],
+                        [
+                            'attribute' => 'okpo',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->okpo)
+                        ],
+
+                    ]);
                 }else{
-                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['inn','kpp','ogrn']);
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
+                        [
+                            'attribute' => 'inn',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->inn)
+                        ],
+                        [
+                            'attribute' => 'kpp',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->kpp)
+                        ],
+                        [
+                            'attribute' => 'ogrn',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->ogrn)
+                        ],
+                    ]);
                 }
                 break;
             case \common\models\CUserRequisites::TYPE_I_PERSON:
                 $dvConfig = [
-                    //'id',
                     [
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
                     ],
-                    'j_fname',
-                    'j_lname',
-                    'j_mname',
-                    'reg_number',
-                    'reg_auth',
-                    'ch_account',
-                    'b_name',
-                    'b_code',
-                    'c_fname',
-                    'c_lname',
-                    'c_mname',
-                    'c_email',
-                    'c_phone',
-                    'c_fax',
-                    'p_address',
-                    'birthday',
-                    'pasp_series',
-                    'pasp_number',
-                    'pasp_ident',
-                    'pasp_auth',
-                    'pasp_date'
+                    [
+                        'attribute' => 'j_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_fname)
+                    ],
+                    [
+                        'attribute' => 'j_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_lname)
+                    ],
+                    [
+                        'attribute' => 'j_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_mname)
+                    ],
+
+                    [
+                        'attribute' => 'reg_number',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->reg_number)
+                    ],
+                    [
+                        'attribute' => 'reg_auth',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->reg_auth)
+                    ],
+                    [
+                        'attribute' => 'ch_account',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->ch_account)
+                    ],
+
+                    [
+                        'attribute' => 'b_name',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->b_name)
+                    ],
+                    [
+                        'attribute' => 'b_code',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->b_code)
+                    ],
+                    [
+                        'attribute' => 'c_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fname)
+                    ],
+
+                    [
+                        'attribute' => 'c_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_lname)
+                    ],
+                    [
+                        'attribute' => 'c_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_mname)
+                    ],
+                    [
+                        'attribute' => 'c_email',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_email)
+                    ],
+
+                    [
+                        'attribute' => 'c_phone',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_phone)
+                    ],
+                    [
+                        'attribute' => 'c_fax',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fax)
+                    ],
+                    [
+                        'attribute' => 'p_address',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->p_address)
+                    ],
+
+                    [
+                        'attribute' => 'birthday',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->birthday)
+                    ],
+                    [
+                        'attribute' => 'pasp_series',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_series)
+                    ],
+                    [
+                        'attribute' => 'pasp_number',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_number)
+                    ],
+
+                    [
+                        'attribute' => 'pasp_ident',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_ident)
+                    ],
+                    [
+                        'attribute' => 'pasp_auth',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_auth)
+                    ],
+                    [
+                        'attribute' => 'pasp_date',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_date)
+                    ],
                 ];
                 if($model->is_resident == \common\models\CUser::RESIDENT_YES)
                 {
-                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['ynp','okpo']);
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
+                        [
+                            'attribute' => 'ynp',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->ynp)
+                        ],
+                        [
+                            'attribute' => 'okpo',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->okpo)
+                        ],
+                    ]);
                 }else{
-                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,['inn','kpp','ogrn']);
+                    $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
+                        [
+                            'attribute' => 'inn',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->inn)
+                        ],
+                        [
+                            'attribute' => 'kpp',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->kpp)
+                        ],
+                        [
+                            'attribute' => 'ogrn',
+                            'format' => 'html',
+                            'value' => CustomHelper::highlight('dummy',$modelR->ogrn)
+                        ],
+                    ]);
                 }
                 break;
             case \common\models\CUserRequisites::TYPE_F_PERSON:
@@ -158,22 +381,91 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'type_id',
                         'value' => $modelR->getTypeStr()
                     ],
-                    'j_fname',
-                    'j_lname',
-                    'j_mname',
-                    'c_fname',
-                    'c_lname',
-                    'c_mname',
-                    'c_email',
-                    'c_phone',
-                    'c_fax',
-                    'p_address',
-                    'birthday',
-                    'pasp_series',
-                    'pasp_number',
-                    'pasp_ident',
-                    'pasp_auth',
-                    'pasp_date'
+                    [
+                        'attribute' => 'j_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_fname)
+                    ],
+                    [
+                        'attribute' => 'j_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_lname)
+                    ],
+                    [
+                        'attribute' => 'j_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->j_mname)
+                    ],
+                    [
+                        'attribute' => 'c_fname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fname)
+                    ],
+
+                    [
+                        'attribute' => 'c_lname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_lname)
+                    ],
+                    [
+                        'attribute' => 'c_mname',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_mname)
+                    ],
+                    [
+                        'attribute' => 'c_email',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_email)
+                    ],
+
+                    [
+                        'attribute' => 'c_phone',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_phone)
+                    ],
+                    [
+                        'attribute' => 'c_fax',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->c_fax)
+                    ],
+                    [
+                        'attribute' => 'p_address',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->p_address)
+                    ],
+
+                    [
+                        'attribute' => 'birthday',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->birthday)
+                    ],
+                    [
+                        'attribute' => 'pasp_series',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_series)
+                    ],
+                    [
+                        'attribute' => 'pasp_number',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_number)
+                    ],
+
+
+                    [
+                        'attribute' => 'pasp_ident',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_ident)
+                    ],
+                    [
+                        'attribute' => 'pasp_auth',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_auth)
+                    ],
+                    [
+                        'attribute' => 'pasp_date',
+                        'format' => 'html',
+                        'value' => CustomHelper::highlight('dummy',$modelR->pasp_date)
+                    ],
                 ];
                 break;
             default:

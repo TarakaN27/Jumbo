@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\CUserRequisites;
+use common\components\helpers\CustomHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\CUserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -41,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         if(empty($obR))
                                                             return Html::a('N/A',['update','id' => $model->id],['class'=>'link-upd']);
                                                         return Html::a(
-                                                            $obR->getCorpName(),
+                                                            CustomHelper::highlight('dummy',$obR->getCorpName()),
                                                             ['update','id' => $model->id],
                                                             ['class'=>'link-upd']);
                                                     }
@@ -49,18 +50,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                             [
                                                 'attribute' => 'fio',
                                                 'label' => Yii::t('app/users','FIO'),
+                                                'format' => 'html',
                                                 'value' => function($model){
                                                         /** @var CUserRequisites $obR */
                                                         $obR = $model->requisites;
                                                         if(empty($obR))
                                                             return 'N/A';
-                                                        return $obR->j_lname.' '.$obR->j_fname.' '.$obR->j_mname;
+                                                        return CustomHelper::highlight('dummy',$obR->j_lname.' '.$obR->j_fname.' '.$obR->j_mname);
                                                     }
                                             ],
                                             [
                                                 'attribute' => 'type',
+                                                'format' => 'html',
                                                 'value' => function($model){
-                                                        return is_object($obType = $model->userType) ? $obType->name : 'N/A';
+                                                        return is_object($obType = $model->userType) ? CustomHelper::highlight('dummy',$obType->name) : 'N/A';
                                                     },
                                                 'filter' => \common\models\CUserTypes::getUserTypesMap()
                                             ],
