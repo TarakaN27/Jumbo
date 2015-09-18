@@ -10,6 +10,12 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 $this->title  = Yii::t('app/book','Add payment');
 $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
+$this->registerJsFile('@web/js/wm_app/helpers.js',[
+        'depends' => [
+            'yii\web\YiiAsset',
+            'yii\bootstrap\BootstrapAsset'],
+        ]
+    );
 $this->registerJs('
     function countASumm()
     {
@@ -106,13 +112,18 @@ $this->registerJs('
                 if(msg.cID)
                   {
                     $("#"+condID).val(msg.cID);
+                    boundsCheckingConditions(parseNum(condID));
+
                     addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
                   }else{
                     addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
+                    $("#"+condID).val("");
                   }
+
             },
             error: function(msg){
                 addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+                $("#"+condID).val("");
                 return false;
             }
         });
@@ -141,6 +152,47 @@ $this->registerJs('
             }
         }
     }
+    // Проверка суммы на соотвествие границам условия.
+    function boundsCheckingConditions($this)
+    {
+        if(typeof $this === "number")
+        {
+            var
+                ID = $this;
+        }else{
+            var
+                ID = parseNum($($this).attr("id"));
+        }
+
+        if((ID == undefined || ID == "") && ID != 0)
+            return false;
+
+        var
+            iCondID = $("#addpaymentform-"+ID+"-condid").val(),
+            iSumm = $("#addpaymentform-"+ID+"-summ").val();
+
+        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "")
+            return false;
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['bounds-checking-conditions']).'",
+            dataType: "json",
+            data: {iCondID:iCondID,iSumm:iSumm},
+            success: function(msg){
+                if(msg)
+                  {
+                    addWarningNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Bounds checking conditions FAIL').'");
+                  }
+            },
+            error: function(msg){
+                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
+    }
+
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();
@@ -243,14 +295,19 @@ $this->registerJs('
                                         <?= $form->field($m, "[{$i}]service")->dropDownList(
                                             \common\models\Services::getServicesMap(),[
                                             'prompt' => Yii::t('app/book','Choose service'),
-                                            'onchange' => 'findCondition(this);',
+                                            'onchange' => 'findCondition(this);boundsCheckingConditions(this);',
                                             'data-service-id' => $i
                                         ]) ?>
-                                        <?= $form->field($m, "[{$i}]summ")->textInput(['maxlength' => true,'class' => 'form-control psumm']) ?>
+                                        <?= $form->field($m, "[{$i}]summ")->textInput([
+                                            'maxlength' => true,
+                                            'class' => 'form-control psumm',
+                                            'onchange' => 'boundsCheckingConditions(this);',
+                                        ]) ?>
                                         <?= $form->field($m, "[{$i}]comment")->textarea() ?>
                                         <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
                                             'prompt' => Yii::t('app/book','Choose condition'),
-                                            'data-cond-id' => $i
+                                            'data-cond-id' => $i,
+                                            'onchange' => 'boundsCheckingConditions(this);',
                                         ]) ?>
                                     </div>
                                 </div>

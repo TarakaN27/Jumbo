@@ -19,6 +19,7 @@ use common\models\AbstractModel;
 use common\models\CUser;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
+use common\models\ExchangeRates;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
@@ -59,7 +60,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $tmp;
     }
 
-
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $searchModel = new PaymentRequestSearch();
@@ -75,6 +78,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
         ]);
     }
 
+    /**
+     * @param $pID
+     * @return string|Response
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
     public function actionAddPayment($pID)
     {
         $modelP = PaymentRequest::findOne($pID);
@@ -232,6 +241,10 @@ class PaymentRequestController extends AbstractBaseBackendController{
         ]);
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     public function actionView($id)
     {
         $model = PaymentRequest::find()
@@ -277,7 +290,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         else
         {
             $obPPC = CuserPreferPayCond::find()->where([
-                'cuser_id' => $iContrID->id,
+                'cuser_id' => $obCntrID->id,
                 'service_id' => $iServID
             ])->one();
 
@@ -295,6 +308,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
         }
     }
 
+    /**
+     * @param $id
+     * @return Response
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
     public function actionDelete($id)
     {
         $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
@@ -309,6 +328,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $this->redirect(['index']);
     }
 
+    /**
+     * @param $id
+     * @return string|Response
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
     public function actionUpdate($id)
     {
         $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
@@ -329,4 +354,45 @@ class PaymentRequestController extends AbstractBaseBackendController{
         ]);
     }
 
+    /**
+     * @return bool
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionBoundsCheckingConditions()
+    {
+        $iCondID = Yii::$app->request->post('iCondID');     // ID условия
+        $iSumm = Yii::$app->request->post('iSumm');     //сумма платежа
+        $iCurr = Yii::$app->request->post('iCurr');     //Валюта платежа
+
+        if(!empty($iCurr))  //если указана валюта платежа, то переведем в бел. рубли.
+        {
+            /** @var ExchangeRates $obCurrPay */
+            $obCurrPay = ExchangeRates::findOneByIDCached($iCurr);
+            if(!$obCurrPay)
+                throw new NotFoundHttpException('Currency not found');
+
+            $iSumm = (int)($iSumm*$obCurrPay->nbrb_rate);
+        }
+
+        /** @var PaymentCondition $obCond */
+        $obCond = PaymentCondition::findOneByIDCached($iCondID);    //получаем условие
+        if(!$obCond)
+            throw new NotFoundHttpException('Condition not found');
+
+        $iLeftSumm = 0;
+        $iRightSumm = 0;
+        /** @var ExchangeRates $obCurr */
+        $obCurr = ExchangeRates::findOneByIDCached($obCond->currency_id);   //получаем курс валюты
+        if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $iLeftSumm = (int)$obCond->summ_from*$obCurr->nbrb_rate;    //переводим в бел. рубли. Левая граница
+        $iRightSumm = (int)$obCond->summ_to*$obCurr->nbrb_rate;     //переводим в бел. рубли. Правая граница
+
+        Yii::$app->response->format = Response::FORMAT_JSON;        //указываем,что возвращать будем в JSON
+        if($iLeftSumm >= $iSumm || $iSumm >= $iRightSumm)    //соответсвует ли сумма границам.
+            return TRUE;
+        else
+            return FALSE;
+    }
 } 

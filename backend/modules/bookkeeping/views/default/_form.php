@@ -8,6 +8,12 @@ use kartik\select2\Select2;
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+$this->registerJsFile('@web/js/wm_app/helpers.js',[
+        'depends' => [
+            'yii\web\YiiAsset',
+            'yii\bootstrap\BootstrapAsset'],
+    ]
+);
 $this->registerJs('
 function findCondition()
 {
@@ -43,6 +49,37 @@ function findCondition()
         }
     });
 }
+
+// Проверка суммы на соотвествие границам условия.
+    function boundsCheckingConditions()
+    {
+
+        var
+            iCondID = $("#payments-condition_id").val(),
+            iSumm = $("#payments-pay_summ").val(),
+            iCurr = $("#payments-currency_id").val();
+
+        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" || iCurr == undefined || iCurr == "")
+            return false;
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['/bookkeeping/payment-request/bounds-checking-conditions']).'",
+            dataType: "json",
+            data: {iCondID:iCondID,iSumm:iSumm,iCurr:iCurr},
+            success: function(msg){
+                if(msg)
+                  {
+                    addWarningNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Bounds checking conditions FAIL').'");
+                  }
+            },
+            error: function(msg){
+                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
+    }
 
 ',\yii\web\View::POS_END);
 
@@ -90,11 +127,12 @@ $("#payments-cuser_id").on("change",findCondition);
             <?= $form->field($model, 'pay_summ',['template' => $fieldTpl,'options' => [
                 'class' => 'col-md-8 col-sm-8 col-xs-12',
                 'style' => 'padding-left:0px;'
+
             ]])
-                ->textInput(['maxlength' => true])->label(false)
-               // ->widget(\yii\widgets\MaskedInput::className(),[
-               //     'mask' => '000.000.000.000.000,00',
-               // ])
+                ->textInput([
+                    'maxlength' => true,
+                    'onchange' => 'boundsCheckingConditions();'
+                ])->label(false)
             ?>
             <?= $form->field($model, 'currency_id',['template' => $fieldTpl,'options' => [
                 'class' => 'col-md-4 col-sm-4 col-xs-12',
@@ -113,7 +151,8 @@ $("#payments-cuser_id").on("change",findCondition);
     ]) ?>
 
     <?= $form->field($model, 'condition_id')->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
-        'prompt' => Yii::t('app/book','BOOK_choose_payment_condition')
+        'prompt' => Yii::t('app/book','BOOK_choose_payment_condition'),
+        'onchange' => 'boundsCheckingConditions();'
     ]) ?>
 
 

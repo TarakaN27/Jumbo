@@ -107,6 +107,8 @@ return [
     'Comment' => 'Комментарий',
     'Save' => 'Сохранить',
     'Payment' => 'Платеж',
-    'Total summ of payments requests:' => 'Общая сумма'
+    'Total summ of payments requests:' => 'Общая сумма',
+    'Bounds checking conditions request' => 'Соотвествие суммы порогам условия',
+    'Bounds checking conditions FAIL' => 'Сумма не соотвествует порогам условия!'
 
 ];
