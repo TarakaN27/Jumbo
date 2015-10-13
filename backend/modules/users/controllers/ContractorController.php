@@ -3,9 +3,13 @@
 namespace backend\modules\users\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use backend\modules\users\models\CreateExternalAccount;
+use common\components\csda\CSDAConnector;
+use common\models\CuserExternalAccount;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
 use common\models\Services;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Yii;
 use common\models\CUser;
 use common\models\search\CUserSearch;
@@ -255,5 +259,109 @@ class ContractorController extends AbstractBaseBackendController
             'services' => $services,
             'arSelected' =>  $arSelected
         ]);
+    }
+
+    public function actionExternalAccount($iCID)
+    {
+        $csdaAcc = CuserExternalAccount::getExtAccForUser($iCID,CuserExternalAccount::TYPE_CSDA);
+        return $this->render('external_acccount',[
+            'csdaAcc' => $csdaAcc,
+            'iCID' => $iCID
+        ]);
+    }
+
+
+    public function actionCreateExternalAccount($iCID,$type)
+    {
+        /**
+         * Необходимо проверить заданы ли условия для всех услуг.
+         * если не заданы, то запрещаем создавать внешний аккаунт.
+         * если заданы, то продолжаем создание аккаунта.
+         */
+        $serviceMap = Services::getServicesMap();
+        $preferCond = CuserPreferPayCond::find()->select(['service_id'])->where([
+            'cuser_id' => $iCID
+        ])->all();
+
+        $arCond = [];
+        foreach($preferCond as $cond)
+            $arCond [] = $cond->service_id;
+        unset($preferCond);
+
+        $allow = TRUE;
+        /** @var Services $service */
+        foreach($serviceMap as $key=>$service)
+        {
+            if(!in_array($key,$arCond))
+            {
+                $allow = FALSE;
+                break;
+            }
+        }
+        unset($serviceMap);
+
+        $obCReq = CUserRequisites::find()
+            ->select('c_email')
+            ->leftJoin(CUser::tableName().' cu ','cu.requisites_id = '.CUserRequisites::tableName().'.id')
+            ->where(['cu.id' => $iCID])
+            ->one();
+
+
+        $obModel = new CreateExternalAccount();
+        $obModel->type = $type;
+        if(!empty($obCReq))
+            $obModel->email = $obCReq->c_email;
+        $obModel->cUserID = $iCID;
+
+        if($obModel->load(Yii::$app->request->post()) && $obModel->validate())
+        {
+            if($obModel->makeRequest())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/users','External account successfully created'));
+                return $this->redirect(['external-account','iCID' => $iCID]);
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/users','External account can not be created'));
+            }
+        }
+
+        return $this->render('create_external_account',[
+            'allow' => $allow,
+            'type' => $type,
+            'obModel' => $obModel
+        ]);
+    }
+
+    /**
+     * @param $iCID
+     * @param $iExtID
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \Exception
+     */
+    public function actionDeleteExternalAccount($iCID,$iExtID,$type)
+    {
+        /** @var CuserExternalAccount $obExt */
+        $obExt = CuserExternalAccount::findOne($iExtID);
+        if(empty($obExt))
+            throw new NotFoundHttpException();
+        switch($type)
+        {
+            case CuserExternalAccount::TYPE_CSDA:
+                $obCsda = new CSDAConnector();
+                if($obCsda->deleteUser($obExt->secret_key))
+                {
+                    $obExt->delete();
+                    Yii::$app->session->setFlash('success',Yii::t('app/users','External account successfully deleted'));
+                    return $this->redirect(['external-account','iCID' => $iCID]);
+                }
+
+                Yii::$app->session->setFlash('error',Yii::t('app/users','External account can not be deleted'));
+                return $this->redirect(['external-account','iCID' => $iCID]);
+                break;
+
+            default:
+                break;
+        }
+        throw new InvalidArgumentException('Invalid type');
     }
 }

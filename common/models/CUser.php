@@ -192,6 +192,14 @@ class CUser extends AbstractUser
     }
 
     /**
+     * @return ActiveQuery
+     */
+    public function getExternalAccount()
+    {
+        return $this->hasOne(CuserExternalAccount::className(),['cuser_id' => 'id']);
+    }
+
+    /**
      * @return array
      */
     public function behaviors()

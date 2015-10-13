@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\components\anubis\Anubis;
 use Yii;
 use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;

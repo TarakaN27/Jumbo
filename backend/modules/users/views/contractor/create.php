@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 
 
+
 /* @var $this yii\web\View */
 /* @var $model common\models\CUser */
 
@@ -10,7 +11,6 @@ $this->title = Yii::t('app/users', 'Create Cuser');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Cusers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="clearfix"></div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
@@ -21,9 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </section>
                                     <div class="clearfix"></div>
                                 </div>
-    <?= $this->render('_form', [
-        'model' => $model,
-        'modelR' => $modelR
-    ]) ?>
+                                <div class="x_content">
+                                    <?= $this->render('_form', [
+                                        'model' => $model,
+                                        'modelR' => $modelR
+                                    ]) ?>
+                                </div>
 
 </div></div></div>

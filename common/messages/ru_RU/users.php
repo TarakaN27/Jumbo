@@ -126,6 +126,16 @@ return [
     'Bind_BUser_Instruction' => 'Для закрепения сотрудника, необходимо выбрать(один клик) сотрудника в левой колонке,
         при этом сотрудник переместиться в правую колонку.<br> Если необходимо убрать сотрудника то его необходимо выбрать в правой колонке,
         при этом сотрудник переместиться в левую колонку.<br> Для сохранения изменений нажмите "Сохранить"',
-    'Update btn' => 'Сохранить изменения'
+    'Update btn' => 'Сохранить изменения',
+    'Account is not created. Press add account' => 'Аккаунт не создан. Нажмите добавить аккаунт.',
+    'About' => 'Инфо',
+    'requisites for client systems of digital agency' => 'Реквизиты к клиентской системе вебмарт',
+    'Create external account' => 'Добавить внешний аккаунт',
+    'External account can not be created' => 'Ошибка создания внешнего аккаунта',
+    'External account successfully created' => 'Внешний аккаунт упешно создан',
+    'Login' => 'Логин',
+    'Password confirm' => 'Подтверждение пароля',
+    'Passwords do not match' => 'Пароли не совпадают',
+    'This login has already taken in external system.' => 'Логин занят, выберите другой'
 
 ];
