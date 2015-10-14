@@ -2,6 +2,7 @@
 namespace frontend\controllers;
 
 use common\components\anubis\Anubis;
+use linslin\yii2\curl\Curl;
 use Yii;
 use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
@@ -9,6 +10,7 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use yii\base\InvalidParamException;
+use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -68,6 +70,27 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
+        $obCurl = new Curl();
+        $response = $obCurl->setOption(
+            CURLOPT_POSTFIELDS,
+            Json::encode(['users' => [
+                'z0nshaiGX9VhIXbGReEAJi8_r6buzl5C',
+                'fhaskjdfkajsdhk',
+                'sdfasdfsdfsdf'
+            ]]))
+            ->post('http://wmcorp.loc/api/web/v1/service/get-services?token=mAv;iAYI@sf(OFXv,@p<qE');
+
+        var_dump($response);
+
+        var_dump(Json::decode($response));
+        /*
+        echo Json::encode(['users' => [
+            '64728g2hg32hg4',
+            'fhaskjdfkajsdhk',
+            'sdfasdfsdfsdf'
+        ]]);
+        */
+        die;
         return $this->render('index');
     }
 

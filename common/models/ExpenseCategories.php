@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
@@ -75,10 +76,6 @@ class ExpenseCategories extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
             ]);
     }
 
@@ -89,7 +86,7 @@ class ExpenseCategories extends AbstractActiveRecord
      */
     public static function getParentCat($except = NULL)
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         $arCat = self::getDb()->cache(function($db){
             return self::find()->where(['parent_id' => 0])->all();
         },3600*24,$dep);
@@ -108,7 +105,7 @@ class ExpenseCategories extends AbstractActiveRecord
      */
     public static function getAllExpenseCategories()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         $arCat = self::getDb()->cache(function($db){
             return ExpenseCategories::find()->all($db);
         },3600*24,$dep);

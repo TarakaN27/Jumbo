@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "{{%cuser_external_account}}".
@@ -99,6 +101,23 @@ class CuserExternalAccount extends AbstractActiveRecord
     public static function getExtAccForUser($userID,$type)
     {
         return self::find()->where(['cuser_id' => $userID,'type' => $type])->one();
+    }
+
+    /**
+     * @param array $secretKeys
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function findAllBySecretKeyCached(array $secretKeys)
+    {
+        $obDep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+
+        return self::getDb()->cache(
+            function ($db) use ($secretKeys){
+                return self::find()->select(['secret_key','cuser_id'])->where(['secret_key' => $secretKeys])->all($db);
+            }, 86400, $obDep);
     }
 
 }

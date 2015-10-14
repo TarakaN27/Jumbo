@@ -7,6 +7,7 @@ use common\components\loggingUserBehavior\LogModelBehavior;
 use common\models\AbstractActiveRecord;
 use common\models\ExchangeRates;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use common\models\CUser;
 use common\models\Services;
@@ -114,10 +115,6 @@ class Units extends AbstractActiveRecord
                     'class' => LogModelBehavior::className(),
                     'ignored' => ['created_at','updated_at']
                 ],
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
             ]);
     }
 
@@ -216,7 +213,7 @@ class Units extends AbstractActiveRecord
      */
     public function getAllUnits()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         return self::getDb()->cache(function ($db) {
             return Units::find()->all($db);
         },86400,$dep);
@@ -227,7 +224,7 @@ class Units extends AbstractActiveRecord
      */
     public function getUnitsMap()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         $models = self::getDb()->cache(function ($db) {
             return Units::find()->select(['id','name'])->all($db);
         },86400,$dep);

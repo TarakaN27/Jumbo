@@ -103,10 +103,7 @@ class Messages extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 

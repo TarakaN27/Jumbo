@@ -4,11 +4,12 @@ namespace backend\models;
 
 use app\models\BindBuser;
 use common\models\AbstractUser;
-use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
+
 
 /**
  * This is the model class for table "{{%b_user}}".
@@ -29,6 +30,7 @@ use yii\helpers\ArrayHelper;
  */
 class BUser extends AbstractUser
 {
+    use \DevGroup\TagDependencyHelper\TagDependencyTrait;
     /**
      * описываем роли пользователей backend
      */
@@ -173,7 +175,7 @@ class BUser extends AbstractUser
      */
     public static function getManagersArr()
     {
-        $dependency = new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $dependency = new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         return self::getDb()->cache(function ($db) {
             return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all($db);
         }, 3600*24, $dependency);
@@ -197,7 +199,7 @@ class BUser extends AbstractUser
      */
     public static function getAllMembersObj()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         $models = self::getDb()->cache(function ($db) {
             return BUser::find()->all($db);
         },86400,$dep);
@@ -238,10 +240,9 @@ class BUser extends AbstractUser
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+                'CacheableActiveRecord' => [
+                    'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
+                ],
             ]);
     }
 

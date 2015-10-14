@@ -5,6 +5,7 @@ namespace common\models;
 use common\components\behavior\UploadBehavior;
 use common\components\helpers\CustomHelper;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -73,9 +74,6 @@ class BillDocxTemplate extends AbstractActiveRecord
             $arBhvrs,
             [
                 [
-                    'class' => ActiveRecordHelper::className(),
-                ],
-                [
                     'class' => UploadBehavior::className(),
                     'attribute' => 'src',
                     'scenarios' => ['insert', 'update'],
@@ -118,7 +116,7 @@ class BillDocxTemplate extends AbstractActiveRecord
     {
         $dep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(self::className()),
             ]
         ]);
 
@@ -136,7 +134,7 @@ class BillDocxTemplate extends AbstractActiveRecord
     {
         $dep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(self::className()),
             ]
         ]);
 

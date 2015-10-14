@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -66,10 +67,6 @@ class Services extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
             ]);
     }
 
@@ -79,9 +76,9 @@ class Services extends AbstractActiveRecord
      */
     public static function getAllServices()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         $models = self::getDb()->cache(function ($db) {
-            return Services::find()->all($db);
+            return Services::find()->all();
         },86400,$dep);
 
         return $models;

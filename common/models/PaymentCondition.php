@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\components\loggingUserBehavior\LogModelBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -128,7 +129,7 @@ class PaymentCondition extends AbstractActiveRecord
     {
         $obDep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(self::className()),
                // ActiveRecordHelper::getCommonTag(ExchangeRates::className())
             ]
         ]);
@@ -162,9 +163,6 @@ class PaymentCondition extends AbstractActiveRecord
                     'class' => LogModelBehavior::className(),
                     'ignored' => ['created_at','updated_at']
                 ],
-                [
-                    'class' => ActiveRecordHelper::className(),
-                ]
             ]);
     }
 

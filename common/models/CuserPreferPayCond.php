@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "{{%cuser_prefer_pay_cond}}".
@@ -72,5 +74,21 @@ class CuserPreferPayCond extends AbstractActiveRecordWTB
     public function getCuser()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cuser_id']);
+    }
+
+    /**
+     * @param array $usersID
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getPreferCondForUsers(array $usersID)
+    {
+        $obDep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+
+        return self::getDb()->cache(function($db) use ($usersID){
+            return self::find()->where(['cuser_id' => $usersID])->all();
+        },86400,$obDep);
     }
 }

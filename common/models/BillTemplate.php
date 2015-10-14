@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -87,7 +88,7 @@ class BillTemplate extends AbstractActiveRecord
     {
         $dep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(self::className()),
             ]
         ]);
 

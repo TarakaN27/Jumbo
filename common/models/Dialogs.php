@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use backend\models\BUser;
 use yii\caching\TagDependency;
@@ -138,10 +139,7 @@ class Dialogs extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 
@@ -163,8 +161,8 @@ class Dialogs extends AbstractActiveRecord
     {
         $obDep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
-                ActiveRecordHelper::getCommonTag(BuserToDialogs::className())
+                NamingHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(BuserToDialogs::className())
             ]
         ]);
 

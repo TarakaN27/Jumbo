@@ -13,6 +13,7 @@ use common\models\BuserToDialogs;
 use common\models\Dialogs;
 use common\models\Messages;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\caching\DbDependency;
@@ -214,8 +215,8 @@ class DialogManager extends Component{
 
         $obDep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(Dialogs::className()),
-                ActiveRecordHelper::getCommonTag(BuserToDialogs::className())
+                NamingHelper::getCommonTag(Dialogs::className()),
+                NamingHelper::getCommonTag(BuserToDialogs::className())
             ]
         ]);
 

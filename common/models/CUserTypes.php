@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -64,10 +65,7 @@ class CUserTypes extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 
@@ -78,7 +76,7 @@ class CUserTypes extends AbstractActiveRecord
      */
     public static function getAllUserTypes()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         $models = self::getDb()->cache(function ($db) {
             return CUserTypes::find()->all($db);
         },186400,$dep);

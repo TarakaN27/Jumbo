@@ -10,6 +10,7 @@ namespace common\models;
 
 use yii\behaviors\TimestampBehavior;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 abstract class AbstractActiveRecord extends AbstractActiveRecordWTB{
 
@@ -36,8 +37,9 @@ abstract class AbstractActiveRecord extends AbstractActiveRecordWTB{
      */
     public function behaviors()
     {
-        return [
+        $arTmp = parent::behaviors();
+        return ArrayHelper::merge($arTmp,[
             TimestampBehavior::className(),
-        ];
+        ]);
     }
 } 

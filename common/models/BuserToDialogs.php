@@ -73,10 +73,7 @@ class BuserToDialogs extends \yii\db\ActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 }

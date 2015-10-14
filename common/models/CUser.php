@@ -4,6 +4,7 @@ namespace common\models;
 
 use backend\models\BUser;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
@@ -33,6 +34,7 @@ use yii\helpers\ArrayHelper;
  */
 class CUser extends AbstractUser
 {
+    use \DevGroup\TagDependencyHelper\TagDependencyTrait;
     CONST
         RESIDENT_YES = 1,
         RESIDENT_NO = 0,
@@ -208,10 +210,9 @@ class CUser extends AbstractUser
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+                'CacheableActiveRecord' => [
+                    'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
+                ],
             ]);
     }
 
@@ -223,8 +224,8 @@ class CUser extends AbstractUser
     {
         $dep =  new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getCommonTag(self::className()),
-                ActiveRecordHelper::getCommonTag(CUserRequisites::className())
+                NamingHelper::getCommonTag(self::className()),
+                NamingHelper::getCommonTag(CUserRequisites::className())
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
@@ -286,7 +287,7 @@ class CUser extends AbstractUser
     {
         $obDep = new TagDependency([
             'tags' => [
-                ActiveRecordHelper::getObjectTag(self::className(),$model_id),
+                NamingHelper::getObjectTag(self::className(),$model_id),
             ]
         ]);
         return self::getDb()->cache(function() use ($model_id){

@@ -8,15 +8,16 @@
 
 namespace common\models;
 
-
-use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use Yii;
 use yii\web\NotFoundHttpException;
+use yii\helpers\ArrayHelper;
 
 abstract class AbstractActiveRecordWTB extends ActiveRecord{
 
+    use \DevGroup\TagDependencyHelper\TagDependencyTrait;
     CONST
         YES = 1,
         NO = 0,
@@ -96,6 +97,19 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $arTmp = parent::behaviors();
+        return ArrayHelper::merge($arTmp,[
+            'CacheableActiveRecord' => [
+                'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
+            ],
+        ]);
+    }
+
+    /**
      * @param $model_id
      * @return mixed|null|static
      * @throws \yii\web\NotFoundHttpException
@@ -113,7 +127,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
                 new TagDependency(
                     [
                         'tags' => [
-                            ActiveRecordHelper::getObjectTag(self::className(), $model_id),
+                            NamingHelper::getObjectTag(self::className(), $model_id),
                         ]
                     ]
                 )

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
@@ -119,10 +120,7 @@ class ExchangeRates extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 
@@ -132,7 +130,7 @@ class ExchangeRates extends AbstractActiveRecord
      */
     public static function getExchangeRates()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className()),]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         $models = self::getDb()->cache(function ($db) {
             return ExchangeRates::find()->orderBy(['is_default' => SORT_DESC])->all($db);
         },86400,$dep);

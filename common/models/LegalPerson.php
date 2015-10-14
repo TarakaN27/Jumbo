@@ -3,6 +3,7 @@
 namespace common\models;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
@@ -75,10 +76,7 @@ class LegalPerson extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-                [
-                    'class' => ActiveRecordHelper::className(),
-                    'cache' => 'cache', // optional option - application id of cache component
-                ]
+
             ]);
     }
 
@@ -88,7 +86,7 @@ class LegalPerson extends AbstractActiveRecord
      */
     public static function getAllLegalPerson()
     {
-        $dep =  new TagDependency(['tags' => ActiveRecordHelper::getCommonTag(self::className())]);
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
         $models = self::getDb()->cache(function ($db) {
             return LegalPerson::find()->orderBy(['id' => SORT_ASC])->all($db);
         },86400,$dep);
