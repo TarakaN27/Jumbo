@@ -7,9 +7,9 @@ return [
     'name' => 'Webmart Group corp',
     'timeZone'=> 'Europe/Minsk',
     'components' => [
-       // 'cache' => [
-       //     'class' => 'yii\caching\FileCache',
-       // ],
+        'config' => [
+            'class' => 'common\components\config\Config'
+        ],
         'i18n' => [
             'translations' => [
                 'app*' => [

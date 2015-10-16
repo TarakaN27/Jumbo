@@ -7,7 +7,7 @@ use common\models\Services;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-
+use Yii;
 /**
  * Created by PhpStorm.
  * User: zhenya
@@ -76,7 +76,8 @@ class ServiceController extends AbstractActiveActionREST
                         'id' => $key,
                         'name' => $value,
                         'allow' => isset($arPreferCond[$userID]) && isset($arPreferCond[$userID][$key]) ?
-                            $arPreferCond[$userID][$key] : FALSE
+                            $arPreferCond[$userID][$key] : FALSE,
+                        'minAmount' => Yii::$app->config->get('min_bill_amount')
                     ];
                 }
             }else{

@@ -36,6 +36,9 @@ return [
         'documents' => [
             'class' => 'backend\modules\documents\Module',
         ],
+        'config' => [
+            'class' => 'backend\modules\config\Module',
+        ],
     ],
     'components' => [
 

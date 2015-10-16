@@ -55,6 +55,11 @@ return [
     'Bill list' => 'Список счетов',
     'Bill docx template' => 'Docx шаблоны счетов',
     'Show detail' => 'Показать детали',
-    'Hide detail' => 'Спрятать детали'
+    'Hide detail' => 'Спрятать детали',
+    'Config' => 'Конфигурация',
+    'Name' => 'Название',
+    'Alias' => 'Псевдоним',
+    'Value' => 'Значение',
+    'New value' => 'Новое значение'
 
 ];
