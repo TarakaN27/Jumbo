@@ -58,6 +58,7 @@ return [
             ],
         ],
         'user' => [
+            'class' => 'backend\components\CustomUser',
             'identityClass' => 'backend\models\BUser',
             'enableAutoLogin' => true,
             'identityCookie' => [

@@ -26,6 +26,8 @@ use yii\db\Query;
  * @property string $buy_target
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $external
+ * @property string $bsk
  *
  * @property Services $service
  * @property BillDocxTemplate $docxTmpl
@@ -62,11 +64,12 @@ class Bills extends AbstractActiveRecord
                  'manager_id', 'cuser_id', 'l_person_id',
                  'service_id', 'docx_tmpl_id', 'amount',
                  'bill_number', 'bill_template', 'use_vat',
-                 'created_at', 'updated_at'
+                 'created_at', 'updated_at','external'
              ], 'integer'],
+            ['bsk','unique'],
             [['bill_date'], 'safe'],
             [['vat_rate'], 'number'],
-            [['description', 'object_text'], 'string'],
+            [['description', 'object_text','bsk'], 'string'],
             [['buy_target'], 'string', 'max' => 255]
         ];
     }
@@ -94,6 +97,8 @@ class Bills extends AbstractActiveRecord
             'buy_target' => Yii::t('app/documents', 'Buy Target'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
+            'external' => Yii::t('app/documents', 'External'),
+            'bsk' => Yii::t('app/documents', 'Bill secret key'),
         ];
     }
 
@@ -151,6 +156,7 @@ class Bills extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
+        $this->getBSK();
         if(parent::beforeSave($insert))
         {
             $this->setBillNumberAndDate();
@@ -178,6 +184,18 @@ class Bills extends AbstractActiveRecord
             $iBNmr++;
 
         $this->bill_number = $iBNmr;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBSK()
+    {
+        $tmp = Yii::$app->security->generateRandomString();
+        if(self::find()->where(['bsk' => $tmp])->exists())
+            return $this->getBSK();
+        else
+            return $this->bsk = $tmp;
     }
 
 }

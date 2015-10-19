@@ -41,6 +41,7 @@ class CUser extends AbstractUser
         SCENARIO_REGISTER = 'register';
 
     public
+        $isNew = FALSE,
         $password;
 
     /**
@@ -165,7 +166,21 @@ class CUser extends AbstractUser
      */
     public function beforeSave($insert)
     {
+        if($insert)
+            $this->isNew = TRUE;
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if($this->isNew)
+            $this->createCuserSettings();
+
+        parent::afterSave($insert, $changedAttributes);
     }
 
     /**
@@ -274,6 +289,10 @@ class CUser extends AbstractUser
     public function afterDelete()
     {
         $obR = CUserRequisites::findOne($this->requisites_id);
+        $obSetings = CuserSettings::findOne(['cuser_id' => $this->id]);
+        if(!empty($obSetings))
+            $obSetings->delete();
+
         if(!empty($obR))
             $obR->delete();
         return parent::afterDelete();
@@ -327,6 +346,21 @@ class CUser extends AbstractUser
                 ->all($db);
         },3600*24,$dep);
     }
+
+    /**
+     * @return bool
+     */
+    protected function createCuserSettings()
+    {
+        if(!CuserSettings::find()->where(['cuser_id' => $this->id])->exist())
+        {
+            $obSettings = new CuserSettings();
+            $obSettings->cuser_id = $this->id;
+            return $obSettings->save();
+        }
+        return FALSE;
+    }
+
 }
 
 /**

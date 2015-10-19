@@ -2,6 +2,8 @@
 namespace frontend\controllers;
 
 use common\components\anubis\Anubis;
+use common\models\Bills;
+use common\models\managers\BillsManager;
 use linslin\yii2\curl\Curl;
 use Yii;
 use common\models\LoginForm;
@@ -15,6 +17,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\NotFoundHttpException;
 
 /**
  * Site controller
@@ -92,6 +95,21 @@ class SiteController extends Controller
         */
         die;
         return $this->render('index');
+    }
+
+
+    public function actionGetPdf($bsk)
+    {
+        if(!$bsk)
+            throw new NotFoundHttpException('File not found');
+        /** @var BillsManager $obBill */
+        $obBill = BillsManager::findOne(['bsk' => $bsk]);
+
+        if(!$obBill)
+            throw new NotFoundHttpException('File not found');
+
+        $obBill->getDocument(BillsManager::TYPE_DOC_PDF);
+        Yii::$app->end();
     }
 
     /*

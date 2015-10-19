@@ -91,4 +91,14 @@ class CuserPreferPayCond extends AbstractActiveRecordWTB
             return self::find()->where(['cuser_id' => $usersID])->all();
         },86400,$obDep);
     }
+
+    /**
+     * @param $userID
+     * @param $serviceID
+     * @return mixed
+     */
+    public static function findOneByUserIDAndServiceID($userID,$serviceID)
+    {
+        return self::find()->where(['cuser_id' => $userID,'service_id'=>$serviceID])->with('cond')->one();
+    }
 }

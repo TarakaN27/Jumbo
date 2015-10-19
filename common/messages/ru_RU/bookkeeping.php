@@ -109,6 +109,14 @@ return [
     'Payment' => 'Платеж',
     'Total summ of payments requests:' => 'Общая сумма',
     'Bounds checking conditions request' => 'Соотвествие суммы порогам условия',
-    'Bounds checking conditions FAIL' => 'Сумма не соотвествует порогам условия!'
+    'Bounds checking conditions FAIL' => 'Сумма не соотвествует порогам условия!',
+    'BOOK_promised_payment' => 'Обещанные платежи',
+    'Amount' => 'Сумма платежа',
+    'Paid Date' => 'Дата погашения',
+    'Paid' => 'Платеж погашен',
+    'Create Promised Payment' => 'Добавить обещаный платеж',
+    'Promised Payments' => 'Обещанные платежи',
+    'Can not add new promised payment,user has an unpaid promised payment.' =>
+        'Невозможно добавить обещанный платеж, у пользователя есть неоплаченный платеж!'
 
 ];

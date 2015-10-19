@@ -120,4 +120,20 @@ class CuserExternalAccount extends AbstractActiveRecord
             }, 86400, $obDep);
     }
 
+    /**
+     * @param $sk
+     * @return null
+     */
+    public static function findOneBySecretKeyCahed($sk)
+    {
+        return CUser::find()
+            ->select(['id','manager_id'])
+            ->with([
+                'externalAccount' => function ($query) use ($sk) {
+                             $query->andWhere(['secret_key' => $sk]);
+                         },
+            ])
+            ->one();
+    }
+
 }

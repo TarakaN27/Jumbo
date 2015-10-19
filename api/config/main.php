@@ -51,6 +51,7 @@ return [
                     'except' => ['delete', 'create', 'update'], //запрещаем действия
                     'extraPatterns' => [    //дополнительные экшены
                         'POST get-services' => 'get-services', // 'xxxxx' refers to 'actionXxxxx'
+                        'POST get-new-bill' => 'get-new-bill'
                     ],
                 ],
                 [
