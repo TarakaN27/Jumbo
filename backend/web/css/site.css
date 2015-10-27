@@ -52,3 +52,6 @@
 .hideShowBtnClass{cursor: pointer;}
 .min-height-100{min-height: 100px;}
 .marg-l-10{margin-left: 10px;}
+.paid-red{color: #90111A;}
+.paid-green{color: #5cb85c;}
+.paid-control{cursor: pointer;font-size: 18px;}

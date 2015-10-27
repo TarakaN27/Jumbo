@@ -46,6 +46,7 @@ return [
     'Template found' => 'Шаблон найден',
     'Template not found' => 'Шаблон не найден',
     'Legal person found' => 'Юр. лицо найдено',
-    'Legal person not found' => 'Юр. лицо не найдено'
+    'Legal person not found' => 'Юр. лицо не найдено',
+    'External' => 'Внешний'
 
 ];

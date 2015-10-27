@@ -3,9 +3,15 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
+use yii\helpers\ArrayHelper;
+use common\models\CUser;
 /* @var $this yii\web\View */
 /* @var $model common\models\PromisedPayment */
 /* @var $form yii\widgets\ActiveForm */
+
+$arContrMap = Yii::$app->user->isManager() ?
+    CUser::getContractorMapForManager(Yii::$app->user->id) :
+    CUser::getContractorMap();
 ?>
 
 <div class="promised-payment-form">
@@ -22,7 +28,7 @@ use kartik\select2\Select2;
     ]); ?>
 
     <?= $form->field($model, 'cuser_id')->widget(Select2::classname(), [
-        'data' => \common\models\CUser::getContractorMap(),
+        'data' => $arContrMap,
         'options' => [
             'placeholder' => Yii::t('app/book','BOOK_choose_cuser')
         ],
@@ -30,6 +36,11 @@ use kartik\select2\Select2;
             'allowClear' => true
         ],
     ]); ?>
+
+
+    <?= $form->field($model,'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
+        'prompt' => Yii::t('app/book','BOOK_choose_service')
+    ])?>
 
     <?= $form->field($model, 'amount')->textInput(['maxlength' => true]) ?>
 

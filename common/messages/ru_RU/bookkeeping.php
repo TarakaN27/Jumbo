@@ -117,6 +117,10 @@ return [
     'Create Promised Payment' => 'Добавить обещаный платеж',
     'Promised Payments' => 'Обещанные платежи',
     'Can not add new promised payment,user has an unpaid promised payment.' =>
-        'Невозможно добавить обещанный платеж, у пользователя есть неоплаченный платеж!'
+        'Невозможно добавить обещанный платеж, у пользователя есть неоплаченный платеж!',
+    'Amount can not be more than ' => 'Сумма платежа не может быть больше чем ',
+    'Service id' => 'Услуга',
+    'The user {user} has promised payment overdue for services <br>{services}' =>
+        'Пользователь {user} просрочил обещанный платеж по следующим услуге(ам):<br>{services}'
 
 ];

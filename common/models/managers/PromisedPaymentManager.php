@@ -15,12 +15,6 @@ class PromisedPaymentManager extends PromisedPayment
 {
 
 
-	public static function getAllowedAmount()
-	{
 
-
-
-
-	}
 
 }

@@ -266,6 +266,21 @@ class CUser extends AbstractUser
     }
 
     /**
+     * @param $iManagerID
+     * @return array
+     */
+    public static function getContractorMapForManager($iManagerID)
+    {
+        $tmp = self::getContractorForManager($iManagerID);
+        $result = [];
+        foreach($tmp as $t)
+        {
+            $result[$t->id] = $t->getInfo();
+        }
+        return $result;
+    }
+
+    /**
      * Устанавливаем заглушки
      */
     public function setDummyFields()

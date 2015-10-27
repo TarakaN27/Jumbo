@@ -1,19 +1,9 @@
 <?php
 namespace frontend\controllers;
 
-use common\components\anubis\Anubis;
-use common\models\Bills;
 use common\models\managers\BillsManager;
-use linslin\yii2\curl\Curl;
+use console\components\controllerHelper\ManagerMsg;
 use Yii;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
-use yii\base\InvalidParamException;
-use yii\helpers\Json;
-use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -73,31 +63,16 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        $obCurl = new Curl();
-        $response = $obCurl->setOption(
-            CURLOPT_POSTFIELDS,
-            Json::encode(['users' => [
-                'z0nshaiGX9VhIXbGReEAJi8_r6buzl5C',
-                'fhaskjdfkajsdhk',
-                'sdfasdfsdfsdf'
-            ]]))
-            ->post('http://wmcorp.loc/api/web/v1/service/get-services?token=mAv;iAYI@sf(OFXv,@p<qE');
-
-        var_dump($response);
-
-        var_dump(Json::decode($response));
-        /*
-        echo Json::encode(['users' => [
-            '64728g2hg32hg4',
-            'fhaskjdfkajsdhk',
-            'sdfasdfsdfsdf'
-        ]]);
-        */
-        die;
+        Yii::$app->cache->flush();
+        //ManagerMsg::checkForOverduePromisedPayment();
         return $this->render('index');
     }
 
-
+    /**
+     * @param $bsk
+     * @throws NotFoundHttpException
+     * @throws \yii\base\ExitException
+     */
     public function actionGetPdf($bsk)
     {
         if(!$bsk)

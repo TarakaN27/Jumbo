@@ -23,6 +23,11 @@ class TechnicalController extends Controller
         ];
     }
 
+    public function actions()
+    {
+        return [];
+    }
+
     public function actionPing()
     {
         $this->checkAccessByToken();

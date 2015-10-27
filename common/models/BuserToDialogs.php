@@ -16,7 +16,7 @@ use backend\models\BUser;
  * @property Dialogs $dialog
  * @property BUser $buser
  */
-class BuserToDialogs extends \yii\db\ActiveRecord
+class BuserToDialogs extends AbstractActiveRecord
 {
     /**
      * @inheritdoc

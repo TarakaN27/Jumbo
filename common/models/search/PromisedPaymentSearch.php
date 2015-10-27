@@ -18,7 +18,7 @@ class PromisedPaymentSearch extends PromisedPayment
     public function rules()
     {
         return [
-            [['id', 'cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'cuser_id', 'buser_id_p','service_id' ,'paid_date', 'paid', 'created_at', 'updated_at'], 'integer'],
             [['amount'], 'safe'],
         ];
     }
@@ -41,7 +41,7 @@ class PromisedPaymentSearch extends PromisedPayment
      */
     public function search($params)
     {
-        $query = PromisedPayment::find();
+        $query = PromisedPayment::find()->with('service');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -59,6 +59,7 @@ class PromisedPaymentSearch extends PromisedPayment
             'id' => $this->id,
             'cuser_id' => $this->cuser_id,
             'buser_id_p' => $this->buser_id_p,
+            'service_id' => $this->service_id,
             'paid_date' => $this->paid_date,
             'paid' => $this->paid,
             'created_at' => $this->created_at,

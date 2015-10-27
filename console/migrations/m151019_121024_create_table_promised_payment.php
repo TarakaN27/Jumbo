@@ -18,8 +18,8 @@ class m151019_121024_create_table_promised_payment extends Migration
             'cuser_id' => Schema::TYPE_INTEGER.' NOT NULL',
             'buser_id_p' => Schema::TYPE_INTEGER,
             'amount' => Schema::TYPE_STRING.' NOT NULL',
-            'paid_date' => Schema::TYPE_INTEGER.' NOT NULL',
-            'paid' => Schema::TYPE_BOOLEAN.' NOT NULL ',
+            'paid_date' => Schema::TYPE_INTEGER,
+            'paid' => Schema::TYPE_BOOLEAN,
             'created_at' => Schema::TYPE_INTEGER ,
             'updated_at' => Schema::TYPE_INTEGER ,
         ],$tableOptions);

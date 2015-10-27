@@ -172,7 +172,7 @@ $menuItems[] = [
                                         <?php endif;?>
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/promised-payment/indexx']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
+                                                <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
                                             </li>
 
                                             <li>

@@ -2,8 +2,11 @@
 
 namespace common\models;
 
+use backend\models\BUser;
 use common\components\loggingUserBehavior\LogModelBehavior;
+use common\components\payment\PromisedPaymentHelper;
 use Yii;
+use yii\caching\DbDependency;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -17,11 +20,13 @@ use yii\helpers\ArrayHelper;
  * @property integer $paid
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $service_id
  */
 class PromisedPayment extends AbstractActiveRecord
 {
 
     CONST
+        OVERDUE_DAYS = 3,
         SCENARIO_NEW = 'add_new';
 
     /**
@@ -38,12 +43,25 @@ class PromisedPayment extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['cuser_id', 'amount', 'paid_date', 'paid'], 'required'],
-            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at'], 'integer'],
+            [['cuser_id', 'amount','service_id'], 'required'],
+            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id'], 'integer'],
             [['amount'], 'number', 'min' => 0],
-
-            ['cuser_id','customValidate','on' => [self::SCENARIO_NEW]]
+            ['paid','default', 'value' => self::NO],
+            ['cuser_id','customValidate','on' => [self::SCENARIO_NEW]],
+            ['amount','customValAmount']
         ];
+    }
+
+    /**
+     * @param $attribute
+     * @param $params
+     */
+    public function customValAmount($attribute,$params)
+    {
+        $obPPHelp = new PromisedPaymentHelper($this->cuser_id,$this->service_id);
+        $maxAmount = $obPPHelp->getMaxAmount();
+        if($this->amount > $maxAmount)
+            $this->addError($attribute,Yii::t('app/book','Amount can not be more than ').$maxAmount);
     }
 
     /**
@@ -53,8 +71,8 @@ class PromisedPayment extends AbstractActiveRecord
     public function customvalidate($attribute, $params)
     {
         if(self::find()
-            ->where(['cuser_id' => $this->cuser_id])
-            ->andWhere('paid != :paid',[':paid' => self::YES])->exist())
+            ->where(['cuser_id' => $this->cuser_id,'service_id' => $this->service_id])
+            ->andWhere('paid != :paid or paid is NULL',[':paid' => self::YES])->exists())
             $this->addError($attribute,Yii::t('app/book','Can not add new promised payment,user has an unpaid promised payment.'));
     }
 
@@ -72,7 +90,32 @@ class PromisedPayment extends AbstractActiveRecord
             'paid' => Yii::t('app/book', 'Paid'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'service_id' => Yii::t('app/book', 'Service id')
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getService()
+    {
+        return $this->hasOne(Services::className(),['id' => 'service_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCuser()
+    {
+        return $this->hasOne(CUser::className(),['id' => 'cuser_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBuser()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'buser_id_p']);
     }
 
     /**
@@ -89,5 +132,58 @@ class PromisedPayment extends AbstractActiveRecord
                     'ignored' => ['created_at','updated_at']
                 ]
             ]);
+    }
+
+    /**
+     * @param $userID
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getPaymentListForUserCached($userID)
+    {
+        $obDep = new DbDependency([
+            'sql' => 'SELECT MAX(updated_at) FROM '.self::tableName().' WHERE cuser_id = :user_id',
+            'params' => [
+                ':user_id' => $userID
+            ]
+        ]);
+
+        return self::getDb()->cache(function($db) use ($userID){
+            return self::find()
+                ->where('paid != :paid OR paid is NULL',[
+                    ':paid' => self::YES
+                ])
+                ->andWhere(['cuser_id' => $userID])->with('service')->all();
+        },86400,$obDep);
+    }
+
+    /**
+     * @param $userID
+     * @param $iServID
+     * @return mixed
+     */
+    public static function isPaymentExist($userID,$iServID)
+    {
+        return self::find()
+            ->where('paid != :paid OR paid is NULL',[
+                ':paid' => self::YES
+            ])
+            ->andWhere(['cuser_id' => $userID,'service_id' => $iServID])->exists();
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getOverduePromisedPayment()
+    {
+        $time = time()-3600*24*self::OVERDUE_DAYS;
+
+        return self::find()
+            //->where('paid_date > :pay_date',[':pay_date' => $time])
+           // ->andWhere('paid != :paid OR paid is NULL',[
+           //     ':paid' => self::YES
+          //  ])
+            ->with('service','cuser.requisites')
+            ->all();
     }
 }

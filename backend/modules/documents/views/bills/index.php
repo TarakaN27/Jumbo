@@ -89,6 +89,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'filter' => \common\models\BillDocxTemplate::getBillDocxMap()
                     ],
                     [
+                        'attribute' => 'external',
+                        'value' => function($model){
+                            return $model->getYesNoStr($model->external);
+                        }
+                    ],
+                    [
                         'class' => 'yii\grid\ActionColumn',
                         'template' => '{docx}{pdf}',
                         'buttons' => [

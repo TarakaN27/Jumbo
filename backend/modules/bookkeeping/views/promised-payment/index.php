@@ -14,6 +14,13 @@ $gridView = [
     ['class' => 'yii\grid\SerialColumn'],
     'amount',
     [
+        'attribute' => 'service_id',
+        'value' => function($model){
+            return is_object($obServ = $model->service) ? $obServ->name : 'N/A';
+        },
+        'filter' => \common\models\Services::getServicesMap()
+    ],
+    [
         'attribute' => 'paid_date',
         'format' => 'html',
         'value' => function($model){
@@ -22,26 +29,75 @@ $gridView = [
     ],
     [
         'attribute' => 'paid',
-        'format' => 'html',
+        'format' => 'raw',
         'value' => function($model){
-            return $model->getYesNo($model->paid);
-        }
+            return Html::tag('i','',[
+                'class' => "fa fa-check-circle paid-control " . ($model->paid ? "paid-green" : "paid-red"),
+                'data' => $model->paid ? 1 : 0,
+                'data-id' => $model->id
+            ]);
+        },
+        'filter' => \common\models\PromisedPayment::getYesNo(),
+        'contentOptions' => ['class' => 'text-center'],
     ],
     [
         'attribute' => 'created_at',
-        'format' => 'hrml',
+        'format' => 'html',
         'value' => function($model){
             return Yii::$app->formatter->asDatetime($model->created_at);
         }
     ],
-    ['class' => 'yii\grid\ActionColumn'],
 ];
 
-if(Yii::$app->user->isManager())
+if(!Yii::$app->user->isManager())
 {
-    $gridView  [] = 'cuser_id';
-    $gridView  [] = 'buser_id_p';
+    $gridView  [] = [
+        'attribute' => 'cuser_id',
+        'value' => function($model){
+            return is_object($obUser = $model->cuser) ? $obUser->getInfo() : 'N/A';
+        }
+    ];
+    $gridView  [] = [
+        'attribute' => 'buser_id_p',
+        'value' => function($model){
+            return is_object($obBuser = $model->buser) ? $obBuser->getFio() : 'N/A';
+        }
+    ];
+    $gridView  [] = [
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{view}'
+    ];
 }
+
+$this->registerJs("
+$('table').on('click','.paid-control',function(){
+    var
+        id = $(this).attr('data-id'),
+        paidControl = $('.paid-control[data-id = \"'+id+'\"]');
+    console.log(id);
+    $.ajax({
+   type: \"POST\",
+   url: '".\yii\helpers\Url::to(['change-paid'])."',
+   data: { pk: id},
+   dataType: 'json',
+   success: function(msg){
+        if(msg == 1)
+        {
+            paidControl.removeClass('paid-red');
+            paidControl.addClass('paid-green');
+        }else{
+            paidControl.removeClass('paid-green');
+            paidControl.addClass('paid-red');
+        }
+   },
+   error: function(err){
+    alert('Error');
+   }
+ });
+
+
+});
+",\yii\web\View::POS_READY);
 
 ?>
 <div class = "row">

@@ -168,4 +168,17 @@ class Payments extends AbstractActiveRecord
         return date('d.m.Y H:i',$this->pay_date);
     }
 
+    /**
+     * @param $userID
+     * @param $period
+     * @return mixed
+     */
+    public static function getPaymentByLastPeriod($userID,$period)
+    {
+        return self::find()   //получаем платежи пользователя за последние 3 месяца.
+            ->where('pay_date > :pay_date',[':pay_date' => $period])
+            ->andWhere(['cuser_id' => $userID])
+            ->all();
+    }
+
 }

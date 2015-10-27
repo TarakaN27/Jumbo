@@ -93,6 +93,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     '.Yii::t('app/book','Settings').' <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu">
+                                                     <li>
+                                                        '.Html::a(Yii::t('app/users','Settings'),['/users/contractor-settings/index','userID' => $model->id]).'
+                                                    </li>
                                                     <li>
                                                         '.Html::a(Yii::t('app/users','Prefer condition'),['prefer-cond','id' => $model->id]).'
                                                     </li>

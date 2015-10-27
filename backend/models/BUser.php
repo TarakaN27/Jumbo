@@ -287,4 +287,40 @@ class BUser extends AbstractUser
 
         return $arRole;
     }
+
+    /**
+     * Получаем администратора(используется для отправки технических сообщений)
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getAdmin()
+    {
+        $obDep = new TagDependency([
+                'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+
+        return self::getDb()->cache(function(){
+            return self::find()
+                ->where(['role' => [self::ROLE_ADMIN,self::ROLE_SUPERADMIN]])
+                ->orderBy(['role' => SORT_DESC,'id' => SORT_ASC])
+                ->limit(1)
+                ->one();
+        },86400,$obDep);
+    }
+
+    /**
+     * @param $model_id
+     * @return mixed
+     */
+    public static function findOneByIDCached($model_id)
+    {
+        $obDep = new TagDependency([
+            'tags' => [
+                NamingHelper::getObjectTag(self::className(),$model_id),
+            ]
+        ]);
+        return self::getDb()->cache(function() use ($model_id){
+            return self::findOne($model_id);
+        },3600*24,$obDep);
+    }
 }

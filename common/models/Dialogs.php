@@ -32,8 +32,9 @@ class Dialogs extends AbstractActiveRecord
 
     CONST
         ROW_LIMIT = 10,
-        TYPE_MSG = 5,
-        TYPE_REQUEST = 10;
+        TYPE_MSG = 5,   //обычное сообщение
+        TYPE_REQUEST = 10,  //запрос на платеж
+        TYPE_OVERDUE_PP = 15;   //просороченный обещанный платеж
 
     /**
      * @return array
@@ -42,7 +43,8 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             self::TYPE_MSG => Yii::t('app/common','DIALOG_message'),
-            self::TYPE_REQUEST => Yii::t('app/common','DIALOG_request')
+            self::TYPE_REQUEST => Yii::t('app/common','DIALOG_request'),
+            self::TYPE_OVERDUE_PP => Yii::t('app/common','DIALOG_overdue_pp')
         ];
     }
 
@@ -53,7 +55,8 @@ class Dialogs extends AbstractActiveRecord
     {
         $arTmp = [
             self::TYPE_MSG => 'green_tag',
-            self::TYPE_REQUEST => 'red_tag'
+            self::TYPE_REQUEST => 'red_tag',
+            self::TYPE_OVERDUE_PP => 'blue_tag'
         ];
         return array_key_exists($this->type,$arTmp) ? $arTmp[$this->type] : 'N/A';
     }

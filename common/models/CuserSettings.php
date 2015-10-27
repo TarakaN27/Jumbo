@@ -16,7 +16,7 @@ use Yii;
  *
  * @property CUser $cuser
  */
-class CuserSettings extends \yii\db\ActiveRecord
+class CuserSettings extends AbstractActiveRecord
 {
     /**
      * @inheritdoc
@@ -33,7 +33,9 @@ class CuserSettings extends \yii\db\ActiveRecord
     {
         return [
             [['cuser_id'], 'required'],
-            [['cuser_id', 'pp_max', 'pp_percent', 'created_at', 'updated_at'], 'integer']
+            [['cuser_id', 'created_at', 'updated_at'], 'integer'],
+            ['pp_percent','integer','min' => 0,'max' => 100],
+            ['pp_max','integer','min'=>0]
         ];
     }
 

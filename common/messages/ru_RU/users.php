@@ -136,6 +136,8 @@ return [
     'Login' => 'Логин',
     'Password confirm' => 'Подтверждение пароля',
     'Passwords do not match' => 'Пароли не совпадают',
-    'This login has already taken in external system.' => 'Логин занят, выберите другой'
+    'This login has already taken in external system.' => 'Логин занят, выберите другой',
+    'Pp Max' => 'Максимальная сумма обещанного платежа',
+    'Pp Percent' => 'Процент для обещанного платежа'
 
 ];

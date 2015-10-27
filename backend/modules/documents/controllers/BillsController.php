@@ -89,7 +89,7 @@ class BillsController extends AbstractBaseBackendController
             $model->manager_id = Yii::$app->user->id;
 
         $model->buy_target = Yii::t('app/documents','DefaultBuytarget');
-
+        $model->external = Bills::NO;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {

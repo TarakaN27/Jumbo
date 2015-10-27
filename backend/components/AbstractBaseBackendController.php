@@ -48,4 +48,21 @@ abstract class AbstractBaseBackendController extends Controller{
 
         return $str;
     }
+
+    /**
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
+     */
+    public function beforeAction($action)
+    {
+        if(parent::beforeAction($action))
+        {
+
+
+
+            return TRUE;
+        }
+        return FALSE;
+    }
 } 

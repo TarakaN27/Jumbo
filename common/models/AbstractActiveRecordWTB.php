@@ -42,7 +42,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     public function getYesNoStr($val)
     {
         $tmp = self::getYesNo();
-        return isset($tmp[$val]) ? $tmp[$val] : 'N/A';
+        return isset($tmp[$val]) ? $tmp[$val] : NULL;
     }
 
     /**

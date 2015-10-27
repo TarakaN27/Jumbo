@@ -7,14 +7,36 @@ use common\models\CUser;
 use Yii;
 use common\models\PromisedPayment;
 use common\models\search\PromisedPaymentSearch;
+use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
+use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * PromisedPaymentController implements the CRUD actions for PromisedPayment model.
  */
 class PromisedPaymentController extends AbstractBaseBackendController
 {
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => TRUE,
+                    'roles' => ['admin', 'bookkeeper', 'moder']
+                ]
+            ]
+        ];
 
+        return $tmp;
+    }
 
     /**
      * Lists all PromisedPayment models.
@@ -23,11 +45,10 @@ class PromisedPaymentController extends AbstractBaseBackendController
     public function actionIndex()
     {
         $arSearchParam = [];
-        if(Yii::$app->user->isManager())
-        {
+        if (Yii::$app->user->isManager()) {
             $tmp = CUser::getContractorForManager(Yii::$app->user->id);
             $arUserID = [];
-            foreach($tmp as $t)
+            foreach ($tmp as $t)
                 $arUserID [] = $t->id;
 
             $arSearchParam ['cuser_id'] = $arUserID;
@@ -36,6 +57,7 @@ class PromisedPaymentController extends AbstractBaseBackendController
 
         $searchModel = new PromisedPaymentSearch($arSearchParam);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -114,10 +136,41 @@ class PromisedPaymentController extends AbstractBaseBackendController
      */
     protected function findModel($id)
     {
-        if (($model = PromisedPayment::findOne($id)) !== null) {
+        if (($model = PromisedPayment::findOne($id)) !== NULL) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @return int
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionChangePaid()
+    {
+        $pk = Yii::$app->request->post('pk');
+        if(empty($pk))
+            throw new InvalidParamException();
+
+        $model = $this->findModel($pk);
+
+        if($model->paid) {
+            $model->buser_id_p = '';
+            $model->paid_date = '';
+            $model->paid = PromisedPayment::NO;
+        }
+        else {
+            $model->buser_id_p = Yii::$app->user->id;
+            $model->paid_date = time();
+            $model->paid = PromisedPayment::YES;
+        }
+
+        if(!$model->save())
+            throw new ServerErrorHttpException();
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model->paid;
     }
 }

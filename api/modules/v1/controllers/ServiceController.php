@@ -30,6 +30,11 @@ class ServiceController extends AbstractActiveActionREST
     CONST
         USER_REQUEST_LIMIT = 50;
 
+    public function actions()
+    {
+        return [];
+    }
+
     /**
      * @return array
      */
@@ -111,6 +116,7 @@ class ServiceController extends AbstractActiveActionREST
      */
     public function actionGetNewBill()
     {
+        $this->checkAccessByToken();
         $sk = Yii::$app->request->post('sk');
         $servID = Yii::$app->request->post('servID');
         $amount = Yii::$app->request->post('amount');

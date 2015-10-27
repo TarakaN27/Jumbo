@@ -137,7 +137,7 @@ class CustomHelper {
     }
 
     /**
-     * Переводч целого числа в строку(прописью)
+     * Перевод целого числа в строку(прописью)
      * @param $num
      * @return string
      * @link http://xn----7sbfbqq4deedd2d1bu.xn--p1ai/%D0%A7%D0%B8%D1%81%D0%BB%D0%BE-%D0%BF%D1%80%D0%BE%D0%BF%D0%B8%D1%81%D1%8C%D1%8E/
@@ -279,5 +279,15 @@ class CustomHelper {
     public static function highlight($search,$html)
     {
         return preg_replace("#($search)#iu", "<span style='color:#FF0000; background:#FFFF00;'>$1</span>", $html);
+    }
+
+    /**
+     * @param $amount
+     * @return float
+     */
+    public static function roundBy50000UP($amount)
+    {
+        $t_p=ceil($amount/100000) * 100000;// 120 рублей ровно
+        return ($t_p-$amount)>=50000?$t_p-50000:$t_p;
     }
 }

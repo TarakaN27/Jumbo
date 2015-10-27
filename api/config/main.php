@@ -56,9 +56,20 @@ return [
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'except' => ['delete', 'create', 'update','index'], //запрещаем действия
                     'controller' => ['v1/technical' => 'v1/technical'],
                     'extraPatterns' => [    //дополнительные экшены
                         'GET ping' => 'ping', // 'xxxxx' refers to 'actionXxxxx'
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'except' => ['delete', 'update','index'], //запрещаем действия
+                    'controller' => ['v1/promised' => 'v1/promised'],
+                    'extraPatterns' => [    //дополнительные экшены
+                        'POST promised-payment' => 'promised-payment', // 'xxxxx' refers to 'actionXxxxx'
+                        'POST get-services' => 'get-services', // 'xxxxx' refers to 'actionXxxxx'
+                        'POST create' => 'create', // 'xxxxx' refers to 'actionXxxxx'
                     ],
                 ],
             ],
