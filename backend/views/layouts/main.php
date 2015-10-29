@@ -46,7 +46,7 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
     $subItems[] = ['label' => Yii::t('app/book', 'BOOK_payment_condition'), 'url' => ['/bookkeeping/payment-condition/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill template'), 'url' => ['/documents/bill-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill docx template'), 'url' => ['/documents/bill-docx-template/index']];
-
+    $subItems[] = ['label' => Yii::t('app/common', 'Acts template'), 'url' => ['/documents/acts-template/index']];
     $menuItems[] = [
         'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),
         'items' => $subItems,
@@ -160,6 +160,13 @@ $menuItems[] = [
                                 <li><a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
+
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/acts/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_acts'); ?></a>
+                                            </li>
+                                        <?php endif;?>
+
                                         <?php if(Yii::$app->user->can('forAll')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>

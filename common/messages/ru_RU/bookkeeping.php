@@ -121,6 +121,9 @@ return [
     'Amount can not be more than ' => 'Сумма платежа не может быть больше чем ',
     'Service id' => 'Услуга',
     'The user {user} has promised payment overdue for services <br>{services}' =>
-        'Пользователь {user} просрочил обещанный платеж по следующим услуге(ам):<br>{services}'
+        'Пользователь {user} просрочил обещанный платеж по следующим услуге(ам):<br>{services}',
+    'Buser Id P' => 'Кто погасил платеж',
+    'BOOK_acts' => 'Акты',
+    'Create Acts' => 'Добавить акт'
 
 ];

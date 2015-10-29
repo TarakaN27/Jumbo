@@ -179,10 +179,10 @@ class PromisedPayment extends AbstractActiveRecord
         $time = time()-3600*24*self::OVERDUE_DAYS;
 
         return self::find()
-            //->where('paid_date > :pay_date',[':pay_date' => $time])
-           // ->andWhere('paid != :paid OR paid is NULL',[
-           //     ':paid' => self::YES
-          //  ])
+           ->where('paid_date > :pay_date',[':pay_date' => $time])
+            ->andWhere('paid != :paid OR paid is NULL',[
+                ':paid' => self::YES
+            ])
             ->with('service','cuser.requisites')
             ->all();
     }

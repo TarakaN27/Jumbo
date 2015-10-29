@@ -47,6 +47,8 @@ return [
     'Template not found' => 'Шаблон не найден',
     'Legal person found' => 'Юр. лицо найдено',
     'Legal person not found' => 'Юр. лицо не найдено',
-    'External' => 'Внешний'
+    'External' => 'Внешний',
+    'Create Acts Template' => 'Добавить новый шаблон актов',
+    'Path' => 'Файл'
 
 ];
