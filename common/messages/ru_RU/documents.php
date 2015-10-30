@@ -49,6 +49,18 @@ return [
     'Legal person not found' => 'Юр. лицо не найдено',
     'External' => 'Внешний',
     'Create Acts Template' => 'Добавить новый шаблон актов',
-    'Path' => 'Файл'
-
+    'Path' => 'Файл',
+    'Act number' => 'Номер акта',
+    'Act numbers' => 'Номера актов',
+    'Statistic' => 'Статистика',
+    'Total numbers' => 'Всего номеров',
+    'Available' => 'Доступно',
+    'Manage' => 'Управление',
+    'Value' => 'Значение',
+    'Range' => 'Диапазон',
+    'Add' => 'Добавить',
+    'Remove' => 'Удалить',
+    'Show' => 'Показать',
+    'View' => 'Просмотр',
+    'Allow' => 'Доступно'
 ];

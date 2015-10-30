@@ -114,12 +114,15 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
      * @return mixed|null|static
      * @throws \yii\web\NotFoundHttpException
      */
-    public static function findOneByIDCached($model_id)
+    public static function findOneByIDCached($model_id,$throwExc = TRUE)
     {
         $cacheKey = get_called_class().':' . $model_id;
         if (false === $model = Yii::$app->cache->get($cacheKey)) {
             if (null === $model = self::findOne($model_id))
-                throw new NotFoundHttpException;
+                if($throwExc)
+                    throw new NotFoundHttpException('Model not found');
+                else
+                    return $model;
             Yii::$app->cache->set(
                 $cacheKey,
                 $model,

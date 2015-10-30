@@ -29,6 +29,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'yii\grid\SerialColumn'],
                         ['class' => 'yii\grid\CheckboxColumn'],
                         [
+                            'attribute' => 'act_num',
+                            'format' => 'html',
+                            'value' => function($model){
+                                return Html::a($model->act_num,['update','id' => $model->id],['class' => 'link-upd']);
+                            }
+                        ],
+                        [
                             'attribute' => 'amount',
                             'format' => 'html',
                             'value' => function($model){

@@ -19,6 +19,7 @@ use Yii;
  * @property integer $change
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $act_num
  *
  * @property ActsTemplate $template
  * @property BUser $buser
@@ -46,7 +47,7 @@ class Acts extends AbstractActiveRecord
     {
         return [
             [['cuser_id', 'buser_id', 'service_id', 'template_id', 'amount'], 'required'],
-            [['cuser_id', 'buser_id', 'service_id', 'template_id', 'sent', 'change', 'created_at', 'updated_at'], 'integer'],
+            [['act_num','cuser_id', 'buser_id', 'service_id', 'template_id', 'sent', 'change', 'created_at', 'updated_at'], 'integer'],
             [['act_date'], 'safe'],
             ['act_date','date', 'format' => 'yyyy-m-dd'],
             [['amount'], 'string', 'max' => 255]
@@ -70,6 +71,7 @@ class Acts extends AbstractActiveRecord
             'change' => Yii::t('app/documents', 'Change'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
+            'act_num' => Yii::t('app/documents', 'Act number')
         ];
     }
 
@@ -107,7 +109,7 @@ class Acts extends AbstractActiveRecord
 
     public function afterSave($insert, $changedAttributes)
     {
-        if($insert)
+        //if($insert)
 
 
         return parent::afterSave($insert, $changedAttributes);

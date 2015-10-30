@@ -18,7 +18,7 @@ class ActsSearch extends Acts
     public function rules()
     {
         return [
-            [['id', 'cuser_id', 'buser_id', 'service_id', 'template_id', 'sent', 'change', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'act_num' ,'cuser_id', 'buser_id', 'service_id', 'template_id', 'sent', 'change', 'created_at', 'updated_at'], 'integer'],
             [['amount', 'act_date'], 'safe'],
         ];
     }
@@ -57,6 +57,7 @@ class ActsSearch extends Acts
 
         $query->andFilterWhere([
             'id' => $this->id,
+            'act_num' => $this->act_num,
             'cuser_id' => $this->cuser_id,
             'buser_id' => $this->buser_id,
             'service_id' => $this->service_id,
