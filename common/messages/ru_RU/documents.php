@@ -62,5 +62,11 @@ return [
     'Remove' => 'Удалить',
     'Show' => 'Показать',
     'View' => 'Просмотр',
-    'Allow' => 'Доступно'
+    'Allow' => 'Доступно',
+    'Template ID' => 'Шаблон',
+    'Legal person' => 'Юр. лицо',
+    'File name' => 'Файл',
+    'Generate document' => 'Сгенерировать документ'
+
+
 ];

@@ -8,92 +8,86 @@
 
 namespace common\components\acts;
 
-
+use common\components\helpers\CustomHelper;
+use common\models\Acts;
 use common\models\ActsTemplate;
 use common\models\CUser;
 use common\models\LegalPerson;
 use common\models\Services;
-use yii\base\Exception;
+use PhpOffice\PhpWord\Exception\Exception;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use Gears\Pdf;
 
 class ActsDocuments
 {
 	public
+        $bUseVat = FALSE,
+        $actDate = NULL,
+        $dVatRate = NULL,
 		$iTplID = NULL,
 		$iCuserID = NULL,
 		$iServID = NULL,
-		$iActID = NULL,
+		$iActNum = NULL,
 		$iLegPersID = NULL,
 		$amount = NULL;
 
 
 	protected
+        $fileName = NULL,
 		$data = [],
-		$LPInfo = [ //параметры юр лица
+		$lPInfo = [ //параметры юр лица
 			'legalName' => '',
-			'legalReq' => '',
+			'legalRequisites' => '',
 			'site' => '',
 			'email' => ''
 		],
-		$CntrInfo = [   //параметры контрагента
-			'corpName' => '',
-			'requisites' => '',
-			'address' => '',
-			'email' => '',
-			'site' => ''
+		$cntrInfo = [   //параметры контрагента
+            'contrCorpName' =>'',
+            'contrRequisites' =>'',
+            'contrAddress' => '',
+            'contrEmail' => '',
+            'contrSite' => ''
 		];
 
 
 	CONST
-		FOLDER_RIGHT = 0777,
-		ACTS_PATH = '@common/upload/docx_acts';
+		FOLDER_RIGHT = 0777;
 
-	/**
-	 * @param $iTplID
-	 * @param $iCuserID
-	 * @param $iServID
-	 * @param $amount
-	 * @throws Exception
-	 */
-	public function __construct($iActID,$iTplID,$iLegPersID,$iCuserID,$iServID,$amount)
+
+    /**
+     * @param $iActNum
+     * @param $iTplID
+     * @param $iLegPersID
+     * @param $iCuserID
+     * @param $iServID
+     * @param $amount
+     * @param $useVat
+     * @param $vatRate
+     */
+    public function __construct($iActNum,$actDate,$iTplID,$iLegPersID,$iCuserID,$iServID,$amount,$useVat,$vatRate)
 	{
-		$this->iActID = $iActID;
+		$this->iActNum = $iActNum;
+        $this->actDate = $actDate;
 		$this->iTplID = $iTplID;
 		$this->iLegPersID = $iLegPersID;
-		$this->$iCuserID = $iCuserID;
+		$this->iCuserID = $iCuserID;
 		$this->iServID = $iServID;
-		$amount = $amount;
+		$this->amount = $amount;
+        $this->bUseVat = $useVat;
+        $this->dVatRate = $vatRate;
 
-		if(!$this->isDirExist())    //проверяем чтобы существовала директория(если нет, то пробуем создать)
-			throw new Exception('Folder for acts not exist!!');
+		if(!CustomHelper::isDirExist(Acts::FILE_PATH))    //проверяем чтобы существовала директория(если нет, то пробуем создать)
+			throw new NotFoundHttpException('Folder for acts not exist!!');
 	}
 
-
-	/**
-	 * @return bool
-	 */
-	protected function isDirExist()
-	{
-		$path = \Yii::getAlias(self::ACTS_PATH);
-		//проверяем ,что папка существует
-		if(is_dir($path))
-			return TRUE;
-
-		//создаем папку и назначаем права
-		if(mkdir($path,self::FOLDER_RIGHT))
-		{
-			return TRUE;
-		}
-
-		return FALSE;
-	}
 
 	/**
 	 * @return string
 	 */
 	protected function generateName()
 	{
-		return 'Act_'.uniqid().'.docx';
+		return $this->fileName = 'Act_'.uniqid();
 	}
 
 	/**
@@ -102,7 +96,7 @@ class ActsDocuments
 	 */
 	protected function generateRealPath($name)
 	{
-		return \Yii::getAlias(self::ACTS_PATH).'/'.$name;
+		return \Yii::getAlias(Acts::FILE_PATH).'/'.$name;
 	}
 
 	/**
@@ -130,35 +124,155 @@ class ActsDocuments
 		return $obCuser;
 	}
 
-
-	protected function getLegalPerson()
+    /**
+     * @return array
+     */
+    protected function getLegalPerson()
 	{
 		/** @var LegalPerson $obLP */
 		$obLP = LegalPerson::findOneByIDCached($this->iLegPersID);
 
-		return $this->LPInfo = [
+		return $this->lPInfo = [
 			'legalName' => $obLP->name,
-			'legalReq' => $obLP->doc_requisites,
+			'legalRequisites' => $obLP->doc_requisites,
 			'site' => $obLP->doc_site,
 			'email' => $obLP->doc_email
 		];
 	}
 
+    /**
+     * @return array
+     */
+    protected function getCuser()
+    {
+        $obCUser = $this->getCUserRequisites();
+        if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
+        {
+            $this->cntrInfo = [   //параметры контрагента
+                'contrCorpName' => !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo(),
+                'contrRequisites' =>'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp,
+                'contrAddress' => $obR->j_address,
+                'contrEmail' => $obR->c_email,
+                'contrSite' => ''
+            ];
+        }
+        return $this->cntrInfo;
+    }
+
+    protected function getData($obServ)
+    {
+        return [
+            'actNumber' => $this->iActNum,
+            'actDate' => $this->actDate,
+            'n' => 1,
+            'serviceName' => $obServ->name,
+            'price' => $this->getPrice(),
+            'amount' => $this->amount,
+            'vat' => $this->getVat(),
+            'vatAmount' => $this->getVatAmount(),
+            'amountWithVat' => $this->amount,
+            'fullAmount' => $this->amount,
+            'totalAmountWords' => $this->getTotalAmountWords()
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTotalAmountWords()
+    {
+        $str = CustomHelper::numPropis($this->amount).' белорусских '.
+            CustomHelper::ciRub($this->amount);
+
+        if(!$this->bUseVat)
+            $str.= ' без НДС';
+        else
+            $str.=',в т.ч.: НДС - '.CustomHelper::numPropis($this->getVatAmount()).' белорусских '.
+                CustomHelper::ciRub($this->getVatAmount());
+
+        return $str;
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getVatAmount()
+    {
+        if(!$this->bUseVat)
+            return '--';
+
+        return $this->amount - $this->getPrice();
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getVat()
+    {
+        if(!$this->bUseVat)
+            return '--';
+        else
+            return $this->dVatRate;
+    }
+
+    /**
+     * @return float|null
+     */
+    protected function getPrice()
+    {
+        if(!$this->bUseVat)
+            return $this->amount;
+
+        return round($this->amount/(1+$this->dVatRate/100),-3);
+    }
 
 	public function generateDocument()
 	{
+        /** @var ActsTemplate $obTpl */
 		$obTpl = $this->getTemplate();  //шаблон для акта
 		$arLP = $this->getLegalPerson(); //данные о юр лице
+        $obServ = Services::findOneByIDCached($this->iServID); //услуга
+        $arCntr = $this->getCuser(); //контрагент
+        $arData = $this->getData($obServ);
+        $fileName = $this->generateName();
+        $realPath = $this->generateRealPath($fileName.'.docx');
 
-
-
+        try{
+            $obDoc =  new \PhpOffice\PhpWord\TemplateProcessor($obTpl->getFilePath());
+            $arData = ArrayHelper::merge($arLP,$arCntr ,$arData);
+            foreach($arData as $key => $value)    //пишем данные
+                $obDoc->setValue($key,$value);
+            $obDoc->saveAs($realPath);
+        }catch (Exception $e)
+        {
+            return FALSE;
+        }
+        return file_exists($realPath) ? $fileName.'.docx' : NULL;
 	}
 
+    /**
+     * @return null
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
 
-
-
-
-
-
-
+    /**
+     * @return null|string
+     */
+    public function generatePDF()
+    {
+        if($docFile = $this->generateDocument()) //генерируем .docx
+        {
+            $pdfTryPath = $this->generateRealPath($this->fileName.'.pdf'); //путь к pdf
+            $docTryPath = $this->generateRealPath($docFile);
+            Pdf::convert($docTryPath,$pdfTryPath); //конверитируем .docx => .pdf
+            if(file_exists($pdfTryPath))
+            {
+                return $this->fileName.'.pdf';
+            }
+        }
+        return NULL;
+    }
 }

@@ -290,4 +290,26 @@ class CustomHelper {
         $t_p=ceil($amount/100000) * 100000;// 120 рублей ровно
         return ($t_p-$amount)>=50000?$t_p-50000:$t_p;
     }
+
+    /**
+     * @param $path
+     * @param int $rights
+     * @return bool
+     */
+    public static function isDirExist($path,$rights = 0777)
+    {
+        $path = \Yii::getAlias($path);
+        //проверяем ,что папка существует
+        if(is_dir($path))
+            return TRUE;
+
+        //создаем папку и назначаем права
+        if(mkdir($path,$rights))
+        {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
 }
