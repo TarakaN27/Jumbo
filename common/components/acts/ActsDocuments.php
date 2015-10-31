@@ -272,6 +272,7 @@ class ActsDocuments
             {
                 return $this->fileName.'.pdf';
             }
+            @unlink($docTryPath);
         }
         return NULL;
     }
