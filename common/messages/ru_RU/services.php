@@ -55,6 +55,16 @@ return [
     'Doc Email' => 'Email для документов',
     'Doc Site' => 'Сайт для документов',
     'Use vat' => 'Использовать НДС',
-    'Docx ID' => 'Шаблон генерации счетов'
+    'Docx ID' => 'Шаблон генерации счетов',
+    'Legal person' => 'Юр. лицо',
+    'Contract number' => 'Номер договора',
+    'Contract date' => 'Дата договора',
+    'Services default contacts' => 'Договора по-умолчанию',
+    'save' => 'Сохранить',
+    'Default Contracts' => 'Договора по-умолчанию',
+    'Settings' => 'Настройки',
+    'Act template' => 'Шаблон для акта'
+
+
 
 ];

@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         return '
                                                             <div class="btn-group">
                                                 <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
-                                                    '.Yii::t('app/book','Settings').' <span class="caret"></span>
+                                                    '.Yii::t('app/users','Settings').' <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                      <li>
@@ -101,6 +101,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     </li>
                                                     <li>
                                                         '.Html::a(Yii::t('app/users','External account'),['external-account','iCID' => $model->id]).'
+                                                    </li>
+                                                    <li>
+                                                        '.Html::a(Yii::t('app/users','Services contract'),['services-contract','iCID' => $model->id]).'
                                                     </li>
                                                 </ul>
                                             </div>

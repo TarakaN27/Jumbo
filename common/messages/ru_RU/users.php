@@ -138,6 +138,16 @@ return [
     'Passwords do not match' => 'Пароли не совпадают',
     'This login has already taken in external system.' => 'Логин занят, выберите другой',
     'Pp Max' => 'Максимальная сумма обещанного платежа',
-    'Pp Percent' => 'Процент для обещанного платежа'
+    'Pp Percent' => 'Процент для обещанного платежа',
+    'Settings' => 'Настройки',
+    'Prefer condition' => 'Предопределенные условия',
+    'External account' => 'Внешние аккаунты',
+    'Services contract' => 'Договора услуг',
+    'Legal person' => 'Юр. лицо',
+    'Contract number' => 'Номер договора',
+    'Contract date' => 'Дата договора',
+    'Services default contacts' => 'Договора по-умолчанию',
+    'save' => 'Сохранить',
+    'Service' => 'Услуга'
 
 ];

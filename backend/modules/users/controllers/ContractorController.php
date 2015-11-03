@@ -8,6 +8,7 @@ use common\components\csda\CSDAConnector;
 use common\models\CuserExternalAccount;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
+use common\models\CuserServiceContract;
 use common\models\Services;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Yii;
@@ -363,5 +364,60 @@ class ContractorController extends AbstractBaseBackendController
                 break;
         }
         throw new InvalidArgumentException('Invalid type');
+    }
+
+    /**
+     * @param $iCID
+     * @return array
+     */
+    public function actionServicesContract($iCID)
+    {
+        $arService  = Services::getServicesMap();
+        $arCSCTmp= CuserServiceContract::find()->where(['cuser_id' => $iCID])->all();
+
+        $arCSC = [];
+        foreach($arCSCTmp as $csc)
+            $arCSC[$csc->service_id] = $csc;
+
+        $arNumber = Yii::$app->request->post('number'); //номера договоров
+        $arDate = Yii::$app->request->post('date'); //даты договров
+
+        if(is_array($arNumber) && is_array($arDate))
+        {
+            $trans = Yii::$app->db->beginTransaction(); // начинаем транзакцию, так как редактируем много записей
+            $bError = false;
+            CuserServiceContract::deleteAll(['cuser_id' => $iCID]); //удаляем всме предыдущие настройки
+            foreach($arNumber as $key=>$num)
+            {
+                /** @var ServiceDefaultContract $obSDC */
+                $obSDC = new CuserServiceContract();
+                $obSDC->cuser_id = $iCID;
+                $obSDC->service_id = $key;
+                $obSDC->cont_number = $num;
+                $obSDC->cont_date = isset($arDate[$key]) ? $arDate[$key] : NULL;
+                if(!$obSDC->save())
+                {
+                    $bError = TRUE;
+                    break;
+                }
+                unset($obSDC);
+            }
+
+            if(!$bError)
+            {
+                $trans->commit();
+                Yii::$app->session->setFlash('success','Изменения успешно сохранены');
+                return $this->redirect(['index']);
+            }else{
+
+                Yii::$app->session->setFlash('error','Ошибка');
+                $trans->rollBack();
+            }
+        }
+
+        return $this->render('service_contract',[
+            'arService' => $arService,
+            'arCSC' => $arCSC
+        ]);
     }
 }

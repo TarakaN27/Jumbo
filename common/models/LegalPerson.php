@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property string $doc_email
  * @property integer $use_vat
  * @property integer $docx_id
+ * @property integer $act_tpl_id
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -40,7 +41,7 @@ class LegalPerson extends AbstractActiveRecord
     {
         return [
             [['description','doc_requisites'], 'string'],
-            [['status', 'created_at', 'updated_at','use_vat','docx_id'], 'integer'],
+            [['status', 'created_at', 'updated_at','use_vat','docx_id','act_tpl_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
@@ -63,7 +64,8 @@ class LegalPerson extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'doc_requisites' => Yii::t('app/services','Requisites for documents'),
             'use_vat' => Yii::t('app/services', 'Use vat'),
-            'docx_id' => Yii::t('app/services', 'Docx ID')
+            'docx_id' => Yii::t('app/services', 'Docx ID'),
+            'act_tpl_id' => Yii::t('app/services', 'Act template')
         ];
     }
 
@@ -110,5 +112,13 @@ class LegalPerson extends AbstractActiveRecord
     public function getDocx()
     {
         return $this->hasOne(BillDocxTemplate::className(),['id'=>'docx_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActTemplate()
+    {
+        return $this->hasOne(ActsTemplate::className(),['id' => 'act_tpl_id']);
     }
 }

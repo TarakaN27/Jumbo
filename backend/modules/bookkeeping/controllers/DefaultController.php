@@ -6,13 +6,16 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use common\components\payment\PaymentOperations;
 use common\models\CUser;
+
 use common\models\Dialogs;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
+
 use Yii;
 use common\models\Payments;
 use common\models\search\PaymentsSearch;
+
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -48,7 +51,9 @@ class DefaultController extends AbstractBaseBackendController
         $tmp['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                'delete' => ['post','get-manager'],
+                'delete' => ['post'],
+                'get-manager' => ['post'],
+                'find-contact-number' => ['post']
             ],
         ];
 
@@ -347,4 +352,6 @@ class DefaultController extends AbstractBaseBackendController
 
         return ['mID' => $obCtr->manager_id];
     }
+
+
 }

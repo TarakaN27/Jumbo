@@ -2,12 +2,18 @@
 
 namespace backend\modules\bookkeeping\controllers;
 
+use common\models\LegalPerson;
 use Yii;
 use common\models\Acts;
 use common\models\search\ActsSearch;
 use backend\components\AbstractBaseBackendController;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use yii\base\InvalidParamException;
+use common\models\ServiceDefaultContract;
+use common\models\CuserServiceContract;
+use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * ActsController implements the CRUD actions for Acts model.
@@ -31,6 +37,13 @@ class ActsController extends AbstractBaseBackendController
                     'roles' => ['superadmin','bookkeeper']
                 ]
             ]
+        ];
+        $tmp['verbs'] = [
+            'class' => VerbFilter::className(),
+            'actions' => [
+                'find-contact-number' => ['post'],
+                'find-act-template' => ['post']
+            ],
         ];
         return $tmp;
     }
@@ -127,5 +140,62 @@ class ActsController extends AbstractBaseBackendController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @return array|null
+     */
+    public function actionFindContactNumber()
+    {
+        $iCID = Yii::$app->request->post('iCID');
+        $iServ = Yii::$app->request->post('iServ');
+        $iLP = Yii::$app->request->post('iLP');
+
+        if(!$iCID || !$iServ || !$iLP)
+            throw new InvalidParamException('contractor id and service id must be set');
+
+        Yii::$app->response->format = Response::FORMAT_JSON;    //указываем что отдаем json
+        /** @var CuserServiceContract $obCSC */
+        $obCSC = CuserServiceContract::findOne(['cuser_id' => $iCID,'service_id' => $iServ]);
+        if($obCSC && $obCSC->cont_number && $obCSC->cont_date)
+            return ['num' => $obCSC->cont_number, 'date' => $obCSC->cont_date];
+        /** @var ServiceDefaultContract $obDSC */
+        $obDSC = ServiceDefaultContract::findOne(['service_id' => $iServ,'lp_id' => $iLP]);
+        if(!$obDSC)
+            return NULL;
+
+        return ['num' => $obDSC->cont_number, 'date' => $obDSC->cont_date];
+
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionFindActTemplate()
+    {
+        $iLP = Yii::$app->request->post('iLP');
+
+        if(!$iLP)
+            throw new InvalidParamException('contractor id and service id must be set');
+        /** @var LegalPerson $obLP */
+        $obLP = LegalPerson::findOneByIDCached($iLP);
+        Yii::$app->response->format = Response::FORMAT_JSON;    //указываем что отдаем json
+        return ['tpl' => $obLP->act_tpl_id];
+    }
+
+    /**
+     * @param $ask
+     * @return $this
+     * @throws NotFoundHttpException
+     */
+    public function actionDownloadFile($ask)
+    {
+        /** @var Acts $obAct */
+        $obAct = Acts::findOne(['ask' => $ask]);
+        if(!$obAct)
+            throw new NotFoundHttpException('Acts not found');
+
+        return $obAct->getDocument();
     }
 }

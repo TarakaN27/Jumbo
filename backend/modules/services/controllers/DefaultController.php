@@ -3,6 +3,8 @@
 namespace backend\modules\services\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\LegalPerson;
+use common\models\ServiceDefaultContract;
 use Yii;
 use common\models\Services;
 use common\models\search\ServicesSearch;
@@ -132,5 +134,61 @@ class DefaultController extends AbstractBaseBackendController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws \yii\db\Exception
+     */
+    public function actionDefaultContracts($id)
+    {
+        $models = ServiceDefaultContract::find()->where(['service_id' => $id])->all();
+        $legalPerson = LegalPerson::getLegalPersonMap();
+
+        $arDC = [];
+        foreach($models as $mod)
+            $arDC[$mod->lp_id] = $mod;
+
+        $arNumber = Yii::$app->request->post('number');
+        $arDate = Yii::$app->request->post('date');
+
+        if(is_array($arNumber) && is_array($arDate))
+        {
+            $trans = Yii::$app->db->beginTransaction();
+            $bError = false;
+            ServiceDefaultContract::deleteAll(['service_id' => $id]);
+            foreach($arNumber as $key=>$num)
+            {
+                /** @var ServiceDefaultContract $obSDC */
+                $obSDC = new ServiceDefaultContract();
+                $obSDC->service_id = $id;
+                $obSDC->lp_id = $key;
+                $obSDC->cont_number = $num;
+                $obSDC->cont_date = isset($arDate[$key]) ? $arDate[$key] : NULL;
+                if(!$obSDC->save())
+                {
+                    $bError = TRUE;
+                    break;
+                }
+                unset($obSDC);
+            }
+
+            if(!$bError)
+            {
+                $trans->commit();
+                Yii::$app->session->setFlash('success','Изменения успешно сохранены');
+                return $this->redirect(['index']);
+            }else{
+
+                Yii::$app->session->setFlash('error','Ошибка');
+                $trans->rollBack();
+            }
+        }
+        return $this->render('default_contracts',[
+            'legalPerson' => $legalPerson,
+            'arDC' => $arDC
+        ]);
+
     }
 }

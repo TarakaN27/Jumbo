@@ -74,6 +74,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
+                            'template' => '{dwld}',
+                            'buttons' => [
+                                'dwld' => function($url, $model, $key){
+                                    $options = [
+                                        'title' => Yii::t('app/common', 'Download'),
+                                        'aria-label' => Yii::t('app/common', 'Download'),
+                                        'target' => '_blank',
+                                    ];
+                                    $url = \yii\helpers\Url::to(['download-file','ask' => $model->ask]);
+                                    return Html::a('<span class="glyphicon glyphicon-download-alt"></span>', $url, $options);
+                                }
+                            ]
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
                             'template' => '{update}{view}'
                         ],
                         [

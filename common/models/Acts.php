@@ -29,8 +29,8 @@ use yii\web\ServerErrorHttpException;
  * @property integer $lp_id
  * @property string $file_name
  * @property string $ask
- * @property double $vat_rate
- * @property integer $use_vat
+ * @property string $contract_date
+ * @property string $contract_num
  *
  * @property ActsTemplate $template
  * @property BUser $buser
@@ -67,17 +67,16 @@ class Acts extends AbstractActiveRecord
                 'act_num','cuser_id','lp_id' ,
                 'buser_id', 'service_id', 'template_id',
                 'sent', 'change', 'created_at',
-                'use_vat','updated_at','genFile'], 'integer'],
+                'updated_at','genFile'], 'integer'],
             [['act_date'], 'safe'],
-            [['vat_rate'], 'number'],
             [['ask'],'unique'],
-            ['act_date','date', 'format' => 'yyyy-m-dd'],
-            [['amount','ask'], 'string', 'max' => 255],
+            [['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
+            [['amount','ask','contract_num'], 'string', 'max' => 255],
             ['file_name','file','on' => ['insert', 'update'],'when' => function($model) {
-                return !$model->$genFile;
+                return !$model->genFile;
             }],
             ['file_name','required','on' => ['insert'],'when' => function($model) {
-                    return !$model->$genFile;
+                    return !$model->genFile;
                 }],
         ];
     }
@@ -103,7 +102,9 @@ class Acts extends AbstractActiveRecord
             'lp_id' =>  Yii::t('app/documents', 'Legal person'),
             'file_name' => Yii::t('app/documents', 'File name'),
             'ask' => Yii::t('app/documents', 'Act secret key'),
-            'genFile' => Yii::t('app/documents','Generate document')
+            'genFile' => Yii::t('app/documents','Generate document'),
+            'contract_num' => Yii::t('app/documents', 'Contract number'),
+            'contract_date' => Yii::t('app/documents', 'Contract date')
         ];
     }
 
@@ -180,8 +181,8 @@ class Acts extends AbstractActiveRecord
                     $this->cuser_id,
                     $this->service_id,
                     $this->amount,
-                    $this->use_vat,
-                    $this->vat_rate
+                    $this->contract_num,
+                    $this->contract_date
                 );
                 $fileName = $obActs->generatePDF();
                 if(empty($fileName))

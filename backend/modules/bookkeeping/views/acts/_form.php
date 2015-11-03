@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
+use Yii;
 /* @var $this yii\web\View */
 /* @var $model common\models\Acts */
 /* @var $form yii\widgets\ActiveForm */
@@ -22,11 +23,88 @@ function checkGen()
             file.removeAttr('disabled');
         }
 }
+function findContractNumber()
+{
+    var
+        iCID = $('#acts-cuser_id').val(),
+        iLP = $('#acts-lp_id').val(),
+        iServ = $('#acts-service_id').val();
+
+    if(iCID && iServ && iLP)
+        {
+            $.ajax({
+                type: \"POST\",
+                cache: false,
+                url: '".\yii\helpers\Url::to(['find-contact-number'])."',
+                dataType: \"json\",
+                data: {iCID:iCID,iServ:iServ,iLP:iLP},
+                success: function(msg){
+                    if(!msg)
+                      {
+                            addWarningNotify('".Yii::t('app/book','Find contract number request')."','".Yii::t('app/book','Find contract number request FAIL')."');
+
+                      }else{
+
+                            $('#acts-contract_date').val(msg.date);
+                            $('#acts-contract_num').val(msg.num);
+                            addSuccessNotify('".Yii::t('app/book','Find contract number request')."','".Yii::t('app/book','Contract detail successfully find')."');
+                      }
+                },
+                error: function(msg){
+                    addErrorNotify('".Yii::t('app/book','Find contract number request')."','".Yii::t('app/book','Server error')."');
+                    return false;
+                }
+            });
+        }
+
+    return false;
+}
+
+function findActTemplate()
+{
+    var
+        iLP = $('#acts-lp_id').val();
+
+    if(iLP)
+            {
+                $.ajax({
+                    type: \"POST\",
+                    cache: false,
+                    url: '".\yii\helpers\Url::to(['find-act-template'])."',
+                    dataType: \"json\",
+                    data: {iLP:iLP},
+                    success: function(msg){
+                        if(!msg)
+                          {
+                                addWarningNotify('".Yii::t('app/book','Find act template request')."','".Yii::t('app/book','Find act template request FAIL')."');
+
+                          }else{
+                                $('#acts-template_id').val(msg.tpl);
+                                addSuccessNotify('".Yii::t('app/book','Find act template request')."','".Yii::t('app/book','Act template successfully find')."');
+                          }
+                    },
+                    error: function(msg){
+                        addErrorNotify('".Yii::t('app/book','Find act template request')."','".Yii::t('app/book','Server error')."');
+                        return false;
+                    }
+                });
+            }
+
+        return false;
+
+}
 ",\yii\web\View::POS_END);
 $this->registerJs("
 $('.form-group').on('change','#acts-genfile',function(){
     checkGen();
-})
+});
+$('#acts-cuser_id,#acts-lp_id,#acts-service_id').on('change',function(){
+    findContractNumber();
+});
+$('#acts-lp_id').on('change',function(){
+    findActTemplate();
+});
+
 ",\yii\web\View::POS_READY)
 ?>
 
@@ -51,18 +129,27 @@ $('.form-group').on('change','#acts-genfile',function(){
         ],
     ]); ?>
 
-
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
         'prompt' => Yii::t('app/book','BOOK_choose_service')
     ]) ?>
-
-    <?= $form->field($model, 'template_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap()) ?>
 
     <?= $form->field($model,'lp_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap(),[
         'prompt' => Yii::t('app/book','Choose legal person')
     ])?>
 
     <?= $form->field($model, 'amount')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model,'contract_num')->textInput()?>
+
+    <?= $form->field($model,'contract_date')->widget(\kartik\date\DatePicker::className(),[
+        'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
+        'pluginOptions' => [
+            'autoclose'=>true,
+            'format' => 'yyyy-m-dd'
+        ]
+    ])?>
+
+    <?= $form->field($model, 'template_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap()) ?>
 
     <?= $form->field($model,'act_num')->textInput()?>
 

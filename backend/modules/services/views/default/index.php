@@ -70,6 +70,24 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                 ],
                 [
+                    'label' => '',
+                    'format' => 'raw',
+                    'value' => function($model){
+                        return '
+                                                            <div class="btn-group">
+                                                <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
+                                                    '.Yii::t('app/services','Settings').' <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                     <li>
+                                                        '.Html::a(Yii::t('app/services','Default Contracts'),['default-contracts','id' => $model->id]).'
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                                            ';
+                    }
+                ],
+                [
                     'class' => 'yii\grid\ActionColumn',
                     'template'=>$viewTpl
                 ],

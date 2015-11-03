@@ -22,15 +22,17 @@ use Gears\Pdf;
 class ActsDocuments
 {
 	public
-        $bUseVat = FALSE,
-        $actDate = NULL,
-        $dVatRate = NULL,
-		$iTplID = NULL,
-		$iCuserID = NULL,
-		$iServID = NULL,
-		$iActNum = NULL,
-		$iLegPersID = NULL,
-		$amount = NULL;
+        $cntrDate = NULL,   // дата контракта
+        $cntrNumber = NULL, // номер  контракта
+        $bUseVat = FALSE,   // использовать НДС
+        $actDate = NULL,    // дата акта
+        $dVatRate = NULL,   // величина НДС в процентах
+		$iTplID = NULL,     // ID шаблона для акта
+		$iCuserID = NULL,   // ID контрагента
+		$iServID = NULL,    // ID услуги
+		$iActNum = NULL,    // номер акта
+		$iLegPersID = NULL, // ID юр. лица
+		$amount = NULL;     // сумма акта
 
 
 	protected
@@ -52,7 +54,7 @@ class ActsDocuments
 
 
 	CONST
-		FOLDER_RIGHT = 0777;
+		FOLDER_RIGHT = 0777; ///права на папку
 
 
     /**
@@ -65,7 +67,7 @@ class ActsDocuments
      * @param $useVat
      * @param $vatRate
      */
-    public function __construct($iActNum,$actDate,$iTplID,$iLegPersID,$iCuserID,$iServID,$amount,$useVat,$vatRate)
+    public function __construct($iActNum,$actDate,$iTplID,$iLegPersID,$iCuserID,$iServID,$amount,$cntrNumber,$cntrDate)
 	{
 		$this->iActNum = $iActNum;
         $this->actDate = $actDate;
@@ -74,8 +76,8 @@ class ActsDocuments
 		$this->iCuserID = $iCuserID;
 		$this->iServID = $iServID;
 		$this->amount = $amount;
-        $this->bUseVat = $useVat;
-        $this->dVatRate = $vatRate;
+        $this->cntrDate = $cntrDate;   // дата контракта
+        $this->cntrNumber = $cntrNumber;
 
 		if(!CustomHelper::isDirExist(Acts::FILE_PATH))    //проверяем чтобы существовала директория(если нет, то пробуем создать)
 			throw new NotFoundHttpException('Folder for acts not exist!!');
@@ -132,6 +134,12 @@ class ActsDocuments
 		/** @var LegalPerson $obLP */
 		$obLP = LegalPerson::findOneByIDCached($this->iLegPersID);
 
+        if($obLP)   //использование НДС определяем по ЮР. лицу
+        {
+            $this->bUseVat = $obLP->use_vat;
+            $this->dVatRate = CustomHelper::getVat();
+        }
+
 		return $this->lPInfo = [
 			'legalName' => $obLP->name,
 			'legalRequisites' => $obLP->doc_requisites,
@@ -159,9 +167,15 @@ class ActsDocuments
         return $this->cntrInfo;
     }
 
+    /**
+     * @param $obServ
+     * @return array
+     */
     protected function getData($obServ)
     {
         return [
+            'contractDate' => $this->cntrDate,
+            'contractNumber' => $this->cntrNumber,
             'actNumber' => $this->iActNum,
             'actDate' => $this->actDate,
             'n' => 1,
@@ -226,6 +240,10 @@ class ActsDocuments
         return round($this->amount/(1+$this->dVatRate/100),-3);
     }
 
+    /**
+     * @return bool|null|string
+     * @throws NotFoundHttpException
+     */
 	public function generateDocument()
 	{
         /** @var ActsTemplate $obTpl */

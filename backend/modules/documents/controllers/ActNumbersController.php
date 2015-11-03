@@ -16,7 +16,7 @@ class ActNumbersController extends AbstractBaseBackendController
 
 	public function actionIndex()
 	{
-		$obN
+		//$obN
 
 
 
