@@ -136,6 +136,11 @@ $menuItems[] = [
                                             <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
                                         </li>
                                         <?php endif;?>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                        <li>
+                                            <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
+                                        </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
                                 <li><a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>

@@ -148,6 +148,25 @@ return [
     'Contract date' => 'Дата договора',
     'Services default contacts' => 'Договора по-умолчанию',
     'save' => 'Сохранить',
-    'Service' => 'Услуга'
+    'Service' => 'Услуга',
+    'USER_partner' => 'Партнеры',
+    'Partners' => 'Партнеры',
+    'Create Partner' => 'Добавить партнера',
+    'Fname' => 'Имя' ,
+    'Lname' => 'Фамилия',
+    'Mname' => 'Отчество',
+    'Phone' => 'Телефон',
+    'Post Address' => 'Почтовый адрес',
+    'Psk' => 'Секретный ключ партнера',
+    'Update Partner: ' => 'Редактирование партнера:',
+    'Connect' => 'Дата подключения',
+    'Partner ID' => 'Партнер',
+    'Cuser ID' => 'Контрагент',
+    'Service ID' => 'Услуга',
+    'Create link' => 'Добавить связь',
+    'Link already exists' => 'Связь уже существет',
+    'Partner contractor serv' => 'Связь контрагенты и услуги'
+
+
 
 ];

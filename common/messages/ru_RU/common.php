@@ -61,6 +61,5 @@ return [
     'Alias' => 'Псевдоним',
     'Value' => 'Значение',
     'New value' => 'Новое значение',
-    'DIALOG_overdue_pp' => 'Обещ. платеж'
-
+    'DIALOG_overdue_pp' => 'Обещ. платеж',
 ];
