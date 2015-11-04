@@ -72,7 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ]) ?>
 
-                    <!-- @todo вынести в oтдельный виджет --->
+                    <!--
+                        @todo вынести в oтдельный виджет
+                        @todo сделать пагинацию
+                    --->
                     <!-- In production, only one script (pdf.js) is necessary -->
                     <!-- In production, change the content of PDFJS.workerSrc below -->
                     <script src="<?php echo Yii::getAlias('@web/js/pdfjs/src/shared/util.js') ?>"></script>
@@ -88,6 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         // In production, leave this undefined or change it to point to the
                         // combined `pdf.worker.js` file.
                         PDFJS.workerSrc = '<?php echo Yii::getAlias('@web/js/pdfjs/src/worker_loader.js') ?>';
+                        PDFJS.sideBarOpen=true ;
                         'use strict';
                         //
                         // Fetch the PDF document from the URL using promises
