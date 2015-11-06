@@ -165,7 +165,11 @@ return [
     'Service ID' => 'Услуга',
     'Create link' => 'Добавить связь',
     'Link already exists' => 'Связь уже существет',
-    'Partner contractor serv' => 'Связь контрагенты и услуги'
+    'Partner contractor serv' => 'Связь контрагенты и услуги',
+    'Purse payments' => 'Платежи',
+    'Purse acts' => 'Акты',
+    'Purse amount' => 'Баланс',
+    'Purse' => 'Кошелек'
 
 
 

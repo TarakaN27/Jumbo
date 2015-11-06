@@ -4,8 +4,10 @@ namespace common\models;
 
 use backend\models\BUser;
 use common\components\acts\ActsDocuments;
+use common\components\acts\PartnerProfitActBehavior;
 use common\components\behavior\UploadBehavior;
 use common\components\helpers\CustomHelper;
+use common\components\loggingUserBehavior\LogModelBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
@@ -208,6 +210,13 @@ class Acts extends AbstractActiveRecord
                 'scenarios' => ['insert', 'update'],
                 'path' => self::FILE_PATH.'/',
                 'url' => ''
+            ],
+            [
+                'class' => LogModelBehavior::className(),       //логирование актов
+                'ignored' => ['created_at','updated_at']
+            ],
+            [
+                'class' => PartnerProfitActBehavior::className()    //начисление прибыли партнерам
             ]
         ]);
     }

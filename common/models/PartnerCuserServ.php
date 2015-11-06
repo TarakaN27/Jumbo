@@ -2,10 +2,12 @@
 
 namespace common\models;
 
+use common\components\partner\PartnerLinkCuserServBehavior;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 
 use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%partner_cuser_serv}}".
@@ -111,5 +113,18 @@ class PartnerCuserServ extends AbstractActiveRecord
         return self::getDb()->cache(function($db) use ($partnerID){
             return self::find()->where(['partner_id' => $partnerID])->all($db);
         },86400,$obDep);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        return ArrayHelper::merge($tmp,[
+           [
+               'class' => PartnerLinkCuserServBehavior::className() //поведение для начисления прибыли партнерам
+           ]
+        ]);
     }
 }

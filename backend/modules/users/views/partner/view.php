@@ -6,9 +6,10 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Partner */
 
-$this->title = $model->id;
+$this->title = $model->getFio();
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Partners'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+$obPurse = \common\models\PartnerPurse::getPurse($model->id);
 ?>
     <div class = "row">
         <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -55,6 +56,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                             ],
                         ]) ?>
+
+                        <hr>
+                    <h3><?=Yii::t('app/users', 'Purse')?>:</h3>
+                    <?php if($obPurse):?>
+                        <?= DetailView::widget([
+                            'model' => \common\models\PartnerPurse::getPurse($model->id),
+                            'attributes' => [
+                                'payments',
+                                'acts',
+                                'amount',
+                            ]
+                        ])?>
+                    <?php else:?>
+                        <p><?=Yii::t('app/users', 'The partner does not have a purse')?></p>
+
+                    <?php endif;?>
                 </div>
             </div>
         </div>

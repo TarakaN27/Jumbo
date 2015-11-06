@@ -63,8 +63,10 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        Yii::$app->cache->flush();
-        //ManagerMsg::checkForOverduePromisedPayment();
+
+        $tmp = '2015-10-14' > '2015-10-13';
+        var_dump($tmp);die;
+
         return $this->render('index');
     }
 

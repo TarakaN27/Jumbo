@@ -62,4 +62,10 @@ return [
     'Value' => 'Значение',
     'New value' => 'Новое значение',
     'DIALOG_overdue_pp' => 'Обещ. платеж',
+    'Acts template' => 'Шаблоны актов',
+    'Partner condition' => 'Условия партнеров',
+    'Act' => 'Акт',
+    'Date' => 'Дата',
+    'Partner' => 'Партнер',
+    'Profit' => 'Прибыль'
 ];

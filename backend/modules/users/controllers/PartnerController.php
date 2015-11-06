@@ -2,6 +2,7 @@
 
 namespace backend\modules\users\controllers;
 
+use common\models\managers\PartnerPurseManager;
 use common\models\PartnerCuserServ;
 use common\models\search\PartnerCuserServSearch;
 use Yii;
@@ -46,21 +47,27 @@ class PartnerController extends AbstractBaseBackendController
     }
 
     /**
-     * Creates a new Partner model.
+     * Creates a new Partner model and PartnerPurse model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
         $model = new Partner();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
+        if ($model->load(Yii::$app->request->post()) ) {
+            $tr  = Yii::$app->db->beginTransaction();  //транзакция, так как работам с двумя моделями
+            if($model->save() && PartnerPurseManager::createPurse($model->id)) //создаем партнера и его кашелек
+                {
+                    $tr->commit();
+                    Yii::$app->session->setFlash('success',Yii::t('app/users','Partner and purse successfully created'));
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            $tr->rollBack();
+            Yii::$app->session->setFlash('error',Yii::t('app/users','Error can not create partner or purse'));
+        }
+        return $this->render('create', [
                 'model' => $model,
             ]);
-        }
     }
 
     /**

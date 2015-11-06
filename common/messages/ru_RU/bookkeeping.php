@@ -125,6 +125,12 @@ return [
     'Buser Id P' => 'Кто погасил платеж',
     'BOOK_acts' => 'Акты',
     'Create Acts' => 'Добавить акт',
+    'Min Amount' => 'Мин. сумма',
+    'Max Amount' => 'Макс. сумма',
+    'Percent' => 'Процент',
+    'Start Date' => 'Дата начала',
+    'Partner Conditions' => 'Условия партнеров',
+    'Create Partner Condition' => 'Добавить условие'
 
 
 ];

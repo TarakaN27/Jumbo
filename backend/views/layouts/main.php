@@ -47,7 +47,8 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
     $subItems[] = ['label' => Yii::t('app/common', 'Bill template'), 'url' => ['/documents/bill-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill docx template'), 'url' => ['/documents/bill-docx-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Acts template'), 'url' => ['/documents/acts-template/index']];
-    $subItems[] = ['label' => Yii::t('app/common', 'Acts numbers'), 'url' => ['/documents/act-numbers/index']];
+    //$subItems[] = ['label' => Yii::t('app/common', 'Acts numbers'), 'url' => ['/documents/act-numbers/index']];
+    $subItems[] = ['label' => Yii::t('app/common', 'Partner condition'), 'url' => ['/bookkeeping/partner-condition/index']];
     $menuItems[] = [
         'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),
         'items' => $subItems,
