@@ -59,7 +59,7 @@ class PartnerProfitActBehavior extends Behavior
 	 */
 	public function beforeUpdate()
 	{
-		$this->_oldProfit = $this->owner->getOldAttribute('amount');
+		$this->_oldActAmount = $this->owner->getOldAttribute('amount');
 	}
 
 	/**
@@ -67,7 +67,7 @@ class PartnerProfitActBehavior extends Behavior
 	 */
 	public function beforeDelete()
 	{
-		$obProfit = PartnerProfit::find()->where(['act_id' => $this->owner->id])->one;
+		$obProfit = PartnerProfit::find()->where(['act_id' => $this->owner->id])->one();
 		if($obProfit) {
 			$this->_partnerID = $obProfit->partner_id;
 			$this->_oldProfit = $obProfit->amount;

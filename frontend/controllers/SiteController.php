@@ -63,7 +63,6 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-
         $tmp = '2015-10-14' > '2015-10-13';
         var_dump($tmp);die;
 

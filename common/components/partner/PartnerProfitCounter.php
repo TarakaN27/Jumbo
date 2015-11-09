@@ -79,10 +79,12 @@ class PartnerProfitCounter
 	 */
 	protected function deleteProfitHelper($amount,$partnerID)
 	{
+        /** @var PartnerPurse $obPurse */
 		$obPurse = PartnerPurse::find()->where(['partner_id' => $partnerID])->one();
 		if(!$obPurse)
 			return $this->addError('Purse not found');
-		$obPurse->amount-= $amount;
+		$obPurse->amount-= $amount; //корректируем сумму кошелька
+        $obPurse->acts -= $this->_act->amount; //корректируем сумму актов
 
 		return $obPurse->save();
 	}
@@ -155,8 +157,8 @@ class PartnerProfitCounter
 			return $this->addError('Can not add profit');
 		}
 
-		$obPurse->amount +=$profit; // суммируем прибыль
-		$obPurse->acts += $diffActAmount;  //суммирем общую сумму прибыли
+		$obPurse->amount +=$diff; // суммируем прибыль
+		$obPurse->acts +=$diffActAmount;  //суммирем общую сумму прибыли
 
 		if(!$obPurse->save()) {//пробуем сохранить кашелек
 			$tr->rollBack(); // все плохо. откат
@@ -256,7 +258,7 @@ class PartnerProfitCounter
 	protected function getCondition($actsAmount)
 	{
 		return PartnerCondition::find()
-			->where('min_amount >= :amount && max_amount <= :amount',[':amount' => $actsAmount])
+			->where('min_amount <= :amount && max_amount >= :amount',[':amount' => $actsAmount])
 			->orderBy('id DESC')
 			->one();
 	}
@@ -272,14 +274,14 @@ class PartnerProfitCounter
 	{
 		$date = new \DateTime($endDate);
 		$date->modify('-1 month');
-		$end = $date->format('Y-t-d'); //конец прошлого месяца
+		$end = $date->format('Y-m-t'); //конец прошлого месяца
 		$date->modify('-'.self::ACT_PERIOD.' month');
 		$start = $date->format('Y-m-d');//- 12 месяцев
 
 		return Acts::find()
 			->select('SUM(amount) as amount')
 			->where(['cuser_id' => $cuserID])
-			->andWhere(' act_date >= :start_date AND act_date <= :end_date  AND act_date > = :start',[
+			->andWhere(' act_date >= :start_date AND act_date <= :end_date  AND act_date >= :start',[
 				':start_date' => $startDate, //ограничиваемся датой привязки услуги в партнеру
 				':end_date' => $end, //ограничиваемся датой окончания прошлого месяца
 				':start' => $start //ограничиваем 12 месяцами

@@ -228,4 +228,13 @@ class Acts extends AbstractActiveRecord
     {
         return Yii::$app->response->sendFile(Yii::getAlias(self::FILE_PATH).'/'.$this->file_name);
     }
+
+    /**
+     *
+     */
+    public function afterDelete()
+    {
+        @unlink(Yii::getAlias(self::FILE_PATH).'/'.$this->file_name); //удалим акт
+        parent::afterDelete();
+    }
 }
