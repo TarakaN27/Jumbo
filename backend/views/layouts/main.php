@@ -175,6 +175,11 @@ $menuItems[] = [
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/acts/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_acts'); ?></a>
                                             </li>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/partner-withdrawal/index']); ?>">
+                                                    <?php echo Yii::t('app/book', 'BOOK_partner_withdrawal'); ?>
+                                                </a>
+                                            </li>
                                         <?php endif;?>
 
                                         <?php if(Yii::$app->user->can('forAll')):?>

@@ -37,6 +37,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'ch_account')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model,'psk')->textInput()?>
+
     <?= $form->field($model, 'status')->dropDownList(\common\models\Partner::getStatusArr())?>
 
     <div class="form-group">

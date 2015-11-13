@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "{{%partner}}".
@@ -38,7 +40,7 @@ class Partner extends AbstractActiveRecord
     {
         return [
             [['description', 'post_address', 'ch_account'], 'string'],
-            [['psk'], 'required'],
+            //[['psk'], 'required'],
             ['psk','unique'],
             ['email','email'],
             [['status', 'created_at', 'updated_at'], 'integer'],
@@ -91,9 +93,6 @@ class Partner extends AbstractActiveRecord
      */
     public function beforeValidate()
     {
-        if($this->isNewRecord && empty($this->psk))
-            $this->psk = Yii::$app->security->generateRandomString();
-
         return parent::beforeValidate();
     }
 
@@ -103,8 +102,55 @@ class Partner extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
-        if($insert && empty($this->psk))
-            $this->psk = Yii::$app->security->generateRandomString();
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public static function getPartnerMap()
+    {
+        $obDep  = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+
+        $arTmp = self::getDb()->cache(function($db){
+            return self::find()->select(['id', 'fname', 'lname', 'mname'])->all($db);
+        },86400,$obDep);
+
+        $arRes = [];
+        foreach($arTmp as $tmp)
+            $arRes[$tmp->id] = $tmp->getFio();
+
+        return $arRes;
+    }
+
+    /**
+     * @param $psk
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getPartnerByPsk($psk)
+    {
+        $obDep = new TagDependency([
+            'tags' => self::getTagName('psk',$psk)
+        ]);
+
+        return self::getDb()->cache(function($db) use ($psk){
+            return self::find()->where(['psk' => $psk])->one();
+        },86400,$obDep);
+    }
+
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        //инвалидируем кеш для определенного партнера
+        if(!$insert)
+            TagDependency::invalidate(Yii::$app->cache,[self::getTagName('psk',$this->psk)]);
+        return parent::afterSave($insert, $changedAttributes);
     }
 }

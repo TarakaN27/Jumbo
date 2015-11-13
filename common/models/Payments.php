@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
+use common\components\payment\PartnerPaymentBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -116,6 +117,9 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
+                ],
+                [
+                    'class' => PartnerPaymentBehavior::className()   // начисления партнеру в кошелек
                 ]
             ]);
     }

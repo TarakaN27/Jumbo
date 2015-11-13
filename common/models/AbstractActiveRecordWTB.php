@@ -138,4 +138,14 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         }
         return $model;
     }
+
+    /**
+     * @param $property
+     * @param $value
+     * @return string
+     */
+    protected static function getTagName($property,$value)
+    {
+        return 'Tag:'.self::className().':'.$property.':'.$value;
+    }
 } 

@@ -2,6 +2,8 @@
 
 namespace backend\modules\users\controllers;
 
+use backend\modules\users\form\ExternalCSDA;
+use common\components\csda\CSDAPartner;
 use common\models\managers\PartnerPurseManager;
 use common\models\PartnerCuserServ;
 use common\models\search\PartnerCuserServSearch;
@@ -9,9 +11,11 @@ use Yii;
 use common\models\Partner;
 use common\models\search\PartnerSearch;
 use backend\components\AbstractBaseBackendController;
+use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 /**
@@ -41,8 +45,12 @@ class PartnerController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+
+        $obForm = new ExternalCSDA();
+        $obForm->partnerID = $id;
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'obForm' => $obForm
         ]);
     }
 
@@ -166,4 +174,54 @@ class PartnerController extends AbstractBaseBackendController
         $model->delete();
         return $this->redirect(['link-contractor-service','id' => $id]);
     }
+
+    public function actionConnectCsda()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $arReturn = ['error' => '','data' => ''];
+        $model = new ExternalCSDA();
+        if($model->load(Yii::$app->request->post()))
+        {
+            if($model->validate())
+            {
+                if($model->makeRequest())
+                    $arReturn['data'] = '1';
+                else
+                    $arReturn['error'] = implode('</br>',$model->getSPErrors());
+            }else{
+                $arErr = [];
+                foreach($model->getErrors() as $key => $value)
+                {
+                    $arErr [] = $model->getAttributeLabel($key).':'.implode(';',$value);
+                }
+                $arReturn['error'] = implode('</br>',$arErr);
+            }
+        }else{
+            $arReturn['error'] = Yii::t('app/users','Can not get POST parameters');
+        }
+
+
+        return $arReturn;
+    }
+
+    public function actionDisconnectCsda()
+    {
+        $psk = Yii::$app->request->post('psk');
+        $pid = Yii::$app->request->post('pid');
+
+
+        if(empty($psk) || empty($pid))
+            throw new InvalidParamException('psk and pid must be set');
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $obCSDA = new CSDAPartner();
+        $res = $obCSDA->deleteUser($psk);
+        if($res)
+        {
+            /** @var Partner $obPartner */
+            $obPartner = Partner::findOneByIDCached($pid);
+            $obPartner->psk = '';
+            return $obPartner->save();
+        }
+        return false;
+     }
 }

@@ -130,7 +130,23 @@ return [
     'Percent' => 'Процент',
     'Start Date' => 'Дата начала',
     'Partner Conditions' => 'Условия партнеров',
-    'Create Partner Condition' => 'Добавить условие'
-
+    'Create Partner Condition' => 'Добавить условие',
+    'BOOK_partner_withdrawal' => 'Вывод средств. Партнер',
+    'Type' => 'Тип',
+    'Partner ID' => 'Партнер',
+    'Partner not found. Can not count available sum.' => 'Партнер не найден. Невозможно получть доступные средства',
+    'Not enough available sum. Available: ' => 'Не достаточно доступных средст. Доступно:',
+    'Value must be more than 0' => 'Значение должно быть больше 0',
+    'Choose type' => 'Выберите тип',
+    'BOOK_choose_partner' => 'Выберите партнера',
+    'Type service' => 'Услуга',
+    'Type money' => 'Деньги',
+    'Amount withdrawal' => 'Сумма',
+    'Available amount' => 'Доступная сумма',
+    'Available partner amount request' => 'Сумма кошелька партнера',
+    'Available partner amount FAIL' => 'Запрос не удался.',
+    'Create Partner Withdrawal' => 'Новый вывод средств партнера',
+    'Partner Withdrawals' => 'Вывод средств партнера',
+    'Partner purse not found' => 'Кашелек партнера не найден'
 
 ];

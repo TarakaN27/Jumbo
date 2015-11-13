@@ -157,7 +157,7 @@ return [
     'Mname' => 'Отчество',
     'Phone' => 'Телефон',
     'Post Address' => 'Почтовый адрес',
-    'Psk' => 'Секретный ключ партнера',
+    'Psk' => 'Секретный ключ партнера CSDA',
     'Update Partner: ' => 'Редактирование партнера:',
     'Connect' => 'Дата подключения',
     'Partner ID' => 'Партнер',
@@ -169,7 +169,19 @@ return [
     'Purse payments' => 'Платежи',
     'Purse acts' => 'Акты',
     'Purse amount' => 'Баланс',
-    'Purse' => 'Кошелек'
+    'Purse' => 'Кошелек',
+    'External csda account' => 'Внешний аккаунт партнера в CSDA',
+    'External csda account title' => 'Создание аккаунта в CSDA для партнера',
+    'passwordRepeat' => 'Пароль еще раз',
+    'CSDA partner create account request' => 'Запрос на создание аккаунта в CSDA',
+    'CSDA account successfully created' => 'Аккаунт успешно создан',
+    'Can not connect to external system.' =>'Невозможно подключиться к CSDA',
+    'External system return empty response.' => 'CSDA вернул пустой ответ',
+    'This username has already taken in external system.' => 'Имя пользователя уже используется.',
+    'This email has already taken in external system.' => 'Емаил уже используется.',
+    'Error. Remove account' => 'Ошибка удаления аккаунта',
+    'CSDA account successfully deleted' => 'CSDA аккаунт успешно удален'
+
 
 
 

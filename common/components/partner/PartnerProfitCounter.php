@@ -48,18 +48,18 @@ class PartnerProfitCounter
 	 * @throws \Exception
 	 * @throws \yii\db\Exception
 	 */
-	public function deleteProfit($oldProfit = NULL,$partnerID = NULL)
+	public function deleteProfit($oldProfit = NULL,$partnerID = NULL,$oldActAMount = NULL)
 	{
 		/** @var PartnerProfit $obProfit */
 		$obProfit = PartnerProfit::find()->where(['act_id' => $this->_act->id])->one();
 		if(!$obProfit)
 			if(!empty($oldProfit) && !empty($partnerID))
-				return $this->deleteProfitHelper($oldProfit,$partnerID);
+				return $this->deleteProfitHelper($oldProfit,$partnerID,$oldActAMount);
 			else
 				return TRUE;
 
 		$tr = \Yii::$app->db->beginTransaction();
-		if(!$this->deleteProfit($obProfit->amount,$obProfit->partner_id))
+		if(!$this->deleteProfitHelper($obProfit->amount,$obProfit->partner_id,$oldActAMount))
 			return $this->addError('Can not save purse');
 
 		if($obProfit->delete())
@@ -77,15 +77,16 @@ class PartnerProfitCounter
 	 * @param $partnerID
 	 * @return bool
 	 */
-	protected function deleteProfitHelper($amount,$partnerID)
+	protected function deleteProfitHelper($amount,$partnerID,$oldActAMount)
 	{
+		if(is_null($oldActAMount))
+			$oldActAMount = $this->_act->amount;
         /** @var PartnerPurse $obPurse */
 		$obPurse = PartnerPurse::find()->where(['partner_id' => $partnerID])->one();
 		if(!$obPurse)
 			return $this->addError('Purse not found');
 		$obPurse->amount-= $amount; //корректируем сумму кошелька
-        $obPurse->acts -= $this->_act->amount; //корректируем сумму актов
-
+        $obPurse->acts -= $oldActAMount; //корректируем сумму актов
 		return $obPurse->save();
 	}
 

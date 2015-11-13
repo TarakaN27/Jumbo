@@ -81,18 +81,8 @@ class PartnerPurse extends AbstractActiveRecord
         ]);
 
         return self::getDb()->cache(function($db) use ($partnerID){
-            return self::find()->where(['partner_id' => $partnerID])->one();
+            return self::find()->where(['partner_id' => $partnerID])->one($db);
         },86400,$obDep);
-    }
-
-    /**
-     * @param $property
-     * @param $value
-     * @return string
-     */
-    protected static function getTagName($property,$value)
-    {
-        return 'Tag:'.self::className().':'.$property.':'.$value;
     }
 
     /**
@@ -102,7 +92,7 @@ class PartnerPurse extends AbstractActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         //инвалидируем кеш для определенного партнера
-        if(!$insert)
+        //if(!$insert)
             TagDependency::invalidate(Yii::$app->cache,[self::getTagName('partner_id',$this->partner_id)]);
         return parent::afterSave($insert, $changedAttributes);
     }

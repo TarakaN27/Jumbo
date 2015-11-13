@@ -24,7 +24,7 @@ class m151104_085546_create_table_puser extends Migration
             'phone' => Schema::TYPE_STRING,
             'post_address' => Schema::TYPE_TEXT,
             'ch_account' =>Schema::TYPE_TEXT,
-            'psk' => Schema::TYPE_STRING.' NOT NULL',
+            'psk' => Schema::TYPE_STRING,
             'status' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 1',
             'created_at' => Schema::TYPE_INTEGER ,
             'updated_at' => Schema::TYPE_INTEGER ,

@@ -50,8 +50,11 @@ class PartnerProfitActBehavior extends Behavior
 	 */
 	public function afterUpdate()
 	{
+		//$obPPC = new  PartnerProfitCounter($this->owner);
+		//return $obPPC->updateProfit($this->_oldActAmount);
 		$obPPC = new  PartnerProfitCounter($this->owner);
-		return $obPPC->updateProfit($this->_oldActAmount);
+		$obPPC->deleteProfit($this->_oldProfit,$this->_partnerID,$this->_oldActAmount); //удалим, то что насчитали ранее
+		return $obPPC->countProfitPerPeriod(); //пересчитаем заново
 	}
 
 	/**
@@ -59,6 +62,11 @@ class PartnerProfitActBehavior extends Behavior
 	 */
 	public function beforeUpdate()
 	{
+		$obProfit = PartnerProfit::find()->where(['act_id' => $this->owner->id])->one();
+		if($obProfit) {
+			$this->_partnerID = $obProfit->partner_id;
+			$this->_oldProfit = $obProfit->amount;
+		}
 		$this->_oldActAmount = $this->owner->getOldAttribute('amount');
 	}
 

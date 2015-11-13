@@ -72,6 +72,14 @@ return [
                         'POST create' => 'create', // 'xxxxx' refers to 'actionXxxxx'
                     ],
                 ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'except' => ['delete', 'create', 'update','index'], //запрещаем действия
+                    'controller' => ['v1/partner' => 'v1/partner'],
+                    'extraPatterns' => [    //дополнительные экшены
+                        'POST purse' => 'purse', // 'xxxxx' refers to 'actionXxxxx'
+                    ],
+                ],
             ],
         ]
     ],

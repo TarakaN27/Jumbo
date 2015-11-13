@@ -9,7 +9,9 @@
 namespace common\models\managers;
 
 
+use common\components\helpers\CustomHelper;
 use common\models\PartnerPurse;
+use yii\caching\TagDependency;
 
 class PartnerPurseManager extends PartnerPurse
 {
