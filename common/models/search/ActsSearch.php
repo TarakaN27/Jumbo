@@ -45,6 +45,10 @@ class ActsSearch extends Acts
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                'pageSizeLimit' => [1,1000]
+            ],
         ]);
 
         $this->load($params);

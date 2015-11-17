@@ -2,11 +2,16 @@
 
 namespace backend\modules\bookkeeping\controllers;
 
+use common\components\csda\CSDAUser;
+use common\models\CUser;
+use common\models\CuserExternalAccount;
+use common\models\CUserRequisites;
 use common\models\LegalPerson;
 use Yii;
 use common\models\Acts;
 use common\models\search\ActsSearch;
 use backend\components\AbstractBaseBackendController;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\base\InvalidParamException;
@@ -199,4 +204,64 @@ class ActsController extends AbstractBaseBackendController
 
         return $obAct->getDocument();
     }
+
+    /**
+     * @todo возможно нужно будет применять очередь сообщений. Например RabbitMQ
+     * @return bool
+     * @throws NotFoundHttpException
+     */
+    public function actionSendActs()
+    {
+        $arSelected = Yii::$app->request->post('selection');
+        if(!$arSelected)
+            throw new InvalidParamException('Acts not set');
+
+        $arActs = Acts::find()->where(['id' => $arSelected])->all();
+        if(!$arActs)
+            throw new NotFoundHttpException('Acts not found');
+
+        $arCUser = [];
+        /** @var Acts $act */
+        foreach($arActs as $act)
+            if(!in_array($act->cuser_id,$arCUser))
+                $arCUser [] = $act->cuser_id;
+
+        $arCUserEmail = CUser::getCUserEmails($arCUser); //получаем емаил пользователя
+        $arSKUsers = CuserExternalAccount::getSKByCUserIDs($arCUser,CuserExternalAccount::TYPE_CSDA); // получаем внешние аккаунты
+        if(!$arCUserEmail)
+            throw new NotFoundHttpException('Contractor not found');
+
+        foreach($arActs as $act)
+        {
+            if(isset($arCUserEmail[$act->cuser_id]))
+            {
+                if(\Yii::$app->mailer->compose( // отправялем уведомление по ссылке
+                    [
+                        'html' => 'actNotification-html',
+                        'text' => 'actNotification-text'
+                    ],
+                    [
+                        'act' => $act]
+                    )
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                    ->setTo($arCUserEmail[$act->cuser_id])
+                    ->setSubject('Act notification ' . \Yii::$app->name)
+                    ->send()) {
+
+                        if(isset($arSKUsers[$act->cuser_id])) //отпарвляем уведомление на внешний аккаунт
+                        {
+                            $obCSDA = new CSDAUser();
+                            $obCSDA->sentNotificationNewAct($act,$arSKUsers[$act->cuser_id]);
+                        }
+
+                        $act->sent = Acts::YES;
+                        $act->save();
+                }
+            }
+
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;    //set answer format
+        return TRUE;
+    }
+
 }

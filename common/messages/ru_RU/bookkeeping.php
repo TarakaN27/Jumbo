@@ -147,6 +147,12 @@ return [
     'Available partner amount FAIL' => 'Запрос не удался.',
     'Create Partner Withdrawal' => 'Новый вывод средств партнера',
     'Partner Withdrawals' => 'Вывод средств партнера',
-    'Partner purse not found' => 'Кашелек партнера не найден'
+    'Partner purse not found' => 'Кашелек партнера не найден',
+    'Acts' => 'Акты',
+    'You have not selected acts' => 'Вы не выбрали акты для отправки',
+    'Sent act request' => 'Отправка актов',
+    'Acts successfully sent' => 'Акты успешно отправлены',
+    'Acts not sent' => 'Акты не отправлены'
+
 
 ];

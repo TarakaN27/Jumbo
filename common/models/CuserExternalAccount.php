@@ -5,6 +5,7 @@ namespace common\models;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cuser_external_account}}".
@@ -136,4 +137,14 @@ class CuserExternalAccount extends AbstractActiveRecord
             ->one();
     }
 
+    /**
+     * @param array $ids
+     * @param $type
+     * @return array
+     */
+    public static function getSKByCUserIDs(array $ids,$type)
+    {
+        $tmp = self::find()->select(['cuser_id','secret_key'])->where(['cuser_id' => $ids,'type' => $type])->all();
+        return ArrayHelper::map($tmp,'cuser_id','secret_key');
+    }
 }

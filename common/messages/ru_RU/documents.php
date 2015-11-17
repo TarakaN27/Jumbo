@@ -66,7 +66,10 @@ return [
     'Template ID' => 'Шаблон',
     'Legal person' => 'Юр. лицо',
     'File name' => 'Файл',
-    'Generate document' => 'Сгенерировать документ'
+    'Generate document' => 'Сгенерировать документ',
+    'Sent' => 'Отправлено',
+    'Act Date' => 'Дата акта',
+    'Buser ID' => 'Добавил акт'
 
 
 ];

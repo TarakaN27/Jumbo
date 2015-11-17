@@ -9,6 +9,7 @@ use common\components\behavior\UploadBehavior;
 use common\components\helpers\CustomHelper;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use Yii;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -167,7 +168,8 @@ class Acts extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
-        $this->ask = Yii::$app->security->generateRandomString(); //уникальный ключ для файла
+        if($insert)
+            $this->ask = Yii::$app->security->generateRandomString(); //уникальный ключ для файла
         if(!CustomHelper::isDirExist(self::FILE_PATH))
             throw new NotFoundHttpException('Folder for acts is not exist. Path: '.self::FILE_PATH);
 
@@ -219,6 +221,19 @@ class Acts extends AbstractActiveRecord
                 'class' => PartnerProfitActBehavior::className()    //начисление прибыли партнерам
             ]
         ]);
+    }
+
+    /**
+     * @param $ask
+     * @param bool|FALSE $onlySent
+     * @return mixed
+     */
+    public static function getOneByAsk($ask,$onlySent = FALSE)
+    {
+        if($onlySent)
+            return self::find()->where(['ask' => $ask,'sent' => self::YES])->one();
+        else
+            return self::find()->where(['ask' => $ask])->one();
     }
 
     /**

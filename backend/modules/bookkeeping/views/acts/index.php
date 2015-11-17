@@ -2,13 +2,56 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\bootstrap\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ActsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app/book', 'Acts');
 $this->params['breadcrumbs'][] = $this->title;
+
+$this->registerJs("
+function sendActs()
+{
+    var
+       items = $('.selectedActs:checked');
+
+    if(items == undefined || items.length == 0)
+    {
+        alert('".Yii::t('app/book', 'You have not selected acts')."');
+        return false;
+    }
+    $.ajax({
+                type: \"POST\",
+                cache: false,
+                url: '".\yii\helpers\Url::to(['send-acts'])."',
+                dataType: \"json\",
+                data: items.serialize(),
+                success: function(msg){
+                    if(!msg)
+                      {
+                            addErrorNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/book','Acts not sent')."');
+                      }else{
+                            addSuccessNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/book','Acts successfully sent')."');
+                            location.reload();
+                      }
+                },
+                error: function(msg){
+                    addErrorNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/users','Server error')."');
+                    return false;
+                }
+            });
+}
+
+
+",\yii\web\View::POS_END);
+
+
+
+
+$this->registerJs("
+$('#sendActID').on('click',sendActs);
+",\yii\web\View::POS_READY);
 ?>
 
 <div class = "row">
@@ -18,16 +61,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h2><?= Html::encode($this->title) ?></h2>
                 <section class="pull-right">
                     <?= Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']) ?>
+                    <?= Html::button(Yii::t('app/book', 'Send acts'),['class' => 'btn btn-warning', 'id' => 'sendActID'])?>
                 </section>
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
-                            <?= GridView::widget([
+                <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget(); ?>
+                <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'filterSelector' => 'select[name="per-page"]',
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-                        ['class' => 'yii\grid\CheckboxColumn'],
+                        [
+                            'class' => 'yii\grid\CheckboxColumn',
+                            'checkboxOptions' => [
+                                'class' => 'selectedActs'
+                            ]
+                        ],
                         [
                             'attribute' => 'act_num',
                             'format' => 'html',
@@ -39,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'amount',
                             'format' => 'html',
                             'value' => function($model){
-                                                return Html::a($model->amount,['update','id' => $model->id],['class' => 'link-upd']);
+                                return Html::a($model->amount,['update','id' => $model->id],['class' => 'link-upd']);
                             }
                         ],
                         [

@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Acts;
 use common\models\managers\BillsManager;
 use console\components\controllerHelper\ManagerMsg;
 use Yii;
@@ -86,6 +87,24 @@ class SiteController extends Controller
 
         $obBill->getDocument(BillsManager::TYPE_DOC_PDF);
         Yii::$app->end();
+    }
+
+    /**
+     * @param $ask
+     * @return $this
+     * @throws NotFoundHttpException
+     */
+    public function actionGetActPdf($ask)
+    {
+        if(!$ask)
+            throw new NotFoundHttpException('File not found');
+        /** @var Acts $obAct */
+        $obAct = Acts::getOneByAsk($ask,TRUE);
+
+        if(!$obAct)
+            throw new NotFoundHttpException('File not found');
+
+        return $obAct->getDocument();
     }
 
     /*
