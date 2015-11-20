@@ -17,7 +17,7 @@ use yii\helpers\ArrayHelper;
 
 abstract class AbstractActiveRecordWTB extends ActiveRecord{
 
-    use \DevGroup\TagDependencyHelper\TagDependencyTrait;
+    use \DevGroup\TagDependencyHelper\TagDependencyTrait; //Тегированное кеширование
     CONST
         YES = 1,
         NO = 0,
@@ -97,6 +97,8 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     }
 
     /**
+     * Важно !
+     * В классах наследниках не забывать вызывать родительский метод
      * @inheritdoc
      */
     public function behaviors()
@@ -110,6 +112,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     }
 
     /**
+     * Вернем кешированную запись
      * @param $model_id
      * @return mixed|null|static
      * @throws \yii\web\NotFoundHttpException
@@ -140,12 +143,27 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     }
 
     /**
+     * Для кастомного тегированного кеширования
      * @param $property
      * @param $value
      * @return string
      */
-    protected static function getTagName($property,$value)
+    public static function getTagName($property,$value,$className = NULL)
     {
-        return 'Tag:'.self::className().':'.$property.':'.$value;
+        $className = is_null($className) ? self::getModelName(self::className()) : $className;
+        return 'Tag:'.$className.':'.$property.':'.$value;
+    }
+
+    /**
+     * Возвращает название класса без пути
+     * @return string
+     */
+    public static function getModelName()
+    {
+        $className = 'empty';
+        if (preg_match('@\\\\([\w]+)$@', self::className(), $matches)) {
+            $className = $matches[1];
+        }
+        return $className;
     }
 } 
