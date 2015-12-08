@@ -39,6 +39,9 @@ return [
         'config' => [
             'class' => 'backend\modules\config\Module',
         ],
+        'crm' => [
+            'class' => 'app\modules\crm\Module',
+        ],
     ],
     'components' => [
 

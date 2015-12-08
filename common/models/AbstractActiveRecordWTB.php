@@ -12,6 +12,7 @@ use DevGroup\TagDependencyHelper\NamingHelper;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use Yii;
+use yii\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 
@@ -160,10 +161,6 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
      */
     public static function getModelName()
     {
-        $className = 'empty';
-        if (preg_match('@\\\\([\w]+)$@', self::className(), $matches)) {
-            $className = $matches[1];
-        }
-        return $className;
+        return StringHelper::basename(self::className());
     }
 } 
