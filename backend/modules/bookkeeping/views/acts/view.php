@@ -72,6 +72,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ]) ?>
 
+                        <?=\common\components\entityFields\widget\EntityFieldsDisplayWidget::widget([
+                            'model' => $model,
+                            'title' => 'Дополнительные поля'
+                        ]);?>
+
                     <!--
                         @todo вынести в oтдельный виджет
                         @todo сделать пагинацию

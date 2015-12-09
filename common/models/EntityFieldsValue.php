@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\components\behavior\CacheCustomTagBehavior\CacheCustomTagBehavior;
 use Yii;
+use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%entity_fields_value}}".
@@ -62,5 +65,39 @@ class EntityFieldsValue extends AbstractActiveRecord
     public function getField()
     {
         return $this->hasOne(EntityFields::className(), ['id' => 'field_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $parent = parent::behaviors();
+        return ArrayHelper::merge($parent,[
+            [
+                'class' => CacheCustomTagBehavior::className(),
+                'items' => [
+                    'entity'
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @param $arIds
+     * @param $entity
+     * @param $itemID
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getFieldsValue($arIds,$entity,$itemID)
+    {
+        $obDep = new TagDependency([
+            'tags' => self::getTagName('entity',$entity)
+        ]);
+        return self::getDb()->cache(function() use($arIds,$entity,$itemID){
+            return self::find()->where(['field_id' => $arIds,'entity'=> $entity,'item_id' => $itemID])->all();
+        },86400,$obDep);
+
     }
 }

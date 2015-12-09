@@ -163,7 +163,10 @@ $('#acts-lp_id').on('change',function(){
 
     <?= $form->field($model,'genFile',['template' => $checkBoxTpl])->checkbox();?>
     <?= $form->field($model,'file_name')->fileInput();?>
-
+    <?= \common\components\entityFields\widget\EntityFieldsFormWidget::widget([
+        'form' => $form,
+        'model' => $model
+    ]);?>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

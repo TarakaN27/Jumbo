@@ -228,6 +228,19 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
+                                <li><a><i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?> <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li>
+                                            <a href="<?= Url::to(['/crm/default/index']); ?>">
+                                                <?php echo Yii::t('app/common', 'List feed'); ?>
+                                            </a>
+                                            <a href="<?= Url::to(['/crm/company/index']); ?>">
+                                                <?php echo Yii::t('app/common', 'Company'); ?>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </li>
                             </ul>
                         </div>
                         <!--div class="menu_section">

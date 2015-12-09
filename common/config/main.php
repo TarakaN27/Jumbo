@@ -25,7 +25,8 @@ return [
                         'app/reports' => 'reports.php',
                         'app/msg' => 'messenger.php',
                         'app/units' => 'units.php',
-                        'app/documents' => 'documents.php'
+                        'app/documents' => 'documents.php',
+                        'app/crm' => 'crm.php'
                     ]
                 ]
             ]

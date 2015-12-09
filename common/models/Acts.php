@@ -6,6 +6,7 @@ use backend\models\BUser;
 use common\components\acts\ActsDocuments;
 use common\components\acts\PartnerProfitActBehavior;
 use common\components\behavior\UploadBehavior;
+use common\components\entityFields\EntityFieldsTrait;
 use common\components\helpers\CustomHelper;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use Yii;
@@ -42,7 +43,7 @@ use yii\web\ServerErrorHttpException;
  */
 class Acts extends AbstractActiveRecord
 {
-
+    use EntityFieldsTrait; //подключаем доп настройки
     public
         $genFile = 0, //сгенерировать файл
         $contNotif = 0, // уведомить контрагента
@@ -71,7 +72,7 @@ class Acts extends AbstractActiveRecord
                 'buser_id', 'service_id', 'template_id',
                 'sent', 'change', 'created_at',
                 'updated_at','genFile'], 'integer'],
-            [['act_date'], 'safe'],
+            [['act_date','entityFields'], 'safe'],
             [['ask'],'unique'],
             [['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
             [['amount','ask','contract_num'], 'string', 'max' => 255],

@@ -13,8 +13,8 @@ $this->registerCssFile('@web/css/editor/index.css');
 //регистрируем переменные для работы скрипта
 $this->registerJs('
 var
-    DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['ajax-service/add-comment']) . '",
-    DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['ajax-service/load-lf-dialogs']) . '",
+    DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-comment']) . '",
+    DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['/ajax-service/load-lf-dialogs']) . '",
     DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",

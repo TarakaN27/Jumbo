@@ -88,6 +88,7 @@ class ActsController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new Acts();
+        $model->getEntityFields(); //доп поля
         $model->buser_id = Yii::$app->user->id;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -109,6 +110,7 @@ class ActsController extends AbstractBaseBackendController
     {
         $model = $this->findModel($id);
         $model->setScenario('update');
+        $model->getEntityFields(); //доп поля
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

@@ -5,8 +5,11 @@ namespace common\models;
 use common\components\behavior\CacheCustomTagBehavior\CacheCustomTagBehavior;
 use common\components\helpers\CustomHelper;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\caching\TagDependency;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "{{%entity_fields}}".
@@ -204,7 +207,42 @@ class EntityFields extends AbstractActiveRecord
             'tags' => self::getTagName('entity',$strEntity)
         ]);
         return self::getDb()->cache(function($db) use ($strEntity){
-            self::find()->where(['entity' => $strEntity])->all($db);
+            return self::find()->where(['entity' => $strEntity])->all($db);
         },86400,$obDep);
     }
+
+    /**
+     * @todo дописать все типы
+     * @param \yii\widgets\ActiveForm $form
+     * @param ActiveRecord $model
+     * @return $this|string
+     */
+    public function renderFormInput(\yii\widgets\ActiveForm $form,ActiveRecord $model)
+    {
+        $strReturn  = '';
+        switch($this->type)
+        {
+            case self::TYPE_TEXT:
+                $strReturn = $form->field(
+                    $model,
+                    'entityFields['.$this->alias.']',
+                    [
+
+                    ]
+                )->textInput()->label($this->name);
+                break;
+            case self::TYPE_CHECKBOX:
+                $strReturn = $form->field(
+                    $model,
+                    'entityFields['.$this->alias.']',
+                    []
+                )->checkbox()->label($this->name);
+            default:
+                break;
+        }
+
+        return $strReturn;
+    }
+
+
 }
