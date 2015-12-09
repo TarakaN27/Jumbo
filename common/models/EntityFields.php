@@ -10,6 +10,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%entity_fields}}".
@@ -18,6 +19,7 @@ use yii\helpers\Html;
  * @property string $name
  * @property string $alias
  * @property string $entity
+ * @property string $options
  * @property integer $type
  * @property integer $required
  * @property integer $validate
@@ -45,8 +47,8 @@ class EntityFields extends AbstractActiveRecord
     public static function getValidArr()
     {
         return [
-            self::VALID_EMAIL => Yii::t('app/crm','Email'),
-            self::VALID_PHONE => Yii::t('app/crm','Phone')
+            self::VALID_EMAIL => Yii::t('app/crm', 'Email'),
+            self::VALID_PHONE => Yii::t('app/crm', 'Phone')
         ];
     }
 
@@ -56,6 +58,7 @@ class EntityFields extends AbstractActiveRecord
     public function getValidateStr()
     {
         $tmp = self::getValidArr();
+
         return isset($tmp[$this->validate]) ? $tmp[$this->validate] : 'N/A';
     }
 
@@ -65,11 +68,11 @@ class EntityFields extends AbstractActiveRecord
     public static function getTypeArr()
     {
         return [
-            self::TYPE_TEXT => Yii::t('app/crm','Text'),
-            self::TYPE_CHECKBOX => Yii::t('app/crm','Checkbox'),
-            self::TYPE_TEXTAREA => Yii::t('app/crm','Textarea'),
-            self::TYPE_DROPDOWN => Yii::t('app/crm','Dropdown'),
-            self::TYPE_DATE => Yii::t('app/crm','Email')
+            self::TYPE_TEXT => Yii::t('app/crm', 'Text'),
+            self::TYPE_CHECKBOX => Yii::t('app/crm', 'Checkbox'),
+            self::TYPE_TEXTAREA => Yii::t('app/crm', 'Textarea'),
+            self::TYPE_DROPDOWN => Yii::t('app/crm', 'Dropdown'),
+            self::TYPE_DATE => Yii::t('app/crm', 'Data')
         ];
     }
 
@@ -79,6 +82,7 @@ class EntityFields extends AbstractActiveRecord
     public function getTypeStr()
     {
         $tmp = self::getTypeArr();
+
         return isset($tmp[$this->type]) ? $tmp[$this->type] : 'N/A';
     }
 
@@ -97,8 +101,8 @@ class EntityFields extends AbstractActiveRecord
      */
     public static function getEntityArr()
     {
-        return[
-            Acts::getModelName() => Yii::t('app/crm','Акты'),
+        return [
+            Acts::getModelName() => Yii::t('app/crm', 'Acts'),
         ];
     }
 
@@ -108,6 +112,7 @@ class EntityFields extends AbstractActiveRecord
     public function getEntityStr()
     {
         $tmp = self::getEntityArr();
+
         return isset($tmp[$this->entity]) ? $tmp[$this->entity] : 'N/A';
     }
 
@@ -129,7 +134,8 @@ class EntityFields extends AbstractActiveRecord
             [['type', 'required', 'validate', 'created_at', 'updated_at'], 'integer'],
             [['name', 'alias', 'entity'], 'string', 'max' => 255],
             [['name'], 'unique'],
-            [['alias'], 'unique']
+            [['alias'], 'unique'],
+            ['options', 'safe']
         ];
     }
 
@@ -144,6 +150,7 @@ class EntityFields extends AbstractActiveRecord
             'alias' => Yii::t('app/crm', 'Alias'),
             'entity' => Yii::t('app/crm', 'Entity'),
             'type' => Yii::t('app/crm', 'Type'),
+            'options' => Yii::t('app/crm', 'Options'),
             'required' => Yii::t('app/crm', 'Required'),
             'validate' => Yii::t('app/crm', 'Validate'),
             'created_at' => Yii::t('app/crm', 'Created At'),
@@ -165,7 +172,8 @@ class EntityFields extends AbstractActiveRecord
     public function behaviors()
     {
         $parent = parent::behaviors();
-        return ArrayHelper::merge($parent,[
+
+        return ArrayHelper::merge($parent, [
             [
                 'class' => CacheCustomTagBehavior::className(),
                 'items' => [
@@ -180,8 +188,9 @@ class EntityFields extends AbstractActiveRecord
      */
     public function beforeValidate()
     {
-        if(empty($this->alias))
+        if (empty($this->alias))
             $this->alias = CustomHelper::cyrillicToLatin($this->name);
+        $this->encodeOptions();
         return parent::beforeValidate();
     }
 
@@ -191,9 +200,34 @@ class EntityFields extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
-        if(empty($this->alias))
+        if (empty($this->alias))
             $this->alias = CustomHelper::cyrillicToLatin($this->name);
+        $this->encodeOptions();
         return parent::beforeSave($insert);
+    }
+
+    public function afterFind()
+    {
+        $this->decodeOptions();
+        return parent::afterFind();
+    }
+
+    /**
+     *
+     */
+    protected function encodeOptions()
+    {
+        if (is_array($this->options))
+            $this->options = Json::encode($this->options);
+    }
+
+    /**
+     *
+     */
+    protected function decodeOptions()
+    {
+        if(!is_array($this->options) && $this->options)
+            $this->options = Json::decode($this->options);
     }
 
     /**
@@ -231,16 +265,43 @@ class EntityFields extends AbstractActiveRecord
                     ]
                 )->textInput()->label($this->name);
                 break;
+
             case self::TYPE_CHECKBOX:
                 $strReturn = $form->field(
                     $model,
                     'entityFields['.$this->alias.']',
                     []
                 )->checkbox()->label($this->name);
+                break;
+
+            case self::TYPE_TEXTAREA:
+                $strReturn = $form->field($model,'entityFields['.$this->alias.']')->textarea()->label($this->name);
+                break;
+
+            case self::TYPE_DATE:
+                $strReturn= $form->field(
+                    $model,
+                    'entityFields['.$this->alias.']',
+                    []
+                )->widget(\kartik\date\DatePicker::className(),[
+                    'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
+                    'pluginOptions' => [
+                        'autoclose'=>true,
+                        'format' => 'yyyy-m-dd'
+                    ]
+                ])->label($this->name);
+
+                break;
+
+            case self::TYPE_DROPDOWN:
+                $options = [];
+                foreach($this->options as $option)
+                    $options[$option] = $option;
+                $strReturn = $form->field($model,'entityFields['.$this->alias.']', [])->dropDownList($options)->label($this->name);
+                break;
             default:
                 break;
         }
-
         return $strReturn;
     }
 

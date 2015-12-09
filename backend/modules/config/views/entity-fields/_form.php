@@ -6,6 +6,24 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\EntityFields */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerJs("
+    function checkSelect()
+    {
+        var
+            type = $('#entityfields-type').val();
+
+        if(type == '".\common\models\EntityFields::TYPE_DROPDOWN."')
+            {
+                $('.field-entityfields-options').show();
+            }else{
+                $('.field-entityfields-options').hide();
+            }
+    }
+",\yii\web\View::POS_END);
+$this->registerJs("
+checkSelect();
+$('#entityfields-type').on('change',checkSelect);
+",\yii\web\View::POS_READY);
 ?>
 
 <div class="entity-fields-form">
@@ -40,6 +58,15 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'validate')->dropDownList(\common\models\EntityFields::getValidArr(),[
         'prompt' => Yii::t('app/config','Validate type')
     ]) ?>
+
+
+    <?= $form->field($model,'options')->widget(\common\components\multipleInput\MultipleInput::className(),[
+        'limit'             => 10,
+        'allowEmptyList'    => false,
+        'enableGuessTitle'  => FALSE,
+        'min'               => 1, // should be at least 2 rows
+        'addButtonPosition' => \common\components\multipleInput\MultipleInput::POS_ROW // show add button in the header
+    ])?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

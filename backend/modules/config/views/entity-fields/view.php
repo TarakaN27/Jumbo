@@ -52,6 +52,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => $model->getValidateStr()
                                 ],
                                 [
+                                    'attribute' => 'options',
+                                    'format' => 'html',
+                                    'value' => is_array($model->options) ? implode('<br/>',$model->options) : $model->options
+                                ],
+                                [
                                     'attribute' => 'created_at',
                                     'value' => Yii::$app->formatter->asDatetime($model->created_at)
                                 ],
