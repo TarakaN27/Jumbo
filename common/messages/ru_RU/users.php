@@ -180,7 +180,9 @@ return [
     'This username has already taken in external system.' => 'Имя пользователя уже используется.',
     'This email has already taken in external system.' => 'Емаил уже используется.',
     'Error. Remove account' => 'Ошибка удаления аккаунта',
-    'CSDA account successfully deleted' => 'CSDA аккаунт успешно удален'
+    'CSDA account successfully deleted' => 'CSDA аккаунт успешно удален',
+    'Crm Group Id' => 'CRM группа пользователей',
+    'Choose CRM group' => 'Выберите CRM группу пользователй'
 
 
 

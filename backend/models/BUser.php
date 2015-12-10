@@ -4,6 +4,8 @@ namespace backend\models;
 
 use app\models\BindBuser;
 use common\models\AbstractUser;
+use common\models\BUserCrmGroup;
+use common\models\BUserCrmRules;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\DbDependency;
@@ -24,13 +26,14 @@ use yii\helpers\ArrayHelper;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $crm_group_id
  * @property string $fname
  * @property string $lname
  * @property string $mname
  */
 class BUser extends AbstractUser
 {
-    use \DevGroup\TagDependencyHelper\TagDependencyTrait;
+    use \DevGroup\TagDependencyHelper\TagDependencyTrait; //Трейд добавляет функционал для кешировани по тегам
     /**
      * описываем роли пользователей backend
      */
@@ -104,7 +107,7 @@ class BUser extends AbstractUser
     {
         return [
             [['email'],'required'],
-            [['role','status','created_at','updated_at'],'integer'],
+            [['role','status','created_at','updated_at','crm_group_id'],'integer'],
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             //имя пользователя
@@ -153,7 +156,9 @@ class BUser extends AbstractUser
             'password' => Yii::t('app/users', 'Password'),
             'fname' => Yii::t('app/users', 'First name'),
             'lname' => Yii::t('app/users', 'Last name'),
-            'mname' => Yii::t('app/users', 'Midle name')
+            'mname' => Yii::t('app/users', 'Midle name'),
+            'crm_group_id' => Yii::t('app/users', 'Crm Group Id')
+
         ];
     }
 
@@ -255,6 +260,14 @@ class BUser extends AbstractUser
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCRMGroup()
+    {
+        return $this->hasOne(BUserCrmGroup::className(),['id' => 'crm_group_id']);
+    }
+
+    /**
      * @return array
      */
     public static function getRoleByPermission()
@@ -322,5 +335,22 @@ class BUser extends AbstractUser
         return self::getDb()->cache(function() use ($model_id){
             return self::findOne($model_id);
         },3600*24,$obDep);
+    }
+
+    /**
+     * @param $entity
+     * @return array|bool
+     */
+    public function getCRMRulesByGroup($entity)
+    {
+        if(empty($this->crm_group_id))
+            return [];
+
+        return BUserCrmRules::find()
+            ->leftJoin(BUserCrmGroup::tableName(),['role_id'=>'role_id'])
+            ->where([
+                BUserCrmGroup::tableName().'.id' => $this->crm_group_id,
+                'entity' => $entity
+            ])->one();
     }
 }

@@ -67,5 +67,9 @@ return [
     'Act' => 'Акт',
     'Date' => 'Дата',
     'Partner' => 'Партнер',
-    'Profit' => 'Прибыль'
+    'Profit' => 'Прибыль',
+    'List feed' => 'Лента новостей',
+    'Company' => 'Компании',
+    'CRM roles' => 'CRM Роли',
+    'CRM group' => 'CRM группы'
 ];

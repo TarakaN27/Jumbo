@@ -5,6 +5,7 @@ namespace backend\modules\users\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\modules\users\form\BindMembersForm;
 use backend\modules\users\models\ChangePasswordBUserForm;
+use common\models\BUserCrmRules;
 use common\models\BuserInviteCode;
 use Yii;
 use backend\models\BUser;

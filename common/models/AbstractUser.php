@@ -5,6 +5,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\StringHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -234,5 +235,14 @@ class AbstractUser extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * Возвращает название класса без пути
+     * @return string
+     */
+    public static function getModelName()
+    {
+        return StringHelper::basename(self::className());
     }
 }

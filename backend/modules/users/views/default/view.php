@@ -65,6 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->getRoleStr()
             ],
             [
+                'attribute' => 'crm_group_id',
+                'value' => is_object($obGroup = $model->cRMGroup) ? $obGroup->name : $model->crm_group_id
+            ],
+            [
                 'attribute' => 'status',
                 'value' => $model->getStatusStr()
             ],

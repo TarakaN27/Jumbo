@@ -41,6 +41,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'role')->dropDownList(\backend\models\BUser::getRoleArrWithRights()) ?>
 
+    <?= $form->field($model,'crm_group_id')->dropDownList(\common\models\BUserCrmGroup::getCRMGroupMap(),[
+        'prompt' => Yii::t('app/users','Choose CRM group')
+    ])?>
+
     <?= $form->field($model, 'status')->dropDownList(\backend\models\BUser::getStatusArr()) ?>
     <div class = "form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

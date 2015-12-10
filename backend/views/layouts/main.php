@@ -41,6 +41,14 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
 
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
+    $subItems[] = ['label' => Yii::t('app/common', 'CRM roles'), 'url' => ['/config/b-user-crm-roles/index']];
+    $subItems[] = ['label' => Yii::t('app/common', 'CRM group'), 'url' => ['/config/b-user-crm-group/index']];
+    $menuItems[] = [
+        'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','CRM'),
+        'items' => $subItems,
+    ];
+    unset($subItems);
+
     $subItems[] = ['label' => Yii::t('app/common', 'Config'), 'url' => ['/config/default/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Entity fields'), 'url' => ['/config/entity-fields/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
@@ -234,6 +242,8 @@ $menuItems[] = [
                                             <a href="<?= Url::to(['/crm/default/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'List feed'); ?>
                                             </a>
+                                        </li>
+                                        <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
                                             </a>
@@ -243,46 +253,8 @@ $menuItems[] = [
                                 </li>
                             </ul>
                         </div>
-                        <!--div class="menu_section">
-                            <h3>Live On</h3>
-                            <ul class="nav side-menu">
-                                <li><a><i class="fa fa-bug"></i> Additional Pages <span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu" style="display: none">
-                                        <li><a href="e_commerce.html">E-commerce</a>
-                                        </li>
-                                        <li><a href="projects.html">Projects</a>
-                                        </li>
-                                        <li><a href="project_detail.html">Project Detail</a>
-                                        </li>
-                                        <li><a href="contacts.html">Contacts</a>
-                                        </li>
-                                        <li><a href="profile.html">Profile</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li><a><i class="fa fa-windows"></i> Extras <span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu" style="display: none">
-                                        <li><a href="page_404.html">404 Error</a>
-                                        </li>
-                                        <li><a href="page_500.html">500 Error</a>
-                                        </li>
-                                        <li><a href="plain_page.html">Plain Page</a>
-                                        </li>
-                                        <li><a href="login.html">Login Page</a>
-                                        </li>
-                                        <li><a href="pricing_tables.html">Pricing Tables</a>
-                                        </li>
-
-                                    </ul>
-                                </li>
-                                <li><a><i class="fa fa-laptop"></i> Landing Page <span class="label label-success pull-right">Coming Soon</span></a>
-                                </li>
-                            </ul>
-                        </div-->
-
                     </div>
                     <!-- /sidebar menu -->
-
                 </div>
             </div>
 
