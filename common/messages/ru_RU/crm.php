@@ -42,5 +42,24 @@ return [
 	'Updated At' => 'Обновлено',
 	'Buser Crm Roles' => 'CRM роли',
 	'Role ID' => 'Роль',
-	'Choose role' => 'Выберите роль'
+	'Choose role' => 'Выберите роль',
+	'CRM company' => 'CRM компании',
+	'Add_new_company' => 'Добавить компанию',
+	'Add new company' => 'Добавить новую компанию',
+	'Contacts' => 'Контакты',
+	'Project files' => 'Файлы проекта',
+	'No contacts' => 'Нет контактов',
+	'Add contact' => 'Добавить контакт',
+	'Quick adding a contact' => 'Быстрое добавление контакта',
+	'Contact successfully added' => 'Контакт успешно добавлен',
+	'Error. Can not add contact' => 'Ошибка. Не удалось добавить контакт',
+	'Fio' => 'Фамилия Имя Отчество',
+	'Post' => 'Должность',
+	'Description' => 'Описание',
+	'Addition Info' => 'Дополнительные контакты',
+	'Assigned At' => 'Ответсвенный',
+	'Add file' => 'Добавить файл',
+	'Adding a file' => 'Добавление файла',
+	'No crm file' => 'Нет файлов'
+
 ];

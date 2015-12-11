@@ -303,6 +303,18 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
                 </div>
            </div>
         </section>
+    <section class="contactSite">
+        <?php echo $form->field($modelR,'site')->widget(\yii\widgets\MaskedInput::className(),[
+            'clientOptions' => [
+                'alias' =>  'url',
+            ],
+            'options' => [
+                'placeholder'=>'http://site.com',
+                'class'=>'form-control'
+            ]
+        ]);
+        ?>
+    </section>
 
     <div class="form-group">
         <div class = "col-md-offset-8 pull-right">

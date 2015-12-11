@@ -44,6 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property string $pasp_ident
  * @property string $pasp_auth
  * @property string $pasp_date
+ * @property string $site
  */
 class CUserRequisites extends AbstractActiveRecord
 {
@@ -100,7 +101,7 @@ class CUserRequisites extends AbstractActiveRecord
                  'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
                  'reg_number', 'reg_auth', 'ch_account', 'b_name', 'b_code',
                  'c_fname', 'c_lname', 'c_mname', 'c_email', 'c_phone', 'c_fax',
-                 'ynp', 'okpo', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident'
+                 'ynp', 'okpo', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident','site'
              ], 'string', 'max' => 255],
             [['pasp_series'], 'string', 'max' => 4],
             ['c_email', 'email'],
@@ -171,6 +172,7 @@ class CUserRequisites extends AbstractActiveRecord
                     return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."';
                 }"
             ],
+            ['site','url'],
         ];
     }
 
@@ -214,7 +216,8 @@ class CUserRequisites extends AbstractActiveRecord
             'pasp_series' => Yii::t('app/users', 'Passport_series'),
             'pasp_number' => Yii::t('app/users', 'Passport_number'),
             'pasp_auth' => Yii::t('app/users', 'Passport_auth'),
-            'pasp_ident' => Yii::t('app/users', 'Passport_identity_number')
+            'pasp_ident' => Yii::t('app/users', 'Passport_identity_number'),
+            'site' => Yii::t('app/users', 'Site')
         ];
     }
 

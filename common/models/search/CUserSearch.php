@@ -16,6 +16,8 @@ class CUserSearch extends CUser
 {
     public
         $corp_name,
+        $c_email,
+        $phone,
         $fio;
 
     /**
@@ -25,7 +27,7 @@ class CUserSearch extends CUser
     {
         return [
             [['id', 'ext_id', 'type', 'manager_id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email','corp_name'], 'safe'],
+            [['phone','c_email','fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email','corp_name'], 'safe'],
         ];
     }
 
@@ -39,6 +41,7 @@ class CUserSearch extends CUser
         return ArrayHelper::merge($arPLabel,[
             'fio' => Yii::t('app/users', 'FIO'),
             'corp_name' => Yii::t('app/users', 'Corp Name'),
+            'phone' => Yii::t('app/users', 'Phone')
         ]);
     }
 
@@ -58,10 +61,12 @@ class CUserSearch extends CUser
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$addQuery = NULL,$addParams = [])
     {
         $query = CUser::find()->with('manager','userType','requisites');
         $query->joinWith('requisites');
+        if(!is_null($addQuery))
+            $query->where($addQuery,$addParams);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -94,6 +99,7 @@ class CUserSearch extends CUser
             ->andFilterWhere(['like', 'password_hash', $this->password_hash])
             ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
             ->andFilterWhere(['like', 'email', $this->email]);
+
         if(!empty($this->fio))
             $query->andWhere(' ( '.CUserRequisites::tableName().'.j_lname LIKE "'.$this->fio.'%" OR '.
                 CUserRequisites::tableName().'.j_fname LIKE "'.$this->fio.'%" OR '.
@@ -106,7 +112,10 @@ class CUserSearch extends CUser
                 CUserRequisites::tableName().'.j_fname LIKE "%'.$this->corp_name.'%" OR '.
                 CUserRequisites::tableName().'.j_mname LIKE "%'.$this->corp_name.'%")');
 
-        //$query->andFilterWhere(['like',CUserRequisites::tableName().'.j_lname',$this->fio]);
+
+        $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_phone',$this->phone]);
+        $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_email',$this->c_email]);
+
         return $dataProvider;
     }
 }

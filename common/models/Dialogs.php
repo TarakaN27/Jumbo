@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $theme
+ * @property integer $crm_cmp_id
  *
  * @property BuserToDialogs[] $buserToDialogs
  * @property BUser[] $busers
@@ -85,7 +86,7 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id', 'status', 'type', 'created_at', 'updated_at'], 'integer'],
+            [['buser_id', 'status', 'type', 'created_at', 'updated_at','crm_cmp_id'], 'integer'],
             [['theme'],'string']
         ];
     }
@@ -113,6 +114,14 @@ class Dialogs extends AbstractActiveRecord
     public function getBusers()
     {
         return $this->hasMany(BUser::className(), ['id' => 'buser_id'])->viaTable(BuserToDialogs::tableName(), ['dialog_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCrmCmp()
+    {
+        return $this->hasOne(CUser::className(),['id' => 'crm_cmp_id']);
     }
 
     /**

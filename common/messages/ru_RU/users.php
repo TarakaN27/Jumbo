@@ -21,7 +21,7 @@ return [
     'Username' => 'Имя пользователя(login)',
     'Ext ID' => 'Внешний код',
     'Type' => 'Тип',
-    'Manager ID' => 'Менеджер',
+    'Manager ID' => 'Ответственный',
     'Role' => 'Роль',
     'Email' => 'Емаил',
     'Status' => 'Статус',
@@ -182,7 +182,10 @@ return [
     'Error. Remove account' => 'Ошибка удаления аккаунта',
     'CSDA account successfully deleted' => 'CSDA аккаунт успешно удален',
     'Crm Group Id' => 'CRM группа пользователей',
-    'Choose CRM group' => 'Выберите CRM группу пользователй'
+    'Choose CRM group' => 'Выберите CRM группу пользователй',
+    'Site' => 'Сайт',
+    'Is opened' => 'Досутпна для всех',
+    'Is closed' => 'Не доступна'
 
 
 

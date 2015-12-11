@@ -233,7 +233,8 @@ class BUser extends AbstractUser
      */
     public function getFio()
     {
-        return $this->lname.' '.$this->fname.' '.$this->mname;
+        $str = trim($this->lname.' '.$this->fname.' '.$this->mname);
+        return empty($str) ? $this->username : $str;
     }
 
     /**
@@ -346,11 +347,14 @@ class BUser extends AbstractUser
         if(empty($this->crm_group_id))
             return [];
 
-        return BUserCrmRules::find()
-            ->leftJoin(BUserCrmGroup::tableName(),['role_id'=>'role_id'])
+        $data =  BUserCrmRules::find()
+            ->leftJoin(BUserCrmGroup::tableName().' as groups ',BUserCrmRules::tableName().'.role_id = groups.role_id')
             ->where([
-                BUserCrmGroup::tableName().'.id' => $this->crm_group_id,
+                'groups.id' => $this->crm_group_id,
                 'entity' => $entity
-            ])->one();
+            ])
+            ->one();
+
+        return $data;
     }
 }

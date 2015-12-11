@@ -31,11 +31,15 @@ use yii\helpers\ArrayHelper;
  * @property integer $requisites_id
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $is_opened
+ * @property integer $created_by
  */
 class CUser extends AbstractUser
 {
     use \DevGroup\TagDependencyHelper\TagDependencyTrait;
     CONST
+        IS_OPENED = 1,
+        IS_CLOSED = 0,
         RESIDENT_YES = 1,
         RESIDENT_NO = 0,
         SCENARIO_REGISTER = 'register';
@@ -43,6 +47,23 @@ class CUser extends AbstractUser
     public
         $isNew = FALSE,
         $password;
+
+    /**
+     * @return array
+     */
+    public static function getOpenedCloserArr()
+    {
+        return [
+            self::IS_CLOSED => Yii::t('app/users','Is closed'),
+            self::IS_OPENED => Yii::t('app/users','Is opened'),
+        ];
+    }
+
+    public function getOpenedClosedStr()
+    {
+        $tmp = self::getOpenedCloserArr();
+        return isset($tmp[$this->is_opened]) ? $tmp[$this->is_opened] : 'N/A';
+    }
 
     /**
      * @return array
@@ -97,7 +118,7 @@ class CUser extends AbstractUser
     public function rules()
     {
         return [
-            [['role','status','created_at','updated_at','manager_id'],'integer'],
+            [['role','status','created_at','updated_at','manager_id','is_opened','created_by'],'integer'],
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             //имя пользователя
@@ -131,6 +152,9 @@ class CUser extends AbstractUser
             [['requisites_id','is_resident'],'integer'],
             ['is_resident', 'in', 'range' => array_keys(self::getResidentArr())],
             ['r_country', 'string'],
+
+            ['is_opened','default','value' => self::IS_CLOSED],
+            ['is_opened','in','range' => array_keys(self::getOpenedCloserArr())]
         ];
     }
 
@@ -157,6 +181,8 @@ class CUser extends AbstractUser
             'is_resident' => Yii::t('app/users', 'Is resident'),
             'requisites_id' => Yii::t('app/users', 'Requisites'),
             'r_country' => Yii::t('app/users', 'Resident country'),
+            'is_opened' => Yii::t('app/users','Is opened'),
+            'created_by' => Yii::t('app/users','Created by')
         ];
     }
 
@@ -193,6 +219,14 @@ class CUser extends AbstractUser
     }
 
     /**
+     * @return ActiveQuery
+     */
+    public function getCreatedBy()
+    {
+        return $this->hasOne(BUser::className(), ['id' => 'created_by']);
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getUserType()
@@ -214,6 +248,22 @@ class CUser extends AbstractUser
     public function getExternalAccount()
     {
         return $this->hasOne(CuserExternalAccount::className(),['cuser_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCrmContacts()
+    {
+        return $this->hasMany(CrmCmpContacts::className(),['cmp_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getCrmFiles()
+    {
+        return $this->hasMany(CrmCmpFile::className(),['cmp_id' => 'id']);
     }
 
     /**
@@ -367,7 +417,7 @@ class CUser extends AbstractUser
      */
     protected function createCuserSettings()
     {
-        if(!CuserSettings::find()->where(['cuser_id' => $this->id])->exist())
+        if(!CuserSettings::find()->where(['cuser_id' => $this->id])->exists())
         {
             $obSettings = new CuserSettings();
             $obSettings->cuser_id = $this->id;

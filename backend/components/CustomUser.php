@@ -28,6 +28,9 @@ class CustomUser extends User
 
 	/**
 	 * Возвращаем тип правила для действия $action c сущностью $entity.
+	 * @param $entity
+	 * @param $action
+	 * @return int|null
 	 */
 	public function getCRMLevelAccess($entity,$action)
 	{
@@ -43,7 +46,7 @@ class CustomUser extends User
 			$this->_crmAcceess[$entity] = $this->identity->getCRMRulesByGroup($entity);
 		}
 
-		if(is_object($obRule = $this->_crmAcceess[$entity]) && property_exists($obRule,$action))
+		if(is_object($obRule = $this->_crmAcceess[$entity]))
 			return $obRule->$action;
 
 		return BUserCrmRules::RULE_CLOSED;
