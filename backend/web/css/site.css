@@ -132,3 +132,10 @@
 .btnContact{
     margin-top: 23px;
 }
+.company-header{
+    background-color: #F2F5F7;
+    padding: 20px;
+}
+.company-msg li{
+    list-style-type: none;
+}

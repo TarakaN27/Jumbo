@@ -111,17 +111,61 @@ class CrmCmpFile extends AbstractActiveRecord
         return $this->name.'.'.$this->ext;
     }
 
+    /**
+     * @return string
+     */
     public function getHtmlClassExt()
     {
         $str = 'fa-file';
         switch($this->ext)
         {
             case 'jpg':
-            //case 'jpeg':
-
+            case 'jpeg':
+            case 'png':
+                $str = 'fa-file-image-o';
                 break;
+
+            case 'docx':
+            case 'doc':
+                $str = 'fa-file-word-o';
+                break;
+
+            case 'zip':
+            case 'tar':
+            case 'rar':
+                $str = 'fa-file-archive-o';
+                break;
+
+            case 'txt':
+                $str = 'fa-file-text-o';
+                break;
+
+            case 'xls':
+            case 'xlsx':
+                $str = 'fa-file-excel-o';
+                break;
+
+            case 'pdf':
+                $str = 'fa-file-pdf-o';
+                break;
+
+            case 'ppt':
+            case 'pot':
+            case 'pptx':
+            case 'potx':
+
             default:
                 break;
         }
+
+        return 'fa '.$str;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return Yii::getAlias(self::FILE_PATH.'/'.$this->src);
     }
 }

@@ -71,5 +71,8 @@ return [
     'List feed' => 'Лента новостей',
     'Company' => 'Компании',
     'CRM roles' => 'CRM Роли',
-    'CRM group' => 'CRM группы'
+    'CRM group' => 'CRM группы',
+    'Add new dialog' => 'Новый диалог',
+    'DIALOG_company' => 'Компания',
+    'DIALOG_ERROR_LOAD_DIALOG' => 'Ошибка загрузки диалогов'
 ];

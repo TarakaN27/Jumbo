@@ -17,6 +17,7 @@ use common\models\CUser;
 use common\models\search\CUserSearch;
 use Yii;
 use common\models\CUserRequisites;
+use yii\web\NotFoundHttpException;
 
 class CompanyController extends AbstractBaseBackendController
 {
@@ -148,7 +149,7 @@ class CompanyController extends AbstractBaseBackendController
 
 		return $this->render('view',[
 			'model' => $model,
-			'obRequisites' => $obRequisite,
+			'obRequisite' => $obRequisite,
 			'arContacts' => $arContacts,
 			'obModelContact' => $obModelContact,
 			'obFile' => $obFile,
@@ -156,5 +157,18 @@ class CompanyController extends AbstractBaseBackendController
 		]);
 	}
 
+	/**
+	 * @param $cmpID
+	 * @param $id
+	 * @return $this
+	 * @throws NotFoundHttpException
+	 */
+	public function actionDownloadFile($cmpID,$id)
+	{
+		$obFile = CrmCmpFile::findOne(['id' => $id,'cmp_id' => $cmpID]);
+		if(!$obFile)
+			throw new NotFoundHttpException('File not found');
+		return Yii::$app->response->sendFile($obFile->getFilePath());
+	}
 
 }

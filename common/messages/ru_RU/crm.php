@@ -60,6 +60,15 @@ return [
 	'Assigned At' => 'Ответсвенный',
 	'Add file' => 'Добавить файл',
 	'Adding a file' => 'Добавление файла',
-	'No crm file' => 'Нет файлов'
+	'No crm file' => 'Нет файлов',
+	'Company type' => 'Тип компании',
+	'FIO' => 'ФИО',
+	'Recent Activity' => 'Лента',
+	'Tasks' => 'Задачи',
+	'History' => 'История',
+	'No dialogs at feed' => 'Нет диалогов в ленте',
+	'MSG_DIALOG_EMPTY_CONTENT' => 'Пустое сообщение',
+	'DIALOG_ERROR_ADD_DIALOG' => 'Не удалось добавить диалог',
+	'Show messages' => 'Показать сообщения'
 
 ];

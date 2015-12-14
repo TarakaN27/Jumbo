@@ -18,6 +18,7 @@ use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
+use Yii;
 
 class AjaxServiceController extends AbstractBaseBackendController{
 
@@ -42,7 +43,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
                         'add-message' => ['post'],
                         'load-dialog' => ['post'],
                         'add-new-message' => ['post'],
-                        'add-dialog' => ['post']
+                        'add-dialog' => ['post'],
+                        'add-new-dialog' => ['post']
                     ],
                 ],
             ]
@@ -154,5 +156,40 @@ class AjaxServiceController extends AbstractBaseBackendController{
         ]);
     }
 
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionAddNewDialog()
+    {
+        $iCmpID = Yii::$app->request->post('cmp_id');
+        $sMsg = Yii::$app->request->post('redactor');
+        $iAthID = Yii::$app->request->post('author_id');
+
+        $obDlgMng = new DialogManager();
+        $obDialog = $obDlgMng->addNewDialogForCompany($iCmpID,$sMsg,$iAthID);
+
+        return [
+            'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
+                'models' => [$obDialog],
+                'pag' => NULL
+            ])
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function actionLoadCmpDialogs()
+    {
+        $obDialogs = (new DialogManager())->getDialogsForCompany(Yii::$app->request->get('id'));
+        return [
+            'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
+                'models' => $obDialogs->getModels(),
+                'pag' => $obDialogs->getPagination()
+            ])
+        ];
+    }
 
 } 

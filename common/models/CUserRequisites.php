@@ -233,6 +233,9 @@ class CUserRequisites extends AbstractActiveRecord
             ]);
     }
 
+    /**
+     * @return string
+     */
     public function getCorpName()
     {
         if($this->type_id == self::TYPE_I_PERSON)
@@ -242,5 +245,13 @@ class CUserRequisites extends AbstractActiveRecord
             return 'ФИЗ '.$this->j_lname.' '.$this->j_fname.' '.$this->j_mname;
         else
             return $this->corp_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContactFIO()
+    {
+        return $this->c_lname.' '.$this->c_fname.' '.$this->c_mname;
     }
 }
