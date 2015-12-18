@@ -13,6 +13,12 @@
 .yellow_tag{
     background: rgba(243, 156, 18, 0.88);
 }
+.violet_tag{
+    background: #8E44AD;
+}
+.violet_tag:after {
+    border-left: 11px solid #8E44AD;
+}
 .green_tag:after {
     border-left: 11px solid #1ABB9C;
 }
@@ -139,3 +145,17 @@
 .company-msg li{
     list-style-type: none;
 }
+.delete-link,.link-btn-cursor{
+    cursor: pointer;
+}
+.block-view-type{
+    float: left;
+    padding-left: 20px;
+}
+.modal-header h2{
+    float: none;
+}
+.block-min-height{
+    min-height: 60px;
+}
+

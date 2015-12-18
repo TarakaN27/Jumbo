@@ -29,6 +29,13 @@ use yii\web\View;
  */
 class Alert extends \yii\bootstrap\Widget
 {
+    CONST
+        TYPE_SUCCESS = 'success',
+        TYPE_ERROR = 'error',
+        TYPE_DANGER = 'danger',
+        TYPE_INFO = 'info',
+        TYPE_WARNING = 'waning';
+
     /**
      * @var array the alert types configuration for the flash messages.
      * This array is setup as $key => $value, where:
@@ -36,11 +43,11 @@ class Alert extends \yii\bootstrap\Widget
      * - $value is the bootstrap alert type (i.e. danger, success, info, warning)
      */
     public $alertTypes = [
-        'error'   => 'alert-danger',
-        'danger'  => 'alert-danger',
-        'success' => 'alert-success',
-        'info'    => 'alert-info',
-        'warning' => 'alert-warning'
+        self::TYPE_ERROR   => 'alert-danger',
+        self::TYPE_DANGER  => 'alert-danger',
+        self::TYPE_SUCCESS => 'alert-success',
+        self::TYPE_INFO    => 'alert-info',
+        self::TYPE_WARNING => 'alert-warning'
     ];
 
     /**

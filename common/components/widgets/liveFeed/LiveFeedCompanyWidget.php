@@ -42,7 +42,8 @@ class LiveFeedCompanyWidget extends Widget
 			var
 				MSG_DIALOG_EMPTY_CONTENT = "'.Yii::t('app/crm','MSG_DIALOG_EMPTY_CONTENT').'",
 				DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-new-dialog']) . '",
-			   // DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['/ajax-service/load-lf-dialogs']) . '",
+			    DIALOG_LOAD_COMMENTS = "' . \yii\helpers\Url::to(['/ajax-service/load-dialog-comments']) . '",
+			    DIALOG_SEND_CRM_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-crm-msg']) . '",
 			    DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
@@ -52,7 +53,11 @@ class LiveFeedCompanyWidget extends Widget
 			    DIALOG_SUCCESS_ADD_DIALOG = "' . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_DIALOG') . '",
 			    DIALOG_ERROR_LOAD_CONTENT = "' . Yii::t('app/common', 'DIALOG_ERROR_LOAD_CONTENT') . '",
 			    DIALOG_ERROR_ADDCOMMENT = "'. Yii::t('app/common', 'DIALOG_ERROR_ADDCOMMENT') .'",
+			    DIALOG_NO_COMMETS = "'. Yii::t('app/common', 'DIALOG_NO_COMMETS') .'",
 			    DIALOG_ERROR_LOAD_DIALOG = "'. Yii::t('app/common', 'DIALOG_ERROR_LOAD_DIALOG') .'",
+			    HIDE_MSG_TEXT = "'. Yii::t('app/common', 'HIDE_MSG_TEXT') .'",
+			    SHOW_MSG_TEXT = "'. Yii::t('app/common', 'SHOW_MSG_TEXT') .'",
+			    DIALOG_ERROR_ADD_MESSAGE = "'. Yii::t('app/common', 'DIALOG_ERROR_ADD_MESSAGE') .'",
 			    DIALOG_ERROR_ADD_DIALOG = "'.Yii::t('app/crm','DIALOG_ERROR_ADD_DIALOG').'";
 		',$view::POS_BEGIN);
 
@@ -65,6 +70,10 @@ class LiveFeedCompanyWidget extends Widget
 			$('.addDialog').on('click',addNewDialog);
 			$('.msgBoxList').on('click','.btn-load-more',loadMoreCmp);
 			$('.msgBoxList').on('click','.btn-show-hide',showHideComments);
+			$('.msg_list').on('click','.btn-load-more-comment',function(){
+				loadMoreComments(false,false,this);
+			});
+			$('.company-msg').on('click','.addCmpMsg',addCmpMessage);
 		",$view::POS_READY);
 	}
 }

@@ -19,6 +19,8 @@ use backend\models\BUser;
  * @property integer $updated_at
  * @property string $phone
  * @property string $email
+ * @property integer $is_opened
+ * @property integer $created_by
  *
  * @property BUser $assignedAt
  * @property CUser $cmp
@@ -30,6 +32,30 @@ class CrmCmpContacts extends AbstractActiveRecord
         TYPE_CLIENT  = 1,
         TYPE_PARTNER = 2,
         TYPE_OTHER = 3;
+
+    CONST
+        IS_OPENED = 1,
+        IS_CLOSED = 0;
+
+    /**
+     * @return array
+     */
+    public static function getOpenedClosedArr()
+    {
+        return [
+            self::IS_OPENED => Yii::t('app/crm','Is opened'),
+            self::IS_CLOSED => Yii::t('app/crm','Is closed')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getOpenedClosedStr()
+    {
+        $tmp = self::getOpenedClosedArr();
+        return isset($tmp[$this->is_opened]) ? $tmp[$this->is_opened] : 'N/A';
+    }
 
     /**
      * @return array
@@ -66,8 +92,8 @@ class CrmCmpContacts extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['cmp_id', 'fio'], 'required'],
-            [['cmp_id', 'type', 'assigned_at', 'created_at', 'updated_at'], 'integer'],
+            [['type','fio', 'assigned_at'], 'required'],
+            [['cmp_id', 'type', 'assigned_at', 'created_at', 'updated_at', 'is_opened','created_by'], 'integer'],
             [['description', 'addition_info'], 'string'],
             [['fio', 'post', 'phone', 'email'], 'string', 'max' => 255],
             ['email','email']
@@ -92,6 +118,8 @@ class CrmCmpContacts extends AbstractActiveRecord
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'phone' => Yii::t('app/crm', 'Phone'),
             'email' => Yii::t('app/crm', 'Email'),
+            'is_opened' => Yii::t('app/crm','Is opened'),
+            'created_by' => Yii::t('app/crm','Created by')
         ];
     }
 
@@ -117,5 +145,27 @@ class CrmCmpContacts extends AbstractActiveRecord
     public function getDialogs()
     {
         return $this->hasMany(Dialogs::className(), ['crm_cmp_contact_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthor()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'created_by']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFiles()
+    {
+        return $this->hasMany(CrmCmpFile::className(),['contact_id' => 'id']);
+    }
+
+    public function beforeSave($insert)
+    {
+        $this->created_by = Yii::$app->user->id;
+        return parent::beforeSave($insert);
     }
 }

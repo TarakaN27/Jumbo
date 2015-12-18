@@ -17,7 +17,10 @@ use common\models\CUser;
 use common\models\search\CUserSearch;
 use Yii;
 use common\models\CUserRequisites;
+use yii\base\Exception;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 class CompanyController extends AbstractBaseBackendController
 {
@@ -64,6 +67,10 @@ class CompanyController extends AbstractBaseBackendController
 		]);
 	}
 
+	/**
+	 * @return string
+	 * @throws \yii\db\Exception
+	 */
 	public function actionCreate()
 	{
 		$model = new CUser();
@@ -106,9 +113,15 @@ class CompanyController extends AbstractBaseBackendController
 		]);
 	}
 
+	/**
+	 * @param $id
+	 * @return string|\yii\web\Response
+	 */
 	public function actionView($id)
 	{
+		/** @var CUser $model */
 		$model = CUser::findOneByIDCached($id);
+		/** @var CUserRequisites $obRequisite */
 		$obRequisite = $model->requisites;
 		$arContacts =  $model->crmContacts;
 		$arFile = $model->crmFiles;
@@ -116,12 +129,14 @@ class CompanyController extends AbstractBaseBackendController
 		$obModelContact->cmp_id = $id;
 		$obModelContact->type = CrmCmpContacts::TYPE_CLIENT;
 		$obModelContact->assigned_at = Yii::$app->user->id;
+		$obModelContact->is_opened = $model->is_opened; //по умолчанию для контакта ставим уровень такой же как и у компании
+		$obModelContact->created_by = Yii::$app->user->id;
 		$obFile = new CrmCmpFile();
 		$obFile->setScenario('insert');
 		$obFile->cmp_id = $id;
 
 		/**
-		 * добавление контакта
+		 * Добавление контакта
 		 */
 		if($obModelContact->load(Yii::$app->request->post()) )
 		{
@@ -134,7 +149,9 @@ class CompanyController extends AbstractBaseBackendController
 				return $this->redirect(['view','id' => $id]);
 			}
 		}
-
+		/**
+		 * Добавление файла
+		 */
 		if($obFile->load(Yii::$app->request->post()))
 		{
 			if($obFile->save())
@@ -144,6 +161,19 @@ class CompanyController extends AbstractBaseBackendController
 			}else{
 				Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add file'));
 				return $this->redirect(['view','id' => $id]);
+			}
+		}
+		/**
+		 * Смена отвественного
+		 */
+		if($model->load(Yii::$app->request->post()))
+		{
+			if($model->save())
+			{
+				Yii::$app->session->setFlash('success',Yii::t('app/crm','Assigned successfully changed'));
+				return $this->redirect(['view','id' => $id]);
+			}else{
+				Yii::$app->session->setFlash('error',Yii::t('app/crm','Assigned changed with error'));
 			}
 		}
 
@@ -163,12 +193,50 @@ class CompanyController extends AbstractBaseBackendController
 	 * @return $this
 	 * @throws NotFoundHttpException
 	 */
-	public function actionDownloadFile($cmpID,$id)
+	public function actionDownloadFile($id)
 	{
-		$obFile = CrmCmpFile::findOne(['id' => $id,'cmp_id' => $cmpID]);
+		$obFile = CrmCmpFile::findOne(['id' => $id]);
 		if(!$obFile)
 			throw new NotFoundHttpException('File not found');
 		return Yii::$app->response->sendFile($obFile->getFilePath());
+	}
+
+	/**
+	 * @throws ServerErrorHttpException
+	 * @throws \yii\base\ExitException
+	 */
+	public function actionEditContacts()
+	{
+		$pk = Yii::$app->request->post('pk');
+		$name = Yii::$app->request->post('name');
+		$value = Yii::$app->request->post('value');
+		try {
+			$obContact = CrmCmpContacts::findOne($pk);
+			if (!$obContact)
+				throw new NotFoundHttpException('Contact not found');
+
+			$obContact->$name = $value;
+			if (!$obContact->save())
+				throw new ServerErrorHttpException();
+		}catch (Exception $e)
+		{
+			throw new ServerErrorHttpException();
+		}
+		Yii::$app->end(200);
+	}
+
+	/**
+	 * @return false|int
+	 * @throws NotFoundHttpException
+	 */
+	public function actionDeleteFile()
+	{
+		$pk = Yii::$app->request->post('pk');
+		$obFile = CrmCmpFile::findOne($pk);
+		if(!$obFile)
+			throw new NotFoundHttpException('File not found');
+		Yii::$app->response->format = Response::FORMAT_JSON;
+		return $obFile->delete();
 	}
 
 }

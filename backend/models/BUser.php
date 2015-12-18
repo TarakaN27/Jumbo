@@ -225,7 +225,12 @@ class BUser extends AbstractUser
                 if($item->id == $exeptID)
                     unset($tmp[$key]);
 
-        return !is_array($tmp) ? [] : ArrayHelper::map($tmp,'id','username');
+        $arReturn = [];
+        if(is_array($tmp))
+            foreach($tmp as $t)
+                $arReturn[$t->id] = $t->getFio();
+
+        return $arReturn;
     }
 
     /**

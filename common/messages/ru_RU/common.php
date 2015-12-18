@@ -74,5 +74,13 @@ return [
     'CRM group' => 'CRM группы',
     'Add new dialog' => 'Новый диалог',
     'DIALOG_company' => 'Компания',
-    'DIALOG_ERROR_LOAD_DIALOG' => 'Ошибка загрузки диалогов'
+    'DIALOG_ERROR_LOAD_DIALOG' => 'Ошибка загрузки диалогов',
+    'DIALOG_NO_COMMETS' => 'Нет сообщений',
+    'HIDE_MSG_TEXT' => 'Скрыть сообщения',
+    'SHOW_MSG_TEXT' => 'Показать сообщения',
+    'DIALOG_ERROR_ADD_MESSAGE' => 'Не удалось добавить сообщение',
+    'Load more' => 'Загрузить еще',
+    'Contacts' => 'Контакты',
+    'Tasks' => 'Задачи',
+    'DIALOG_task' => 'Задача'
 ];

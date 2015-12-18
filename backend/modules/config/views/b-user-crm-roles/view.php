@@ -54,6 +54,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             ]),
                             'columns' => [
                                 [
+                                    'attribute' => 'entity',
+                                    'value' => function($model){
+                                        return $model->getEntityStr();
+                                    }
+                                ],
+                                [
                                     'attribute' => 'crt',
                                     'value' => function($model)
                                     {

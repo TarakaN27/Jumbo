@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property string $theme
  * @property integer $crm_cmp_id
+ * @property integer $crm_cmp_contact_id
  *
  * @property BuserToDialogs[] $buserToDialogs
  * @property BUser[] $busers
@@ -37,7 +38,8 @@ class Dialogs extends AbstractActiveRecord
         TYPE_MSG = 5,   //обычное сообщение
         TYPE_REQUEST = 10,  //запрос на платеж
         TYPE_OVERDUE_PP = 15,   //просороченный обещанный платеж
-        TYPE_COMPANY = 20; //компания
+        TYPE_COMPANY = 20, //компания
+        TYPE_TASK = 25;
 
     /**
      * @return array
@@ -48,7 +50,8 @@ class Dialogs extends AbstractActiveRecord
             self::TYPE_MSG => Yii::t('app/common','DIALOG_message'),
             self::TYPE_REQUEST => Yii::t('app/common','DIALOG_request'),
             self::TYPE_OVERDUE_PP => Yii::t('app/common','DIALOG_overdue_pp'),
-            self::TYPE_COMPANY => Yii::t('app/common','DIALOG_company')
+            self::TYPE_COMPANY => Yii::t('app/common','DIALOG_company'),
+            self::TYPE_TASK => Yii::t('app/common','DIALOG_task')
         ];
     }
 
@@ -60,7 +63,9 @@ class Dialogs extends AbstractActiveRecord
         $arTmp = [
             self::TYPE_MSG => 'green_tag',
             self::TYPE_REQUEST => 'red_tag',
-            self::TYPE_OVERDUE_PP => 'blue_tag'
+            self::TYPE_OVERDUE_PP => 'blue_tag',
+            self::TYPE_COMPANY => 'yellow_tag',
+            self::TYPE_TASK => 'violet_tag'
         ];
         return array_key_exists($this->type,$arTmp) ? $arTmp[$this->type] : 'N/A';
     }
@@ -89,7 +94,7 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id', 'status', 'type', 'created_at', 'updated_at','crm_cmp_id'], 'integer'],
+            [['buser_id', 'status', 'type', 'created_at', 'updated_at','crm_cmp_id','crm_cmp_contact_id'], 'integer'],
             [['theme'],'string']
         ];
     }

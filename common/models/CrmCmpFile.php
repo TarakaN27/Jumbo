@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property string $src
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $contact_id
  *
  * @property CUser $cmp
  */
@@ -40,7 +41,7 @@ class CrmCmpFile extends AbstractActiveRecord
         return [
             [['name','cmp_id'],'required'],
             ['src','required', 'on' => ['insert']],
-            [['cmp_id', 'created_at', 'updated_at'], 'integer'],
+            [['cmp_id', 'created_at', 'updated_at','contact_id'], 'integer'],
             [['name', 'ext'], 'string', 'max' => 255],
             [['src'], 'file','on' => ['insert']]
         ];
@@ -59,6 +60,7 @@ class CrmCmpFile extends AbstractActiveRecord
             'src' => Yii::t('app/crm', 'Src'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
+            'contact_id' => Yii::t('app/crm', 'CRM contact'),
         ];
     }
 
@@ -68,6 +70,14 @@ class CrmCmpFile extends AbstractActiveRecord
     public function getCmp()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cmp_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContact()
+    {
+        return $this->hasOne(CrmCmpContacts::className(),['id' => 'contact_id']);
     }
 
     /**
@@ -89,6 +99,10 @@ class CrmCmpFile extends AbstractActiveRecord
             ]);
     }
 
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert)
     {
         if(parent::beforeSave($insert))

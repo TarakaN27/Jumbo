@@ -169,12 +169,39 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
         $obDlgMng = new DialogManager();
         $obDialog = $obDlgMng->addNewDialogForCompany($iCmpID,$sMsg,$iAthID);
-
+        $uniqStr = uniqid();
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => [$obDialog],
-                'pag' => NULL
-            ])
+                'pag' => NULL,
+                'uniqStr' => $uniqStr
+
+            ]),
+            'uniqueStr' => $uniqStr
+        ];
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionAddNewDialogContact()
+    {
+        $iCmpID = Yii::$app->request->post('cnt_id');
+        $sMsg = Yii::$app->request->post('redactor');
+        $iAthID = Yii::$app->request->post('author_id');
+
+        $obDlgMng = new DialogManager();
+        $obDialog = $obDlgMng->addNewDialogForContact($iCmpID,$sMsg,$iAthID);
+        $uniqStr = uniqid();
+        return [
+            'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
+                'models' => [$obDialog],
+                'pag' => NULL,
+                'uniqStr' => $uniqStr
+            ]),
+            'uniqueStr' => $uniqStr
         ];
     }
 
@@ -184,12 +211,82 @@ class AjaxServiceController extends AbstractBaseBackendController{
     public function actionLoadCmpDialogs()
     {
         $obDialogs = (new DialogManager())->getDialogsForCompany(Yii::$app->request->get('id'));
+        $uniqStr = uniqid();
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => $obDialogs->getModels(),
-                'pag' => $obDialogs->getPagination()
-            ])
+                'pag' => $obDialogs->getPagination(),
+                'uniqStr' => $uniqStr
+            ]),
+            'uniqueStr' => $uniqStr
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function actionLoadContactDialogs()
+    {
+        $obDialogs = (new DialogManager())->getDialogsForContact(Yii::$app->request->get('id'));
+        $uniqStr = uniqid();
+        return [
+            'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
+                'models' => $obDialogs->getModels(),
+                'pag' => $obDialogs->getPagination(),
+                'uniqStr' => $uniqStr
+            ]),
+            'uniqueStr' => $uniqStr
+        ];
+
+    }
+
+
+    /**
+     * @return array
+     */
+    public function actionLoadDialogComments()
+    {
+        $dID = Yii::$app->request->post('dID');
+        $obComm = (new DialogManager())->getCommentsForDialog($dID);
+        return [
+            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
+                'models' => array_reverse($obComm->getModels()),
+                'pag' => $obComm->getPagination(),
+                'dID' => $dID
+            ]))
+        ];
+    }
+
+    /**
+     * @return array
+     * @throws ServerErrorHttpException
+     */
+    public function actionAddCrmMsg()
+    {
+        $iAuthID = Yii::$app->request->post('author_id');
+        $iDialogID = Yii::$app->request->post('dialog_id');
+        $sMsg = trim(Yii::$app->request->post('redactor'));
+
+        $obMsg = new Messages();
+        $obMsg->buser_id = $iAuthID;
+        $obMsg->msg = $sMsg;
+        $obMsg->dialog_id = $iDialogID;
+        $obMsg->status = Messages::PUBLISHED;
+        $obMsg->parent_id = 0;
+        $obMsg->lvl = 0;
+        if(!$obMsg->save())
+            throw new ServerErrorHttpException();
+
+        return [
+            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
+                'models' => [$obMsg],
+                'pag' => NULL,
+                'dID' => $iDialogID
+            ]))
+        ];
+
+        return $_POST;
+
     }
 
 } 

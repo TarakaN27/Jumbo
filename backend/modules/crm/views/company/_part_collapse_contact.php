@@ -6,16 +6,64 @@
  * Time: 16.43
  */
 use yii\helpers\Html;
+use yii\helpers\Url;
 ?>
 <div class="project_detail">
 	<p class="title"><?= $contact->getAttributeLabel('phone'); ?></p>
-	<p><?=$contact->phone;?></p>
+	<p>
+		<?php echo Html::a($contact->phone,'#',[
+			'class' => 'editable',
+			'data-type' => "text",
+			'data-name' => 'phone',
+			'data-pk' => $contact->id,
+			'data-url' => Url::to(['edit-contacts']),
+			'data-title' => $contact->getAttributeLabel('phone')
+		]) ?>
+	</p>
 	<p class="title"><?= $contact->getAttributeLabel('email'); ?></p>
-	<p><?=$contact->email;?></p>
+	<p>
+		<?php echo Html::a($contact->email,'#',[
+			'class' => 'editable',
+			'data-type' => "text",
+			'data-name' => 'email',
+			'data-pk' => $contact->id,
+			'data-url' => Url::to(['edit-contacts']),
+			'data-title' => $contact->getAttributeLabel('email')
+		]) ?>
+	</p>
 	<p class="title"><?= $contact->getAttributeLabel('addition_info'); ?></p>
-	<p><?=$contact->addition_info;?></p>
+	<p>
+		<?php echo Html::a($contact->addition_info,'#',[
+			'class' => 'editable',
+			'data-type' => "textarea",
+			'data-pk' => $contact->id,
+			'data-name' => 'addition_info',
+			'data-url' => Url::to(['edit-contacts']),
+			'data-title' => $contact->getAttributeLabel('addition_info')
+		]) ?>
+	</p>
 	<p class="title"><?= $contact->getAttributeLabel('description'); ?></p>
-	<p><?=$contact->description;?></p>
+	<p>
+		<?php echo Html::a($contact->description,'#',[
+			'class' => 'editable',
+			'data-type' => "textarea",
+			'data-pk' => $contact->id,
+			'data-name' => 'description',
+			'data-url' => Url::to(['edit-contacts']),
+			'data-title' => $contact->getAttributeLabel('description')
+		]) ?>
+	</p>
 	<p class="title"><?= $contact->getAttributeLabel('assigned_at'); ?></p>
-	<p><?=is_object($obAss = $contact->assignedAt) ? $obAss->getFio() : $contact->assigned_at;?></p>
+	<p>
+		<?php echo Html::a(is_object($obAss = $contact->assignedAt) ? $obAss->getFio() : $contact->assigned_at,'#',[
+			'class' => 'editable',
+			'data-type' => "select",
+			'data-value' => $contact->assigned_at,
+			'data-source' => \yii\helpers\Json::encode(\backend\models\BUser::getListManagers()),
+			'data-pk' => $contact->id,
+			'data-name' => 'assigned_at',
+			'data-url' => Url::to(['edit-contacts']),
+			'data-title' => $contact->getAttributeLabel('description')
+		]) ?>
+	</p>
 </div>

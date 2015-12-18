@@ -9,6 +9,57 @@ use yii\bootstrap\Modal;
 use common\components\customComponents\collapse\CollapseWidget;
 
 $this->title = $model->getInfo();
+//скрипты для редактирования контактов
+if(!empty($arContacts)) {
+	$this->registerCssFile('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css');
+	$this->registerJsFile(
+		'//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js',
+		['depends' => [
+			'yii\web\JqueryAsset',
+			'yii\web\YiiAsset',
+			'yii\bootstrap\BootstrapPluginAsset',
+		]]
+	);
+	$this->registerJs("
+		$('.editable').editable({
+		    clear: false,
+		    validate: function(value) {
+				if($.trim(value) == '') {
+					return 'This field is required';
+				}
+			}
+		});
+	", \yii\web\View::POS_READY);
+}
+
+$this->registerJs("
+	$('.project_files').on('click','.delete-link',function(){
+		var
+			id = $(this).attr('data-id'),
+			confirmText = '".Yii::t('app/crm','Do you wont delete file')." '+$('.linkFileClass[data-id=\"'+id+'\"] span').html(),
+			r = confirm(confirmText);
+		if (r != true) {
+		   return false;
+		}
+		$.ajax({
+	        type: \"POST\",
+	        cache: false,
+	        url: '".\yii\helpers\Url::to(['delete-file'])."',
+	        dataType: \"json\",
+	        data: {pk:id},
+	        success: function(msg){
+				if(msg == 1)
+				{
+					$('#file-list-'+id).remove();
+				}
+	        },
+	        error: function(msg){
+	            alert('Error');
+	            return false;
+	        }
+	    });
+	});
+")
 ?>
 <div class="row">
 	<div class="col-md-12">
@@ -165,7 +216,20 @@ $this->title = $model->getInfo();
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Assigned At')?></h2>
 							<ul class="nav navbar-right panel_toolbox">
-								<li><a href="#"><i class="fa fa-pencil"></i> сменить</a>
+								<li>
+									<?php
+									Modal::begin([
+										'header' => '<h2>'.Yii::t('app/crm','Change assigned').'</h2>',
+										'size' => Modal::SIZE_DEFAULT,
+										'toggleButton' => [
+											'tag' => 'a',
+											'class' => 'link-btn-cursor',
+											'label' => '<i class="fa fa-pencil"></i> '.Yii::t('app/crm','Change'),
+										]
+									]);
+									echo $this->render('_part_form_change_assigned',['model' => $model]);
+									Modal::end();
+									?>
 								</li>
 							</ul>
 							<div class="clearfix"></div>
@@ -181,31 +245,26 @@ $this->title = $model->getInfo();
 							</div>
 						</div>
 					</section>
-
-
 					<section>
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Contacts')?></h2>
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 										<?php
-										Modal::begin([
-											'header' => '<h2>'.Yii::t('app/crm','Quick adding a contact').'</h2>',
-											'size' => Modal::SIZE_LARGE,
-											'toggleButton' => [
-												'tag' => 'a',
-											//	'class' => 'btn btn-sm btn-warning',
-												'label' => '<i class="fa fa-plus"></i> '.Yii::t('app/crm','Add contact'),
-											]
-										]);
-
-										echo $this->render('_part_form_contact',['model' => $obModelContact]);
-
-										Modal::end();
+											Modal::begin([
+												'header' => '<h2>'.Yii::t('app/crm','Quick adding a contact').'</h2>',
+												'size' => Modal::SIZE_LARGE,
+												'toggleButton' => [
+													'tag' => 'a',
+													'class' => 'link-btn-cursor',
+													'label' => '<i class="fa fa-plus"></i> '.Yii::t('app/crm','Add contact'),
+												]
+											]);
+											echo $this->render('_part_form_contact',['model' => $obModelContact]);
+											Modal::end();
 										?>
 								</li>
 							</ul>
-
 							<div class="clearfix"></div>
 						</div>
 							<?php if(!empty($arContacts)):?>
@@ -236,19 +295,17 @@ $this->title = $model->getInfo();
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 									<?php
-									Modal::begin([
-										'header' => '<h2>'.Yii::t('app/crm','Adding a file').'</h2>',
-										'size' => Modal::SIZE_LARGE,
-										'toggleButton' => [
-											'tag' => 'a',
-											//	'class' => 'btn btn-sm btn-warning',
-											'label' => '<i class="fa fa-plus"></i> '.Yii::t('app/crm','Add file'),
-										]
-									]);
-
-									echo $this->render('_part_form_file',['model' => $obFile]);
-
-									Modal::end();
+										Modal::begin([
+											'header' => '<h2>'.Yii::t('app/crm','Adding a file').'</h2>',
+											'size' => Modal::SIZE_LARGE,
+											'toggleButton' => [
+												'tag' => 'a',
+												'class' => 'link-btn-cursor',
+												'label' => '<i class="fa fa-plus"></i> '.Yii::t('app/crm','Add file'),
+											]
+										]);
+										echo $this->render('_part_form_file',['model' => $obFile]);
+										Modal::end();
 									?>
 								</li>
 							</ul>
@@ -259,14 +316,15 @@ $this->title = $model->getInfo();
 								<?=Yii::t('app/crm','No crm file')?>
 							<?php else:?>
 							<ul class="list-unstyled project_files">
-								<li>
-									<?php foreach($arFile as $file):?>
-										<a href="<?=\yii\helpers\Url::to(['download-file','cmpID' => $model->id,'id' => $file->id])?>" target="_blank">
-											<i class="<?=$file->getHtmlClassExt();?>"></i>
-											<?=$file->getSplitName();?>
-										</a>
-									<?php endforeach;?>
+								<?php foreach($arFile as $file):?>
+								<li id="file-list-<?=$file->id;?>">
+									<a class="linkFileClass" href="<?=\yii\helpers\Url::to(['download-file','id' => $file->id])?>" data-id="<?=$file->id;?>" target="_blank">
+										<i class="<?=$file->getHtmlClassExt();?>"></i>
+										<span><?=$file->getSplitName();?></span>
+									</a>
+									<a class="delete-link pull-right" data-id="<?=$file->id;?>"><i class="fa fa-close"></i></a>
 								</li>
+								<?php endforeach;?>
 							</ul>
 							<?php endif;?>
 						</div>

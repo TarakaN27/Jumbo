@@ -14,20 +14,20 @@ use yii\web\AssetBundle;
 class LifeFeedCompanyAssets extends AssetBundle
 {
 	public
-	$css = [
-		'css/life_feed_company.css',
-	],
-	$js = [
-		'js/life_feed_company.js'
-	],
-	$depends = [
-		'yii\web\JqueryAsset',
-		'yii\web\YiiAsset',
-		'yii\bootstrap\BootstrapAsset',
-	],
-	$publishOptions = [
-	    'forceCopy' => true
-	];
+		$css = [
+			'css/life_feed_company.css',
+		],
+		$js = [
+			'js/life_feed_company.js'
+		],
+		$depends = [
+			'yii\web\JqueryAsset',
+			'yii\web\YiiAsset',
+			'yii\bootstrap\BootstrapAsset',
+		],
+		$publishOptions = [
+		    'forceCopy' => true
+		];
 
 	public function init()
 	{

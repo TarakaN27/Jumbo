@@ -12,8 +12,10 @@ use backend\models\BUser;
 use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use common\models\BuserToDialogs;
+use common\models\CrmCmpContacts;
 use common\models\CUser;
 use common\models\Dialogs;
+use common\models\managers\CUserCrmRulesManager;
 use common\models\Messages;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
@@ -292,12 +294,49 @@ class DialogManager extends Component{
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pagesize' => 1,
+                'pagesize' => 10,
                 'route' => '/ajax-service/load-cmp-dialogs'
             ],
             'sort'=> ['defaultOrder' => ['updated_at'=>SORT_DESC]]
         ]);
 
+        return $dataProvider;
+    }
+
+    /**
+     * @param $iCntID
+     * @return ActiveDataProvider
+     */
+    public function getDialogsForContact($iCntID)
+    {
+        $query = Dialogs::find()->where(['crm_cmp_contact_id' => $iCntID])->with('owner');
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pagesize' => 10,
+                'route' => '/ajax-service/load-contact-dialogs'
+            ],
+            'sort'=> ['defaultOrder' => ['updated_at'=>SORT_DESC]]
+        ]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * @param $dID
+     * @return ActiveDataProvider
+     */
+    public function getCommentsForDialog($dID)
+    {
+        $query = Messages::find()->where(['dialog_id' => $dID])->with('buser');
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pagesize' => 5,
+                'route' => '/ajax-service/load-dialog-comments'
+            ],
+            'sort' => ['defaultOrder' => ['updated_at'=>SORT_DESC]]
+        ]);
         return $dataProvider;
     }
 
@@ -312,58 +351,7 @@ class DialogManager extends Component{
      */
     public function addNewDialogForCompany($iCmpID,$sMsg,$iAthID)
     {
-        /** @var  CUser $obCmp */
-        $obCmp = CUser::findOne($iCmpID);
-        if(!$obCmp)
-            throw new NotFoundHttpException($obCmp);
-
-        $arBUIDs = [];
-        if($obCmp->is_opened)
-        {
-            /**
-             * получаем пользователей, которые могут видеть компанию
-             */
-            $arBUserIDs = (new Query())
-                ->select('b.id as id')
-                ->from(BUser::tableName().' b ')
-                ->leftJoin(BUserCrmGroup::tableName().' as g','g.id = b.crm_group_id')
-                ->leftJoin(BUserCrmRules::tableName().' as r','r.role_id = g.role_id')
-                ->where('(r.rd = :rd OR r.rd = :rd2)')
-                ->params([
-                    ':rd' => BUserCrmRules::RULE_ALL,
-                    ':rd2' => BUserCrmRules::RULE_OPENED
-                ])
-                ->all();
-
-            foreach($arBUserIDs as $user)
-                $arBUIDs [] = $user['id'];
-
-            //проверяем не забыли ли пользователя, коотрый создал компанию
-            if($iAthID != $obCmp->created_by && !in_array($obCmp->created_by,$arBUserIDs))
-            {
-                $arOwner = (new Query())
-                    ->select('r.rd as rd')
-                    ->from(BUserCrmRules::tableName().' r ')
-                    ->leftJoin(BUserCrmGroup::tableName().' as g ','g.role_id = r.role_id')
-                    ->leftJoin(BUser::tableName().' as b','b.crm_group_id = g.id')
-                    ->where('b.id = :ID')
-                    ->params([':ID' => $obCmp->created_by])
-                    ->one();
-                if(!empty($arOwner) && $arOwner['rd'] == BUserCrmRules::RULE_THEMSELF)
-                    $arBUIDs[]= $arOwner['rd'];
-            }
-
-            // отвественный
-            if(!in_array($obCmp->manager_id,$arBUIDs))
-                $arBUIDs[] = $obCmp->manager_id;
-        }else{
-            $arBUIDs [] = (int)$obCmp->manager_id;
-            $arBUIDs [] = (int)$iAthID;
-            $arBUIDs [] = (int)$obCmp->created_by;
-            $arBUIDs = array_unique($arBUIDs);
-            $arBUIDs = array_filter($arBUIDs);
-        }
-
+        $arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
@@ -388,6 +376,52 @@ class DialogManager extends Component{
                 }
 
                 $tr->commit();
+        }catch (\Exception $e)
+        {
+            $tr->rollBack();
+            throw new ServerErrorHttpException('Can not save new dialog');
+        }
+        return $obDialog;
+    }
+
+    /**
+     * @param $iCntID
+     * @param $sMsg
+     * @param $iAthID
+     * @return int
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\db\Exception
+     */
+    public function addNewDialogForContact($iCntID,$sMsg,$iAthID)
+    {
+        $obCmp = CrmCmpContacts::findOne($iCntID);
+        $arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp);
+        $obDialog = New Dialogs([
+            'buser_id' => $iAthID,
+            'status' => Dialogs::PUBLISHED,
+            'type' => Dialogs::TYPE_COMPANY,
+            'crm_cmp_id' => empty($obCmp->cmp_id) ? ' ' : $obCmp->cmp_id,
+            'crm_cmp_contact_id' => $obCmp->id,
+            'theme' => $sMsg
+        ]);
+        $tr = Yii::$app->db->beginTransaction();
+
+        if(!$obDialog->save())
+            throw new ServerErrorHttpException('Can not save new dialog');
+        try {
+            $postModel = new BuserToDialogs();
+            $rows = [];
+            foreach ($arBUIDs as $id) {
+                $rows [] = [$id, $obDialog->id];
+            }
+
+            if (!Yii::$app->db->createCommand()->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)->execute()) {
+                $tr->rollBack();
+                throw new ServerErrorHttpException('Can not save new dialog');
+            }
+
+            $tr->commit();
         }catch (\Exception $e)
         {
             $tr->rollBack();

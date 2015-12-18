@@ -43,7 +43,11 @@ use \vova07\imperavi\Widget as ImperaviWidget;
 <!-- start recent activity -->
 <ul class="messages company-msg msgBoxList">
 	<?php if($obDialogs && $obModels = $obDialogs->getModels()):?>
-			<?= $this->render('_dialog_crm_msg', ['models' => $obModels,'pag' => $pagination]) ?>
+			<?= $this->render('_dialog_crm_msg', [
+			'models' => $obModels,
+			'pag' => $pagination,
+			'uniqStr' => 'dummy_'.$iCmpID
+		]) ?>
 	<?php else:?>
 		<p class="emptyDialog"><?php echo Yii::t('app/crm','No dialogs at feed')?>
 	<?php endif;?>

@@ -89,8 +89,18 @@ class BUserCrmRules extends AbstractActiveRecord
     public static function getEntityArr()
     {
         return [
-            CUser::getModelName() => Yii::t('app/crm','Company')
+            CUser::getModelName() => Yii::t('app/crm','Company'),
+            CrmCmpContacts::getModelName() => Yii::t('app/crm','Contacts')
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityStr()
+    {
+        $tmp = self::getEntityArr();
+        return isset($tmp[$this->entity]) ? $tmp[$this->entity] : 'N/A';
     }
 
     /**
