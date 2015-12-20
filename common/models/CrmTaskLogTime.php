@@ -11,7 +11,7 @@ use backend\models\BUser;
  * @property integer $task_id
  * @property integer $buser_id
  * @property integer $spend_time
- * @property string $description
+ * @property string  $description
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -34,6 +34,7 @@ class CrmTaskLogTime extends AbstractActiveRecord
     public function rules()
     {
         return [
+            [['task_id','buser_id'],'required'],
             [['task_id', 'buser_id', 'spend_time', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string']
         ];

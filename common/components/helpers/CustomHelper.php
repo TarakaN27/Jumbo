@@ -358,4 +358,14 @@ class CustomHelper {
 
         return $text;
     }
+
+    /**
+     * Форматирование времяени для отображения на странице задач
+     * @param $time
+     * @return string
+     */
+    public static function getFormatedTaskTime($time)
+    {
+        return sprintf('%02d:%02d', $time/3600, ($time % 3600)/60);
+    }
 }

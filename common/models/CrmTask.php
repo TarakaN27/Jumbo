@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\helpers\CustomHelper;
 use Yii;
 use backend\models\BUser;
 /**
@@ -357,6 +358,6 @@ class CrmTask extends AbstractActiveRecord
      */
     public function getFormatedTimeEstimate()
     {
-        return sprintf('%02d:%02d', $this->time_estimate/3600, ($this->time_estimate % 3600)/60);
+        return CustomHelper::getFormatedTaskTime($this->time_estimate);
     }
 }

@@ -55,19 +55,47 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-9 col-sm-9 col-xs-12">
                     <div class="company-header">
                         <div class="row">
-                            <div class="col-md-9 col-sm-9 col-xs-12">
+                            <div class="col-md-8 col-sm-8 col-xs-12">
                             <h2><?=$model->title;?></h2>
                             <section>
                                 <?=$model->description;?>
                             </section>
                             </div>
-                            <div class="col-md-3 col-sm-3 col-xs-12">
-                                <table>
-                                        <tr>
-                                            <th></th>
-                                            <td></td>
-                                        </tr>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <table class="table">
+                                    <tr>
+                                        <th><?=Yii::t('app/crm','Type')?></th>
+                                        <td><?=$model->getTypeStr()?></td>
+                                    </tr>
+                                    <tr>
+                                        <th><?=Yii::t('app/crm','Priority')?></th>
+                                        <td><?=$model->getPriorityStr()?></td>
+                                    </tr>
+                                    <tr>
+                                        <th><?= Yii::t('app/crm','Deadline');?></th>
+                                        <td><?=$model->deadline;?></td>
+                                    </tr>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-time-control">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <span class="user-time" data-spend="<?=$timeSpend?>" data-begined="<?=$timeBegined?>">
+                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend+$timeBegined)?>
+                                </span>/
+                                <span class="time_estimate">
+                                    <?=$model->getFormatedTimeEstimate()?>
+                                </span>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <?php if($timeBegined):?>
+                                    <?=Html::button(Yii::t('app/crm','Pause task'),['class' => 'btn btn-success'])?>
+                                <?php else:?>
+                                    <?=Html::button(Yii::t('app/crm','Begin do task'),['class' => 'btn btn-success'])?>
+                                <?php endif;?>
+                                <?=Html::button(Yii::t('app/crm','Done task'),['class' => 'btn btn-danger'])?>
                             </div>
                         </div>
                     </div>

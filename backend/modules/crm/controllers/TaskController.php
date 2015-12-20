@@ -6,6 +6,7 @@ use backend\models\BUser;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
 use common\models\CrmTaskAccomplices;
+use common\models\CrmTaskLogTime;
 use common\models\CrmTaskWatcher;
 use common\models\Dialogs;
 use common\models\managers\CUserCrmRulesManager;
@@ -52,6 +53,20 @@ class TaskController extends AbstractBaseBackendController
         $obAccmpl->task_id = (int)$id;
         $obWatcher = new CrmTaskWatcher();
         $obWatcher->task_id = (int)$id;
+
+        $obTime = CrmTaskLogTime::find()->where(['task_id' => $model->id,'buser_id' => Yii::$app->user->id])->all();
+        $timeBegined = NULL;
+        $timeSpend = 0;
+        /** @var CrmTaskLogTime $time */
+        foreach($obTime as $time)
+        {
+            if(empty($time->spend_time))
+            {
+                $timeBegined = (int)(time()-$time->created_at);
+            }else{
+                $timeSpend +=(int)$time->spend_time;
+            }
+        }
 
         /**
          * Соисполнитель
@@ -120,7 +135,9 @@ class TaskController extends AbstractBaseBackendController
             'obAccmpl' => $obAccmpl,
             'arAccmpl' => $arAccompl,
             'obWatcher' => $obWatcher,
-            'arWatchers' => $arWatchers
+            'arWatchers' => $arWatchers,
+            'timeBegined' => $timeBegined,
+            'timeSpend' => $timeSpend
         ]);
     }
 
