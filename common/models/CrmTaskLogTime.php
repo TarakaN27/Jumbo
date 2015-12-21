@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\helpers\CustomHelper;
 use Yii;
 use backend\models\BUser;
 /**
@@ -70,5 +71,13 @@ class CrmTaskLogTime extends AbstractActiveRecord
     public function getTask()
     {
         return $this->hasOne(CrmTask::className(), ['id' => 'task_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormatedSpendTime()
+    {
+        return CustomHelper::getFormatedTaskTime($this->spend_time);
     }
 }

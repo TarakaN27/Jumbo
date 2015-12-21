@@ -3,33 +3,26 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap\Modal;
+use common\models\CrmTaskLogTime;
+use common\models\CrmTask;
 /* @var $this yii\web\View */
 /* @var $model common\models\CrmTask */
-/**
- * 'title',
-'description:ntext',
-'deadline',
-'priority',
-'type',
-'task_control',
-'parent_id',
-'assigned_id',
-'created_by',
-'time_estimate:datetime',
-'status',
-'date_start',
-'duration_fact',
-'closed_by',
-'closed_date',
-'cmp_id',
-'contact_id',
-'dialog_id',
-'created_at',
-'updated_at',
- */
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/crm', 'Crm Tasks'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerJs("
+    var
+        URL_BEGIN_TASK = '".\yii\helpers\Url::toRoute(['begin-task'])."',
+        URL_PAUSE_TASK = '".\yii\helpers\Url::toRoute(['pause-task'])."',
+        URL_DONE_TASK = '".\yii\helpers\Url::toRoute(['done-task'])."',
+        TASK_TIME_TRACKING = '".Yii::t('app/crm','TASK_TIME_TRACKING')."',
+        CLOCK_ON_LOAD = ".($timeBegined ? 'true' : 'false').",
+        TASK_TIME_TRACKING_BEGIN_SUCCESS = '".Yii::t('app/crm','TASK_TIME_TRACKING_BEGIN_SUCCESS')."',
+        TASK_TIME_TRACKING_PAUSE_SUCCESS = '".Yii::t('app/crm','TASK_TIME_TRACKING_PAUSE_SUCCESS')."',
+        TASK = '".Yii::t('app/crm','TASK')."'
+        ;
+",\yii\web\View::POS_HEAD);
+$this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAsset::className()]]);
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -75,27 +68,54 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <th><?= Yii::t('app/crm','Deadline');?></th>
                                         <td><?=$model->deadline;?></td>
                                     </tr>
+                                    <tr>
+                                        <th><?= Yii::t('app/crm','Status');?></th>
+                                        <td><?=$model->getStatusStr();?></td>
+                                    </tr>
+                                    <tr>
+                                        <th><?= Yii::t('app/crm','Created at');?></th>
+                                        <td><?=Yii::$app->formatter->asDatetime($model->created_at);?></td>
+                                    </tr>
+                                    <tr>
+                                        <th><?= Yii::t('app/crm','Updated at');?></th>
+                                        <td><?=Yii::$app->formatter->asDatetime($model->updated_at);?></td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
                     </div>
                     <div class="company-time-control">
                         <div class="row">
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <span class="user-time" data-spend="<?=$timeSpend?>" data-begined="<?=$timeBegined?>">
+                            <div class="col-md-2 col-sm-2 col-xs-12 text-center time-block">
+                                <span
+                                    class="user-time"
+                                    data-current="<?=(int)$timeSpend+(int)$timeBegined?>"
+                                    data-spend="<?=$timeSpend?>"
+                                    data-begined="<?=$timeBegined?>"
+                                    data-action = "true",
+                                    data-log-id = "<?=$obLogBegin ? $obLogBegin->id : 0?>"
+                                    >
                                     <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend+$timeBegined)?>
-                                </span>/
+                                </span> /
                                 <span class="time_estimate">
                                     <?=$model->getFormatedTimeEstimate()?>
                                 </span>
                             </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
-                                <?php if($timeBegined):?>
-                                    <?=Html::button(Yii::t('app/crm','Pause task'),['class' => 'btn btn-success'])?>
-                                <?php else:?>
-                                    <?=Html::button(Yii::t('app/crm','Begin do task'),['class' => 'btn btn-success'])?>
+                            <div class="col-md-10 col-sm-10 col-xs-12 ">
+                                <?php if(in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_OPENED])):?>
+                                    <?=Html::button(Yii::t('app/crm','Pause task'),[
+                                        'class' => 'btn btn-warning pause-task '.($timeBegined ? '' : 'hide'),
+                                        'data-task-id' => $model->id,
+                                    ])?>
+                                    <?=Html::button(Yii::t('app/crm','Begin do task'),[
+                                        'class' => 'btn btn-success begin-task '.(!$timeBegined ? '' : 'hide'),
+                                        'data-task-id' => $model->id,
+                                    ])?>
+                                    <?=Html::button(Yii::t('app/crm','Done task'),[
+                                        'class' => 'btn btn-danger done-task',
+                                        'data-task-id' => $model->id,
+                                    ])?>
                                 <?php endif;?>
-                                <?=Html::button(Yii::t('app/crm','Done task'),['class' => 'btn btn-danger'])?>
                             </div>
                         </div>
                     </div>
@@ -124,65 +144,31 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]);?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
-                                <!-- start user projects -->
-                                <table class="data table table-striped no-margin">
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Project Name</th>
-                                        <th>Client Company</th>
-                                        <th class="hidden-phone">Hours Spent</th>
-                                        <th>Contribution</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>New Company Takeover Review</td>
-                                        <td>Deveint Inc</td>
-                                        <td class="hidden-phone">18</td>
-                                        <td class="vertical-align-mid">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-success" data-transitiongoal="35"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>New Partner Contracts Consultanci</td>
-                                        <td>Deveint Inc</td>
-                                        <td class="hidden-phone">13</td>
-                                        <td class="vertical-align-mid">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-danger" data-transitiongoal="15"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Partners and Inverstors report</td>
-                                        <td>Deveint Inc</td>
-                                        <td class="hidden-phone">30</td>
-                                        <td class="vertical-align-mid">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-success" data-transitiongoal="45"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>New Company Takeover Review</td>
-                                        <td>Deveint Inc</td>
-                                        <td class="hidden-phone">28</td>
-                                        <td class="vertical-align-mid">
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-success" data-transitiongoal="75"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <!-- end user projects -->
+                                <?=\yii\grid\GridView::widget([
+                                        'tableOptions' => [
+                                            'class' => 'table table-striped no-margin'
+                                        ],
+                                        'dataProvider' => (New \yii\data\ArrayDataProvider([
+                                            'allModels' => $obLog
+                                        ])),
+                                        'columns' => [
+                                            ['class' => 'yii\grid\SerialColumn'],
+                                            [
+                                                'attribute' => 'buser',
+                                                'value' => function($model){
+                                                    return ($obUser = $model->buser) ? $obUser->getFio() : $model->buser_id;
+                                                }
+                                            ],
+                                            [
+                                                'attribute' => 'time_spend',
+                                                'value' => function($model){
+                                                    return $model->getFormatedSpendTime();
+                                                }
+                                            ],
+                                            'description:text',
+                                            'created_at:datetime',
+                                          ],
+                                ]);?>
 
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">

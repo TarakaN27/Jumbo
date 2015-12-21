@@ -74,6 +74,7 @@ class CrmTaskSearch extends CrmTask
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> ['defaultOrder' => ['created_at'=>SORT_DESC]]
         ]);
 
         $this->load($params);

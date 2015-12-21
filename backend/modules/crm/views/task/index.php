@@ -56,7 +56,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'deadline',
                         ],
-                        'priority',
+                        [
+                            'attribute' => 'priority',
+                            'value' => function($model){
+                                return $model->getPriorityStr();
+                            },
+                            'filter' => \common\models\CrmTask::getPriorityArr()
+                        ],
+                        //'priority',
                         // 'type',
                         // 'task_control',
                         // 'parent_id',

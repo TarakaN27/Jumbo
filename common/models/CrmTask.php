@@ -218,6 +218,8 @@ class CrmTask extends AbstractActiveRecord
             'dialog_id' => Yii::t('app/crm', 'Dialog ID'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
+            'hourEstimate' => Yii::t('app/crm', 'Hour'),
+            'minutesEstimate' => Yii::t('app/crm', 'Minutes')
         ];
     }
 

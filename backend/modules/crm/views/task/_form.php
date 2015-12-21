@@ -8,6 +8,10 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $model common\models\CrmTask */
 /* @var $form yii\widgets\ActiveForm */
+
+$fieldCheckBoxTmpl = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>';
+$fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+
 ?>
 
 <div class="crm-task-form">
@@ -33,11 +37,18 @@ use yii\web\JsExpression;
 
     <?= $form->field($model, 'priority')->dropDownList(CrmTask::getPriorityArr()) ?>
 
-    <?= $form->field($model, 'time_estimate')->textInput() ?>
-    <div>
-        <?= $form->field($model, 'hourEstimate')->textInput() ?>
-        <?= $form->field($model, 'minutesEstimate')->textInput() ?>
+    <div class = "form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="crmtask-time_estimate">
+            <?=$model->getAttributeLabel('time_estimate')?>
+        </label>
+        <div class = "col-md-1 col-sm-1 col-xs-6">
+            <?= $form->field($model, 'hourEstimate', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => TRUE]) ?>
+        </div>
+        <div class = "col-md-1 col-sm-1 col-xs-6">
+            <?= $form->field($model, 'minutesEstimate', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => TRUE]) ?>
+        </div>
     </div>
+
     <?= $form->field($model, 'deadline')->widget(\kartik\datetime\DateTimePicker::className(),[
         'options' => ['placeholder' => 'Select operating time ...'],
         'convertFormat' => true,
@@ -49,7 +60,7 @@ use yii\web\JsExpression;
         ]
     ]) ?>
 
-    <?= $form->field($model, 'task_control')->checkbox() ?>
+    <?= $form->field($model, 'task_control',['template' => $fieldCheckBoxTmpl])->checkbox() ?>
 
     <?= $form->field($model, 'assigned_id')->widget(\kartik\select2\Select2::className(),[
         'initValueText' => $sAssName, // set the initial display text

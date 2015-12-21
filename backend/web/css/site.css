@@ -132,30 +132,14 @@
         transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
     }
 }
-.btnMinusRule{
-    margin-top: 25px;
-}
-.btnContact{
-    margin-top: 23px;
-}
-.company-header{
-    background-color: #F2F5F7;
-    padding: 20px;
-}
-.company-msg li{
-    list-style-type: none;
-}
-.delete-link,.link-btn-cursor{
-    cursor: pointer;
-}
-.block-view-type{
-    float: left;
-    padding-left: 20px;
-}
-.modal-header h2{
-    float: none;
-}
-.block-min-height{
-    min-height: 60px;
-}
+.btnMinusRule{  margin-top: 25px;  }
+.btnContact{  margin-top: 23px;  }
+.company-header{  background-color: #F2F5F7;  padding: 20px;  }
+.company-msg li{  list-style-type: none;  }
+.delete-link,.link-btn-cursor{  cursor: pointer; }
+.block-view-type{  float: left;  padding-left: 20px;  }
+.modal-header h2{  float: none;  }
+.block-min-height{  min-height: 60px;  }
+.company-time-control{  padding-top: 20px;  padding-bottom: 10px;  background-color: #E6E9ED;  }
+.time-block{padding-top: 6px;font-size: 18px;}
 

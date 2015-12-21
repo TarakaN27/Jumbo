@@ -146,7 +146,26 @@ return [
 	'Add accomplice' => 'Добавить соисполнителя',
 	'Add' => 'Добавить',
 	'Watchers' => 'Наблюдатели',
-	'Add watcher' => 'Добавить наблюдателя'
-
+	'Add watcher' => 'Добавить наблюдателя',
+	'Begin do task' => 'Начать выполнение',
+	'Pause task' => 'Приостановить выполнение',
+	'Done task' => 'Завершить задачу',
+	'You are already begin task' => 'Вы уже начали выполнять задание',
+	'Can not create log time' => 'Не удалось начать учет времени',
+	'TASK_TIME_TRACKING' => 'Учет времени',
+	'TASK_TIME_TRACKING_BEGIN_SUCCESS' => 'Учет времени начат',
+	'TASK_TIME_TRACKING_PAUSE_SUCCESS' => 'Выполнение задачи приостановлено',
+	'Pause task error' => 'ВЫполнение задачи приостановлено',
+	'Created at' => 'Создано',
+	'Updated at' => 'Обновлено',
+	'Buser' => 'Пользователь',
+	'Time Spend' => 'Затраченное время',
+	'Not all users stop do task' => 'Не все пользователи завершили задачу',
+	'Can not close time tracking' => 'Не удалось завершить учет времени',
+	'Task is done' => 'Задача завершена',
+	'TASK_DONE_SUCCESS' => 'Задача завершена',
+	'TASK' => 'Задача',
+	'Hour' => 'Часы',
+	'Minutes' => 'Минуты'
 
 ];

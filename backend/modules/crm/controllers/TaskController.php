@@ -14,8 +14,10 @@ use Yii;
 use common\models\CrmTask;
 use common\models\search\CrmTaskSearch;
 use backend\components\AbstractBaseBackendController;
+use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 /**
@@ -54,17 +56,24 @@ class TaskController extends AbstractBaseBackendController
         $obWatcher = new CrmTaskWatcher();
         $obWatcher->task_id = (int)$id;
 
-        $obTime = CrmTaskLogTime::find()->where(['task_id' => $model->id,'buser_id' => Yii::$app->user->id])->all();
+        $obTime = CrmTaskLogTime::find()->where([
+            'task_id' => $model->id,
+            'buser_id' => Yii::$app->user->id
+        ])->all();
         $timeBegined = NULL;
         $timeSpend = 0;
+        $obLogBegin = NULL;
+        $obLog = [];
         /** @var CrmTaskLogTime $time */
         foreach($obTime as $time)
         {
             if(empty($time->spend_time))
             {
                 $timeBegined = (int)(time()-$time->created_at);
+                $obLogBegin = $time;
             }else{
                 $timeSpend +=(int)$time->spend_time;
+                $obLog[] = $time;
             }
         }
 
@@ -137,8 +146,157 @@ class TaskController extends AbstractBaseBackendController
             'obWatcher' => $obWatcher,
             'arWatchers' => $arWatchers,
             'timeBegined' => $timeBegined,
-            'timeSpend' => $timeSpend
+            'timeSpend' => $timeSpend,
+            'obLogBegin' => $obLogBegin,
+            'obLog' => $obLog
         ]);
+    }
+
+    /**
+     * @return mixed
+     * @throws NotFoundHttpException
+     */
+    public function actionBeginTask()
+    {
+        $tID = Yii::$app->request->post('tID');
+        $iUser = Yii::$app->user->id;
+        if(empty($tID) || empty($iUser))
+            throw new InvalidParamException('Task id and user id is required');
+        /** @var CrmTask $obTask */
+        $obTask = CrmTask::findOne($tID);
+        if(!$obTask)
+            throw new NotFoundHttpException();
+
+        if(CrmTaskLogTime::find()
+            ->where(['task_id' => $tID,'buser_id' => $iUser])
+            ->andWhere('spend_time is NULL OR spend_time = "0"')
+            ->exists()
+        )
+            $data =[ 'error' => Yii::t('app/crm','You are already begin task'),'success' => false];
+        else{
+            $obTaskLog = new CrmTaskLogTime();
+            $obTaskLog->task_id = $tID;
+            $obTaskLog->buser_id = $iUser;
+            if($obTaskLog->save()) {
+                $obTask->status = CrmTask::STATUS_IN_PROGRESS;
+                $obTask->save();
+                $data = ['error' => '', 'success' => $obTaskLog->id];
+            }
+            else
+                $data =[ 'error' => Yii::t('app/crm','Can not create log time'),'success' => false];
+        }
+
+        return $this->returnJsonHelper($data);
+    }
+
+    /**
+     * @return mixed
+     * @throws NotFoundHttpException
+     */
+    public function actionPauseTask()
+    {
+        $iLogID = Yii::$app->request->post('logID');
+        $tID = Yii::$app->request->post('tID');
+        $iUser = Yii::$app->user->id;
+        if(empty($tID) || empty($iUser) || empty($iLogID))
+            throw new InvalidParamException('Task id and user id is required');
+
+        /** @var CrmTask $obTask */
+        $obTask = CrmTask::findOne($tID);
+        if(!$obTask)
+            throw new NotFoundHttpException();
+
+        $obLog = CrmTaskLogTime::find()->where(['id' => $iLogID,'buser_id' => $iUser,'task_id' => $tID])->one();
+        if(!$obLog)
+            throw new NotFoundHttpException('Task log not found');
+
+        $spendTime = time()-$obLog->created_at;
+        $obLog->spend_time = $spendTime;
+        if($obLog->save()) {
+            $obTask->status = CrmTask::STATUS_OPENED;
+            $obTask->save();
+            $data = ['error' => '', 'success' => TRUE];
+        }
+        else
+            $data = ['error' => Yii::t('app/crm','Pause task error'),'success' => FALSE];
+
+        return $this->returnJsonHelper($data);
+    }
+
+    public function actionDoneTask()
+    {
+        $iTID = Yii::$app->request->post('tID');
+        /** @var CrmTask $obTask */
+        $obTask = CrmTask::findOne($iTID); //находим задачу
+        if(!$obTask)
+            throw new NotFoundHttpException('Task not found');
+
+        $bTRError = FALSE;
+        $tr = Yii::$app->db->beginTransaction(); //транзакция
+
+        if($obTask->status == CrmTask::STATUS_IN_PROGRESS) { //если у задачи стоит статус в процесе
+            $arTimeLog = CrmTaskLogTime::find() //ищем незакрытое время
+                ->where(['task_id' => $iTID])
+                ->andWhere('spend_time is NULL OR spend_time = "0"')
+                ->all();
+            $arBUserDoTask = [];
+            foreach ($arTimeLog as $log) { //если есть соисполнители, которые не закрыли время, покажем ошибку  с имена тех, кто не закрыл
+                if ($log->buser_id != Yii::$app->user->id)
+                    $arBUserDoTask[$log->buser_id] = is_object($obUser = $log->buser) ? $obUser->getFio() : $log->buser_id;
+            }
+
+            if (!empty($arBUserDoTask)) {
+                $tr->rollBack();
+
+                return $this->returnJsonHelper([
+                    'error' => Yii::t('app/crm', 'Not all users stop do task') . ' : ' . implode(', ', $arBUserDoTask),
+                    'success' => FALSE
+                ]);
+            }
+
+            foreach ($arTimeLog as $log) { //если время не закрыл, тот кто закрывает задачу, закроемего время
+                $spendTime = time() - $log->created_at;
+                $log->spend_time = $spendTime;
+                if (!$log->save())
+                    $bTRError = TRUE;
+            }
+
+            if ($bTRError) {
+                $tr->rollBack();
+
+                return $this->returnJsonHelper([
+                    'error' => Yii::t('app/crm', 'Can not close time tracking') . ' : ' . implode(', ', $arBUserDoTask),
+                    'success' => FALSE
+                ]);
+            }
+        }
+
+        if($obTask->task_control)   //если задача требует контроля, то ставим статус готово
+            $obTask->status = CrmTask::STATUS_DONE;
+        else    //иначе закрываем задачу.
+            $obTask->status = CrmTask::STATUS_CLOSE;
+
+        if($obTask->save()) {
+            $tr->commit();
+            $data = ['error' => Yii::t('app/crm', 'Task is done'), 'success' => TRUE];
+        }
+        else {
+            $tr->rollBack();
+            $data = ['error' => Yii::t('app/crm', 'Can not set status done'), 'success' => FALSE];
+        }
+
+
+        return $this->returnJsonHelper($data);
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    protected function returnJsonHelper($data)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $data;
     }
 
     /**
