@@ -21,9 +21,28 @@ use yii\base\Exception;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
-
+use yii\filters\AccessControl;
 class CompanyController extends AbstractBaseBackendController
 {
+
+	/**
+	 * переопределяем права на контроллер и экшены
+	 * @return array
+	 */
+	public function behaviors()
+	{
+		$tmp = parent::behaviors();
+		$tmp['access'] = [
+			'class' => AccessControl::className(),
+			'rules' => [
+				[
+					'allow' => true,
+					'roles' => ['moder','bookkeeper','admin']
+				]
+			]
+		];
+		return $tmp;
+	}
 
 	public function actionIndex()
 	{

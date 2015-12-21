@@ -12,12 +12,32 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use common\models\BUserCrmRules;
 use yii\web\Response;
-
+use yii\filters\AccessControl;
 /**
  * ContactController implements the CRUD actions for CrmCmpContacts model.
  */
 class ContactController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['moder','bookkeeper','admin']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
     /**
      * Lists all CrmCmpContacts models.
      * @return mixed

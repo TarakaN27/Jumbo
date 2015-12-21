@@ -18,13 +18,31 @@ use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
-
+use yii\filters\AccessControl;
 
 /**
  * TaskController implements the CRUD actions for CrmTask model.
  */
 class TaskController extends AbstractBaseBackendController
 {
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['moder','bookkeeper','admin']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
     /**
      * Lists all CrmTask models.
      * @return mixed
