@@ -50,9 +50,9 @@ class MultiSelectWidget extends InputWidget{
      */
     protected function validate()
     {
-        if (empty($this->data)) {
-            throw new  InvalidConfigException('"MultiSelect::$data" attribute cannot be blank or an empty array.');
-        }
+        //if (empty($this->data)) {
+        //    throw new  InvalidConfigException('"MultiSelect::$data" attribute cannot be blank or an empty array.');
+       // }
     }
 
     /**
