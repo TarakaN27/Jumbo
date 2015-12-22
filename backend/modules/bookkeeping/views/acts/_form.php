@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
-use Yii;
+
 /* @var $this yii\web\View */
 /* @var $model common\models\Acts */
 /* @var $form yii\widgets\ActiveForm */
