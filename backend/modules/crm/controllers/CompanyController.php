@@ -78,6 +78,11 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 
 			default:
+				$searchModel = new CUserSearch();
+				$dataProvider = $searchModel->search(
+					Yii::$app->request->queryParams,
+					'1=0'
+				);
 				break;
 		}
 
