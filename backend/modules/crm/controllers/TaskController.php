@@ -339,7 +339,7 @@ class TaskController extends AbstractBaseBackendController
             $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
             $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
                 'user'=>Yii::$app->user->identity->getFio()
-            ]);
+            ]).' "'.$model->title.'"';
 
             $arBUIDs = [$iUserID,$model->assigned_id]; //пользователя для которых добавляется диалог
 

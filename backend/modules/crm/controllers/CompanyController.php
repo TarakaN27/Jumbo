@@ -14,6 +14,7 @@ use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CUser;
+use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
 use Yii;
 use common\models\CUserRequisites;
@@ -196,13 +197,21 @@ class CompanyController extends AbstractBaseBackendController
 			}
 		}
 
+		$obCrmTaskSearch = new CrmTaskSearch();
+		$dataProviderTask = $obCrmTaskSearch->search(
+			Yii::$app->request->queryParams,
+			CrmTaskSearch::VIEW_TYPE_ALL,
+			['cmp_id' => $model->id]
+			);
+
 		return $this->render('view',[
 			'model' => $model,
 			'obRequisite' => $obRequisite,
 			'arContacts' => $arContacts,
 			'obModelContact' => $obModelContact,
 			'obFile' => $obFile,
-			'arFile' => $arFile
+			'arFile' => $arFile,
+			'dataProviderTask' => $dataProviderTask
 		]);
 	}
 

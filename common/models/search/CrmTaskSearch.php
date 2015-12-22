@@ -64,10 +64,12 @@ class CrmTaskSearch extends CrmTask
      *
      * @return ActiveDataProvider
      */
-    public function search($params,$viewType = self::VIEW_TYPE_ALL)
+    public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [])
     {
         $query = CrmTask::find();
         $query = $this->getAdditionQuery($query,$viewType);
+        if(!is_null($addQuery)) //дополнительное условие
+            $query->andWhere($addQuery,$addParams);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

@@ -4,6 +4,7 @@ namespace app\modules\crm\controllers;
 
 use backend\widgets\Alert;
 use common\models\CrmCmpFile;
+use common\models\search\CrmTaskSearch;
 use Yii;
 use common\models\CrmCmpContacts;
 use common\models\search\CrmCmpContactsSearch;
@@ -124,11 +125,19 @@ class ContactController extends AbstractBaseBackendController
 
             return $this->redirect(Url::current());
         }
+        //Задачи
+        $obCrmTaskSearch = new CrmTaskSearch();
+        $dataProviderTask = $obCrmTaskSearch->search(
+            Yii::$app->request->queryParams,
+            CrmTaskSearch::VIEW_TYPE_ALL,
+            ['contact_id' => $model->id]
+        );
 
         return $this->render('view', [
             'model' => $model,
             'arFiles' => $arFiles,
-            'obFile' => $obFile
+            'obFile' => $obFile,
+            'dataProviderTask' => $dataProviderTask
         ]);
     }
 
