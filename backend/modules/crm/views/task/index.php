@@ -63,6 +63,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\CrmTask::getPriorityArr()
                         ],
+                        [
+                            'attribute' => 'status',
+                            'value' => function($model){
+                                return $model->getStatusStr();
+                            },
+                            'filter' => \common\models\CrmTask::getStatusArr()
+                        ],
                         //'priority',
                         // 'type',
                         // 'task_control',
