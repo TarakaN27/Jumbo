@@ -4,6 +4,8 @@
  * User: zhenya
  * Date: 19.10.15
  * Time: 15.29
+ * @property boolean $getCRMLevelAccess return access level for crm . This property is read-only.
+ * @property boolean $isManager Whether the current user is a manager. This property is read-only.
  */
 
 namespace backend\components;
