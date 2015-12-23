@@ -324,7 +324,8 @@ $menuItems[] = [
                 // ==== we add the code below to set the field values ====
                 fieldValues : {
                     fullname : '<?php echo Yii::$app->user->identity->username;?>'
-                    , email : '<?php echo Yii::$app->user->identity->email;?>'
+                    , email : '<?php echo Yii::$app->user->identity->email;?>',
+                    versions : '10719'
                 },
                 // ==== Special field config for environment ====
                 environment : {
