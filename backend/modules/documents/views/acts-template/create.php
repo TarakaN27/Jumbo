@@ -20,11 +20,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?=  Html::a(Yii::t('app/documents', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                 </section>
                 <div class="clearfix"></div>
+                <p>
+                    <?=Html::a('<i class="fa fa-warning"></i> '.
+                        Yii::t('app/documents','Template field description'),
+                        'http://wiki.webmart.by/pages/viewpage.action?pageId=2556123',
+                        [
+                            'class' => 'colorYellow',
+                            'target' => '_blank'
+                        ])
+                    ?>
+                </p>
             </div>
             <div class="x_content acts-template-create">
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+                <?= $this->render('_form', [
+                    'model' => $model,
+                ]) ?>
             </div>
         </div>
     </div>
