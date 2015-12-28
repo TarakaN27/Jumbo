@@ -46,7 +46,7 @@ class ActsTemplate extends AbstractActiveRecord
             [['name'], 'string', 'max' => 255],
             [['path'],'required','on' => ['insert']],
             [['path'],'file', 'on' => ['insert', 'update']],
-            ['path', 'file', 'extensions' => ['docx'], 'maxSize' => 1024*1024,'checkExtensionByMimeType' => false,'on' => ['insert', 'update']],
+            ['path', 'file', 'extensions' => ['docx'], 'maxSize' => 5*1024*1024,'checkExtensionByMimeType' => false,'on' => ['insert', 'update']],
         ];
     }
 

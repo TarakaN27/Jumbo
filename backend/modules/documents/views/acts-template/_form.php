@@ -23,6 +23,23 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+    <?php if(!$model->isNewRecord):?>
+        <div class="form-group field-billdocxtemplate-src">
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="billdocxtemplate-src"><?=Yii::t('app/documents','Current file')?>:</label>
+                <div class="col-md-6 col-sm-6 col-xs-12" style="padding-top: 8px;">
+                    <?=Html::a(
+                        $model->path,
+                        ['download-file','id' => $model->id],
+                        [
+                            'target' => '_blank'
+                        ]
+                    )?>
+                </div>
+            </div>
+        </div>
+    <?php endif;?>
+
     <?= $form->field($model, 'path')->fileInput() ?>
 
     <?= $form->field($model, 'is_default')->dropDownList(\common\models\ActsTemplate::getYesNo()) ?>
