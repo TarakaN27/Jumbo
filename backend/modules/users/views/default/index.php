@@ -83,7 +83,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'attribute' => 'created_at',
                                                     'value' => function($model){
                                                             return $model->getFormatedCreatedAt();
-                                                        }
+                                                        },
+                                                    'filter' => \yii\jui\DatePicker::widget([
+
+                                                        'model'=>$searchModel,
+                                                        'attribute'=>'created_at',
+                                                        'language' => 'ru',
+                                                        'dateFormat' => 'dd-MM-yyyy',
+                                                        'options' =>['class' => 'form-control'],
+                                                        'clientOptions' => [
+                                                            'defaultDate' => date('d-m-Y',time())
+                                                        ],
+                                                    ]),
                                                 ],
                                                 [
                                                     'class' => 'yii\grid\ActionColumn',

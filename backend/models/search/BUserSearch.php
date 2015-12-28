@@ -22,8 +22,8 @@ class BUserSearch extends BUser
     public function rules()
     {
         return [
-            [['id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email','fio'], 'safe'],
+            [['id', 'role', 'status', 'updated_at'], 'integer'],
+            [['username', 'auth_key', 'password_hash', 'created_at', 'password_reset_token', 'email','fio'], 'safe'],
         ];
     }
 
@@ -68,11 +68,14 @@ class BUserSearch extends BUser
             'id' => $this->id,
             'role' => $this->role,
             'status' => $this->status,
-            'created_at' => $this->created_at,
+            //'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andWhere(['role' => array_keys(self::getRoleByPermission())]);
+
+        if(!empty($this->created_at))
+            $query->andWhere("FROM_UNIXTIME(created_at,'%d-%m-%Y') = '".$this->created_at."'");
 
         $query->andFilterWhere(['like', 'username', $this->username])
             ->andFilterWhere(['like', 'auth_key', $this->auth_key])
