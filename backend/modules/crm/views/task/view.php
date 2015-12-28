@@ -32,14 +32,16 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                 <section class="pull-right">
                     <?=  Html::a(Yii::t('app/crm', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                     <?= Html::a(Yii::t('app/crm', 'Create Crm Task'), ['create'], ['class' => 'btn btn-success']) ?>
-                    <?= Html::a(Yii::t('app/crm', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                    <?= Html::a(Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
-                        'class' => 'btn btn-danger',
-                        'data' => [
-                            'confirm' => Yii::t('app/crm', 'Are you sure you want to delete this item?'),
-                            'method' => 'post',
-                        ],
-                    ]) ?>
+                    <?php if($model->created_by == Yii::$app->user->id):?>
+                        <?= Html::a(Yii::t('app/crm', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a(Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
+                            'class' => 'btn btn-danger',
+                            'data' => [
+                                'confirm' => Yii::t('app/crm', 'Are you sure you want to delete this item?'),
+                                'method' => 'post',
+                            ],
+                        ]) ?>
+                    <?php endif;?>
                 </section>
                 <div class="clearfix"></div>
             </div>

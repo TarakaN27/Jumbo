@@ -99,11 +99,39 @@ $this->params['breadcrumbs'][] = $this->title;
                         // 'updated_at',
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{update}{view}'
+                            'template' => '{update}{view}',
+                            'buttons' => [
+                                'update' => function ($url, $model, $key) {
+
+                                    if($model->created_by != Yii::$app->user->id)
+                                        return NULL;
+
+                                    $options = [
+                                        'title' => Yii::t('yii', 'Update'),
+                                        'aria-label' => Yii::t('yii', 'Update'),
+                                        'data-pjax' => '0',
+                                    ];
+                                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options);
+                                }
+                            ]
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{delete}'
+                            'template' => '{delete}',
+                            'buttons' => [
+                                'delete' => function ($url, $model, $key) {
+                                    if($model->created_by != Yii::$app->user->id)
+                                        return NULL;
+                                    $options = [
+                                        'title' => Yii::t('yii', 'Delete'),
+                                        'aria-label' => Yii::t('yii', 'Delete'),
+                                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                        'data-method' => 'post',
+                                        'data-pjax' => '0',
+                                    ];
+                                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                                }
+                            ]
                         ],
                     ],
                 ]); ?>

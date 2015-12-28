@@ -16,6 +16,7 @@ use common\models\search\CrmTaskSearch;
 use backend\components\AbstractBaseBackendController;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\AccessControl;
@@ -427,14 +428,16 @@ class TaskController extends AbstractBaseBackendController
     }
 
     /**
-     * Updates an existing CrmTask model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     * @return string|Response
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        if($model->created_by != Yii::$app->user->id) //редактировать задачу может только автор
+            throw new ForbiddenHttpException();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -449,7 +452,6 @@ class TaskController extends AbstractBaseBackendController
                 $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
             else
                 $contactDesc = '';
-            var_dump($model->getErrors());
             return $this->render('update', [
                 'model' => $model,
                 'cuserDesc' => $cuserDesc,
@@ -460,15 +462,19 @@ class TaskController extends AbstractBaseBackendController
     }
 
     /**
-     * Deletes an existing CrmTask model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     * @return Response
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @throws \Exception
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        if($model->created_by != Yii::$app->user->id) //удалить задачу может только тот кто создал
+            throw new ForbiddenHttpException();
 
+        $model->delete();
         return $this->redirect(['index']);
     }
 
