@@ -129,6 +129,7 @@ class BillsManager extends Bills{
             $payer = $crp.$obR->j_address;
             $bankDetail = 'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp;
             $contractorEmail = $obR->c_email;
+            $contractorSite = $obR->site;
         }
 
 

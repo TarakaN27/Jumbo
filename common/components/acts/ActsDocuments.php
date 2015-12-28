@@ -161,7 +161,7 @@ class ActsDocuments
                 'contrRequisites' =>'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp,
                 'contrAddress' => $obR->j_address,
                 'contrEmail' => $obR->c_email,
-                'contrSite' => ''
+                'contrSite' => $obR->site
             ];
         }
         return $this->cntrInfo;
