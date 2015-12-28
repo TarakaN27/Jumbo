@@ -189,14 +189,14 @@ class ExchangeRatesController extends AbstractBaseBackendController
                 $nbrb = new ExchangeRatesNBRB($model->nbrb);
                 $nbrbRate = $nbrb->makeRequest();
             }else{
-                $nbrbRate = $model->nbrb_rate;
+                $nbrbRate = 1;
             }
             if($model->cbr != 0)
             {
                 $crb = new ExchangeRatesCBRF($model->cbr);
                 $crbRate = $crb->makeRequest();
             }else{
-                $crbRate = $model->cbr_rate;
+                $crbRate = 1;
             }
 
             if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))

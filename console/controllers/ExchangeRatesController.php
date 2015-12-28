@@ -47,19 +47,22 @@ class ExchangeRatesController extends AbstractConsoleController{
                 if($model->use_base || $model->use_exchanger)
                     continue;
 
+                $nbrbRate = $model->nbrb_rate;
+                $crbRate = $model->cbr_rate;
+
                 if($model->nbrb != 0)
                 {
                     if(isset($arCurrNBRB[$model->nbrb]))
                         $nbrbRate = $arCurrNBRB[$model->nbrb];
                 }else{
-                    $nbrbRate = $model->nbrb_rate;
+                    $nbrbRate = 1;
                 }
                 if($model->cbr != 0)
                 {
                     if(isset($arCurrCBRF[$model->cbr]))
                         $crbRate = $arCurrCBRF[$model->cbr];
                 }else{
-                    $crbRate = $model->cbr_rate;
+                    $crbRate = 1;
                 }
 
                 if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
