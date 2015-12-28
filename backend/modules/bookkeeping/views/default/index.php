@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'cuser_id',
                                 'format' => 'html',
                                 'value' => function($model){
-                                        $name = is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
+                                        $name = is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
                                         if(
                                             Yii::$app->user->can('adminRights') ||
                                             Yii::$app->user->can('only_bookkeeper') ||
