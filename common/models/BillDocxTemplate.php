@@ -146,4 +146,20 @@ class BillDocxTemplate extends AbstractActiveRecord
         return ArrayHelper::map($models,'id','name');
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        //если установили, что шаблон является по умолчанию, то нужно снять снять флаг с остальных
+        if($this->is_default == self::YES)
+            self::updateAll(['is_default' => self::NO],'id != :ID AND is_default = :isDefault',[
+                ':ID' => $this->id,
+                ':isDefault' => self::YES
+            ]);
+
+        return parent::afterSave($insert, $changedAttributes);
+    }
+
 }
