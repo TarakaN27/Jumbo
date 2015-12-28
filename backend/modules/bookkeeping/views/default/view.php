@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id',
                         [
                             'attribute' => 'cuser_id',
-                            'value' => is_object($obCuser = $model->cuser) ? $obCuser->username : 'N/A'
+                            'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : 'N/A'
                         ],
                         [
                             'attribute' => 'pay_date',
