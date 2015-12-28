@@ -44,8 +44,9 @@ class BillDocxTemplate extends AbstractActiveRecord
             [['name'], 'required'],
             [['is_default', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['src'],'required','on' => ['insert', 'update']],
-            [['src'],'file', 'on' => ['insert', 'update']]
+            [['src'],'required','on' => ['insert']],
+            [['src'],'file', 'on' => ['insert', 'update']],
+            ['src', 'file', 'extensions' => ['docx'], 'maxSize' => 1024*1024,'checkExtensionByMimeType' => false,'on' => ['insert', 'update']],
         ];
     }
 

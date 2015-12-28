@@ -2,6 +2,10 @@
 
 namespace backend\modules\documents\controllers;
 
+use common\components\helpers\Docx_reader;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Yii;
 use common\models\ActsTemplate;
 use common\models\search\ActsTemplateSearch;
@@ -35,8 +39,11 @@ class ActsTemplateController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+
         ]);
     }
 
@@ -104,5 +111,16 @@ class ActsTemplateController extends AbstractBaseBackendController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $id
+     * @return $this
+     * @throws NotFoundHttpException
+     */
+    public function actionDownloadFile($id)
+    {
+        $obModel = $this->findModel($id);
+        return Yii::$app->response->sendFile($obModel->getFilePath());
     }
 }

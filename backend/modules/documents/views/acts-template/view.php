@@ -9,6 +9,7 @@ use yii\widgets\DetailView;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/documents', 'Acts Templates'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
