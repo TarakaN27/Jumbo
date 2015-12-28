@@ -89,7 +89,6 @@ class CrmTaskSearch extends CrmTask
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'deadline' => $this->deadline,
             'priority' => $this->priority,
             'type' => $this->type,
             'task_control' => $this->task_control,
@@ -108,6 +107,9 @@ class CrmTaskSearch extends CrmTask
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        if(!empty($this->deadline))
+            $query->andWhere("DATE_FORMAT(deadline, '%Y-%m-%d') = :deadline",['deadline' => $this->deadline]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'description', $this->description]);

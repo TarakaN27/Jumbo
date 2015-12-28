@@ -55,6 +55,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         [
                             'attribute' => 'deadline',
+                            'filter' =>  \yii\jui\DatePicker::widget([
+                                'model'=>$searchModel,
+                                'attribute'=>'deadline',
+                                'language' => 'ru',
+                                'dateFormat' => 'yyyy-MM-dd',
+                                'options' =>['class' => 'form-control'],
+                                'clientOptions' => [
+                                    'defaultDate' => date('y-m-d',time())
+                                ],
+                            ]),
                         ],
                         [
                             'attribute' => 'priority',
