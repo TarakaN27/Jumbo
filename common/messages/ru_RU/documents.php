@@ -69,7 +69,8 @@ return [
     'Generate document' => 'Сгенерировать документ',
     'Sent' => 'Отправлено',
     'Act Date' => 'Дата акта',
-    'Buser ID' => 'Добавил акт'
+    'Buser ID' => 'Добавил акт',
+    'Current file' => 'Текущий файл'
 
 
 ];
