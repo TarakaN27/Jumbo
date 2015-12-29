@@ -38,8 +38,8 @@ return [
         ],
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
-            'dateFormat' => 'medium',
-            'datetimeFormat' => 'medium'
+            'dateFormat' => 'short',
+            'datetimeFormat' => 'short'
         ],
     ],
 ];
