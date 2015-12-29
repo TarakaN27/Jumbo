@@ -109,7 +109,9 @@ class CrmCmpFile extends AbstractActiveRecord
         {
             if($insert || $this->isAttributeChanged('src'))
             {
-                $this->ext = end(explode('.',$this->src));
+                $tmp = explode('.',$this->src);
+                if(is_array($tmp))
+                    $this->ext = end($tmp);
             }
             return TRUE;
         }
