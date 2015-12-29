@@ -82,5 +82,7 @@ return [
     'Load more' => 'Загрузить еще',
     'Contacts' => 'Контакты',
     'Tasks' => 'Задачи',
-    'DIALOG_task' => 'Задача'
+    'DIALOG_task' => 'Задача',
+    'Invite resend' => 'Приглашение отправлено',
+    'Error, please try again!' => 'Ошибка. Попробуйте еще раз'
 ];

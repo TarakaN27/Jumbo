@@ -168,30 +168,6 @@ class DefaultController extends AbstractBaseBackendController
     }
 
     /**
-     * @return string|\yii\web\Response
-     */
-    public function actionAddInvite()
-    {
-        $uID = Yii::$app->user->id;
-        $model = new BuserInviteCode(['buser_id' => $uID]);
-
-        if($model->load(Yii::$app->request->post()) && $model->save())
-        {
-            if($model->sendEmail())
-            {
-                Yii::$app->session->setFlash('success',Yii::t('app/common','Thank you! Invite was successfully send'));
-                return $this->redirect(['index']);
-            }else
-            {
-                Yii::$app->session->setFlash('error',Yii::t('app/common','Sorry! We have same error, please try again!'));
-            }
-        }
-        return $this->render('add_invite',[
-            'model' => $model
-        ]);
-    }
-
-    /**
      * @return string
      */
     public function actionProfile()

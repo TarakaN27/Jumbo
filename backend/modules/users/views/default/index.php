@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <section class="pull-right">
                                     <?php if(Yii::$app->user->can('adminRights')):?>
                                         <?php echo \yii\helpers\Html::a(Yii::t('app/users','Add_new_user'),['/users/default/create'],['class'=>'btn btn-primary']);?>
-                                        <?php echo \yii\helpers\Html::a(Yii::t('app/users','Add_invite'),['/users/default/add-invite'],['class'=>'btn btn-warning']);?>
+                                        <?php echo Html::a(Yii::t('app/users','Invited users'),['/users/invite/index'],['class'=>'btn btn-warning'])?>
                                     <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>

@@ -23,6 +23,38 @@ class BuserInviteCode extends AbstractActiveRecord
         NORMAL = 0,
         BROKEN = 1;
 
+    protected
+        $blockBeforeSave = FALSE;
+
+    /**
+     * @return array
+     */
+    public static function getStatusArr()
+    {
+        return [
+            self::NORMAL => Yii::t('app/users','Normal'),
+            self::BROKEN => Yii::t('app/users','Broken')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusStr()
+    {
+        $tmp = self::getStatusArr();
+        return isset($tmp[$this->status]) ? $tmp[$this->status] : 'N/A';
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserTypeStr()
+    {
+        $tmp = BUser::getRoleArr();
+        return isset($tmp[$this->user_type]) ? $tmp[$this->user_type] : 'N/A';
+    }
+
     /**
      * @inheritdoc
      */
@@ -73,6 +105,9 @@ class BuserInviteCode extends AbstractActiveRecord
     {
         if(parent::beforeSave($insert))
         {
+            if($this->blockBeforeSave)
+                return TRUE;
+
             if(self::find()->where(['email'=>$this->email,'status' => self::NORMAL])->exists())
             {
                 if(!self::updateAll(['status' => self::BROKEN],
@@ -85,6 +120,19 @@ class BuserInviteCode extends AbstractActiveRecord
             $this->status = self::NORMAL;
             return TRUE;
         }
+        return FALSE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function resend()
+    {
+        $this->blockBeforeSave = TRUE;
+        $this->code = $this->generateInviteToken();
+        $this->status = self::NORMAL;
+        if($this->save())
+            return $this->sendEmail();
         return FALSE;
     }
 
@@ -133,5 +181,13 @@ class BuserInviteCode extends AbstractActiveRecord
             ->setTo($this->email)
             ->setSubject('User invite for ' . \Yii::$app->name)
             ->send();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBuser()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'buser_id']);
     }
 }
