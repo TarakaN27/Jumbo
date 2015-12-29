@@ -38,8 +38,8 @@ return [
         ],
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
-            'dateFormat' => 'php:m.d.Y',
-            'datetimeFormat' => 'php:m.d.Y H:i:s'
+            'dateFormat' => 'php:d.m.Y',
+            'datetimeFormat' => 'php:d.m.Y H:i:s'
         ],
     ],
 ];
