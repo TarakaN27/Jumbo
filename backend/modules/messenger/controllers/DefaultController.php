@@ -33,19 +33,6 @@ class DefaultController extends AbstractBaseBackendController
     public function actionIndex()
     {
         $userID = \Yii::$app->user->id;
-        /*
-        $query = Dialogs::find()->joinWith('busers')
-            ->with([
-                'busers' => function ($query) use ($userID)  {
-                        $query->andWhere(BUser::tableName().'.id is NULL OR '.
-                            BUser::tableName().'.id = '.$userID
-                        );
-                    }
-            ])
-            ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,'type' => Dialogs::TYPE_MSG])
-            ->orWhere([Dialogs::tableName().'.buser_id' => $userID,'type' => Dialogs::TYPE_MSG]);
-*/
-
         $query = Dialogs::find()
             ->joinWith('busers')
             ->where([
@@ -57,10 +44,8 @@ class DefaultController extends AbstractBaseBackendController
                 Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.' AND '.Dialogs::tableName().'.type = :type'.
                 ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )',[
                 ':type' => Dialogs::TYPE_MSG
-            ])
-            ;
-
-
+            ]);
+        
         $countQuery = clone $query;
         $pages = new Pagination([
             'totalCount' => $countQuery->count(' DISTINCT '.Dialogs::tableName().'.id')
