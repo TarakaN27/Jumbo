@@ -320,9 +320,9 @@ class CompanyController extends AbstractBaseBackendController
 			throw new NotFoundHttpException();
 		$cmpName = $model->getInfo();
 		if($model->delete())
-			Yii::$app->session->setFlash(Alert::TYPE_SUCCESS,Yii::t('app/crm','Company {company} successfully deleted'),[
+			Yii::$app->session->setFlash(Alert::TYPE_SUCCESS,Yii::t('app/crm','Company {company} successfully deleted',[
 				'company' => $cmpName
-			]);
+			]));
 		else
 			Yii::$app->session->setFlash(Alert::TYPE_ERROR,Yii::t('app/crm','Error can not delete company'));
 

@@ -150,7 +150,6 @@ array_push($columns,[
 			);
 
 			$color = $model->archive == CUser::ARCHIVE_YES ? 'red' :'';
-
 			$options = [
 				'title' => Yii::t('app/crm', 'Archive'),
 				'aria-label' => Yii::t('app/crm', 'Archive'),
