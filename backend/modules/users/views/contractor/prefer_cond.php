@@ -14,7 +14,7 @@ $this->title = 'Условия по-умолчанию';
             <div class="x_title">
                 <h2><?php echo $this->title;?></h2>
                 <section class="pull-right">
-                    <?= Html::a(Yii::t('app/users', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
+                    <?= Html::a(Yii::t('app/users', 'To list'), ['/crm/company/index'], ['class' => 'btn btn-warning']) ?>
                 </section>
                 <div class="clearfix"></div>
             </div>

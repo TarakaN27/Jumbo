@@ -26,8 +26,16 @@ class CUserSearch extends CUser
     public function rules()
     {
         return [
-            [['id', 'ext_id', 'type', 'manager_id', 'role', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['phone','c_email','fio','username', 'auth_key', 'password_hash', 'password_reset_token', 'email','corp_name'], 'safe'],
+            [[
+
+                'id', 'ext_id', 'type', 'manager_id',
+                'role', 'status', 'created_at', 'updated_at','contractor'
+            ], 'integer'],
+            [[
+                'phone','c_email','fio','username',
+                'auth_key', 'password_hash', 'password_reset_token',
+                'email','corp_name'
+            ], 'safe'],
         ];
     }
 
@@ -67,12 +75,17 @@ class CUserSearch extends CUser
         $query->joinWith('requisites');
         if(!is_null($addQuery))
             $query->where($addQuery,$addParams);
+
+        if(!Yii::$app->user->can('adminRights'))    //показываем архивные компании только админам
+            $query->notArchive();
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> ['defaultOrder' => ['created_at'=>SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -90,6 +103,7 @@ class CUserSearch extends CUser
             'manager_id' => $this->manager_id,
             'role' => $this->role,
             'status' => $this->status,
+            'contractor' => $this->contractor,
             CUser::tableName().'created_at' => $this->created_at,
             CUser::tableName().'updated_at' => $this->updated_at,
         ]);

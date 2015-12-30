@@ -48,7 +48,6 @@ class ContactController extends AbstractBaseBackendController
         $iAccessLevel = \Yii::$app->user->getCRMLevelAccess(CrmCmpContacts::getModelName(),BUserCrmRules::READ_ACTION);
         $searchModel = new CrmCmpContactsSearch();
         $dataProvider = NULL;
-        echo $iAccessLevel;
         switch($iAccessLevel)
         {
             case BUserCrmRules::RULE_ALL:
@@ -57,7 +56,7 @@ class ContactController extends AbstractBaseBackendController
 
             case BUserCrmRules::RULE_THEMSELF:
                 $dataProvider = $searchModel->search(Yii::$app->request->queryParams,
-                    '('.CrmCmpContacts::tableName().'.assigned_at == :userID AND '.CrmCmpContacts::tableName().'.created_by == :userID' ,
+                    '('.CrmCmpContacts::tableName().'.assigned_at = :userID OR '.CrmCmpContacts::tableName().'.created_by = :userID' ,
                     [
                         ':userID' => Yii::$app->user->id
                     ]);

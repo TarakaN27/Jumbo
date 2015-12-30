@@ -55,6 +55,7 @@ class CUserRequisites extends AbstractActiveRecord
         TYPE_I_PERSON = 15; // ИП
 
     public
+        $contructor = CUser::CONTRACTOR_NO,
         $isResident = true;
 
     /**
@@ -107,6 +108,10 @@ class CUserRequisites extends AbstractActiveRecord
             ['c_email', 'email'],
             [['reg_date','birthday','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
 
+
+
+
+
             // обязательные поля для физика
             [[
                  'pasp_date','pasp_auth','pasp_ident',
@@ -114,9 +119,17 @@ class CUserRequisites extends AbstractActiveRecord
              ],
              'required',
              'when' => function($model) {
+                    if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                        return FALSE;
                     return $model->type_id == CUserRequisites::TYPE_F_PERSON;
              },
              'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
                     return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_F_PERSON."';
                 }"
             ],
@@ -125,22 +138,53 @@ class CUserRequisites extends AbstractActiveRecord
               'b_code','j_address', 'p_address'],
              'required',
              'when' => function($model) {
+                     if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                         return FALSE;
                     return $model->type_id == CUserRequisites::TYPE_J_PERSON;
             },
              'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
+
                     return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."';
                 }"
             ],
+
+
+            // обязательные поля для юриков
+            [['corp_name'],
+                'required',
+                'when' => function($model) {
+                    return $model->type_id == CUserRequisites::TYPE_J_PERSON;
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."';
+                }"
+            ],
+
             // юрик или ИП резидент
             [['ynp', 'okpo'],
              'required',
              'when' => function($model) {
+                     if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                         return FALSE;
                     return (
                         $model->type_id == CUserRequisites::TYPE_J_PERSON ||
                         $model->type_id == CUserRequisites::TYPE_I_PERSON
                     ) && $this->isResident;
                 },
              'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
+
                     return ($('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."'
                     || $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."') && $('#cuserrequisites-isresident').val() == 'true';
                 }"
@@ -150,12 +194,23 @@ class CUserRequisites extends AbstractActiveRecord
             [['inn', 'kpp', 'ogrn'],
              'required',
              'when' => function($model) {
-                    return (
+
+                 if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                     return FALSE;
+
+                 return (
                         $model->type_id == CUserRequisites::TYPE_J_PERSON ||
                         $model->type_id == CUserRequisites::TYPE_I_PERSON
                     ) && !$this->isResident;
                 },
              'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
+
                     return ($('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_J_PERSON."'
                     || $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."') && $('#cuserrequisites-isresident').val() != 'true';
                 }"
@@ -166,9 +221,18 @@ class CUserRequisites extends AbstractActiveRecord
              ],
              'required',
              'when' => function($model) {
-                    return $model->type_id == CUserRequisites::TYPE_I_PERSON;
+                 if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                     return FALSE;
+
+                 return $model->type_id == CUserRequisites::TYPE_I_PERSON;
              },
              'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
                     return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."';
                 }"
             ],

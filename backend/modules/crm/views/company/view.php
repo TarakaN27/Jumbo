@@ -10,6 +10,7 @@ use common\components\customComponents\collapse\CollapseWidget;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
+use common\models\CUser;
 $this->title = $model->getInfo();
 //скрипты для редактирования контактов
 if(!empty($arContacts)) {
@@ -67,22 +68,61 @@ $this->registerJs("
 	<div class="col-md-12">
 		<div class="x_panel">
 			<div class="x_title">
-				<h2><?php echo $this->title;?></h2>
-				<ul class="nav navbar-right panel_toolbox">
-					<li><a href="#"><i class="fa fa-chevron-up"></i></a>
-					</li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">Settings 1</a>
-							</li>
-							<li><a href="#">Settings 2</a>
-							</li>
-						</ul>
-					</li>
-					<li><a href="#"><i class="fa fa-close"></i></a>
-					</li>
-				</ul>
+				<h2><?php echo $this->title;?>
+					<?php if($model->archive == CUser::ARCHIVE_YES):?>
+					<small class="red">(<?=Yii::t('app/crm','Company in archive')?>)</small>
+					<?php endif;?>
+				</h2>
+
+				<section class="pull-right">
+				<?=  Html::a(Yii::t('app/crm', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
+
+				<?= Html::a('<i class="fa fa-plus"></i> '.Yii::t('app/crm', 'Create company'), ['create'], ['class' => 'btn btn-success']) ?>
+				<?php if(Yii::$app->user->crmCanEditModel(
+					$model,
+					'created_by',
+					'manager_id',
+					'opened'
+				)):?>
+				<?= Html::a('<i class="fa fa-pencil"></i> '.Yii::t('app/crm', 'Update'), ['update', 'id' => $model->id],[
+						'class' => 'btn btn-primary',
+						'title' => Yii::t('yii', 'Update'),
+						'aria-label' => Yii::t('yii', 'Update'),
+						'data-pjax' => '0',
+					]) ?>
+				<?php endif;?>
+
+				<?php
+
+				$str = $model->archive != CUser::ARCHIVE_YES ? Yii::t('app/crm','Archive') :Yii::t('app/crm','Return from archive');
+				if(Yii::$app->user->crmCanDeleteModel(
+					$model,
+					'created_by',
+					'manager_id',
+					'opened'
+				)):?>
+
+					<?=Html::a('<i class="fa fa-archive"></i> '.$str ,['archive','id' => $model->id],[
+						'class' => 'btn btn-primary',
+						'title' => Yii::t('app/crm', 'Archive'),
+						'aria-label' => Yii::t('app/crm', 'Archive'),
+						'data-pjax' => '0',
+					]);?>
+				<?php endif;?>
+
+				<?php if(Yii::$app->user->can('adminRights')):?>
+				<?= Html::a('<i class="fa fa-trash"></i> '.Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
+						'title' => Yii::t('yii', 'Delete'),
+						'aria-label' => Yii::t('yii', 'Delete'),
+						'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+						'data-method' => 'post',
+						'data-pjax' => '0',
+						'class' => 'btn btn-danger',
+					]) ?>
+				<?php endif;?>
+				</section>
+
+
 				<div class="clearfix"></div>
 			</div>
 
@@ -169,7 +209,6 @@ $this->registerJs("
 												return is_object($obCnt = $model->contact) ? $obCnt->fio : $model->contact_id;
 											}
 										],
-
 										[
 											'attribute' => 'deadline',
 										],

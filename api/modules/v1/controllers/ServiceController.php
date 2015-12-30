@@ -4,6 +4,7 @@ use api\components\AbstractActiveActionREST;
 use common\components\helpers\CustomHelper;
 use common\models\Bills;
 use common\models\BillTemplate;
+use common\models\CUser;
 use common\models\CuserExternalAccount;
 use common\models\CuserPreferPayCond;
 use common\models\LegalPerson;
@@ -14,6 +15,7 @@ use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -111,6 +113,7 @@ class ServiceController extends AbstractActiveActionREST
 
     /**
      * @return string
+     * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
@@ -128,6 +131,9 @@ class ServiceController extends AbstractActiveActionREST
 
         if(!$obUser)
             throw new NotFoundHttpException('User not found');
+
+        if($obUser->contructor != CUser::CONTRACTOR_YES) //проверяем, чтобы пользователь был конрагентом
+            throw new ForbiddenHttpException('Not allowed');
 
         $obPrefCond = CuserPreferPayCond::findOneByUserIDAndServiceID($obUser->id,$servID); // проверяем заданы ли условия для поьзователя
         if(!$obPrefCond)

@@ -232,6 +232,8 @@ class ContractorController extends AbstractBaseBackendController
             CuserPreferPayCond::deleteAll(['cuser_id' => $id]);
             foreach($arPostServ as $key=>$cond)
             {
+                if(!$cond)
+                    continue;
                 $obCUPPC = new CuserPreferPayCond();
                 $obCUPPC->cond_id = (int)$cond;
                 $obCUPPC->service_id = (int)$key;
@@ -248,7 +250,7 @@ class ContractorController extends AbstractBaseBackendController
             {
                 $trans->commit();
                 Yii::$app->session->setFlash('success','Изменения успешно сохранены');
-                return $this->redirect(['index']);
+                return $this->redirect(['/crm/company/index']);
             }else{
 
                 Yii::$app->session->setFlash('error','Ошибка');
@@ -407,7 +409,7 @@ class ContractorController extends AbstractBaseBackendController
             {
                 $trans->commit();
                 Yii::$app->session->setFlash('success','Изменения успешно сохранены');
-                return $this->redirect(['index']);
+                return $this->redirect(['/crm/company/index']);
             }else{
 
                 Yii::$app->session->setFlash('error','Ошибка');

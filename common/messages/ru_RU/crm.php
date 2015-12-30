@@ -166,6 +166,14 @@ return [
 	'TASK_DONE_SUCCESS' => 'Задача завершена',
 	'TASK' => 'Задача',
 	'Hour' => 'Часы',
-	'Minutes' => 'Минуты'
-
+	'Minutes' => 'Минуты',
+	'Company moved to the archive' => 'Компания перемещена в архив',
+	'Error. Can not set archive status for company' => 'Не удалось переместить компанию в архив',
+	'Archive' => 'Перенести в архив',
+	'Company comeback from archive' => 'Компания возвращена из архива',
+	'Company {company} successfully deleted' => 'Компания {company} удалена!',
+	'Error can not delete company' => 'Ошибка удаления компании',
+	'Company in archive' => 'Компания в архиве',
+	'Is opened for all' => 'Доступно для всех',
+	'Return from archive' => 'Восстановить из архива'
 ];

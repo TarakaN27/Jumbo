@@ -130,6 +130,43 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 				]])
 				->textInput(['maxlength' => true])?>
 		</div>
+	</div>
+
+	<div class="ln_solid"></div>
+	<h4 class = "h4_ml_10">Сведение о компании</h4>
+	<div class = "form-group">
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'type', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])
+				->dropDownList(\common\models\CUserTypes::getUserTypesMap(),[
+					'prompt' => Yii::t('app/users','Choose_user_type')
+				]) ?>
+		</div>
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'manager_id', [
+				'template' => $fieldTempl,
+				'labelOptions'=>['class' => 'control-label']])
+				->widget(\kartik\select2\Select2::classname(),[
+					'data' => \backend\models\BUser::getAllMembersMap(),
+					'options' => ['placeholder' => Yii::t('app/users','Choose_manager')],
+					'pluginOptions' => [
+						'allowClear' => true
+					],
+				]);
+			?>
+		</div>
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'status', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])
+				->dropDownList(\common\models\CUser::getStatusArr()) ?>
+		</div>
+
 		<div class = "col-md-4 col-sm-4 col-xs-12">
 			<?= $form->field($model,'is_opened', [
 				'template' => $fieldTempl,
@@ -138,8 +175,16 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 				]])
 				->dropDownList(\common\models\CUser::getOpenedCloserArr())?>
 		</div>
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?=$form->field($model,'contractor', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])->dropDownList(\common\models\CUser::getContractorArr())?>
+		</div>
 
 	</div>
+
 	<section class="jPersonInfo hideBlockClass">
 		<div class="ln_solid"></div>
 		<h4 class = "h4_ml_10">Сведение о юридическом лице</h4>
@@ -195,40 +240,71 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 				->textInput(['maxlength' => TRUE]) ?>
 		</div>
 	</div>
-	<div class="ln_solid"></div>
-	<div class = "form-group">
-		<div class = "col-md-4 col-sm-4 col-xs-12">
-			<?= $form->field($model, 'type', [
-				'template' => $fieldTempl,
-				'labelOptions'=>[
-					'class' => 'control-label'
-				]])
-				->dropDownList(\common\models\CUserTypes::getUserTypesMap(),[
-				'prompt' => Yii::t('app/users','Choose_user_type')
-			]) ?>
+
+	<!-- Contact info--->
+	<section class="contactInfo hideBlockClass">
+		<div class="ln_solid"></div>
+		<h4 class = "h4_ml_10">Контактная информация:</h4>
+		<div class = "form-group">
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_fname', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_lname', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_mname', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_email', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_phone', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($modelR, 'c_fax', [
+					'template' => $fieldTempl,
+					'labelOptions'=>[
+						'class' => 'control-label'
+					]])->textInput(['maxlength' => TRUE]) ?>
+			</div>
 		</div>
-		<div class = "col-md-4 col-sm-4 col-xs-12">
-			<?= $form->field($model, 'manager_id', [
-				'template' => $fieldTempl,
-				'labelOptions'=>['class' => 'control-label']])
-				->widget(\kartik\select2\Select2::classname(),[
-					'data' => \backend\models\BUser::getListManagers(),
-					'options' => ['placeholder' => Yii::t('app/users','Choose_manager')],
-					'pluginOptions' => [
-						'allowClear' => true
-					],
-				]);
-			?>
-		</div>
-		<div class = "col-md-4 col-sm-4 col-xs-12">
-			<?= $form->field($model, 'status', [
-				'template' => $fieldTempl,
-				'labelOptions'=>[
-					'class' => 'control-label'
-				]])
-				->dropDownList(\common\models\CUser::getStatusArr()) ?>
-		</div>
-	</div>
+	</section>
+	<section class="contactSite">
+		<?php echo $form->field($modelR,'site')->widget(\yii\widgets\MaskedInput::className(),[
+			'clientOptions' => [
+				'alias' =>  'url',
+			],
+			'options' => [
+				'placeholder'=>'http://site.com',
+				'class'=>'form-control'
+			]
+		]);
+		?>
+	</section>
+
+
+
 
 	<!--- Passport section--->
 	<section class="passportBlock hideBlockClass">
@@ -423,67 +499,6 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 			'labelOptions'=>['class' => 'control-label']])->textarea() ?>
 	</section>
 	<!--END p address-->
-	<!-- Contact info--->
-	<section class="contactInfo hideBlockClass">
-		<div class="ln_solid"></div>
-		<h4 class = "h4_ml_10">Контактная информация:</h4>
-		<div class = "form-group">
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_fname', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_lname', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_mname', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_email', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_phone', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'c_fax', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
-		</div>
-	</section>
-	<section class="contactSite">
-		<?php echo $form->field($modelR,'site')->widget(\yii\widgets\MaskedInput::className(),[
-			'clientOptions' => [
-				'alias' =>  'url',
-			],
-			'options' => [
-				'placeholder'=>'http://site.com',
-				'class'=>'form-control'
-			]
-		]);
-		?>
-	</section>
 
 	<div class="form-group">
 		<div class = "col-md-offset-8 pull-right">

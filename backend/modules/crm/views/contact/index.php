@@ -22,9 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
+                <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'filterSelector' => 'select[name="per-page"]',
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
                         [

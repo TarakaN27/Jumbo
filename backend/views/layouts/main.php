@@ -41,6 +41,7 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
 
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
+    /*
     $subItems[] = ['label' => Yii::t('app/common', 'CRM roles'), 'url' => ['/config/b-user-crm-roles/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'CRM group'), 'url' => ['/config/b-user-crm-group/index']];
     $menuItems[] = [
@@ -48,7 +49,7 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
         'items' => $subItems,
     ];
     unset($subItems);
-
+*/
     $subItems[] = ['label' => Yii::t('app/common', 'Config'), 'url' => ['/config/default/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Entity fields'), 'url' => ['/config/entity-fields/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
@@ -134,25 +135,31 @@ $menuItems[] = [
                         <div class = "menu_section">
                             <h3>General</h3>
                             <ul class = "nav side-menu">
-                                <li><a><i class = "fa fa-user"></i> <?php echo Yii::t('app/users', 'USER_users'); ?>
-                                        <span class = "fa fa-chevron-down"></span></a>
-                                    <ul class = "nav child_menu" style = "display: none">
-                                        <li><a href = "<?= Url::to(['/users/default/index']) ?>"><?php echo Yii::t('app/users', 'USER_staf'); ?></a>
-                                        </li>
-                                        <li><a href = "<?= Url::to(['/users/contractor/index']) ?>"><?php echo Yii::t('app/users', 'USER_contractor'); ?></a>
-                                        </li>
-                                        <?php if(Yii::$app->user->can('adminRights')):?>
-                                        <li>
-                                            <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
-                                        </li>
-                                        <?php endif;?>
-                                        <?php if(Yii::$app->user->can('superRights')):?>
-                                        <li>
-                                            <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
-                                        </li>
-                                        <?php endif;?>
-                                    </ul>
-                                </li>
+                                <?php if(Yii::$app->user->can('adminRights')):?>
+                                    <li>
+                                        <a>
+                                            <i class = "fa fa-user"></i> <?php echo Yii::t('app/users', 'USER_users'); ?>
+                                            <span class = "fa fa-chevron-down"></span>
+                                        </a>
+                                        <ul class = "nav child_menu" style = "display: none">
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/default/index']) ?>"><?php echo Yii::t('app/users', 'USER_staf'); ?></a>
+                                            </li>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common', 'CRM roles'),['/config/b-user-crm-roles/index']);?>
+                                            </li>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common', 'CRM group'),['/config/b-user-crm-group/index']);?>
+                                            </li>
+
+                                            <?php if(Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
+                                            </li>
+                                            <?php endif;?>
+                                        </ul>
+                                    </li>
+                                <?php endif;?>
                                 <li><a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
@@ -239,11 +246,6 @@ $menuItems[] = [
                                 <li><a><i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
-                                            <a href="<?= Url::to(['/crm/task/index']); ?>">
-                                                <?php echo Yii::t('app/common', 'Tasks'); ?>
-                                            </a>
-                                        </li>
-                                        <li>
                                             <a href="<?= Url::to(['/crm/default/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'List feed'); ?>
                                             </a>
@@ -253,9 +255,19 @@ $menuItems[] = [
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
                                             </a>
                                         </li>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
+                                            </li>
+                                        <?php endif;?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/contact/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Contacts'); ?>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/crm/task/index']); ?>">
+                                                <?php echo Yii::t('app/common', 'Tasks'); ?>
                                             </a>
                                         </li>
                                     </ul>

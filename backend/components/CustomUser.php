@@ -4,8 +4,8 @@
  * User: zhenya
  * Date: 19.10.15
  * Time: 15.29
- * @property boolean $getCRMLevelAccess return access level for crm . This property is read-only.
- * @property boolean $isManager Whether the current user is a manager. This property is read-only.
+ * @property boolean cRMLevelAccess return access level for crm . This property is read-only.
+ * @property boolean manager Whether the current user is a manager. This property is read-only.
  */
 
 namespace backend\components;
@@ -52,6 +52,69 @@ class CustomUser extends User
 			return $obRule->$action;
 
 		return BUserCrmRules::RULE_CLOSED;
+	}
+
+	/**
+	 * @param $model
+	 * @param string $createdField
+	 * @param string $assignFiled
+	 * @param string $openedField
+	 * @return bool
+	 */
+	public function crmCanEditModel($model,$createdField = 'created_by',$assignFiled = 'manager_id',$openedField = 'opened')
+	{
+		$iLevel = $this->getCRMLevelAccess($model::getModelName(),BUserCrmRules::UPDATE_ACTION);
+		return $this->crmLevelHelper($iLevel,$model,$createdField,$assignFiled,$openedField);
+	}
+
+	/**
+	 * @param $model
+	 * @param string $createdField
+	 * @param string $assignFiled
+	 * @param string $openedField
+	 * @return bool
+	 */
+	public function crmCanDeleteModel($model,$createdField = 'created_by',$assignFiled = 'manager_id',$openedField = 'opened')
+	{
+		$iLevel = $this->getCRMLevelAccess($model::getModelName(),BUserCrmRules::DELETE_ACTION);
+		return $this->crmLevelHelper($iLevel,$model,$createdField,$assignFiled,$openedField);
+	}
+
+	/**
+	 * @param $iLevel
+	 * @param $model
+	 * @param string $createdField
+	 * @param string $assignFiled
+	 * @param string $openedField
+	 * @return bool
+	 */
+	protected function crmLevelHelper($iLevel,$model,$createdField = 'created_by',$assignFiled = 'manager_id',$openedField = 'opened')
+	{
+		$bReturn = FALSE;
+		switch($iLevel)
+		{
+			case BUserCrmRules::RULE_ALL:
+				$bReturn = TRUE;
+				break;
+
+			case BUserCrmRules::RULE_OPENED:
+				if($model->$openedField)
+					$bReturn = TRUE;
+				break;
+
+			case BUserCrmRules::RULE_THEMSELF:
+				if($model->$createdField == \Yii::$app->user->id)
+					$bReturn = TRUE;
+
+				if($model->$assignFiled == \Yii::$app->user->id)
+					$bReturn = TRUE;
+
+				break;
+			default:
+				break;
+		}
+
+		return $bReturn;
 	}
 
 

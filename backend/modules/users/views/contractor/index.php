@@ -97,13 +97,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                                         '.Html::a(Yii::t('app/users','Settings'),['/users/contractor-settings/index','userID' => $model->id]).'
                                                     </li>
                                                     <li>
-                                                        '.Html::a(Yii::t('app/users','Prefer condition'),['prefer-cond','id' => $model->id]).'
+                                                        '.Html::a(Yii::t('app/users','Prefer condition'),['/users/contractor/prefer-cond','id' => $model->id]).'
                                                     </li>
                                                     <li>
-                                                        '.Html::a(Yii::t('app/users','External account'),['external-account','iCID' => $model->id]).'
+                                                        '.Html::a(Yii::t('app/users','External account'),['/users/contractor/external-account','iCID' => $model->id]).'
                                                     </li>
                                                     <li>
-                                                        '.Html::a(Yii::t('app/users','Services contract'),['services-contract','iCID' => $model->id]).'
+                                                        '.Html::a(Yii::t('app/users','Services contract'),['/users/contractor/services-contract','iCID' => $model->id]).'
                                                     </li>
                                                 </ul>
                                             </div>

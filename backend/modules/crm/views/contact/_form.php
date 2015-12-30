@@ -32,6 +32,10 @@ use yii\web\JsExpression;
         ]
     ) ?>
 
+    <?= $form->field($model, 'is_opened')->dropDownList(
+        \common\models\CrmCmpContacts::getOpenedClosedArr()
+    ) ?>
+
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>

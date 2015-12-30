@@ -118,7 +118,7 @@ class CrmCmpContacts extends AbstractActiveRecord
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'phone' => Yii::t('app/crm', 'Phone'),
             'email' => Yii::t('app/crm', 'Email'),
-            'is_opened' => Yii::t('app/crm','Is opened'),
+            'is_opened' => Yii::t('app/crm','Is opened for all'),
             'created_by' => Yii::t('app/crm','Created by')
         ];
     }

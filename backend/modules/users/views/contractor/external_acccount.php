@@ -5,6 +5,7 @@
  * Date: 1.10.15
  * Time: 11.10
  */
+use yii\helpers\Html;
 $this->title = Yii::t('app/users','External account');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Cusers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -14,6 +15,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="title_left">
             <h3><?php echo $this->title;?></h3>
         </div>
+        <section class="pull-right">
+            <?= Html::a(Yii::t('app/users', 'Back'), ['/crm/company/index'], ['class' => 'btn btn-warning']) ?>
+        </section>
     </div>
     <div class="clearfix"></div>
     <div class="row">

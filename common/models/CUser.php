@@ -33,11 +33,17 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $is_opened
  * @property integer $created_by
+ * @property integer $contractor
+ * @property integer $archive
  */
 class CUser extends AbstractUser
 {
     use \DevGroup\TagDependencyHelper\TagDependencyTrait;
     CONST
+        ARCHIVE_YES = 1,
+        ARCHIVE_NO = 0,
+        CONTRACTOR_YES = 1,
+        CONTRACTOR_NO = 0,
         IS_OPENED = 1,
         IS_CLOSED = 0,
         RESIDENT_YES = 1,
@@ -47,6 +53,47 @@ class CUser extends AbstractUser
     public
         $isNew = FALSE,
         $password;
+
+
+    /**
+     * @return array
+     */
+    public static function getArchiveArr()
+    {
+        return [
+            self::ARCHIVE_NO => Yii::t('app/users','Contractor NO'),
+            self::ARCHIVE_YES => Yii::t('app/users','Contractor YES')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getArchiveStr()
+    {
+        $tmp = self::getArchiveArr();
+        return isset($tmp[$this->archive]) ? $tmp[$this->archive] : 'N/A';
+    }
+
+    /**
+     * @return array
+     */
+    public static function getContractorArr()
+    {
+        return [
+            self::CONTRACTOR_NO => Yii::t('app/users','Contractor NO'),
+            self::CONTRACTOR_YES => Yii::t('app/users','Contractor YES')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getContractorStr()
+    {
+        $tmp = self::getContractorArr();
+        return isset($tmp[$this->contractor]) ? $tmp[$this->contractor] : 'N/A';
+    }
 
     /**
      * @return array
@@ -118,7 +165,8 @@ class CUser extends AbstractUser
     public function rules()
     {
         return [
-            [['role','status','created_at','updated_at','manager_id','is_opened','created_by'],'integer'],
+            [['role','status','created_at','updated_at','manager_id','is_opened','created_by','contractor'],'integer'],
+
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             //имя пользователя
@@ -154,7 +202,13 @@ class CUser extends AbstractUser
             ['r_country', 'string'],
 
             ['is_opened','default','value' => self::IS_CLOSED],
-            ['is_opened','in','range' => array_keys(self::getOpenedCloserArr())]
+            ['is_opened','in','range' => array_keys(self::getOpenedCloserArr())],
+
+            ['contractor','default','value' => self::CONTRACTOR_NO],
+            ['contractor','in','range' => array_keys(self::getContractorArr())],
+
+            ['archive','default','value' => self::ARCHIVE_NO],
+            ['archive','in','range' => array_keys(self::getArchiveArr())]
         ];
     }
 
@@ -182,7 +236,9 @@ class CUser extends AbstractUser
             'requisites_id' => Yii::t('app/users', 'Requisites'),
             'r_country' => Yii::t('app/users', 'Resident country'),
             'is_opened' => Yii::t('app/users','Is opened'),
-            'created_by' => Yii::t('app/users','Created by')
+            'created_by' => Yii::t('app/users','Created by'),
+            'contractor' => Yii::t('app/users','Contractor'),
+            'archive' => Yii::t('app/users','Archive')
         ];
     }
 
@@ -294,7 +350,7 @@ class CUser extends AbstractUser
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->all($db);
+            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->all($db);
         },86400,$dep);
 
         return $models;
@@ -452,8 +508,34 @@ class CUser extends AbstractUser
  */
 class CUserQuery extends ActiveQuery
 {
+    /**
+     * Активные
+     * @param int $state
+     * @return $this
+     */
     public function active($state = CUser::STATUS_ACTIVE)
     {
-        return $this->andWhere(['status' => $state]);
+        return $this->andWhere([CUser::tableName().'.status' => $state]);
+    }
+
+    /**
+     * Архивные
+     * @return $this
+     */
+    public function archiveState()
+    {
+        return $this->andWhere([CUser::tableName().'.archive' => CUser::ARCHIVE_YES]);
+    }
+
+    /**
+     * Не архивные
+     * @return $this
+     */
+    public function notArchive()
+    {
+        return $this->andWhere(
+            '( '.CUser::tableName().'.archive != :archive or '.CUser::tableName().'.archive IS NULL )',[
+            ':archive' => CUser::ARCHIVE_YES
+        ]);
     }
 }

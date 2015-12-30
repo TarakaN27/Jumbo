@@ -10,6 +10,7 @@ namespace app\modules\crm\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\widgets\Alert;
 use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
@@ -19,13 +20,13 @@ use common\models\search\CUserSearch;
 use Yii;
 use common\models\CUserRequisites;
 use yii\base\Exception;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use yii\filters\AccessControl;
 class CompanyController extends AbstractBaseBackendController
 {
-
 	/**
 	 * переопределяем права на контроллер и экшены
 	 * @return array
@@ -38,7 +39,12 @@ class CompanyController extends AbstractBaseBackendController
 			'rules' => [
 				[
 					'allow' => true,
-					'roles' => ['moder','bookkeeper','admin']
+					'actions' => ['delete'],
+					'roles' => ['admin']
+				],
+				[
+					'allow' => true,
+					'roles' => ['user','moder','bookkeeper','admin']
 				]
 			]
 		];
@@ -62,7 +68,7 @@ class CompanyController extends AbstractBaseBackendController
 				$searchModel = new CUserSearch();
 				$dataProvider = $searchModel->search(
 					Yii::$app->request->queryParams,
-					'('.CUser::tableName().'.manager_id == :userID AND '.CUser::tableName().'.created_by == :userID' ,
+					'('.CUser::tableName().'.manager_id = :userID OR '.CUser::tableName().'.created_by = :userID )' ,
 					[
 						':userID' => Yii::$app->user->id
 					]
@@ -100,12 +106,14 @@ class CompanyController extends AbstractBaseBackendController
 	{
 		$model = new CUser();
 		$model->setDummyFields(); //@todo утановлены заглушки на имя пользователя и емаил. При необходимости убрать!
+		$model->manager_id = Yii::$app->user->id;
 		$modelR = new CUserRequisites();
 		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
 
 			if($model->is_resident != CUser::RESIDENT_YES)
 				$modelR->isResident = FALSE;
 
+			$modelR->contructor = $model->contractor;
 			if($model->validate() && $modelR->validate())
 			{
 				$transaction = Yii::$app->db->beginTransaction(); //транзакция для того чтобы при ошибках сохранения не создавалось лишних записей
@@ -259,6 +267,32 @@ class CompanyController extends AbstractBaseBackendController
 	}
 
 	/**
+	 * @param $id
+	 * @return Response
+	 * @throws NotFoundHttpException
+	 */
+	public function actionArchive($id)
+	{
+		/** @var  CUser $model */
+		$model = CUser::findOne($id);
+		if(!$model)
+			throw new NotFoundHttpException();
+
+		$model->archive = $model->archive == CUser::ARCHIVE_YES ? CUser::ARCHIVE_NO : CUser::ARCHIVE_YES;
+		if($model->save()) {
+			$str = $model->archive == CUser::ARCHIVE_YES ?
+				Yii::t('app/crm', 'Company moved to the archive') :
+				Yii::t('app/crm', 'Company comeback from archive');
+			Yii::$app->session->setFlash(Alert::TYPE_SUCCESS, $str);
+		}
+		else
+			Yii::$app->session->setFlash(Alert::TYPE_ERROR,Yii::t('app/crm','Error. Can not set archive status for company'));
+
+		return $this->redirect(Url::to(['index']));
+	}
+
+
+	/**
 	 * @return false|int
 	 * @throws NotFoundHttpException
 	 */
@@ -270,6 +304,85 @@ class CompanyController extends AbstractBaseBackendController
 			throw new NotFoundHttpException('File not found');
 		Yii::$app->response->format = Response::FORMAT_JSON;
 		return $obFile->delete();
+	}
+
+	/**
+	 * @param $id
+	 * @return Response
+	 * @throws NotFoundHttpException
+	 * @throws \Exception
+	 */
+	public function actionDelete($id)
+	{
+		/** @var  CUser $model */
+		$model = CUser::findOne($id);
+		if(!$model)
+			throw new NotFoundHttpException();
+		$cmpName = $model->getInfo();
+		if($model->delete())
+			Yii::$app->session->setFlash(Alert::TYPE_SUCCESS,Yii::t('app/crm','Company {company} successfully deleted'),[
+				'company' => $cmpName
+			]);
+		else
+			Yii::$app->session->setFlash(Alert::TYPE_ERROR,Yii::t('app/crm','Error can not delete company'));
+
+		return $this->redirect(['index']);
+	}
+
+	/**
+	 * @param $id
+	 * @return string
+	 * @throws NotFoundHttpException
+	 * @throws \yii\db\Exception
+	 */
+	public function actionUpdate($id)
+	{
+		/** @var  CUser $model */
+		$model = CUser::findOne($id);
+		if(!$model)
+			throw new NotFoundHttpException();
+		$modelR = $model->requisites;
+		if(empty($modelR))
+			$modelR = new CUserRequisites();
+
+		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
+
+			if($model->is_resident != CUser::RESIDENT_YES)
+				$modelR->isResident = FALSE;
+
+			$modelR->contructor = $model->contractor;
+
+			if($model->validate() && $modelR->validate())
+			{
+				$transaction = Yii::$app->db->beginTransaction(); //транзакция для того чтобы при ошибках сохранения не создавалось лишних записей
+				try{
+					if($modelR->save() && $model->save())
+					{
+						$model->link('requisites',$modelR);
+						$transaction->commit();
+						Yii::$app->session->set('success',Yii::t('app/users','Contractor_successfully_updated'));
+						return $this->redirect(['view', 'id' => $model->id]);
+					}else{
+						$transaction->rollBack();
+					}
+				}catch (\Exception $e)
+				{
+					$transaction->rollBack();
+					Yii::$app->session->set('error',$e->getMessage());
+				}
+			}else{
+				Yii::$app->session->set('error',Yii::t('app/users','Contractor_validate_error'));
+			}
+		}
+
+		if(empty($modelR->type_id))
+			$modelR->type_id = CUserRequisites::TYPE_F_PERSON;
+
+		return $this->render('update', [
+			'model' => $model,
+			'modelR' => $modelR
+		]);
+
 	}
 
 }

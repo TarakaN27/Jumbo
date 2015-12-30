@@ -1,13 +1,12 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: zhenya
+ * Date: 30.12.15
+ * Time: 15.13
+ */
 use yii\helpers\Html;
-
-
-
-/* @var $this yii\web\View */
-/* @var $model common\models\CUser */
-
-$this->title = Yii::t('app/crm', 'Create company');
+$this->title = Yii::t('app/crm', 'Update company');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/crm', 'CRM company'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
