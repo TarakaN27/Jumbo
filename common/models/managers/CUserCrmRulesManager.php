@@ -68,10 +68,10 @@ class CUserCrmRulesManager
 			$arBUIDs [] = (int)$obCmp->manager_id;
 			$arBUIDs [] = (int)$iAthID;
 			$arBUIDs [] = (int)$obCmp->created_by;
-			$arBUIDs = array_unique($arBUIDs);
-			$arBUIDs = array_filter($arBUIDs);
 		}
 
+		$arBUIDs = array_unique($arBUIDs);
+		$arBUIDs = array_filter($arBUIDs);
 		return $arBUIDs;
 	}
 
