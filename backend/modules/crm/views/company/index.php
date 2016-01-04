@@ -74,7 +74,7 @@ $columns = [
 			$manager = $model->manager;
 			return is_object($manager) ? $manager->getFio() : NULL;
 		},
-		'filter' => \backend\models\BUser::getListManagers()
+		'filter' => \backend\models\BUser::getAllMembersMap()
 	],
 	[
 		'attribute' => 'contractor',
