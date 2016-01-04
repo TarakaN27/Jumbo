@@ -1,7 +1,12 @@
 <?php
 namespace frontend\controllers;
 
+use backend\models\BUser;
+use common\components\helpers\CustomHelper;
 use common\models\Acts;
+use common\models\CrmCmpContacts;
+use common\models\CUser;
+use common\models\CUserRequisites;
 use common\models\managers\BillsManager;
 use console\components\controllerHelper\ManagerMsg;
 use Yii;

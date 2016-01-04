@@ -21,6 +21,7 @@ use backend\models\BUser;
  * @property string $email
  * @property integer $is_opened
  * @property integer $created_by
+ * @property string $ext_id
  *
  * @property BUser $assignedAt
  * @property CUser $cmp
@@ -36,6 +37,9 @@ class CrmCmpContacts extends AbstractActiveRecord
     CONST
         IS_OPENED = 1,
         IS_CLOSED = 0;
+
+    protected
+        $isConsole = FALSE;
 
     /**
      * @return array
@@ -94,7 +98,7 @@ class CrmCmpContacts extends AbstractActiveRecord
         return [
             [['type','fio', 'assigned_at'], 'required'],
             [['cmp_id', 'type', 'assigned_at', 'created_at', 'updated_at', 'is_opened','created_by'], 'integer'],
-            [['description', 'addition_info'], 'string'],
+            [['description', 'addition_info','ext_id'], 'string'],
             [['fio', 'post', 'phone', 'email'], 'string', 'max' => 255],
             ['email','email']
         ];
@@ -163,9 +167,24 @@ class CrmCmpContacts extends AbstractActiveRecord
         return $this->hasMany(CrmCmpFile::className(),['contact_id' => 'id']);
     }
 
+    /**
+     * @param $val
+     */
+    public function setIsConsole($val)
+    {
+        $this->isConsole = $val;
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert)
     {
-        $this->created_by = Yii::$app->user->id;
+        if($this->isConsole)
+            $this->created_by = 1;
+        else
+            $this->created_by = Yii::$app->user->id;
         return parent::beforeSave($insert);
     }
 }

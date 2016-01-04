@@ -500,6 +500,16 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 	</section>
 	<!--END p address-->
 
+	<!-- Description-->
+	<section>
+		<div class="ln_solid"></div>
+		<h4 class = "h4_ml_10">Дополнительное данные</h4>
+		<?= $form->field($modelR,'description',[
+			'template'=>$fieldTemplSecond,
+			'labelOptions'=>['class' => 'control-label']])->textarea()?>
+	</section>
+	<!-- END description-->
+
 	<div class="form-group">
 		<div class = "col-md-offset-8 pull-right">
 			<?= Html::submitButton(

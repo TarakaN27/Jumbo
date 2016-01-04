@@ -45,6 +45,7 @@ use yii\helpers\ArrayHelper;
  * @property string $pasp_auth
  * @property string $pasp_date
  * @property string $site
+ * @property string $description
  */
 class CUserRequisites extends AbstractActiveRecord
 {
@@ -93,7 +94,24 @@ class CUserRequisites extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['j_fname', 'j_lname', 'j_mname','type_id'], 'required'],
+            [
+                ['j_fname', 'j_lname', 'j_mname','type_id'],
+                'required',
+                'when' => function($model) {
+                    if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                        return FALSE;
+                    return TRUE;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-contractor').val();
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                    {
+                        return false;
+                    }
+                    return true;
+                }"
+            ],
 
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
@@ -237,6 +255,7 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             ['site','url'],
+            ['description','string']
         ];
     }
 
@@ -281,7 +300,8 @@ class CUserRequisites extends AbstractActiveRecord
             'pasp_number' => Yii::t('app/users', 'Passport_number'),
             'pasp_auth' => Yii::t('app/users', 'Passport_auth'),
             'pasp_ident' => Yii::t('app/users', 'Passport_identity_number'),
-            'site' => Yii::t('app/users', 'Site')
+            'site' => Yii::t('app/users', 'Site'),
+            'description' => Yii::t('app/users', 'Description'),
         ];
     }
 
