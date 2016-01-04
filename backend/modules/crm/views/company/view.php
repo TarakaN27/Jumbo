@@ -133,11 +133,11 @@ $this->registerJs("
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<table>
 									<tr>
-										<th><?=YII::t('app/crm','Company type')?>:<th>
+										<th><?=YII::t('app/crm','Company type')?>: <th>
 										<td><?=is_object($userType = $model->userType) ? $userType->name : $model->type;?></td>
 									</tr>
 									<tr>
-										<th><?=YII::t('app/crm','FIO')?>:<th>
+										<th><?=YII::t('app/crm','FIO')?>: <th>
 										<td><?=is_object($obRequisite) ? $obRequisite->getContactFIO() : '';?></td>
 									</tr>
 								</table>
@@ -145,16 +145,20 @@ $this->registerJs("
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<table>
 									<tr>
-										<th><?=YII::t('app/crm','Phone')?>:</th>
+										<th><?=YII::t('app/crm','Phone')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_phone : '';?></td>
 									</tr>
 									<tr>
-										<th><?=YII::t('app/crm','Email')?>:</th>
+										<th><?=YII::t('app/crm','Email')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_email : '';?></td>
 									</tr>
 									<tr>
-										<th><?=YII::t('app/crm','Site')?>:</th>
+										<th><?=YII::t('app/crm','Site')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->site : '';?></td>
+									</tr>
+									<tr>
+										<th><?=Yii::t('app/crm','Description')?>: </th>
+										<td><?=is_object($obRequisite) ? $obRequisite->description : '';?></td>
 									</tr>
 								</table>
 							</div>

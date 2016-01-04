@@ -175,5 +175,6 @@ return [
 	'Error can not delete company' => 'Ошибка удаления компании',
 	'Company in archive' => 'Компания в архиве',
 	'Is opened for all' => 'Доступно для всех',
-	'Return from archive' => 'Восстановить из архива'
+	'Return from archive' => 'Восстановить из архива',
+	'Addition info' => 'Дополнительно'
 ];
