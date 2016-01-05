@@ -11,6 +11,7 @@
 namespace backend\components;
 
 
+use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use yii\web\User;
 
@@ -117,5 +118,15 @@ class CustomUser extends User
 		return $bReturn;
 	}
 
+	/**
+	 * @return int|null
+	 * @throws \yii\web\NotFoundHttpException
+	 */
+	public function getLogWorkType()
+	{
+		/** @var BUserCrmGroup $obGroup */
+		$obGroup = BUserCrmGroup::findOneByIDCached(\Yii::$app->user->identity->crm_group_id,FALSE);
+		return $obGroup ? $obGroup->log_work_type : NULL;
+	}
 
 }

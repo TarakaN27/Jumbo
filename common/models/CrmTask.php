@@ -5,6 +5,8 @@ namespace common\models;
 use common\components\helpers\CustomHelper;
 use Yii;
 use backend\models\BUser;
+use yii\base\InvalidParamException;
+
 /**
  * This is the model class for table "{{%crm_task}}".
  *
@@ -50,7 +52,7 @@ class CrmTask extends AbstractActiveRecord
     CONST
         STATUS_OPENED = 1,
         STATUS_IN_PROGRESS = 2,
-        STATUS_DONE = 3,
+        STATUS_NEED_ACCEPT = 3,
         STATUS_CLOSE  = 4;
 
     //приоритет задач
@@ -108,7 +110,7 @@ class CrmTask extends AbstractActiveRecord
         return [
             self::STATUS_OPENED => Yii::t('app/crm','Status open'),
             self::STATUS_IN_PROGRESS => Yii::t('app/crm','Status in progress'),
-            self::STATUS_DONE => Yii::t('app/crm','Status done'),
+            self::STATUS_NEED_ACCEPT => Yii::t('app/crm','Status done'),
             self::STATUS_CLOSE => Yii::t('app/crm','Status close')
         ];
     }
@@ -121,7 +123,7 @@ class CrmTask extends AbstractActiveRecord
         return [
             self::STATUS_OPENED => 'open_class',
             self::STATUS_IN_PROGRESS => 'in_progress_class',
-            self::STATUS_DONE => 'done_class',
+            self::STATUS_NEED_ACCEPT => 'done_class',
             self::STATUS_CLOSE => Yii::t('app/crm','close_class')
         ];
     }
@@ -361,5 +363,75 @@ class CrmTask extends AbstractActiveRecord
     public function getFormatedTimeEstimate()
     {
         return CustomHelper::getFormatedTaskTime($this->time_estimate);
+    }
+
+    /**
+     * Изменение стутуса задачи.
+     * Контроль правильности перехода статусов
+     * @param $iStatus
+     * @return int|null
+     */
+    public function changeTaskStatus($iStatus)
+    {
+        $rtnStatus = NULL;
+        $tmp = self::getStatusArr();
+        if(!in_array($iStatus,array_keys($tmp)))
+            throw new InvalidParamException('Invalid status');
+
+        switch($iStatus)
+        {
+            case self::STATUS_IN_PROGRESS: //статус "в процессе" можно перейти из статуса "открыт"
+                if($this->status == self::STATUS_OPENED)
+                {
+                    $this->status = self::STATUS_IN_PROGRESS;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                break;
+
+            case self::STATUS_OPENED: //статус "открыт" можно перейти из статуса "Закрыт" и "В процессе" или "требуется подтверждение"
+                if($this->status == self::STATUS_IN_PROGRESS || $this->status == self::STATUS_CLOSE || $this->status == self::STATUS_NEED_ACCEPT)
+                {
+                    $this->status = self::STATUS_OPENED;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                break;
+
+            case self::STATUS_CLOSE: //статус "закрыт" можно перейти из статусов "в процессе" или "требуется контроль"
+                //из статуса "в процессе" можно перейти в статус "закрыт", если не требуется "контроля выполнения"
+                if(
+                    ($this->status == self::STATUS_IN_PROGRESS && $this->task_control != 1)
+                    ||
+                    ($this->status == self::STATUS_IN_PROGRESS && $this->created_by == Yii::$app->user->id))
+                {
+                    $this->status = self::STATUS_CLOSE;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                //из статуса "Контроль выполнения" в статус "Закрыт"
+                if($this->status == self::STATUS_NEED_ACCEPT)
+                {
+                    $this->status = self::STATUS_CLOSE;
+
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                break;
+
+            case self::STATUS_NEED_ACCEPT:
+                if($this->status == self::STATUS_IN_PROGRESS)
+                {
+                    $this->status = self::STATUS_NEED_ACCEPT;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return $rtnStatus;
     }
 }

@@ -15,6 +15,7 @@ use backend\models\BUser;
  * @property string  $description
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $log_date
  *
  * @property BUser $buser
  * @property CrmTask $task
@@ -37,7 +38,8 @@ class CrmTaskLogTime extends AbstractActiveRecord
         return [
             [['task_id','buser_id'],'required'],
             [['task_id', 'buser_id', 'spend_time', 'created_at', 'updated_at'], 'integer'],
-            [['description'], 'string']
+            [['description','log_date'], 'string'],
+            ['log_date', 'date', 'format' => 'php:Y-m-d']
         ];
     }
 
@@ -54,6 +56,7 @@ class CrmTaskLogTime extends AbstractActiveRecord
             'description' => Yii::t('app/crm', 'Description'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
+            'log_date' => Yii::t('app/crm','Log date')
         ];
     }
 

@@ -49,6 +49,7 @@ class BUserCrmGroupController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new BUserCrmGroup();
+        $model->log_work_type = BUserCrmGroup::LOG_WORK_TYPE_ALL;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

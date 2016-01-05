@@ -176,5 +176,13 @@ return [
 	'Company in archive' => 'Компания в архиве',
 	'Is opened for all' => 'Доступно для всех',
 	'Return from archive' => 'Восстановить из архива',
-	'Addition info' => 'Дополнительно'
+	'Addition info' => 'Дополнительно',
+	'Log work type' => 'Тип учета времени',
+	'LOG WORK TYPE ALL' => 'Все типы',
+	'LOG WORK TYPE TASK' => 'Задачи',
+	'LOG WORK TYPE TIMER' => 'Рабочий день',
+	'Open task' => 'Открыть задачу',
+	'Log work' => 'Занести время',
+	'TASK_OPEN_SUCCESS' => 'Задача открыта',
+	'Log work time' => 'Занести время'
 ];

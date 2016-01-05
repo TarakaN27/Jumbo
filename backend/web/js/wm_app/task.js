@@ -72,12 +72,14 @@ function beginTask()
         dataType: "json",
         data: {tID:tID},
         success: function(msg){
-            if(msg.success)
+            if(msg.code)
             {
-                $('.user-time').attr('data-log-id',msg.success);
-                clock(); //запускаем таймер
+                //$('.user-time').attr('data-log-id',msg.success);
+                //clock(); //запускаем таймер
                 $($this).addClass('hide'); //скрываем текущую кнопку
                 $('.pause-task').removeClass('hide'); //показываем кнопку приостановить
+                $('.done-task').removeClass('hide');
+                $('#taskStatusID').html(msg.text);
                 addSuccessNotify(TASK_TIME_TRACKING,TASK_TIME_TRACKING_BEGIN_SUCCESS)
             }else{
                 addErrorNotify(TASK_TIME_TRACKING,msg.error);
@@ -104,10 +106,9 @@ function pauseTask()
 {
     var
         $this = this,
-        logID = $('.user-time').attr('data-log-id'),
         tID = $(this).attr('data-task-id');
 
-    if(tID == undefined || tID == "" || logID == undefined || logID == 0 || logID == '')
+    if(tID == undefined || tID == "")
     {
         alert('Error. Не указан ID задачи');
         return false;
@@ -118,14 +119,16 @@ function pauseTask()
         cache: false,
         url: URL_PAUSE_TASK,
         dataType: "json",
-        data: {tID:tID,logID:logID},
+        data: {tID:tID},
         success: function(msg){
-            if(msg.success)
+            if(msg.code)
             {
-                $('.user-time').attr('data-log-id',0);
-                stopClock(); //запускаем таймер
+                //$('.user-time').attr('data-log-id',0);
+                //stopClock(); //запускаем таймер
                 $($this).addClass('hide'); //скрываем текущую кнопку
                 $('.begin-task').removeClass('hide'); //показываем кнопку приостановить
+                $('.done-task').addClass('hide');
+                $('#taskStatusID').html(msg.text);
                 addSuccessNotify(TASK_TIME_TRACKING,TASK_TIME_TRACKING_PAUSE_SUCCESS)
             }else{
                 addErrorNotify(TASK_TIME_TRACKING,msg.error);
@@ -142,7 +145,6 @@ function doneTask()
 {
     var
         $this = this,
-        logID = $('.user-time').attr('data-log-id'),
         tID = $(this).attr('data-task-id');
 
     if(tID == undefined || tID == "" )
@@ -158,12 +160,13 @@ function doneTask()
         dataType: "json",
         data: {tID:tID},
         success: function(msg){
-            if(msg.success)
+            if(msg.code)
             {
-                $('.user-time').attr('data-log-id',0);
-                stopClock(); //останавливаем таймер таймер
                 $($this).addClass('hide'); //скрываем текущую кнопку
                 $('.begin-task,.pause-task').addClass('hide');
+
+                $('.open-task').removeClass('hide');
+                $('#taskStatusID').html(msg.text);
                 addSuccessNotify(TASK,TASK_DONE_SUCCESS)
             }else{
                 addErrorNotify(TASK,msg.error);
@@ -176,6 +179,45 @@ function doneTask()
     });
 }
 
+function openTask()
+{
+    var
+        $this = this,
+        tID = $(this).attr('data-task-id');
+
+    if(tID == undefined || tID == "" )
+    {
+        alert('Error. Не указан ID задачи');
+        return false;
+    }
+
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: URL_OPEN_TASK,
+        dataType: "json",
+        data: {tID:tID},
+        success: function(msg){
+            if(msg.code)
+            {
+                $($this).addClass('hide'); //скрываем текущую кнопку
+                $('.begin-task').removeClass('hide');
+                $('#taskStatusID').html(msg.text);
+                addSuccessNotify(TASK,TASK_OPEN_SUCCESS)
+            }else{
+                addErrorNotify(TASK,msg.error);
+            }
+        },
+        error: function(msg){
+            alert(msg);
+            return false;
+        }
+    });
+
+
+
+}
+
 //вешаем обработчики на события
 jQuery(document).ready(function(){
     if(CLOCK_ON_LOAD)
@@ -183,5 +225,6 @@ jQuery(document).ready(function(){
     jQuery('.company-time-control').on('click','.begin-task',beginTask);
     jQuery('.company-time-control').on('click','.pause-task',pauseTask);
     jQuery('.company-time-control').on('click','.done-task',doneTask);
+    jQuery('.company-time-control').on('click','.open-task',openTask);
 });
 

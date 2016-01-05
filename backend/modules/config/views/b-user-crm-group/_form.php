@@ -6,6 +6,11 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\BUserCrmGroup */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerCss('
+#busercrmgroup-log_work_type{
+    padding-top:8px;
+}
+');
 ?>
 
 <div class="buser-crm-group-form">
@@ -26,6 +31,9 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'role_id')->dropDownList(\common\models\BUserCrmRoles::getRoleMap(),[
         'prompt' => Yii::t('app/crm','Choose role')
     ]) ?>
+
+
+    <?=$form->field($model,'log_work_type')->radioList(\common\models\BUserCrmGroup::getLogWorkTypeArr())?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

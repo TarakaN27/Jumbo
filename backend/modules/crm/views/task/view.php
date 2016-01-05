@@ -15,10 +15,13 @@ $this->registerJs("
         URL_BEGIN_TASK = '".\yii\helpers\Url::toRoute(['begin-task'])."',
         URL_PAUSE_TASK = '".\yii\helpers\Url::toRoute(['pause-task'])."',
         URL_DONE_TASK = '".\yii\helpers\Url::toRoute(['done-task'])."',
+        URL_OPEN_TASK = '".\yii\helpers\Url::toRoute(['open-task'])."',
         TASK_TIME_TRACKING = '".Yii::t('app/crm','TASK_TIME_TRACKING')."',
         CLOCK_ON_LOAD = ".($timeBegined ? 'true' : 'false').",
         TASK_TIME_TRACKING_BEGIN_SUCCESS = '".Yii::t('app/crm','TASK_TIME_TRACKING_BEGIN_SUCCESS')."',
         TASK_TIME_TRACKING_PAUSE_SUCCESS = '".Yii::t('app/crm','TASK_TIME_TRACKING_PAUSE_SUCCESS')."',
+        TASK_OPEN_SUCCESS = '".Yii::t('app/crm','TASK_OPEN_SUCCESS')."',
+        TASK_DONE_SUCCESS = '".Yii::t('app/crm','TASK_DONE_SUCCESS')."',
         TASK = '".Yii::t('app/crm','TASK')."'
         ;
 ",\yii\web\View::POS_HEAD);
@@ -72,7 +75,7 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                                     </tr>
                                     <tr>
                                         <th><?= Yii::t('app/crm','Status');?></th>
-                                        <td><?=$model->getStatusStr();?></td>
+                                        <td id="taskStatusID"><?=$model->getStatusStr();?></td>
                                     </tr>
                                     <tr>
                                         <th><?= Yii::t('app/crm','Created at');?></th>
@@ -89,35 +92,56 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                     <div class="company-time-control">
                         <div class="row">
                             <div class="col-md-2 col-sm-2 col-xs-12 text-center time-block">
-                                <span
-                                    class="user-time"
-                                    data-current="<?=(int)$timeSpend+(int)$timeBegined?>"
-                                    data-spend="<?=$timeSpend?>"
-                                    data-begined="<?=$timeBegined?>"
-                                    data-action = "true",
-                                    data-log-id = "<?=$obLogBegin ? $obLogBegin->id : 0?>"
-                                    >
-                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend+$timeBegined)?>
-                                </span> /
+                                <span class="user-time">
+                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)?> /
+                                </span>
                                 <span class="time_estimate">
                                     <?=$model->getFormatedTimeEstimate()?>
                                 </span>
                             </div>
-                            <div class="col-md-10 col-sm-10 col-xs-12 ">
-                                <?php if(in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_OPENED])):?>
+                            <div class="col-md-8 col-sm-8 col-xs-12 ">
+
                                     <?=Html::button(Yii::t('app/crm','Pause task'),[
-                                        'class' => 'btn btn-warning pause-task '.($timeBegined ? '' : 'hide'),
+                                        'class' => 'btn btn-warning pause-task '.($model->status == CrmTask::STATUS_IN_PROGRESS ? '' : 'hide'),
                                         'data-task-id' => $model->id,
                                     ])?>
                                     <?=Html::button(Yii::t('app/crm','Begin do task'),[
-                                        'class' => 'btn btn-success begin-task '.(!$timeBegined ? '' : 'hide'),
+                                        'class' => 'btn btn-success begin-task '.($model->status == CrmTask::STATUS_OPENED ? '' : 'hide'),
                                         'data-task-id' => $model->id,
                                     ])?>
                                     <?=Html::button(Yii::t('app/crm','Done task'),[
-                                        'class' => 'btn btn-danger done-task',
+                                        'class' => 'btn btn-danger done-task '.(
+                                            in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_NEED_ACCEPT]) ? '' : 'hide'
+                                            ),
                                         'data-task-id' => $model->id,
                                     ])?>
-                                <?php endif;?>
+                                    <?=Html::button(Yii::t('app/crm','Open task'),[
+                                        'class' => 'btn btn-success open-task '.(
+                                            in_array($model->status,[CrmTask::STATUS_CLOSE,CrmTask::STATUS_NEED_ACCEPT]) ? '' : 'hide'
+                                            ),
+                                        'data-task-id' => $model->id,
+                                    ])?>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-12 ">
+                                <?php
+                                    if(Yii::$app->user->getLogWorkType() == \common\models\BUserCrmGroup::LOG_WORK_TYPE_TASK) {
+                                        Modal::begin([
+                                            'header' => '<h2>' . Yii::t('app/crm', 'Log work time') . '</h2>',
+                                            'size' => Modal::SIZE_DEFAULT,
+                                            'toggleButton' => [
+                                                'tag' => 'button',
+                                                'class' => 'btn btn-dark log-work',
+                                                'label' => '<i class="fa fa-clock-o"></i> ' . Yii::t('app/crm', 'Log work time'),
+                                            ]
+                                        ]);
+
+                                        echo $this->render('part/_form_log_work_time', [
+                                            'model' => $obLogWork,
+                                        ]);
+
+                                        Modal::end();
+                                    }
+                                ?>
                             </div>
                         </div>
                     </div>
