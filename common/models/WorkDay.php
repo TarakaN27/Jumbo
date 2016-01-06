@@ -76,8 +76,8 @@ class WorkDay extends AbstractActiveRecord
     public static function getBeginedDay($iUserID)
     {
         return self::find()
-            //->where(['buser_id' => $iUserID,'log_date' => date('Y-m-d',time())])
-            ->where('log_date = :log_date OR (end_time = "" OR end_time IS NULL OR end_time = 0)')
+            ->where(['buser_id' => $iUserID])
+            ->andWhere('log_date = :log_date OR (end_time = "" OR end_time IS NULL OR end_time = 0)')
             ->params([':log_date' => date('Y-m-d',time())])
             ->one();
     }
