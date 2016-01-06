@@ -45,6 +45,8 @@ use yii\widgets\ActiveForm;
         'prompt' => Yii::t('app/users','Choose CRM group')
     ])?>
 
+    <?=$form->field($model,'log_work_type')->radioList(\backend\models\BUser::getLogWorkTypeArr())?>
+
     <?= $form->field($model, 'status')->dropDownList(\backend\models\BUser::getStatusArr()) ?>
     <div class = "form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

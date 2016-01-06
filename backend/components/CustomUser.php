@@ -124,9 +124,12 @@ class CustomUser extends User
 	 */
 	public function getLogWorkType()
 	{
-		/** @var BUserCrmGroup $obGroup */
+		$identity = $this->getIdentity();
+		return $identity = null ? NULL : $identity->log_work_type;
+		/*
 		$obGroup = BUserCrmGroup::findOneByIDCached(\Yii::$app->user->identity->crm_group_id,FALSE);
 		return $obGroup ? $obGroup->log_work_type : NULL;
+		*/
 	}
 
 }

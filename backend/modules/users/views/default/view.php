@@ -69,6 +69,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => is_object($obGroup = $model->cRMGroup) ? $obGroup->name : $model->crm_group_id
             ],
             [
+                'attribute' => 'log_work_type',
+                'value' => $model->getLogWorkTypeStr()
+            ],
+            [
                 'attribute' => 'status',
                 'value' => $model->getStatusStr()
             ],

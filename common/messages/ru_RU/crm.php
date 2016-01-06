@@ -178,7 +178,7 @@ return [
 	'Return from archive' => 'Восстановить из архива',
 	'Addition info' => 'Дополнительно',
 	'Log work type' => 'Тип учета времени',
-	'LOG WORK TYPE ALL' => 'Все типы',
+	'LOG WORK TYPE DEFAULT' => 'Без учета',
 	'LOG WORK TYPE TASK' => 'Задачи',
 	'LOG WORK TYPE TIMER' => 'Рабочий день',
 	'Open task' => 'Открыть задачу',

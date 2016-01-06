@@ -32,9 +32,6 @@ $this->registerCss('
         'prompt' => Yii::t('app/crm','Choose role')
     ]) ?>
 
-
-    <?=$form->field($model,'log_work_type')->radioList(\common\models\BUserCrmGroup::getLogWorkTypeArr())?>
-
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/config', 'Create') : Yii::t('app/config', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

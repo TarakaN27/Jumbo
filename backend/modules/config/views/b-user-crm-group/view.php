@@ -39,10 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => is_object($obRole = $model->role) ? $obRole->name : $model->role_id
                                 ],
                                 [
-                                    'attribute' => 'log_work_type',
-                                    'value' => $model->getLogWorkTypeStr()
-                                ],
-                                [
                                     'attribute' => 'created_at',
                                     'value' => Yii::$app->formatter->asDatetime($model->created_at)
                                 ],

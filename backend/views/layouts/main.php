@@ -314,7 +314,7 @@ $menuItems[] = [
                             <a id = "menu_toggle"><i class = "fa fa-bars"></i></a>
                         </div>
                         <?php
-                            if(Yii::$app->user->getLogWorkType() == \common\models\BUserCrmGroup::LOG_WORK_TYPE_TIMER)
+                            if(Yii::$app->user->getLogWorkType() == \backend\models\BUser::LOG_WORK_TYPE_TIMER)
                                 echo \backend\components\widgets\WorkDay\WorkDayWidget::widget()
                         ?>
                         <?php echo Nav::widget([

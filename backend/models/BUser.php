@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property string $fname
  * @property string $lname
  * @property string $mname
+ * @property integer $log_work_type
  */
 class BUser extends AbstractUser
 {
@@ -47,6 +48,11 @@ class BUser extends AbstractUser
 
     public
         $password;
+
+    CONST
+        LOG_WORK_TYPE_DEFAULT = 0,
+        LOG_WORK_TYPE_TASK = 1,
+        LOG_WORK_TYPE_TIMER = 2;
 
     /**
      * вернем массив со всеми ролями
@@ -134,6 +140,8 @@ class BUser extends AbstractUser
 
             [['fname','lname','mname'], 'string', 'min' => 2, 'max' => 255],
 
+            ['log_work_type','default','value' => self::LOG_WORK_TYPE_DEFAULT],
+            ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())]
         ];
     }
 
@@ -157,9 +165,31 @@ class BUser extends AbstractUser
             'fname' => Yii::t('app/users', 'First name'),
             'lname' => Yii::t('app/users', 'Last name'),
             'mname' => Yii::t('app/users', 'Midle name'),
-            'crm_group_id' => Yii::t('app/users', 'Crm Group Id')
-
+            'crm_group_id' => Yii::t('app/users', 'Crm Group Id'),
+            'log_work_type' => Yii::t('app/crm','Log work type')
         ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function getLogWorkTypeArr()
+    {
+        return [
+            self::LOG_WORK_TYPE_DEFAULT => Yii::t('app/crm','LOG WORK TYPE DEFAULT'),
+            self::LOG_WORK_TYPE_TASK => Yii::t('app/crm','LOG WORK TYPE TASK'),
+            self::LOG_WORK_TYPE_TIMER => Yii::t('app/crm','LOG WORK TYPE TIMER')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogWorkTypeStr()
+    {
+        $tmp = self::getLogWorkTypeArr();
+        return isset($tmp[$this->log_work_type]) ? $tmp[$this->log_work_type] : 'N/A';
     }
 
     /**
