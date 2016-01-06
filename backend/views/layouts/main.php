@@ -160,7 +160,13 @@ $menuItems[] = [
                                         </ul>
                                     </li>
                                 <?php endif;?>
-                                <li><a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
+                                <?php if(
+                                Yii::$app->user->can('adminRights') ||
+                                Yii::$app->user->can('only_bookkeeper') ||
+                                Yii::$app->user->can('only_manager')
+                                ):?>
+                                <li>
+                                    <a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
                                         <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
@@ -183,6 +189,12 @@ $menuItems[] = [
                                         <?php endif;?>
                                     </ul>
                                 </li>
+                                <?php endif;?>
+                                <?php if(
+                                Yii::$app->user->can('adminRights') ||
+                                Yii::$app->user->can('only_bookkeeper') ||
+                                Yii::$app->user->can('only_manager')
+                                ):?>
                                 <li><a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
                                     <ul class = "nav child_menu" style = "display: none">
@@ -224,6 +236,7 @@ $menuItems[] = [
                                         <?php endif;?>
                                     </ul>
                                 </li>
+                                <?php endif;?>
                                 <!--li><a><i class="fa fa-envelope"></i> <?php echo Yii::t('app/common', 'MSG_dialogs'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
@@ -250,26 +263,39 @@ $menuItems[] = [
                                                 <?php echo Yii::t('app/common', 'List feed'); ?>
                                             </a>
                                         </li>
+                                        <?php if(
+                                        Yii::$app->user->can('adminRights') ||
+                                        Yii::$app->user->can('only_bookkeeper') ||
+                                        Yii::$app->user->can('only_manager')
+                                        ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
                                             </a>
                                         </li>
+                                        <?php endif;?>
                                         <?php if(Yii::$app->user->can('adminRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
                                             </li>
                                         <?php endif;?>
+                                        <?php if(
+                                        Yii::$app->user->can('adminRights') ||
+                                        Yii::$app->user->can('only_bookkeeper') ||
+                                        Yii::$app->user->can('only_manager')
+                                        ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/contact/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Contacts'); ?>
                                             </a>
                                         </li>
+                                        <?php endif;?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/task/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Tasks'); ?>
                                             </a>
                                         </li>
+
                                     </ul>
                                 </li>
                             </ul>

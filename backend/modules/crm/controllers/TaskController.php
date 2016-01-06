@@ -38,7 +38,7 @@ class TaskController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['moder','bookkeeper','admin']
+                    'roles' => ['moder','bookkeeper','admin','user']
                 ]
             ]
         ];

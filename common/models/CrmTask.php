@@ -185,7 +185,7 @@ class CrmTask extends AbstractActiveRecord
                 'created_at', 'updated_at','hourEstimate',
                 'minutesEstimate'
             ], 'integer'],
-            ['minutesEstimate','integer','min' => 1,'max' => 60],
+            ['minutesEstimate','integer','min' => 0,'max' => 59],
 
             [['title'], 'string', 'max' => 255],
             ['status','default','value'=>self::STATUS_OPENED],
