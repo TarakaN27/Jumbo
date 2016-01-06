@@ -23,7 +23,7 @@ class DefaultController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper','moder']
+                    'roles' => ['admin','bookkeeper','moder','user']
                 ]
             ]
         ];
