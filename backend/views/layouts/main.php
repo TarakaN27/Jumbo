@@ -130,10 +130,10 @@ $menuItems[] = [
                     <br />
 
                     <!-- sidebar menu -->
-                    <div id = "sidebar-menu" class = "main_menu_side hidden-print main_menu">
+                    <div id = "sidebar-menu" class = "main_menu_side hidden-print main_menu pddtop20">
 
                         <div class = "menu_section">
-                            <h3>General</h3>
+                            <hr>
                             <ul class = "nav side-menu">
                                 <?php if(Yii::$app->user->can('adminRights')):?>
                                     <li>
