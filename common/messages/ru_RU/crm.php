@@ -184,5 +184,23 @@ return [
 	'Open task' => 'Открыть задачу',
 	'Log work' => 'Занести время',
 	'TASK_OPEN_SUCCESS' => 'Задача открыта',
-	'Log work time' => 'Занести время'
+	'Log work time' => 'Занести время',
+	'Log date' => 'Дата',
+	'Spend Time' => 'затраченое время',
+	'Send' => 'Отправить',
+	'Buser ID' => 'Сотрудник',
+	'Time successfully spent' => 'Время успешно занесено',
+	'Error. Can not log time' => 'Ошибка. Не удалось занести время',
+	'Begin Time' => 'Начало дня',
+	'Work day' => 'Рабочий день',
+	'Begin' => 'Начать',
+	'End Time' => 'Время окончания дня',
+	'End' => 'Завершить',
+	'Continue' => 'Продолжить',
+	'WORK_DAY' => 'Рабочий день',
+	'WORK_DAY_STARTED' => 'Рабочий день начат',
+	'WORK_DAY_ENDED' => 'Рабочий день завершен',
+	'WORK_DAY_ERROR' => 'Ошибка',
+	'WORK_DAY_CONTINUE' => 'Робочий день продолжен'
+
 ];

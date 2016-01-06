@@ -46,7 +46,7 @@ class BUserCrmGroup extends AbstractActiveRecord
             [['name'], 'required'],
             [['role_id', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            ['log_work_type','default','value' => self::LOG_WORK_TYPE_ALL],
+            ['log_work_type','default','value' => self::LOG_WORK_TYPE_TASK],
             ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())]
         ];
     }
@@ -72,7 +72,7 @@ class BUserCrmGroup extends AbstractActiveRecord
     public static function getLogWorkTypeArr()
     {
         return [
-            self::LOG_WORK_TYPE_ALL => Yii::t('app/crm','LOG WORK TYPE ALL'),
+           // self::LOG_WORK_TYPE_ALL => Yii::t('app/crm','LOG WORK TYPE ALL'),
             self::LOG_WORK_TYPE_TASK => Yii::t('app/crm','LOG WORK TYPE TASK'),
             self::LOG_WORK_TYPE_TIMER => Yii::t('app/crm','LOG WORK TYPE TIMER')
         ];

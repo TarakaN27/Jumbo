@@ -287,6 +287,10 @@ $menuItems[] = [
                         <div class = "nav toggle">
                             <a id = "menu_toggle"><i class = "fa fa-bars"></i></a>
                         </div>
+                        <?php
+                            if(Yii::$app->user->getLogWorkType() == \common\models\BUserCrmGroup::LOG_WORK_TYPE_TIMER)
+                                echo \backend\components\widgets\WorkDay\WorkDayWidget::widget()
+                        ?>
                         <?php echo Nav::widget([
                             'encodeLabels' => FALSE,
                             'options' => ['class' => 'navbar-nav navbar-right'],

@@ -74,7 +74,8 @@ class TaskController extends AbstractBaseBackendController
         $obAccmpl->task_id = (int)$id;
         $obWatcher = new CrmTaskWatcher();
         $obWatcher->task_id = (int)$id;
-        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time())]);
+        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time()),'task_id' => $model->id]);
+        $obLogWork->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
 
         $obTime = CrmTaskLogTime::find()->where([
             'task_id' => $model->id,
@@ -435,11 +436,31 @@ class TaskController extends AbstractBaseBackendController
      */
     public function actionSendLogWork()
     {
+        $obLog = new CrmTaskLogTime();
+        $obLog->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
+        $obLog->buser_id = Yii::$app->user->id;
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON; //указываем что возвращаем json
+        if($obLog->load(Yii::$app->request->post()) && $obLog->save())
+        {
+            $obTimeArr = CrmTaskLogTime::find()->where([
+                'task_id' => $obLog->task_id,
+            ])->all();
 
+            $timeSpend = 0;
 
+            /** @var CrmTaskLogTime $time */
+            foreach($obTimeArr as $time)
+            {
+                $timeSpend +=(int)$time->spend_time;
+            }
+            return [
+                'error' => NULL,
+                'model' => $obLog,
+                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr]),
+                'timeSpend' => \common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)
+            ];
+        }
 
-        $data = 'Some data to be returned in response to ajax request';
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return $data;
+        return ['error' => $obLog->getErrors(),'model' => NULL,'content' => NULL,'timeSpend' => NULL];
     }
 }

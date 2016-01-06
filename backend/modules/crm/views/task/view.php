@@ -93,8 +93,8 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                         <div class="row">
                             <div class="col-md-2 col-sm-2 col-xs-12 text-center time-block">
                                 <span class="user-time">
-                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)?> /
-                                </span>
+                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)?>
+                                </span> /
                                 <span class="time_estimate">
                                     <?=$model->getFormatedTimeEstimate()?>
                                 </span>
@@ -170,31 +170,13 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                                 ]);?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
-                                <?=\yii\grid\GridView::widget([
-                                        'tableOptions' => [
-                                            'class' => 'table table-striped no-margin'
-                                        ],
-                                        'dataProvider' => (New \yii\data\ArrayDataProvider([
-                                            'allModels' => $obLog
-                                        ])),
-                                        'columns' => [
-                                            ['class' => 'yii\grid\SerialColumn'],
-                                            [
-                                                'attribute' => 'buser',
-                                                'value' => function($model){
-                                                    return ($obUser = $model->buser) ? $obUser->getFio() : $model->buser_id;
-                                                }
-                                            ],
-                                            [
-                                                'attribute' => 'time_spend',
-                                                'value' => function($model){
-                                                    return $model->getFormatedSpendTime();
-                                                }
-                                            ],
-                                            'description:text',
-                                            'created_at:datetime',
-                                          ],
-                                ]);?>
+
+                                <?php echo $this->render('part/_woked_time_area',[
+                                    'obLog' => $obLog,
+                                    ]);
+                                ?>
+
+
 
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
