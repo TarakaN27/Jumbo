@@ -89,6 +89,7 @@ class BUserSignupForm extends Model{
             $user->lname = $this->lname;
             $user->fname = $this->fname;
             $user->mname = $this->mname;
+            $user->log_work_type = BUser::LOG_WORK_TYPE_DEFAULT;
             $user->setPassword($this->password);
             $user->generateAuthKey();
             $user->save();

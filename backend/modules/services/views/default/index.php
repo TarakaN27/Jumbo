@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             if(Yii::$app->user->can('adminRights'))
                                 return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
                             else
-                                $model->name;
+                                return $model->name;
                         }
                 ],
                 'description',
