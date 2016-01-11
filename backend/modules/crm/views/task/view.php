@@ -71,7 +71,34 @@ $('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
      return false;
 });
 ");
-
+$this->registerJs("
+	$('.project_files').on('click','.delete-link',function(){
+		var
+			id = $(this).attr('data-id'),
+			confirmText = '".Yii::t('app/crm','Do you wont delete file')." '+$('.linkFileClass[data-id=\"'+id+'\"] span').html(),
+			r = confirm(confirmText);
+		if (r != true) {
+		   return false;
+		}
+		$.ajax({
+	        type: \"POST\",
+	        cache: false,
+	        url: '".\yii\helpers\Url::to(['delete-file'])."',
+	        dataType: \"json\",
+	        data: {pk:id},
+	        success: function(msg){
+				if(msg == 1)
+				{
+					$('#file-list-'+id).remove();
+				}
+	        },
+	        error: function(msg){
+	            alert('Error');
+	            return false;
+	        }
+	    });
+	});
+");
 
 ?>
 
@@ -385,6 +412,46 @@ $('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
                                     </div>
                                 </section>
                             <?php endforeach;?>
+                        </div>
+                    </section>
+                    <section class="panel">
+                        <div class="x_title">
+                            <h2><?php echo Yii::t('app/crm','Project files')?></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li>
+                                    <?php
+                                    Modal::begin([
+                                        'header' => '<h2>'.Yii::t('app/crm','Adding a file').'</h2>',
+                                        'size' => Modal::SIZE_LARGE,
+                                        'toggleButton' => [
+                                            'tag' => 'a',
+                                            'class' => 'link-btn-cursor',
+                                            'label' => '<i class="fa fa-plus"></i> '.Yii::t('app/crm','Add file'),
+                                        ]
+                                    ]);
+                                    echo $this->render('part/_part_form_file',['model' => $obFile]);
+                                    Modal::end();
+                                    ?>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="panel-body">
+                            <?php if(empty($arFile)):?>
+                                <?=Yii::t('app/crm','No crm file')?>
+                            <?php else:?>
+                                <ul class="list-unstyled project_files">
+                                    <?php foreach($arFile as $file):?>
+                                        <li id="file-list-<?=$file->id;?>">
+                                            <a class="linkFileClass" href="<?=\yii\helpers\Url::to(['download-file','id' => $file->id])?>" data-id="<?=$file->id;?>" target="_blank">
+                                                <i class="<?=$file->getHtmlClassExt();?>"></i>
+                                                <span><?=$file->getSplitName();?></span>
+                                            </a>
+                                            <a class="delete-link pull-right" data-id="<?=$file->id;?>"><i class="fa fa-close"></i></a>
+                                        </li>
+                                    <?php endforeach;?>
+                                </ul>
+                            <?php endif;?>
                         </div>
                     </section>
                 </div>

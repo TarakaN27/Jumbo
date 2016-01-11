@@ -5,6 +5,7 @@ namespace app\modules\crm\controllers;
 use backend\models\BUser;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
+use common\models\CrmCmpFile;
 use common\models\CrmTaskAccomplices;
 use common\models\CrmTaskLogTime;
 use common\models\CrmTaskWatcher;
@@ -70,14 +71,23 @@ class TaskController extends AbstractBaseBackendController
         $model = $this->findModel($id);
         $arAccompl = $model->busersAccomplices; //помогают
         $arWatchers = $model->busersWatchers; //наблюдают
-        $obAccmpl = new CrmTaskAccomplices();
+        $arFile = $model->taskFiles; //файлы
+
+        $obAccmpl = new CrmTaskAccomplices(); // модель для сооисполнитлей
         $obAccmpl->task_id = (int)$id;
-        $obWatcher = new CrmTaskWatcher();
+
+        $obWatcher = new CrmTaskWatcher(); //наблюдатели
         $obWatcher->task_id = (int)$id;
-        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time()),'task_id' => $model->id]);
+
+        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time()),'task_id' => $model->id]); //модель для добавления времени
         $obLogWork->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
 
-        $obTime = CrmTaskLogTime::find()->where([
+        $obFile = new CrmCmpFile(); //модель для добавления файлов
+        $obFile->setScenario('insert');
+        $obFile->task_id = $id;
+
+
+        $obTime = CrmTaskLogTime::find()->where([ //занесенное время
             'task_id' => $model->id,
         ])->all();
         $timeBegined = NULL;
@@ -153,6 +163,21 @@ class TaskController extends AbstractBaseBackendController
             }
         }
 
+        /**
+         * Добавление файла
+         */
+        if($obFile->load(Yii::$app->request->post()))
+        {
+            if($obFile->save())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/crm','File successfully added'));
+                return $this->redirect(['view','id' => $id]);
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add file'));
+                return $this->redirect(['view','id' => $id]);
+            }
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
             'obAccmpl' => $obAccmpl,
@@ -163,7 +188,9 @@ class TaskController extends AbstractBaseBackendController
             'timeSpend' => $timeSpend,
             'obLogBegin' => $obLogBegin,
             'obLog' => $obLog,
-            'obLogWork' => $obLogWork
+            'obLogWork' => $obLogWork,
+            'obFile' => $obFile,
+            'arFile' => $arFile,
         ]);
     }
 
@@ -501,5 +528,32 @@ class TaskController extends AbstractBaseBackendController
             'model' => $model
         ]);
 
+    }
+
+    /**
+     * @param $id
+     * @return $this
+     * @throws NotFoundHttpException
+     */
+    public function actionDownloadFile($id)
+    {
+        $obFile = CrmCmpFile::findOne(['id' => $id]);
+        if(!$obFile)
+            throw new NotFoundHttpException('File not found');
+        return Yii::$app->response->sendFile($obFile->getFilePath());
+    }
+
+    /**
+     * @return false|int
+     * @throws NotFoundHttpException
+     */
+    public function actionDeleteFile()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $obFile = CrmCmpFile::findOne($pk);
+        if(!$obFile)
+            throw new NotFoundHttpException('File not found');
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $obFile->delete();
     }
 }

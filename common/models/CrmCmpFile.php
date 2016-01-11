@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $contact_id
+ * @property integer $task_id
  *
  * @property CUser $cmp
  */
@@ -39,9 +40,9 @@ class CrmCmpFile extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['name','cmp_id'],'required'],
+            [['name'],'required'],
             ['src','required', 'on' => ['insert']],
-            [['cmp_id', 'created_at', 'updated_at','contact_id'], 'integer'],
+            [['cmp_id', 'created_at', 'updated_at','contact_id','task_id'], 'integer'],
             [['name', 'ext'], 'string', 'max' => 255],
             [['src'], 'file','on' => ['insert']]
         ];
@@ -61,6 +62,7 @@ class CrmCmpFile extends AbstractActiveRecord
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'contact_id' => Yii::t('app/crm', 'CRM contact'),
+            'task_id' => Yii::t('app/crm','Task')
         ];
     }
 
@@ -78,6 +80,14 @@ class CrmCmpFile extends AbstractActiveRecord
     public function getContact()
     {
         return $this->hasOne(CrmCmpContacts::className(),['id' => 'contact_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTask()
+    {
+        return $this->hasOne(CrmTask::className(),['id' => 'task_id']);
     }
 
     /**

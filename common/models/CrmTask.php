@@ -334,6 +334,15 @@ class CrmTask extends AbstractActiveRecord
     }
 
     /**
+     * Файлы задач
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTaskFiles()
+    {
+        return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id']);
+    }
+
+    /**
      *
      */
     public function afterFind()
