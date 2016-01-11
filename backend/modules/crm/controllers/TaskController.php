@@ -468,8 +468,8 @@ class TaskController extends AbstractBaseBackendController
     {
         if(is_null($id))
             $id = Yii::$app->request->post('id');
-
-        $model = CrmTaskLogTime::findOne($id);
+        /** @var CrmTaskLogTime $model */
+        $model = CrmTaskLogTime::findOne(['id' => $id,'buser_id' => Yii::$app->user->id]);
         if(!$model)
             throw new NotFoundHttpException();
 
