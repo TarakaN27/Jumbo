@@ -165,21 +165,20 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                         </ul>
                         <div id="myTabContent" class="tab-content">
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                                <!--диалоги-->
                                 <?php echo \common\components\widgets\liveFeed\LiveFeedTaskWidget::widget([
                                     'iDialogID' => $model->dialog_id
                                 ]);?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
-
+                                <!-- Затраченное время -->
                                 <?php echo $this->render('part/_woked_time_area',[
                                     'obLog' => $obLog,
                                     ]);
                                 ?>
-
-
-
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
+                                <!-- история -->
                                 <p>no history</p>
                             </div>
                         </div>

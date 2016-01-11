@@ -463,4 +463,16 @@ class TaskController extends AbstractBaseBackendController
 
         return ['error' => $obLog->getErrors(),'model' => NULL,'content' => NULL,'timeSpend' => NULL];
     }
+
+    public function actionUpdateLogTime($id)
+    {
+        $model = CrmTaskLogTime::findOne($id);
+        if(!$model)
+            throw new NotFoundHttpException();
+
+        return $this->renderAjax('part/log_time_form',[
+            'model' => $model
+        ]);
+
+    }
 }
