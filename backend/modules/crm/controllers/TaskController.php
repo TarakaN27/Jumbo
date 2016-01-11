@@ -464,12 +464,39 @@ class TaskController extends AbstractBaseBackendController
         return ['error' => $obLog->getErrors(),'model' => NULL,'content' => NULL,'timeSpend' => NULL];
     }
 
-    public function actionUpdateLogTime($id)
+    public function actionUpdateLogTime($id = NULL)
     {
+        if(is_null($id))
+            $id = Yii::$app->request->post('id');
+
         $model = CrmTaskLogTime::findOne($id);
         if(!$model)
             throw new NotFoundHttpException();
 
+        $model->setScenario(CrmTaskLogTime::SCENARIO_UPDATE);
+
+        if($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            $obTimeArr = CrmTaskLogTime::find()->where([
+                'task_id' => $model->task_id,
+            ])->all();
+
+            $timeSpend = 0;
+
+            /** @var CrmTaskLogTime $time */
+            foreach($obTimeArr as $time)
+            {
+                $timeSpend +=(int)$time->spend_time;
+            }
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return [
+                'error' => NULL,
+                'model' => $model,
+                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr]),
+                'timeSpend' => \common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)
+            ];
+        }
+        $model->covertSecondsToTime();
         return $this->renderAjax('part/log_time_form',[
             'model' => $model
         ]);

@@ -186,7 +186,7 @@ return [
 	'TASK_OPEN_SUCCESS' => 'Задача открыта',
 	'Log work time' => 'Занести время',
 	'Log date' => 'Дата',
-	'Spend Time' => 'затраченое время',
+	'Spend Time' => 'Затраченое время',
 	'Send' => 'Отправить',
 	'Buser ID' => 'Сотрудник',
 	'Time successfully spent' => 'Время успешно занесено',

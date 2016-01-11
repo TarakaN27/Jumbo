@@ -27,6 +27,7 @@ class CrmTaskLogTime extends AbstractActiveRecord
         $minutes;
 
     CONST
+        SCENARIO_UPDATE = 'log_update',
         SCENARIO_LOG_TIME = 'log_time';
 
     /**
@@ -50,7 +51,7 @@ class CrmTaskLogTime extends AbstractActiveRecord
             [['hour','minutes'],'integer','min' => 0],
             ['hour','integer','max' => 24],
             ['minutes','integer','max' => 60],
-            [['hour','minutes'],'required','on' => [self::SCENARIO_LOG_TIME]]
+            [['hour','minutes'],'required','on' => [self::SCENARIO_LOG_TIME,self::SCENARIO_UPDATE]]
         ];
     }
 
@@ -107,6 +108,22 @@ class CrmTaskLogTime extends AbstractActiveRecord
         {
             $this->spend_time = (int)$this->spend_time + (int)($this->hour*3600) + (int)($this->minutes*60);
         }
+
+        if($this->scenario == self::SCENARIO_UPDATE)
+        {
+            $this->spend_time = (int)($this->hour*3600) + (int)($this->minutes*60);
+        }
+
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return bool
+     */
+    public function covertSecondsToTime()
+    {
+        $this->hour = (int)($this->spend_time/3600);
+        $this->minutes = (int)(($this->spend_time % 3600)/60) ;
+        return FALSE;
     }
 }

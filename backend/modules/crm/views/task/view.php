@@ -26,6 +26,62 @@ $this->registerJs("
         ;
 ",\yii\web\View::POS_HEAD);
 $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAsset::className()]]);
+$this->registerJs("
+$('.table-time-log-area').on('click','.activity-update-link',
+function() {
+    $.post(
+        '".\yii\helpers\Url::to(['update-log-time'])."',
+        {
+            id: $(this).attr('data-id')
+        },
+        function (data) {
+            $('#activity-modal .modal-body').html(data);
+            $('#activity-modal').modal();
+        }
+    );
+});
+$('.activity-update-link').removeClass('hidden');
+",\yii\web\View::POS_READY);
+$this->registerJs("
+
+$('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
+     var form = $(this);
+     // return false if form still have some validation errors
+     if (form.find('.has-error').length) {
+          return false;
+     }
+     // submit form
+     $.ajax({
+          url: form.attr('action'),
+          type: 'post',
+          data: form.serialize(),
+          success: function (res) {
+               if(res && res.content != '')
+               {
+                    $('#tab_content2').html(res.content);
+					addSuccessNotify(TASK,'".Yii::t('app/crm','Time successfully spent')."');
+					$('#activity-modal .modal-dialog button.close').click();
+					$('.user-time').html(res.timeSpend);
+               }else{
+                    $('#activity-modal .modal-body').html(res);
+					addErrorNotify(TASK,'".Yii::t('app/crm','Error. Can not log time')."');
+               }
+          }
+     });
+     return false;
+});
+");
+
+
+?>
+
+<?php Modal::begin([
+    'id' => 'activity-modal',
+    'header' => '<h2>'.Yii::t('app/crm','Edit log time').'</h2>',
+    'size' => Modal::SIZE_DEFAULT,
+]);?>
+
+<?php Modal::end();
 ?>
 <div class="row">
     <div class="col-md-12">
