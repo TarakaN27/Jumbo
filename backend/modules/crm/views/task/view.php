@@ -416,7 +416,7 @@ $this->registerJs("
                     </section>
                     <section class="panel">
                         <div class="x_title">
-                            <h2><?php echo Yii::t('app/crm','Project files')?></h2>
+                            <h2><?php echo Yii::t('app/crm','Task files')?></h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li>
                                     <?php
