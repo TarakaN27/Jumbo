@@ -124,7 +124,6 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-12 ">
                                 <?php
-                                    if(Yii::$app->user->getLogWorkType() == \backend\models\BUser::LOG_WORK_TYPE_TASK) {
                                         Modal::begin([
                                             'header' => '<h2>' . Yii::t('app/crm', 'Log work time') . '</h2>',
                                             'size' => Modal::SIZE_DEFAULT,
@@ -140,7 +139,6 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                                         ]);
 
                                         Modal::end();
-                                    }
                                 ?>
                             </div>
                         </div>

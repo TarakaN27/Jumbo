@@ -130,7 +130,12 @@ class AbstractUser extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+        return static::find()
+            ->where(['status' => self::STATUS_ACTIVE])
+            ->andWhere('username = :username OR email = :username')
+            ->params([':username' => trim($username)])
+            ->one();
+        //return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
     }
 
     /**
