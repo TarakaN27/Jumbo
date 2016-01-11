@@ -124,7 +124,10 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-12 ">
                                 <?php
-                                    if(Yii::$app->user->getLogWorkType() == \backend\models\BUser::LOG_WORK_TYPE_TASK) {
+                                    if(in_array(Yii::$app->user->getLogWorkType(),[
+                                        \backend\models\BUser::LOG_WORK_TYPE_TASK,
+                                        \backend\models\BUser::LOG_WORK_TYPE_TIMER
+                                    ])) {
                                         Modal::begin([
                                             'header' => '<h2>' . Yii::t('app/crm', 'Log work time') . '</h2>',
                                             'size' => Modal::SIZE_DEFAULT,
@@ -223,7 +226,7 @@ $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAs
 
                                         echo $this->render('part/_form_change_assigned',[
                                             'model' => $model,
-                                            'buserDesc' => is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_at
+                                            'buserDesc' => is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_id
                                         ]);
 
                                         Modal::end();
