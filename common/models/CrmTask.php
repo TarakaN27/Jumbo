@@ -69,6 +69,7 @@ class CrmTask extends AbstractActiveRecord
         TYPE_OTHER =4;
 
     public
+        $arrAcc = [],
         $hourEstimate = '',
         $minutesEstimate = '';
 
@@ -189,6 +190,7 @@ class CrmTask extends AbstractActiveRecord
 
             [['title'], 'string', 'max' => 255],
             ['status','default','value'=>self::STATUS_OPENED],
+            [['arrAcc'], 'each', 'rule' => ['integer']],
 
         ];
     }
@@ -221,7 +223,8 @@ class CrmTask extends AbstractActiveRecord
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'hourEstimate' => Yii::t('app/crm', 'Hour'),
-            'minutesEstimate' => Yii::t('app/crm', 'Minutes')
+            'minutesEstimate' => Yii::t('app/crm', 'Minutes'),
+            'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
         ];
     }
 

@@ -288,6 +288,7 @@ class TaskController extends AbstractBaseBackendController
         $model->created_by = $iUserID;  //кто создал задачу
         $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $model->status = CrmTask::STATUS_OPENED; //статус
+        $data = [];
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
 
@@ -325,6 +326,24 @@ class TaskController extends AbstractBaseBackendController
                 $model->dialog_id = $obDialog->id;
                 if($model->save()) //сохраняем задачу
                 {
+
+                    //соисполнители.
+                    if(!empty($model->arrAcc))
+                    {
+                        foreach($model->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                            if($value == $model->assigned_id)
+                                unset($model->arrAcc[$key]);
+
+                        if(!empty($model->arrAcc)) {
+                            $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
+                            if ($arAcc) {
+                                foreach ($arAcc as $obAcc)
+                                    $model->link('busersAccomplices', $obAcc);
+                            }
+                        }
+                    }
+
+                    //$model->unlinkAll('busersAccomplices');
 
                     if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
                         $arBUIDs = ArrayHelper::merge(
@@ -380,7 +399,8 @@ class TaskController extends AbstractBaseBackendController
                 'model' => $model,
                 'sAssName' => $sAssName,
                 'cuserDesc' => $cuserDesc,
-                'contactDesc' => $contactDesc
+                'contactDesc' => $contactDesc,
+                'data' => $data
             ]);
         }
     }
@@ -397,7 +417,33 @@ class TaskController extends AbstractBaseBackendController
         if($model->created_by != Yii::$app->user->id) //редактировать задачу может только автор
             throw new ForbiddenHttpException();
 
+        $arAccOb = $model->busersAccomplices;
+        $data = [];
+        if($arAccOb)
+            foreach($arAccOb as $acc) {
+                $model->arrAcc [] = $acc->id;
+                $data[$acc->id] = $acc->getFio();
+            }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $model->unlinkAll('busersAccomplices',TRUE);
+            if(!empty($model->arrAcc))
+            {
+                //соисполнители.
+                foreach($model->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                    if($value == $model->assigned_id)
+                        unset($model->arrAcc[$key]);
+
+                if(!empty($model->arrAcc)) {
+                    $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
+                    if ($arAcc) {
+                        foreach ($arAcc as $obAcc)
+                            $model->link('busersAccomplices', $obAcc);
+                    }
+                }
+            }
+            
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
 
@@ -414,7 +460,8 @@ class TaskController extends AbstractBaseBackendController
                 'model' => $model,
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
-                'sAssName' => $sAssName
+                'sAssName' => $sAssName,
+                'data' => $data
             ]);
         }
     }

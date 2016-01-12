@@ -69,7 +69,7 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         ],
         'pluginOptions' => [
             'allowClear' => true,
-            'minimumInputLength' => 3,
+            'minimumInputLength' => 2,
             'ajax' => [
                 'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
                 'dataType' => 'json',
@@ -81,6 +81,67 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         ],
     ]) ?>
 
+    <?php
+    echo
+    $form->field($model, 'arrAcc')->widget(\kartik\select2\Select2::className(),[
+        'initValueText' => $sAssName, // set the initial display text
+        'data' => $data,
+        'options' => [
+            'placeholder' => Yii::t('app/crm','Search for a users ...'),
+            'multiple' => true
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'minimumInputLength' => 2,
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                'dataType' => 'json',
+                'data' => new JsExpression('function(params) { return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+            'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+            'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+        ],
+    ])
+
+    ?>
+
+
+    <?php
+/*
+    $form->field($model,'arrAcc')->widget(\common\components\multipleInput\MultipleInput::className(),[
+        'limit' => 10,
+        'columns' =>[
+            [
+                'type' => \kartik\select2\Select2::className(),
+                'name' => 'arrAcc',
+
+                'options' => [
+                    'options' => [
+                        'placeholder' => ''
+                    ],
+                    'initValueText' =>  $data,
+                    //'data' => $data,
+                    'value' => $model->arrAcc,
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                    ],
+                ]
+            ]
+        ]
+    ]);
+*/
+    ?>
+
     <?= $form->field($model, 'cmp_id')->widget(\kartik\select2\Select2::className(),[
         'initValueText' => $cuserDesc, // set the initial display text
         'options' => [
@@ -88,7 +149,7 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         ],
         'pluginOptions' => [
             'allowClear' => true,
-            'minimumInputLength' => 3,
+            'minimumInputLength' => 2,
             'ajax' => [
                 'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
                 'dataType' => 'json',
@@ -107,7 +168,7 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         ],
         'pluginOptions' => [
             'allowClear' => true,
-            'minimumInputLength' => 3,
+            'minimumInputLength' => 2,
             'ajax' => [
                 'url' => \yii\helpers\Url::to(['/ajax-select/get-crm-contact']),
                 'dataType' => 'json',
