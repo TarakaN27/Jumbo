@@ -204,6 +204,12 @@ class TaskController extends AbstractBaseBackendController
         return $this->returnJsonHelper($data);
     }
 
+    /**
+     * @param $iStatus
+     * @param null $obTask
+     * @return array
+     * @throws NotFoundHttpException
+     */
     protected function changeStatus($iStatus,$obTask = NULL)
     {
         if(is_null($obTask))
@@ -290,9 +296,9 @@ class TaskController extends AbstractBaseBackendController
         $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $model->status = CrmTask::STATUS_OPENED; //статус
         $data = [];
+        $obFile = new CrmCmpFile();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
-
             if($model->createTask($iUserID))
             {
                 Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
@@ -300,101 +306,6 @@ class TaskController extends AbstractBaseBackendController
             }else{
                 Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
             }
-
-            /*
-			$tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
-
-            $obDialog = new Dialogs();  //новый диалог
-            $obDialog->buser_id = $iUserID; //кто создал
-            $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
-            $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
-                'user'=>Yii::$app->user->identity->getFio()
-            ]).' "'.$model->title.'"';
-
-            $arBUIDs = [$iUserID,$model->assigned_id]; //пользователя для которых добавляется диалог
-
-            if(!empty($model->cmp_id))  //если выбрана компания, то привяжем диалог к компания
-                $obDialog->crm_cmp_id = $model->cmp_id;
-
-            $obContact = NULL;
-            if(!empty($model->contact_id))  //если выбран контакт, то привяжем диалог к контакту
-            {
-
-                $obContact = CrmCmpContacts::find()
-                    ->select(['cmp_id'])
-                    ->where(['id' => $model->contact_id])
-                    ->one();   //находим контакт
-                if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
-                {
-                    $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
-                }
-                $obDialog->crm_cmp_contact_id = $model->contact_id; //привяжем диалог к контакту
-            }
-
-            if($obDialog->save()) //сохраняем диалог
-            {
-                $model->dialog_id = $obDialog->id;
-                if($model->save()) //сохраняем задачу
-                {
-
-                    //соисполнители.
-                    if(!empty($model->arrAcc))
-                    {
-                        foreach($model->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
-                            if($value == $model->assigned_id)
-                                unset($model->arrAcc[$key]);
-
-                        if(!empty($model->arrAcc)) {
-                            $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
-                            if ($arAcc) {
-                                foreach ($arAcc as $obAcc)
-                                    $model->link('busersAccomplices', $obAcc);
-                            }
-                        }
-                    }
-
-                    //$model->unlinkAll('busersAccomplices');
-
-                    if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
-                        $arBUIDs = ArrayHelper::merge(
-                            $arBUIDs,
-                            CUserCrmRulesManager::getBuserIdsByPermission(
-                                $obDialog->crm_cmp_id,
-                                $iUserID
-                            )
-                        );
-
-                    if(!empty($obDialog->crm_cmp_contact_id))   //ищем пользователй для контакта
-                        $arBUIDs = ArrayHelper::merge(
-                            $arBUIDs,
-                            CUserCrmRulesManager::getBuserByPermissionsContact(
-                                $obDialog->crm_cmp_contact_id,
-                                $iUserID,$obContact
-                            )
-                        );
-
-                    $arBUIDs = array_unique($arBUIDs);
-			        $arBUIDs = array_filter($arBUIDs);
-                    $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
-                    $rows = [];
-                    foreach ($arBUIDs as $id) {
-                        $rows [] = [$id, $obDialog->id];
-                    }
-                    //групповое добавление
-                    if (Yii::$app->db->createCommand()
-                        ->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)
-                        ->execute())
-                    {
-                        $tr->commit();
-                        Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    }
-                }
-            }
-            $tr->rollBack();
-            Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
-            return $this->redirect(['view', 'id' => $model->id]);
-*/
         } else {
 
             $sAssName = BUser::findOne($model->assigned_id)->getFio();
@@ -412,7 +323,8 @@ class TaskController extends AbstractBaseBackendController
                 'sAssName' => $sAssName,
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
-                'data' => $data
+                'data' => $data,
+                'obFile' => $obFile
             ]);
         }
     }
@@ -511,6 +423,10 @@ class TaskController extends AbstractBaseBackendController
         }
     }
 
+    /**
+     * @return mixed
+     * @throws NotFoundHttpException
+     */
     public function actionOpenTask()
     {
         $data = $this->changeStatus(CrmTask::STATUS_OPENED);
@@ -518,7 +434,7 @@ class TaskController extends AbstractBaseBackendController
     }
 
     /**
-     *
+     * @return array
      */
     public function actionSendLogWork()
     {
@@ -550,6 +466,11 @@ class TaskController extends AbstractBaseBackendController
         return ['error' => $obLog->getErrors(),'model' => NULL,'content' => NULL,'timeSpend' => NULL];
     }
 
+    /**
+     * @param null $id
+     * @return array|string
+     * @throws NotFoundHttpException
+     */
     public function actionUpdateLogTime($id = NULL)
     {
         if(is_null($id))

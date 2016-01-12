@@ -8,6 +8,7 @@ use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "{{%crm_task}}".
@@ -71,7 +72,9 @@ class CrmTask extends AbstractActiveRecord
         TYPE_OTHER =4;
 
     public
+
         $arrAcc = [],
+        $arrFiles = [],
         $hourEstimate = '',
         $minutesEstimate = '';
 
@@ -178,7 +181,7 @@ class CrmTask extends AbstractActiveRecord
         return [
             [['title', 'assigned_id', 'created_by'], 'required'],
             [['description'], 'string'],
-            [['deadline'], 'safe'],
+            [['deadline','arrFiles'], 'safe'],
             [[
                 'priority', 'type', 'task_control',
                 'parent_id', 'assigned_id', 'created_by',
@@ -193,6 +196,7 @@ class CrmTask extends AbstractActiveRecord
             [['title'], 'string', 'max' => 255],
             ['status','default','value'=>self::STATUS_OPENED],
             [['arrAcc'], 'each', 'rule' => ['integer']],
+            //[['arrFiles'], 'file', 'skipOnEmpty' => false],
 
         ];
     }
@@ -227,6 +231,7 @@ class CrmTask extends AbstractActiveRecord
             'hourEstimate' => Yii::t('app/crm', 'Hour'),
             'minutesEstimate' => Yii::t('app/crm', 'Minutes'),
             'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
+            'arrFiles' => Yii::t('app/crm', 'arrFiles'),
         ];
     }
 
@@ -490,9 +495,16 @@ class CrmTask extends AbstractActiveRecord
 
         if($obDialog->save()) //сохраняем диалог
         {
+            $bNewRecord = $this->isNewRecord;   //если добавляем новую задачу
             $this->dialog_id = $obDialog->id;
             if($this->save()) //сохраняем задачу
             {
+                if($bNewRecord)
+                    if($this->addFiles()) //добавляем файлы при создании задачи
+                    {
+                        $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
+                        return FALSE;
+                    }
 
                 //соисполнители.
                 if(!empty($this->arrAcc))
@@ -535,19 +547,70 @@ class CrmTask extends AbstractActiveRecord
                 foreach ($arBUIDs as $id) {
                     $rows [] = [$id, $obDialog->id];
                 }
+
                 //групповое добавление
                 if (Yii::$app->db->createCommand()
                     ->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)
                     ->execute())
                 {
                     $tr->commit();
-                    //Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
                     return TRUE;
                 }
             }
         }
         $tr->rollBack();
-        //Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
         return FALSE;
     }
+
+    /**
+     * @return bool
+     */
+    protected function addFiles()
+    {
+        $bError = FALSE;
+        if(!empty($this->arrFiles))
+            {
+                $fileInfo  = UploadedFile::getInstances($this, 'arrFiles');
+                UploadedFile::reset();  //так как UploadedFile хранит ранее загруженные файлы их нужно сбросить
+                foreach($this->arrFiles as $key => $item)
+                {
+                    if(isset($fileInfo[$key]))
+                    {
+                        $file = $fileInfo[$key];
+                        //@todo дописать функционал UploadBehavior для загрузки нескольких файлов
+                        $_FILES['CrmCmpFile'] = [   //костыль формируем массив с файлами, чтобы скормить Uploadbehavior
+                            'name' => [
+                                'src' => $file->name //'api_manual.doc'
+                            ],
+                            'type' => [
+                                'src' => $file->type//'application/vnd.ms-word'
+                            ],
+                            'tmp_name' => [
+                                'src' => $file->tempName//'/tmp/php6Sgotn'
+                            ],
+                            'error' => [
+                                'src' => $file->error//0
+                            ],
+                            'size' => [
+                                'src' => $file->size//397824
+                            ]
+                        ];
+                        //добавляем файлы. Файлы сохраняются через поведение Uploadbehavior
+                        $obFile = new CrmCmpFile();
+                        $obFile->name = $item['title'];
+                        $obFile->task_id = $this->id;
+                        $obFile->setScenario('insert');
+                        if(!$obFile->save())
+                        {
+                            $bError = TRUE;
+                            break;
+                        }
+                        UploadedFile::reset();
+                    }
+                }
+            }
+
+        return $bError;
+    }
+
 }

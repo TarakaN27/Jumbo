@@ -27,7 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     'cuserDesc' => $cuserDesc,
                     'contactDesc' => $contactDesc,
                     'sAssName' => $sAssName,
-                    'data' => $data
+                    'data' => $data,
+                    'obFile' => $obFile
                 ]) ?>
             </div>
         </div>

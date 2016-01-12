@@ -204,5 +204,9 @@ return [
 	'WORK_DAY_CONTINUE' => 'Робочий день продолжен',
 	'Task files' => 'Файлы задачи',
 	'Create company' => 'Добавить компанию',
-	'Add task' => 'Добавить задачу'
+	'Add task' => 'Добавить задачу',
+	'File name' => 'Название файла',
+	'Src file' => 'Файл',
+	'arrFiles' => 'Файлы'
+
 ];
