@@ -2,8 +2,10 @@
 
 namespace app\modules\crm\controllers;
 
+use backend\models\BUser;
 use backend\widgets\Alert;
 use common\models\CrmCmpFile;
+use common\models\CrmTask;
 use common\models\search\CrmTaskSearch;
 use Yii;
 use common\models\CrmCmpContacts;
@@ -92,6 +94,7 @@ class ContactController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $iUserID = Yii::$app->user->id; //текущий пользователь
         $model = $this->findModel($id);
         $arFiles = $model->files;
         $obFile = new CrmCmpFile();
@@ -100,6 +103,34 @@ class ContactController extends AbstractBaseBackendController
             $obFile->cmp_id = $model->cmp_id;
         $obFile->contact_id = (int)$id;
         $obFile->setScenario('insert');
+
+
+        //Модель для задач
+        $modelTask = new CrmTask();
+        //дефолтные состояния
+        $modelTask->created_by = $iUserID;  //кто создал задачу
+        $modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
+        $modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
+        $modelTask->contact_id = $id;
+        $data = [];
+        $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+
+
+        /**
+         * Добавление задачи
+         */
+        if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
+        {
+            if($modelTask->createTask($iUserID))
+            {
+                Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
+                return $this->redirect(['view', 'id' => $id,'#' => 'tab_content2']);
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+                return $this->redirect(['view','id' => $id]);
+            }
+        }
+
         /**
          * добавление файла
          */
@@ -112,6 +143,7 @@ class ContactController extends AbstractBaseBackendController
 
             return $this->redirect(Url::current());
         }
+
         /**
          * смена ответсвенного
          */
@@ -124,6 +156,7 @@ class ContactController extends AbstractBaseBackendController
 
             return $this->redirect(Url::current());
         }
+
         //Задачи
         $obCrmTaskSearch = new CrmTaskSearch();
         $dataProviderTask = $obCrmTaskSearch->search(
@@ -136,7 +169,10 @@ class ContactController extends AbstractBaseBackendController
             'model' => $model,
             'arFiles' => $arFiles,
             'obFile' => $obFile,
-            'dataProviderTask' => $dataProviderTask
+            'dataProviderTask' => $dataProviderTask,
+            'modelTask' => $modelTask,
+            'sAssName' => $sAssName,
+            'data' => $data
         ]);
     }
 

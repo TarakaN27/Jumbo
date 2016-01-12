@@ -3,9 +3,11 @@
 namespace common\models;
 
 use common\components\helpers\CustomHelper;
+use common\models\managers\CUserCrmRulesManager;
 use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%crm_task}}".
@@ -445,5 +447,107 @@ class CrmTask extends AbstractActiveRecord
         }
 
         return $rtnStatus;
+    }
+
+    /**
+     * Сохраняем задчу
+     * @param $iUserID
+     * @return bool
+     * @throws \yii\db\Exception
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function createTask($iUserID)
+    {
+        $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
+
+        /** @var Dialogs $obDialog */
+        $obDialog = new Dialogs();  //новый диалог
+        $obDialog->buser_id = $iUserID; //кто создал
+        $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
+        $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
+                'user'=>Yii::$app->user->identity->getFio()
+            ]).' "'.$this->title.'"';
+
+        $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
+
+        if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
+            $obDialog->crm_cmp_id = $this->cmp_id;
+
+        $obContact = NULL;
+        if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
+        {
+            /** @var CrmCmpContacts $obContact */
+            $obContact = CrmCmpContacts::find()
+                ->select(['cmp_id'])
+                ->where(['id' => $this->contact_id])
+                ->one();   //находим контакт
+            if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
+            {
+                $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
+            }
+            $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
+        }
+
+        if($obDialog->save()) //сохраняем диалог
+        {
+            $this->dialog_id = $obDialog->id;
+            if($this->save()) //сохраняем задачу
+            {
+
+                //соисполнители.
+                if(!empty($this->arrAcc))
+                {
+                    foreach($this->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                        if($value == $this->assigned_id)
+                            unset($this->arrAcc[$key]);
+
+                    if(!empty($this->arrAcc)) {
+                        $arAcc = BUser::find()->where(['id' => $this->arrAcc])->all(); //находим всех соисполнитлей
+                        if ($arAcc) {
+                            foreach ($arAcc as $obAcc)
+                                $this->link('busersAccomplices', $obAcc);
+                        }
+                    }
+                }
+
+                if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
+                    $arBUIDs = ArrayHelper::merge(
+                        $arBUIDs,
+                        CUserCrmRulesManager::getBuserIdsByPermission(
+                            $obDialog->crm_cmp_id,
+                            $iUserID
+                        )
+                    );
+
+                if(!empty($obDialog->crm_cmp_contact_id))   //ищем пользователй для контакта
+                    $arBUIDs = ArrayHelper::merge(
+                        $arBUIDs,
+                        CUserCrmRulesManager::getBuserByPermissionsContact(
+                            $obDialog->crm_cmp_contact_id,
+                            $iUserID,$obContact
+                        )
+                    );
+
+                $arBUIDs = array_unique($arBUIDs);
+                $arBUIDs = array_filter($arBUIDs);
+                $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
+                $rows = [];
+                foreach ($arBUIDs as $id) {
+                    $rows [] = [$id, $obDialog->id];
+                }
+                //групповое добавление
+                if (Yii::$app->db->createCommand()
+                    ->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)
+                    ->execute())
+                {
+                    $tr->commit();
+                    //Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
+                    return TRUE;
+                }
+            }
+        }
+        $tr->rollBack();
+        //Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+        return FALSE;
     }
 }

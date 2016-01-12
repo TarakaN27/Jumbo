@@ -38,7 +38,16 @@ $this->registerJs("
 	        }
 	    });
 	});
-")
+");
+$this->registerJs("
+	var
+			link_hash = window.location.hash; //получаем якорь из урл
+
+	if(link_hash != undefined && link_hash != '')
+		{
+			$('#myTab a[href=\"'+link_hash+'\"]').tab('show'); //выбираем нужный tab
+		}
+",\yii\web\View::POS_READY);
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -123,6 +132,11 @@ $this->registerJs("
                                     <?=Yii::t('app/crm','History');?>
                                 </a>
                             </li>
+                            <li role="presentation" class="wm_right_tab">
+                                <a href="#tab_content4" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
+                                    <h3 class="label label-primary"><?=Yii::t('app/crm','Add task');?></h3>
+                                </a>
+                            </li>
                         </ul>
                         <div id="myTabContent" class="tab-content">
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
@@ -178,6 +192,14 @@ $this->registerJs("
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
                                 <p>no history</p>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="profile-tab">
+                                <?php echo $this->render('../task/_form',[
+                                    'model' => $modelTask,
+                                    'sAssName' => $sAssName,
+                                    'data' => $data,
+                                    'hideContact' => TRUE
+                                ])?>
                             </div>
                         </div>
                     </div>

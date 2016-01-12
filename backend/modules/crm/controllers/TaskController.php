@@ -285,6 +285,7 @@ class TaskController extends AbstractBaseBackendController
     {
         $iUserID = Yii::$app->user->id;
         $model = new CrmTask();
+        //дефолтные состояния
         $model->created_by = $iUserID;  //кто создал задачу
         $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $model->status = CrmTask::STATUS_OPENED; //статус
@@ -292,8 +293,17 @@ class TaskController extends AbstractBaseBackendController
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
 
-            $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
-            /** @var Dialogs $obDialog */
+            if($model->createTask($iUserID))
+            {
+                Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
+                return $this->redirect(['view', 'id' => $model->id]);
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+            }
+
+            /*
+			$tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
+
             $obDialog = new Dialogs();  //новый диалог
             $obDialog->buser_id = $iUserID; //кто создал
             $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
@@ -309,7 +319,7 @@ class TaskController extends AbstractBaseBackendController
             $obContact = NULL;
             if(!empty($model->contact_id))  //если выбран контакт, то привяжем диалог к контакту
             {
-                /** @var CrmCmpContacts $obContact */
+
                 $obContact = CrmCmpContacts::find()
                     ->select(['cmp_id'])
                     ->where(['id' => $model->contact_id])
@@ -384,6 +394,7 @@ class TaskController extends AbstractBaseBackendController
             $tr->rollBack();
             Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
             return $this->redirect(['view', 'id' => $model->id]);
+*/
         } else {
 
             $sAssName = BUser::findOne($model->assigned_id)->getFio();
@@ -395,6 +406,7 @@ class TaskController extends AbstractBaseBackendController
                 $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
             else
                 $contactDesc = '';
+
             return $this->render('create', [
                 'model' => $model,
                 'sAssName' => $sAssName,

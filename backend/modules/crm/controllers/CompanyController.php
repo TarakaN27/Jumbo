@@ -10,10 +10,12 @@ namespace app\modules\crm\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
 use backend\widgets\Alert;
 use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
+use common\models\CrmTask;
 use common\models\CUser;
 use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
@@ -152,21 +154,53 @@ class CompanyController extends AbstractBaseBackendController
 	 */
 	public function actionView($id)
 	{
+		$iUserID = Yii::$app->user->id; //текущий пользователь
+
+		//Все данные по задаче
 		/** @var CUser $model */
 		$model = CUser::findOneByIDCached($id);
 		/** @var CUserRequisites $obRequisite */
 		$obRequisite = $model->requisites;
 		$arContacts =  $model->crmContacts;
 		$arFile = $model->crmFiles;
+
+		//Модель для контактов
 		$obModelContact = new CrmCmpContacts();
 		$obModelContact->cmp_id = $id;
 		$obModelContact->type = CrmCmpContacts::TYPE_CLIENT;
-		$obModelContact->assigned_at = Yii::$app->user->id;
+		$obModelContact->assigned_at =$iUserID;
 		$obModelContact->is_opened = $model->is_opened; //по умолчанию для контакта ставим уровень такой же как и у компании
-		$obModelContact->created_by = Yii::$app->user->id;
+		$obModelContact->created_by = $iUserID;
+
+		//Модель для файла
 		$obFile = new CrmCmpFile();
 		$obFile->setScenario('insert');
 		$obFile->cmp_id = $id;
+
+
+		//Модель для задач
+		$modelTask = new CrmTask();
+		//дефолтные состояния
+		$modelTask->created_by = $iUserID;  //кто создал задачу
+		$modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
+		$modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
+		$modelTask->cmp_id = $id;   //вешаем компанию
+		$data = [];
+
+		/**
+		 * Добавление задачи
+		 */
+		if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
+		{
+			if($modelTask->createTask($iUserID))
+			{
+				Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
+				return $this->redirect(['view', 'id' => $id,'#' => 'tab_content2']);
+			}else{
+				Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+				return $this->redirect(['view','id' => $id]);
+			}
+		}
 
 		/**
 		 * Добавление контакта
@@ -182,6 +216,7 @@ class CompanyController extends AbstractBaseBackendController
 				return $this->redirect(['view','id' => $id]);
 			}
 		}
+
 		/**
 		 * Добавление файла
 		 */
@@ -196,6 +231,7 @@ class CompanyController extends AbstractBaseBackendController
 				return $this->redirect(['view','id' => $id]);
 			}
 		}
+
 		/**
 		 * Смена отвественного
 		 */
@@ -217,6 +253,16 @@ class CompanyController extends AbstractBaseBackendController
 			['cmp_id' => $model->id]
 			);
 
+		$sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+
+		if(!empty($modelTask->contact_id))
+			$contactDesc = \common\models\CrmCmpContacts::findOne($modelTask->contact_id)->fio;
+		else
+			$contactDesc = '';
+		$dataContact = [];
+		foreach($arContacts as $obCnt)
+			$dataContact[$obCnt->id] = $obCnt->fio;
+
 		return $this->render('view',[
 			'model' => $model,
 			'obRequisite' => $obRequisite,
@@ -224,7 +270,12 @@ class CompanyController extends AbstractBaseBackendController
 			'obModelContact' => $obModelContact,
 			'obFile' => $obFile,
 			'arFile' => $arFile,
-			'dataProviderTask' => $dataProviderTask
+			'dataProviderTask' => $dataProviderTask,
+			'modelTask' => $modelTask,
+			'contactDesc' => $contactDesc,
+			'dataContact' => $dataContact,
+			'sAssName' => $sAssName,
+			'data' => $data
 		]);
 	}
 

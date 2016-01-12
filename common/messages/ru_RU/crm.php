@@ -202,6 +202,7 @@ return [
 	'WORK_DAY_ENDED' => 'Рабочий день завершен',
 	'WORK_DAY_ERROR' => 'Ошибка',
 	'WORK_DAY_CONTINUE' => 'Робочий день продолжен',
-	'Task files' => 'Файлы задачи'
-
+	'Task files' => 'Файлы задачи',
+	'Create company' => 'Добавить компанию',
+	'Add task' => 'Добавить задачу'
 ];
