@@ -152,7 +152,7 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             // обязательные поля для юриков
-            [['corp_name', 'j_post', 'j_doc','reg_number', 'reg_auth','reg_date', 'ch_account', 'b_name',
+            [['corp_name', 'j_post', 'j_doc','ch_account', 'b_name',
               'b_code','j_address', 'p_address'],
              'required',
              'when' => function($model) {
@@ -234,8 +234,8 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             // ИП
-            [['pasp_date','pasp_auth','pasp_ident','reg_auth','pasp_number','reg_date',
-              'pasp_series','reg_number', 'ch_account', 'b_name','b_code', 'p_address'
+            [['pasp_date','pasp_auth','pasp_ident','pasp_number',
+              'pasp_series', 'ch_account', 'b_name','b_code', 'p_address'
              ],
              'required',
              'when' => function($model) {
