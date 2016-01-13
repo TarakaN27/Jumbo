@@ -194,6 +194,9 @@ class SiteController extends Controller
 
     public function actionTestNotification()
     {
+
+        //echo Yii::$app->getUrlManager()->getHostInfo();
+        //die;
         $name = 'TEST TITLE';
         $message = 'test messages';
 

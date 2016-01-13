@@ -27,10 +27,12 @@ class TabledNotificationWidget extends Widget
 	 */
 	public function registerAssets1()
 	{
+		$host = \Yii::$app->getUrlManager()->getHostInfo();
 		$view = $this->getView();
 		TNWAssets::register($view);
 		$view->registerJs("
 			var
+				host = '".$host."',
 				wmu = '".\Yii::$app->user->id."',
 				wm_chanel = '".TabledNotification::$chanel."',
 				TYPE_BROADCAST = '".TabledNotification::TYPE_BROADCAST."',

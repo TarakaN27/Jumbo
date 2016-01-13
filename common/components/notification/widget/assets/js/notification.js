@@ -21,7 +21,7 @@ function proccessingMessages(data)
  * Инициируем сокет
  */
 $( document ).ready(function() {
-    var socket = io.connect('http://localhost:8890');
+    var socket = io.connect(host+':8890');
     socket.on(wm_chanel, function (data) { //мониторим канал notification
         var
             message = JSON.parse(data);
