@@ -14,10 +14,10 @@ function addErrorNotify(title,errorText)
         title: title,
         text: errorText,
         type: "error",
-        nonblock: {
-            nonblock: true,
-            nonblock_opacity: .2
-        }
+        //nonblock: {
+        //    nonblock: true,
+        //    nonblock_opacity: .2
+        //}
     });
 }
 /**
@@ -30,10 +30,10 @@ function addSuccessNotify(title,text)
         title: title,
         text: text,
         type: "success",
-        nonblock: {
-            nonblock: true,
-            nonblock_opacity: .2
-        }
+        //nonblock: {
+        //    nonblock: true,
+        //    nonblock_opacity: .2
+        //}
     });
 }
 
@@ -47,10 +47,10 @@ function addWarningNotify(title,text)
         title: title,
         text: text,
         type: "warning",
-        nonblock: {
-            nonblock: true,
-            nonblock_opacity: .2
-        }
+        //nonblock: {
+        //    nonblock: true,
+        //    nonblock_opacity: .2
+        //}
     });
 }
 
@@ -64,9 +64,9 @@ function addInfoNotify(title,text)
         title: title,
         text: text,
         type: "info",
-        nonblock: {
-            nonblock: true,
-            nonblock_opacity: .2
-        }
+        //nonblock: {
+        //    nonblock: true,
+        //    nonblock_opacity: .2
+        //}
     });
 }
