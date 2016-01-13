@@ -285,9 +285,11 @@ $this->registerJs("
                             </a>
                             <div class="media-body" style="height: 50px;vertical-align: middle;">
                                 <p class="title"><?php echo is_object($obMan = $model->createdBy) ? $obMan->getFio() : $model->created_by;?></p>
-                                <p>
-                                    <small><?php echo is_object($obMan = $model->createdBy) ? $obMan->getRoleStr() : 'N/A';?></small>
-                                </p>
+                                <?php if(Yii::$app->user->can('superRights')):?>
+                                    <p>
+                                        <small><?php echo is_object($obMan = $model->createdBy) ? $obMan->getRoleStr() : 'N/A';?></small>
+                                    </p>
+                                <?php endif;?>
                             </div>
                         </div>
                     </section>
@@ -324,9 +326,11 @@ $this->registerJs("
                             </a>
                             <div class="media-body" style="height: 50px;vertical-align: middle;">
                                 <p class="title"><?php echo is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned;?></p>
+                                <?php if(Yii::$app->user->can('superRights')):?>
                                 <p>
                                     <small><?php echo is_object($obMan = $model->assigned) ? $obMan->getRoleStr() : 'N/A';?></small>
                                 </p>
+                                <?php endif;?>
                             </div>
                         </div>
                     </section>
@@ -364,9 +368,11 @@ $this->registerJs("
                                     </a>
                                     <div class="media-body" style="height: 50px;vertical-align: middle;">
                                         <p class="title"><?php echo $acc->getFio();?></p>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
                                         <p>
                                             <small><?php echo $acc->getRoleStr() ;?></small>
                                         </p>
+                                    <?php endif;?>
                                     </div>
                                 </section>
                             <?php endforeach;?>
@@ -406,9 +412,11 @@ $this->registerJs("
                                     </a>
                                     <div class="media-body" style="height: 50px;vertical-align: middle;">
                                         <p class="title"><?php echo $acc->getFio();?></p>
+                                    <?php if(Yii::$app->user->can('superRights')):?>
                                         <p>
                                             <small><?php echo $acc->getRoleStr() ;?></small>
                                         </p>
+                                    <?php endif;?>
                                     </div>
                                 </section>
                             <?php endforeach;?>

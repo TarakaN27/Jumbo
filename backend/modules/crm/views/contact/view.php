@@ -239,7 +239,9 @@ $this->registerJs("
                             </a>
                             <div class="media-body" style="height: 50px;vertical-align: middle;">
                                 <p class="title"><?php echo is_object($obMan = $model->assignedAt) ? $obMan->getFio() : $model->assigned_at;?></p>
-                                <p> <small><?php echo is_object($obMan = $model->assignedAt) ? $obMan->getRoleStr() : 'N/A';?></small>
+                                <?php if(Yii::$app->user->can('superRights')):?>
+                                    <p> <small><?php echo is_object($obMan = $model->assignedAt) ? $obMan->getRoleStr() : 'N/A';?></small>
+                                <?php endif;?>
                                 </p>
                             </div>
                         </div>

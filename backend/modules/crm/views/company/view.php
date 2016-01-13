@@ -298,7 +298,9 @@ $this->registerJs("
 							</a>
 							<div class="media-body" style="height: 50px;vertical-align: middle;">
 								<p class="title"><?php echo is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id;?></p>
-								<p> <small><?php echo is_object($obMan = $model->manager) ? $obMan->getRoleStr() : 'N/A';?></small>
+								<?php if(Yii::$app->user->can('superRights')):?>
+									<p> <small><?php echo is_object($obMan = $model->manager) ? $obMan->getRoleStr() : 'N/A';?></small>
+								<?php endif;?>
 								</p>
 							</div>
 						</div>
