@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\TaskNotificationBehavior;
 use common\components\helpers\CustomHelper;
 use common\models\managers\CUserCrmRulesManager;
 use Yii;
@@ -374,6 +375,18 @@ class CrmTask extends AbstractActiveRecord
         if(!empty($this->hourEstimate) || !empty($this->minutesEstimate))
             $this->time_estimate = (int)$this->minutesEstimate*60 + (int)$this->hourEstimate*3600;
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Поведения
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            TaskNotificationBehavior::className()    //уведомления
+        ]);
     }
 
     /**

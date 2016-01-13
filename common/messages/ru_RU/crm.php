@@ -207,6 +207,8 @@ return [
 	'Add task' => 'Добавить задачу',
 	'File name' => 'Название файла',
 	'Src file' => 'Файл',
-	'arrFiles' => 'Файлы'
+	'arrFiles' => 'Файлы',
+	'You have new task' => 'У вас новая задача',
+
 
 ];

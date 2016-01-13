@@ -3,10 +3,12 @@ namespace backend\controllers;
 
 use backend\models\forms\BUserSignupForm;
 use common\components\helpers\CustomHelper;
+use common\components\notification\TabledNotification;
 use common\models\BuserInviteCode;
 use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\web\Controller;
 use backend\models\LoginForm;
 use yii\filters\VerbFilter;
@@ -35,7 +37,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index','get-document'],
+                        'actions' => ['logout', 'index','get-document','test-notification'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -188,5 +190,18 @@ class SiteController extends Controller
 
         fclose($handle);
         Yii::$app->end(200);
+    }
+
+    public function actionTestNotification()
+    {
+        $name = 'TEST TITLE';
+        $message = 'test messages';
+
+        TabledNotification::addMessage($name,$message,TabledNotification::TYPE_BROADCAST);
+        TabledNotification::addMessage(
+            $name,$message,
+            TabledNotification::TYPE_PRIVATE,TabledNotification::NOTIF_TYPE_ERROR,
+            ['3']
+            );
     }
 }
