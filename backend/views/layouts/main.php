@@ -256,7 +256,12 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
-                                <li><a><i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?> <span class="fa fa-chevron-down"></span></a>
+                                <li><a>
+                                        <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?>
+                                        <span class="fa fa-chevron-down"></span>
+                                        <?= \common\components\notification\widget\TaskNewWidget::widget();?>
+
+                                    </a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/crm/default/index']); ?>">
@@ -293,6 +298,7 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/crm/task/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Tasks'); ?>
+                                                <?= \common\components\notification\widget\TaskNewWidget::widget();?>
                                             </a>
                                         </li>
 

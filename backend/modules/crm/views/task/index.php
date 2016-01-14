@@ -41,8 +41,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'title',
                             'format' => 'html',
-                            'value' => function($model){
-                                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']);
+                            'value' => function($model) use ($arNewTasks){
+
+                                $postfix = in_array($model->id,$arNewTasks) ?
+                                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                                    :
+                                    '';
+                                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
                             }
                         ],
                         [

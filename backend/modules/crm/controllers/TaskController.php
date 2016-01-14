@@ -3,6 +3,7 @@
 namespace app\modules\crm\controllers;
 
 use backend\models\BUser;
+use common\components\notification\RedisNotification;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
@@ -54,10 +55,13 @@ class TaskController extends AbstractBaseBackendController
         $searchModel = new CrmTaskSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$viewType);
 
+        $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'viewType' => $viewType
+            'viewType' => $viewType,
+            'arNewTasks' => $arNewTasks
         ]);
     }
 
@@ -69,6 +73,9 @@ class TaskController extends AbstractBaseBackendController
     public function actionView($id)
     {
         $model = $this->findModel($id);
+
+        RedisNotification::removeViewedNewTask(Yii::$app->user->id,$id);    //удаляем из списка новых задач Redis
+
         $arAccompl = $model->busersAccomplices; //помогают
         $arWatchers = $model->busersWatchers; //наблюдают
         $arFile = $model->taskFiles; //файлы
@@ -239,7 +246,6 @@ class TaskController extends AbstractBaseBackendController
         return $data;
     }
 
-
     /**
      * @return mixed
      * @throws NotFoundHttpException
@@ -342,10 +348,12 @@ class TaskController extends AbstractBaseBackendController
             throw new ForbiddenHttpException();
 
         $arAccOb = $model->busersAccomplices;
+        $arAccObOld = [];
         $data = [];
         if($arAccOb)
             foreach($arAccOb as $acc) {
                 $model->arrAcc [] = $acc->id;
+                $arAccObOld [] =  $acc->id;
                 $data[$acc->id] = $acc->getFio();
             }
 
@@ -367,7 +375,6 @@ class TaskController extends AbstractBaseBackendController
                     }
                 }
             }
-            
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
 
