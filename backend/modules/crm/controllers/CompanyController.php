@@ -56,7 +56,13 @@ class CompanyController extends AbstractBaseBackendController
 	public function actionIndex()
 	{
 		//получаем уровень доступа на чтение компаний
-		$iAccessLevel = \Yii::$app->user->getCRMLevelAccess(CUser::getModelName(),BUserCrmRules::READ_ACTION);
+		$iAccessLevel = \Yii::$app->user->getCRMLevelAccess(
+			CUser::getModelName(),
+			BUserCrmRules::READ_ACTION,
+			$createdField = 'created_by',
+			$assignFiled = 'manager_id',
+			$openedField = 'is_opened'
+		);
 		$dataProvider = NULL;
 		$searchModel = NULL;
 		switch($iAccessLevel)
