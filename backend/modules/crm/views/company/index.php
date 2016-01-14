@@ -126,7 +126,7 @@ array_push($columns,[
 				$model,
 				'created_by',
 				'manager_id',
-				'opened'
+				'is_opened'
 			);
 			$options = [
 				'title' => Yii::t('yii', 'Update'),
@@ -146,7 +146,7 @@ array_push($columns,[
 				$model,
 				'created_by',
 				'manager_id',
-				'opened'
+				'is_opened'
 			);
 
 			$color = $model->archive == CUser::ARCHIVE_YES ? 'red' :'';
