@@ -94,7 +94,7 @@ $this->registerJs("
 					$model,
 					'created_by',
 					'manager_id',
-					'opened'
+					'is_opened'
 				)):?>
 				<?= Html::a('<i class="fa fa-pencil"></i> '.Yii::t('app/crm', 'Update'), ['update', 'id' => $model->id],[
 						'class' => 'btn btn-primary',
@@ -111,7 +111,7 @@ $this->registerJs("
 					$model,
 					'created_by',
 					'manager_id',
-					'opened'
+					'is_opened'
 				)):?>
 
 					<?=Html::a('<i class="fa fa-archive"></i> '.$str ,['archive','id' => $model->id],[
