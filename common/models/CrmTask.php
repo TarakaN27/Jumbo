@@ -595,9 +595,19 @@ class CrmTask extends AbstractActiveRecord
                                 'src' => $file->size//397824
                             ]
                         ];
+
+                        $tmpName = explode('.',$file->name);
+                        if(is_array($tmpName))
+                        {
+                            $tmpName = $tmpName[0];
+                        }else
+                        {
+                            $tmpName = $file->name;
+                        }
+                        
                         //добавляем файлы. Файлы сохраняются через поведение Uploadbehavior
                         $obFile = new CrmCmpFile();
-                        $obFile->name = $item['title'];
+                        $obFile->name = empty($item['title']) ? $tmpName : $item['title'];
                         $obFile->task_id = $this->id;
                         $obFile->setScenario('insert');
                         if(!$obFile->save())
