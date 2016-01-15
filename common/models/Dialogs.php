@@ -115,6 +115,16 @@ class Dialogs extends AbstractActiveRecord
         ];
     }
 
+
+    /**
+     * Получаем связь задача пользователь. Можем получить IDS пользователей
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusersIds()
+    {
+        return $this->hasMany(BuserToDialogs::className(), ['dialog_id' => 'id']);
+    }
+
     /**
      * Получаем всех участников диалога
      * @return \yii\db\ActiveQuery
@@ -204,6 +214,14 @@ class Dialogs extends AbstractActiveRecord
                 ->all();
         },86400,$obDep);
         return $arDlg;
+    }
+
+    /**
+     * @return bool
+     */
+    public function updateUpdatedAt()
+    {
+        return $this->touch('updated_at');
     }
 }
 

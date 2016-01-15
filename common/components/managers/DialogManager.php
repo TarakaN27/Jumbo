@@ -52,6 +52,7 @@ class DialogManager extends Component{
      */
     public function addNewComment()
     {
+        /** @var Dialogs $obDlg */
         $obDlg = Dialogs::findOne($this->iDId);
         if(empty($obDlg))
             throw new NotFoundHttpException('Dialog not found');
@@ -59,6 +60,8 @@ class DialogManager extends Component{
 
         if($obMsg = $this->newMessage($obDlg->id,$this->sMsg,$this->iAthID))
         {
+            $obDlg->updateUpdatedAt();  //перемещаем диалог вверх
+
             $cnt = \Yii::$app->view->renderFile(
                 '@common/components/widgets/liveFeed/views/_dialog_msg.php',
                 ['msg' => $obMsg ]
@@ -240,7 +243,8 @@ class DialogManager extends Component{
                 ->orWhere(
                     Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.
                     ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )')
-                ->groupBy(Dialogs::tableName().'.id ');
+                ->groupBy(Dialogs::tableName().'.id ')
+            ;
             $countQuery = clone $query;
             $pages = new Pagination([
                 'totalCount' => $countQuery->count(),
@@ -249,7 +253,7 @@ class DialogManager extends Component{
             $pages->setPage($page);
             $models = $query->offset($pages->offset)
                 ->limit($pages->limit)
-                ->orderBy('id DESC')
+                ->orderBy('updated_at DESC')
                 ->all();
 
             return [
@@ -351,7 +355,7 @@ class DialogManager extends Component{
      */
     public function addNewDialogForCompany($iCmpID,$sMsg,$iAthID)
     {
-        $arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);
+        $arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);  //изменить?
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
@@ -396,7 +400,7 @@ class DialogManager extends Component{
     public function addNewDialogForContact($iCntID,$sMsg,$iAthID)
     {
         $obCmp = CrmCmpContacts::findOne($iCntID);
-        $arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp);
+        $arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp); //@todo только тем кто причастен к компании
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,

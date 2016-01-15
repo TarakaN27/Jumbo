@@ -26,6 +26,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         UNPUBLISHED = 0;
 
     CONST
+        EVENT_VIEWED = 'viewed',
         EVENT_UNLINK = 'unlink',
         EVENT_LINK = 'link';
 
@@ -191,4 +192,13 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         parent::unlink($name, $model, $delete);
         $this->trigger(self::EVENT_UNLINK);
     }
+
+    /**
+     *
+     */
+    public function callViewedEvent()
+    {
+        $this->trigger(self::EVENT_VIEWED);
+    }
+
 } 
