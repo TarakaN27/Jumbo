@@ -260,12 +260,14 @@ $menuItems[] = [
                                         <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?>
                                         <span class="fa fa-chevron-down"></span>
                                         <?= \common\components\notification\widget\TaskNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\DialogNewWidget::widget();?>
 
                                     </a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/crm/default/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'List feed'); ?>
+                                                <?=\common\components\notification\widget\DialogNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php if(

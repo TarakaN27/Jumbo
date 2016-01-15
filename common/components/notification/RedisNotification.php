@@ -164,6 +164,17 @@ class RedisNotification
 		return TRUE;
 	}
 
+	/**
+	 * есть ли в списке элемент
+	 * @param $key
+	 * @param $value
+	 * @return mixed
+	 */
+	public static function isValueInList($key,$value)
+	{
+		return Yii::$app->redis->sismember($key,$value);
+	}
+
 	/*********************************END общие методы*******************************************/
 
 	/********************************* задачи ***************************************/
@@ -233,9 +244,52 @@ class RedisNotification
 	}
 
 	/*************************************end задачи ***********************************/
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
 	public static function addNewDialogToListForUsers($arUsers,$value)
 	{
 		return static::addItemToListForUsers($arUsers,$value,'getDialogKey');
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeDialogFromListForUser($iUserID,$value)
+	{
+		$key = self::getDialogKey($iUserID);   //получаем ключ
+		return self::removeViewed($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return array
+	 */
+	public static function getDialogListForUser($iUserID)
+	{
+		$key = static::getDialogKey($iUserID);
+		return static::itemList($key);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return mixed
+	 */
+	public static function isDialogInList($iUserID,$value)
+	{
+		$key = static::getDialogKey($iUserID);
+		return static::isValueInList($key,$value);
+	}
+
+	public static function countNewDialog($iUserID)
+	{
+		$key = static::getDialogKey($iUserID);
+		return static::countItem($key);
 	}
 
 }

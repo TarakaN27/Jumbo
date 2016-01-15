@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\DialogNotificationBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
@@ -40,6 +41,10 @@ class Dialogs extends AbstractActiveRecord
         TYPE_OVERDUE_PP = 15,   //просороченный обещанный платеж
         TYPE_COMPANY = 20, //компания
         TYPE_TASK = 25;
+
+    public
+        $task_crm_id;
+
 
     /**
      * @return array
@@ -94,7 +99,7 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id', 'status', 'type', 'created_at', 'updated_at','crm_cmp_id','crm_cmp_contact_id'], 'integer'],
+            [['buser_id','task_crm_id' ,'status', 'type', 'created_at', 'updated_at','crm_cmp_id','crm_cmp_contact_id'], 'integer'],
             [['theme'],'string']
         ];
     }
@@ -112,6 +117,7 @@ class Dialogs extends AbstractActiveRecord
             'created_at' => Yii::t('app/dialogs', 'Created At'),
             'updated_at' => Yii::t('app/dialogs', 'Updated At'),
             'theme' => Yii::t('app/dialogs', 'Theme'),
+            'task_crm_id' => Yii::t('app/dialogs','Task ID')
         ];
     }
 
@@ -169,7 +175,7 @@ class Dialogs extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-
+                DialogNotificationBehavior::className()
             ]);
     }
 

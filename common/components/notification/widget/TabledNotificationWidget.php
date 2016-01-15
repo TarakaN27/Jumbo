@@ -33,7 +33,7 @@ class TabledNotificationWidget extends Widget
 		$view->registerJs("
 			var
 				host = '".$host."',
-				wmu = '".\Yii::$app->user->id."',
+				wmu = ".\Yii::$app->user->id.",
 				wm_chanel = '".TabledNotification::$chanel."',
 				TYPE_BROADCAST = '".TabledNotification::TYPE_BROADCAST."',
 				TYPE_PRIVATE = '".TabledNotification::TYPE_PRIVATE."';

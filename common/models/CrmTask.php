@@ -512,6 +512,7 @@ class CrmTask extends AbstractActiveRecord
             $this->dialog_id = $obDialog->id;
             if($this->save()) //сохраняем задачу
             {
+                $obDialog->task_crm_id = $this->id;
                 if($bNewRecord)
                     if($this->addFiles()) //добавляем файлы при создании задачи
                     {
@@ -567,6 +568,7 @@ class CrmTask extends AbstractActiveRecord
                     ->execute())
                 {
                     $tr->commit();
+                    $obDialog->callSaveDoneEvent();
                     return TRUE;
                 }
             }

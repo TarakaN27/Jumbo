@@ -7,14 +7,22 @@
  */
 function proccessingMessages(data)
 {
+    console.log(data.type);
+    console.log(jQuery.inArray(wmu, data.wmu));
+
+
+
     if(data.type == TYPE_BROADCAST) //общевещательный канал
     {
+        console.log('1111');
         abstractTabletnotification(data.name,data.message,data.ntf_type);
     }
     if(data.type == TYPE_PRIVATE && jQuery.inArray(wmu, data.wmu) >= 0 ) //только для определенного пользователя
     {
+        console.log('22222');
         abstractTabletnotification(data.name,data.message,data.ntf_type);
     }
+    console.log(data);
 }
 
 /**

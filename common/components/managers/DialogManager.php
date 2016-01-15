@@ -33,6 +33,7 @@ use yii\web\NotFoundHttpException;
 use Yii;
 use yii\web\ServerErrorHttpException;
 use yii\widgets\LinkPager;
+use common\components\notification\RedisNotification;
 
 class DialogManager extends Component{
 
@@ -98,14 +99,17 @@ class DialogManager extends Component{
                         }
                     }
                     $transaction->commit();
-
+                    $obDlg->callSaveDoneEvent();//вызываем событие
                     $arDialogs [] = ['dialog' => $obDlg,'msg' => []];
-
+                    $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
                     $arRtn = [
                         'status' => TRUE,
                         'content'=>
                             \Yii::$app->view->renderFile('@common/components/widgets/liveFeed/views/_dialog_part.php',
-                                ['arDialogs' => $arDialogs ]),
+                                [
+                                    'arDialogs' => $arDialogs,
+                                    'arRedisDialog' => $arRedisDialog
+                                ]),
                         'newDialog'=>TRUE,
                         'dialogID' => $obDlg->id];
                 }catch(Exception $e)
@@ -212,6 +216,7 @@ class DialogManager extends Component{
                     }
                 }
                 $transaction->commit();
+                $obDlg->callSaveDoneEvent();//вызываем событие
                 return $obDlg;
             }catch(Exception $e)
             {
@@ -380,6 +385,7 @@ class DialogManager extends Component{
                 }
 
                 $tr->commit();
+                $obDialog->callSaveDoneEvent();//вызываем событие
         }catch (\Exception $e)
         {
             $tr->rollBack();
@@ -426,6 +432,7 @@ class DialogManager extends Component{
             }
 
             $tr->commit();
+            $obDialog->callSaveDoneEvent();//вызываем событие
         }catch (\Exception $e)
         {
             $tr->rollBack();

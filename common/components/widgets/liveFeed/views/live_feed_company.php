@@ -46,7 +46,8 @@ use \vova07\imperavi\Widget as ImperaviWidget;
 			<?= $this->render('_dialog_crm_msg', [
 			'models' => $obModels,
 			'pag' => $pagination,
-			'uniqStr' => 'dummy_'.$iCmpID
+			'uniqStr' => 'dummy_'.$iCmpID,
+			'arRedisDialog' => $arRedisDialog
 		]) ?>
 	<?php else:?>
 		<p class="emptyDialog"><?php echo Yii::t('app/crm','No dialogs at feed')?>

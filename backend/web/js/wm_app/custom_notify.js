@@ -74,7 +74,7 @@ function addInfoNotify(title,text)
 $(function () {
     var cnt = 10; //$("#custom_notifications ul.notifications li").length + 1;
     TabbedNotification = function (options) {
-        var message = "<div id='ntf" + cnt + "' class='text alert-" + options.type + "' style='display:none'><h2><i class='fa fa-bell'></i> " + options.title + "</h2><div class='close'><a href='javascript:;' class='notification_close'><i class='fa fa-close'></i></a></div><p>" + options.text + "</p></div>";
+        var message = "<div id='ntf" + cnt + "' class='text alert-" + options.type + "' style='display:none'><h2 class='tabled-notification-h2'><i class='fa fa-bell'></i> " + options.title + "</h2><div class='close'><a href='javascript:;' class='notification_close'><i class='fa fa-close'></i></a></div><p>" + options.text + "</p></div>";
 
         if (document.getElementById('custom_notifications') == null) {
             alert('doesnt exists');

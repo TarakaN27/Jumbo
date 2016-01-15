@@ -33,13 +33,13 @@ class LiveFeedTaskWidget extends Widget
 
 		if(empty($iDId))
 			return \Yii::t('app/crm','Error no dialog');
-
+		/** @var Dialogs $obDialog */
 		$obDialog = Dialogs::findOne($iDId);
 		if(!$obDialog)
 			return \Yii::t('app/crm','Error no dialog');
 		$obDMan = new DialogManager();
 		$arMessages = $obDMan->getCommentsForDialog($obDialog->id);
-
+		$obDialog->callViewedEvent();
 		$this->renderAssets(); //регистрируем все скрипты
 		return $this->render('live_feed_task',[
 			'obDialog' => $obDialog,

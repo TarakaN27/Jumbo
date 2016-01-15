@@ -26,6 +26,7 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         UNPUBLISHED = 0;
 
     CONST
+        EVENT_SAVE_DONE = 'save_done',
         EVENT_VIEWED = 'viewed',
         EVENT_UNLINK = 'unlink',
         EVENT_LINK = 'link';
@@ -199,6 +200,14 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     public function callViewedEvent()
     {
         $this->trigger(self::EVENT_VIEWED);
+    }
+
+    /**
+     * Добавляем событие полное сохранение модели
+     */
+    public function callSaveDoneEvent()
+    {
+        $this->trigger(self::EVENT_SAVE_DONE);
     }
 
 } 

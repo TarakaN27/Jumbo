@@ -368,4 +368,22 @@ class CustomHelper {
     {
         return sprintf('%02d:%02d', $time/3600, ($time % 3600)/60);
     }
+
+    /**
+     * Обрезаем строку до длины $len
+     * @param $string
+     * @param int $len
+     * @return string
+     */
+    public static function cuttingString($string,$len = 200)
+    {
+        if(mb_strlen($string,'UTF-8') > $len) {
+            $string = strip_tags($string);
+            $string = mb_substr($string, 0, $len,'UTF-8');
+            $string = rtrim($string, "!,.-");
+            $string = mb_substr($string, 0, mb_strrpos($string, ' ','UTF-8'),'UTF-8');
+            $string = $string."… ";
+        }
+        return  $string;
+    }
 }
