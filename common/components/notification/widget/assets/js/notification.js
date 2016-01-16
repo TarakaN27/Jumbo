@@ -7,6 +7,19 @@
  */
 function proccessingMessages(data)
 {
+    var
+        bFound = false;
+    wmu = parseInt(wmu);
+    data.wmu.forEach(function(item, i, arr) {
+        if(parseInt(item) == wmu)
+        {
+            bFound = true;
+        }
+    });
+
+
+
+    console.log(bFound);
     console.log(data.type);
     console.log(jQuery.inArray(wmu, data.wmu));
 
@@ -17,7 +30,7 @@ function proccessingMessages(data)
         console.log('1111');
         abstractTabletnotification(data.name,data.message,data.ntf_type);
     }
-    if(data.type == TYPE_PRIVATE && jQuery.inArray(wmu, data.wmu) >= 0 ) //только для определенного пользователя
+    if(data.type == TYPE_PRIVATE && bFound ) //только для определенного пользователя
     {
         console.log('22222');
         abstractTabletnotification(data.name,data.message,data.ntf_type);

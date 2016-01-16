@@ -73,8 +73,7 @@ class TaskController extends AbstractBaseBackendController
     public function actionView($id)
     {
         $model = $this->findModel($id);
-
-        RedisNotification::removeViewedNewTask(Yii::$app->user->id,$id);    //удаляем из списка новых задач Redis
+        $model->callViewedEvent();
 
         $arAccompl = $model->busersAccomplices; //помогают
         $arWatchers = $model->busersWatchers; //наблюдают

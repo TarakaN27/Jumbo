@@ -386,4 +386,18 @@ class CustomHelper {
         }
         return  $string;
     }
+
+    /**
+     * Удаляем элемент массива по значению
+     * @param array $array
+     * @param $value
+     * @return array
+     */
+    public static function removeArrayItemByValue(array $array,$value)
+    {
+        if(($key = array_search($value,$array)) !== FALSE){
+            unset($array[$key]);
+        }
+        return $array;
+    }
 }

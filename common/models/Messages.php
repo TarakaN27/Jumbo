@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\DialogMessagesBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use backend\models\BUser;
@@ -103,7 +104,7 @@ class Messages extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-
+                DialogMessagesBehavior::className()
             ]);
     }
 

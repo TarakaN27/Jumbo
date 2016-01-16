@@ -11,6 +11,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "{{%dialogs}}".
@@ -24,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property string $theme
  * @property integer $crm_cmp_id
  * @property integer $crm_cmp_contact_id
+ * @property integer $crm_task_id
  *
  * @property BuserToDialogs[] $buserToDialogs
  * @property BUser[] $busers
@@ -99,7 +101,12 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id','task_crm_id' ,'status', 'type', 'created_at', 'updated_at','crm_cmp_id','crm_cmp_contact_id'], 'integer'],
+            [[
+                'buser_id','task_crm_id' ,'status',
+                'type', 'created_at', 'updated_at',
+                'crm_cmp_id','crm_cmp_contact_id',
+                'crm_task_id'
+            ], 'integer'],
             [['theme'],'string']
         ];
     }
@@ -117,7 +124,8 @@ class Dialogs extends AbstractActiveRecord
             'created_at' => Yii::t('app/dialogs', 'Created At'),
             'updated_at' => Yii::t('app/dialogs', 'Updated At'),
             'theme' => Yii::t('app/dialogs', 'Theme'),
-            'task_crm_id' => Yii::t('app/dialogs','Task ID')
+            'task_crm_id' => Yii::t('app/dialogs','Task ID'),
+            'crm_task_id' => Yii::t('app/dialogs','Task')
         ];
     }
 
@@ -164,6 +172,11 @@ class Dialogs extends AbstractActiveRecord
     public function getMessages()
     {
         return $this->hasMany(Messages::className(), ['dialog_id' => 'id']);
+    }
+
+    public function getTasks()
+    {
+        return $this->hasOne(CrmTask::className(),['id' => 'crm_task_id']);
     }
 
     /**
@@ -228,6 +241,21 @@ class Dialogs extends AbstractActiveRecord
     public function updateUpdatedAt()
     {
         return $this->touch('updated_at');
+    }
+
+    /**
+     * Все пользователи диалога
+     * @return array
+     */
+    public function getUsersIdsForDialog()
+    {
+        $arUsers = [$this->buser_id];
+        $tmp = $this->busersIds;
+        if(!empty($tmp))
+            foreach($tmp as $t)
+                $arUsers[] = $t->buser_id;
+
+        return array_unique($arUsers);
     }
 }
 

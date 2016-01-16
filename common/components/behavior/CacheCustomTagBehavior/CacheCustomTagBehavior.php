@@ -46,7 +46,7 @@ use common\models\AbstractActiveRecordWTB;
 use yii\base\Behavior;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
-
+use common\models\AbstractActiveRecord;
 class CacheCustomTagBehavior extends Behavior
 {
 	public
@@ -84,6 +84,25 @@ class CacheCustomTagBehavior extends Behavior
 		if(!empty($tags))
 			TagDependency::invalidate(\Yii::$app->cache,$tags);
 
+		return true;
+	}
+
+	/**
+	 * @param array $arUsers
+	 * @param $modelName
+	 * @param $field
+	 * @return bool
+	 */
+	public static function invalidateTagForUsers(array $arUsers,$modelName,$field)
+	{
+		$tags = [];
+		foreach($arUsers as $user)
+		{
+			$tags []= AbstractActiveRecord::getTagName($field,$user,$modelName);
+		}
+
+		if(!empty($tags))
+			TagDependency::invalidate(\Yii::$app->cache,$tags);
 		return true;
 	}
 }

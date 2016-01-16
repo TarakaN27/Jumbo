@@ -13,7 +13,6 @@ use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\models\AbstractActiveRecord;
 use yii\base\Behavior;
-use yii\db\ActiveRecord;
 use common\components\notification\RedisNotification;
 use Yii;
 use yii\helpers\Html;
@@ -52,8 +51,8 @@ class DialogNotificationBehavior extends Behavior
 			RedisNotification::addNewDialogToListForUsers($arUsers,$this->owner->id);   //добавляем балун
 
 			$title = $this->owner->theme;
-			if(!empty($this->owner->task_crm_id))
-				$title = Html::a($title,['/crm/task/view','id' => $this->owner->task_crm_id]);
+			if(!empty($this->owner->crm_task_id))
+				$title = Html::a($title,['/crm/task/view','id' => $this->owner->crm_task_id]);
 
 			if(!empty($this->owner->crm_cmp_contact_id))
 				$title = Html::a($title,['/crm/contact/view','id' => $this->owner->crm_cmp_contact_id]);
@@ -70,12 +69,13 @@ class DialogNotificationBehavior extends Behavior
 				CustomHelper::cuttingString($title),
 				TabledNotification::TYPE_PRIVATE,
 				TabledNotification::NOTIF_TYPE_WARNING,
-				$arUsers
+				array_values($arUsers)
 			);
 
 		}
 		return TRUE;
 	}
+
 
 	/**
 	 *

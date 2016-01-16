@@ -18,23 +18,14 @@ use Yii;
 class LiveFeedTaskWidget extends Widget
 {
 	public
-		$iDialogID,
 		$iTaskID;
 
 	public function run()
 	{
-		$iDId = $this->iDialogID;
-		if(!empty($this->iTaskID))
-		{
-			$obTask = CrmTask::find()->select(['id','dialog_id'])->where(['id' => $this->iTaskID])->one();
-			if($obTask)
-				$iDId = $obTask->dialog_id;
-		}
-
-		if(empty($iDId))
+		if(empty($this->iTaskID))
 			return \Yii::t('app/crm','Error no dialog');
 		/** @var Dialogs $obDialog */
-		$obDialog = Dialogs::findOne($iDId);
+		$obDialog = Dialogs::find()->where(['crm_task_id' => $this->iTaskID])->one();
 		if(!$obDialog)
 			return \Yii::t('app/crm','Error no dialog');
 		$obDMan = new DialogManager();

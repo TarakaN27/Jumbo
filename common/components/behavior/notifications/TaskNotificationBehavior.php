@@ -35,7 +35,8 @@ class TaskNotificationBehavior extends Behavior
 			ActiveRecord::EVENT_AFTER_DELETE => 'afterDelete',
 			ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeUpdate',
 			ActiveRecord::EVENT_AFTER_UPDATE => 'afterUpdate',
-			AbstractActiveRecord::EVENT_LINK => 'afterLink'
+			AbstractActiveRecord::EVENT_LINK => 'afterLink',
+			AbstractActiveRecord::EVENT_VIEWED => 'viewed'
 		];
 	}
 
@@ -116,11 +117,11 @@ class TaskNotificationBehavior extends Behavior
 	{
 		$owner = $this->owner;
 		// соберем всех пользователй причастных к задаче
-		$arUsers = [$owner->assigned_id];
+		$arUsers = [(int)$owner->assigned_id];
 		$arAcc = $owner->crmTaskAccomplices;
 		if(is_array($arAcc))
 			foreach($arAcc as $acc)
-				$arUsers[] = $acc->buser_id;
+				$arUsers[] = (int)$acc->buser_id;
 		// исключим постановщика задачи. Он и так в курсе того, что задача поставлена
 		foreach($arUsers as $key=>$user)
 			if($user == $owner->created_by)
@@ -142,7 +143,7 @@ class TaskNotificationBehavior extends Behavior
 				Html::a($this->owner->title,['/crm/task/view','id' => $this->owner->id]),
 				TabledNotification::TYPE_PRIVATE,
 				TabledNotification::NOTIF_TYPE_SUCCESS,
-				$arUsers
+				array_values($arUsers)
 			);
 	}
 
@@ -197,6 +198,16 @@ class TaskNotificationBehavior extends Behavior
 	{
 		$this->arTmpUsers = $this->getAllUsers();   //перед удалением сохраним всех пользователей, которые причастны к задаче
 		return TRUE;
+	}
+
+	/**
+	 * Просмотрено
+	 */
+	public function viewed()
+	{
+		$iUserID = \Yii::$app->user->id;
+		RedisNotification::removeViewedNewTask($iUserID,$this->owner->id);    //удаляем из списка новых задач Redis
+		RedisNotification::removeDialogFromListForUser($iUserID,$this->owner->id); //удаляем из списка диалогов Redis
 	}
 
 }

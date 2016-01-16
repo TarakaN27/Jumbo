@@ -9,6 +9,7 @@ use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 /**
@@ -32,7 +33,6 @@ use yii\web\UploadedFile;
  * @property integer $closed_date
  * @property integer $cmp_id
  * @property integer $contact_id
- * @property integer $dialog_id
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -188,7 +188,7 @@ class CrmTask extends AbstractActiveRecord
                 'parent_id', 'assigned_id', 'created_by',
                 'time_estimate', 'status', 'date_start',
                 'duration_fact', 'closed_by', 'closed_date',
-                'cmp_id', 'contact_id', 'dialog_id',
+                'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
                 'minutesEstimate'
             ], 'integer'],
@@ -226,7 +226,6 @@ class CrmTask extends AbstractActiveRecord
             'closed_date' => Yii::t('app/crm', 'Closed Date'),
             'cmp_id' => Yii::t('app/crm', 'Cmp ID'),
             'contact_id' => Yii::t('app/crm', 'Contact ID'),
-            'dialog_id' => Yii::t('app/crm', 'Dialog ID'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'hourEstimate' => Yii::t('app/crm', 'Hour'),
@@ -241,7 +240,7 @@ class CrmTask extends AbstractActiveRecord
      */
     public function getDialog()
     {
-        return $this->hasOne(Dialogs::className(), ['id' => 'dialog_id']);
+        return $this->hasOne(Dialogs::className(), ['crm_task_id' => 'id']);
     }
 
     /**
@@ -478,41 +477,13 @@ class CrmTask extends AbstractActiveRecord
     {
         $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
 
-        /** @var Dialogs $obDialog */
-        $obDialog = new Dialogs();  //новый диалог
-        $obDialog->buser_id = $iUserID; //кто создал
-        $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
-        $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
-                'user'=>Yii::$app->user->identity->getFio()
-            ]).' "'.$this->title.'"';
 
-        $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
 
-        if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
-            $obDialog->crm_cmp_id = $this->cmp_id;
 
-        $obContact = NULL;
-        if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
-        {
-            /** @var CrmCmpContacts $obContact */
-            $obContact = CrmCmpContacts::find()
-                ->select(['cmp_id'])
-                ->where(['id' => $this->contact_id])
-                ->one();   //находим контакт
-            if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
-            {
-                $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
-            }
-            $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
-        }
-
-        if($obDialog->save()) //сохраняем диалог
-        {
             $bNewRecord = $this->isNewRecord;   //если добавляем новую задачу
-            $this->dialog_id = $obDialog->id;
             if($this->save()) //сохраняем задачу
             {
-                $obDialog->task_crm_id = $this->id;
+
                 if($bNewRecord)
                     if($this->addFiles()) //добавляем файлы при создании задачи
                     {
@@ -536,6 +507,42 @@ class CrmTask extends AbstractActiveRecord
                     }
                 }
 
+                /** @var Dialogs $obDialog */
+                $obDialog = new Dialogs();  //новый диалог
+                $obDialog->crm_task_id = $this->id;
+                $obDialog->buser_id = $iUserID; //кто создал
+                $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
+                $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
+                        'user'=>Yii::$app->user->identity->getFio()
+                    ]).' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
+
+                $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
+
+                if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
+                    $obDialog->crm_cmp_id = $this->cmp_id;
+
+                $obContact = NULL;
+                if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
+                {
+                    /** @var CrmCmpContacts $obContact */
+                    $obContact = CrmCmpContacts::find()
+                        ->select(['cmp_id'])
+                        ->where(['id' => $this->contact_id])
+                        ->one();   //находим контакт
+
+                    if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
+                    {
+                        $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
+                    }
+                    $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
+                }
+
+                if(!$obDialog->save())
+                {
+                    $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
+                    return FALSE;
+                }
+
                 if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
                     $arBUIDs = ArrayHelper::merge(
                         $arBUIDs,
@@ -545,7 +552,7 @@ class CrmTask extends AbstractActiveRecord
                         )
                     );
 
-                if(!empty($obDialog->crm_cmp_contact_id))   //ищем пользователй для контакта
+                if(!empty($this->contact_id))   //ищем пользователй для контакта
                     $arBUIDs = ArrayHelper::merge(
                         $arBUIDs,
                         CUserCrmRulesManager::getBuserByPermissionsContact(
@@ -568,11 +575,10 @@ class CrmTask extends AbstractActiveRecord
                     ->execute())
                 {
                     $tr->commit();
-                    $obDialog->callSaveDoneEvent();
                     return TRUE;
                 }
             }
-        }
+
         $tr->rollBack();
         return FALSE;
     }

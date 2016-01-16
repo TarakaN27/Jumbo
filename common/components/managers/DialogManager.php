@@ -9,6 +9,7 @@
 namespace common\components\managers;
 
 use backend\models\BUser;
+use common\models\AbstractActiveRecord;
 use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use common\models\BuserToDialogs;
@@ -53,21 +54,13 @@ class DialogManager extends Component{
      */
     public function addNewComment()
     {
-        /** @var Dialogs $obDlg */
-        $obDlg = Dialogs::findOne($this->iDId);
-        if(empty($obDlg))
-            throw new NotFoundHttpException('Dialog not found');
-        $arRtn = ['status' => FALSE,'content'=>'','newDialog'=>FALSE,'dialogID' => ''];
-
-        if($obMsg = $this->newMessage($obDlg->id,$this->sMsg,$this->iAthID))
+        if($obMsg = $this->newMessage($this->iDId,$this->sMsg,$this->iAthID))
         {
-            $obDlg->updateUpdatedAt();  //перемещаем диалог вверх
-
             $cnt = \Yii::$app->view->renderFile(
                 '@common/components/widgets/liveFeed/views/_dialog_msg.php',
                 ['msg' => $obMsg ]
             );
-            $arRtn = ['status' => TRUE,'content'=>$cnt,'newDialog'=>FALSE,'dialogID' => $obDlg->id];
+            $arRtn = ['status' => TRUE,'content'=>$cnt,'newDialog'=>FALSE,'dialogID' => $obMsg->dialog_id];
         }
 
         return $arRtn;
@@ -234,14 +227,7 @@ class DialogManager extends Component{
             throw new NotFoundHttpException('User ID is not defined!');
         $userID = $this->userID;
 
-        $obDep = new TagDependency([
-            'tags' => [
-                NamingHelper::getCommonTag(Dialogs::className()),
-                NamingHelper::getCommonTag(BuserToDialogs::className())
-            ]
-        ]);
-
-        $arDialogs = Dialogs::getDb()->cache(function($db)use($userID,$page){
+        //@todo подумать как сделать кеширование
             $query = Dialogs::find()
                 ->joinWith('busers')
                 ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,Dialogs::tableName().'.buser_id' => $userID])
@@ -261,11 +247,12 @@ class DialogManager extends Component{
                 ->orderBy('updated_at DESC')
                 ->all();
 
-            return [
+            $arDialogs =  [
                 'models' => $models,
                 'pages' => $pages
             ];
-        },3600*24,$obDep);//получаем диалоги для пользователя
+
+
 
         $arDlgs = isset($arDialogs['models']) && !empty($arDialogs['models']) ? $arDialogs['models'] : [];
         $this->pages = isset($arDialogs['pages']) && !empty($arDialogs['pages']) ? $arDialogs['pages'] : NULL;

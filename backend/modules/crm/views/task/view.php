@@ -253,7 +253,7 @@ $this->registerJs("
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
                                 <!--диалоги-->
                                 <?php echo \common\components\widgets\liveFeed\LiveFeedTaskWidget::widget([
-                                    'iDialogID' => $model->dialog_id
+                                    'iTaskID' => $model->id
                                 ]);?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
