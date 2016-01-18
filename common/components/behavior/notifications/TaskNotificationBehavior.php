@@ -26,7 +26,7 @@ class TaskNotificationBehavior extends Behavior
             'priority' => 'getPriorityStr',
             'type' => 'getTypeStr',
             'time_estimate' => 'getFormatedTimeEstimate',
-			'status' => 'statusStr'
+			'status' => 'getStatusStr'
 		];
 
 	protected
