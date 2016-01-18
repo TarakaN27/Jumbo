@@ -34,7 +34,7 @@ class LiveFeedTaskWidget extends Widget
 		$this->renderAssets(); //регистрируем все скрипты
 		return $this->render('live_feed_task',[
 			'obDialog' => $obDialog,
-			'arMessages' => $arMessages->getModels(),
+			'arMessages' => array_reverse($arMessages->getModels()),
 			'pag' => $arMessages->getPagination(),
 			'uniqStr' => 'one_task'
 		]);
@@ -68,7 +68,6 @@ class LiveFeedTaskWidget extends Widget
 			    DIALOG_ERROR_ADD_MESSAGE = "'. Yii::t('app/common', 'DIALOG_ERROR_ADD_MESSAGE') .'",
 			    DIALOG_ERROR_ADD_DIALOG = "'.Yii::t('app/crm','DIALOG_ERROR_ADD_DIALOG').'";
 		',$view::POS_BEGIN);
-
 
 		LiveFeedTaskAssets::register($view);
 		//вешаем события

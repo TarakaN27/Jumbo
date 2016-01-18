@@ -322,7 +322,7 @@ class DialogManager extends Component{
      * @param $dID
      * @return ActiveDataProvider
      */
-    public function getCommentsForDialog($dID)
+    public function getCommentsForDialog($dID,$order = SORT_DESC)
     {
         $query = Messages::find()->where(['dialog_id' => $dID])->with('buser');
         $dataProvider = new ActiveDataProvider([
@@ -331,7 +331,7 @@ class DialogManager extends Component{
                 'pagesize' => 5,
                 'route' => '/ajax-service/load-dialog-comments'
             ],
-            'sort' => ['defaultOrder' => ['updated_at'=>SORT_DESC]]
+            'sort' => ['defaultOrder' => ['updated_at'=>$order]]
         ]);
         return $dataProvider;
     }
@@ -426,6 +426,64 @@ class DialogManager extends Component{
             throw new ServerErrorHttpException('Can not save new dialog');
         }
         return $obDialog;
+    }
+
+    /**
+     * @param $iDialogID
+     * @param $iAuthor
+     * @param $msg
+     * @return bool
+     */
+    public static function addMessageToDialog($iDialogID,$iAuthor,$msg)
+    {
+        $obMsg = new Messages();
+        $obMsg->msg = $msg;
+        $obMsg->parent_id = 0;
+        $obMsg->lvl = 0;
+        $obMsg->buser_id = $iAuthor;
+        $obMsg->dialog_id = $iDialogID;
+        $obMsg->status = Messages::PUBLISHED;
+        return $obMsg->save();
+    }
+
+    /**
+     * Добавление сообщения
+     * @param $obDialog
+     * @param $newAssignedID
+     * @param $oldAssignedID
+     * @return bool
+     */
+    public static function actionChangeAssigned($obDialog,$newAssignedID,$oldAssignedID,$forItem)
+    {
+        $arBUsers = BUser::find()
+            ->select(['id','username','fname','lname','mname'])
+            ->where(['id' => [(int)$newAssignedID,(int)$oldAssignedID]])
+            ->all();
+        if(!empty($arBUsers) && count($arBUsers) == 2 && is_object($obDialog))
+        {
+            $arUsers = [];
+            foreach($arBUsers as $obBUser)
+                $arUsers[$obBUser->id] = $obBUser->getFio();
+
+            if(isset($arUsers[(int)$newAssignedID]) && isset($arUsers[(int)$oldAssignedID]))
+            {
+                $msg = \Yii::t('app/msg','{user} change assigned for {forItem} from {oldAss} to {newAss}',[
+                    'user' => \Yii::$app->user->identity->getFio(),
+                    'oldAss' => $arUsers[(int)$oldAssignedID],
+                    'newAss' => $arUsers[(int)$newAssignedID],
+                    'forItem' => $forItem
+                ]);
+                return DialogManager::addMessageToDialog($obDialog->id,\Yii::$app->user->id,$msg);
+            }
+        }
+
+        return FALSE;
+    }
+
+
+    public static function actionChangeField()
+    {
+
     }
 
 } 

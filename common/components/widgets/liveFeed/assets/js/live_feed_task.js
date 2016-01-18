@@ -13,7 +13,7 @@ function loadMoreComments()
         cache: false,
         url: url,
         dataType: "json",
-        data: {dID:id},
+        data: {dID:id,type:"task"},
         success: function(msg){
             if(msg.content != undefined)
             {

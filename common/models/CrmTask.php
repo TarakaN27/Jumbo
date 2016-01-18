@@ -3,13 +3,17 @@
 namespace common\models;
 
 use common\components\behavior\notifications\TaskNotificationBehavior;
+use common\components\behavior\Task\TaskActionBehavior;
 use common\components\helpers\CustomHelper;
+use common\components\managers\DialogManager;
+use common\components\notification\RedisNotification;
 use common\models\managers\CUserCrmRulesManager;
 use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -72,8 +76,10 @@ class CrmTask extends AbstractActiveRecord
         TYPE_CALL = 3,
         TYPE_OTHER =4;
 
-    public
+    CONST
+        EVENT_UPDATE_DIALOG = 'upd_dialog';
 
+    public
         $arrAcc = [],
         $arrFiles = [],
         $hourEstimate = '',
@@ -365,7 +371,6 @@ class CrmTask extends AbstractActiveRecord
 
         return parent::afterFind();
     }
-
     /**
      *
      */
@@ -384,7 +389,8 @@ class CrmTask extends AbstractActiveRecord
     {
         $arParent = parent::behaviors();
         return ArrayHelper::merge($arParent,[
-            TaskNotificationBehavior::className()    //уведомления
+            TaskNotificationBehavior::className(),    //уведомления
+            TaskActionBehavior::className() //поведение действий
         ]);
     }
 
@@ -477,9 +483,6 @@ class CrmTask extends AbstractActiveRecord
     {
         $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
 
-
-
-
             $bNewRecord = $this->isNewRecord;   //если добавляем новую задачу
             if($this->save()) //сохраняем задачу
             {
@@ -509,12 +512,11 @@ class CrmTask extends AbstractActiveRecord
 
                 /** @var Dialogs $obDialog */
                 $obDialog = new Dialogs();  //новый диалог
+                $obDialog->type = Dialogs::TYPE_TASK;
                 $obDialog->crm_task_id = $this->id;
                 $obDialog->buser_id = $iUserID; //кто создал
                 $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
-                $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
-                        'user'=>Yii::$app->user->identity->getFio()
-                    ]).' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
+                $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
 
                 $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
 
@@ -541,6 +543,12 @@ class CrmTask extends AbstractActiveRecord
                 {
                     $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
                     return FALSE;
+                }else{
+                    DialogManager::addMessageToDialog($obDialog->id,Yii::$app->user->id,Yii::t('app/crm',
+                        'User {user} create new task',[
+                            'user' => Yii::$app->user->identity->getFio()
+                        ]
+                        ));
                 }
 
                 if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
@@ -632,6 +640,89 @@ class CrmTask extends AbstractActiveRecord
             }
 
         return $bError;
+    }
+
+    /**
+     * @param null $obDialog
+     * @return bool|int
+     * @throws \yii\db\Exception
+     */
+    public function updateUserForDialog($obDialog = NULL)
+    {
+        if(!$obDialog)
+            $obDialog = $this->dialog;
+
+        if(!$obDialog)
+            return FALSE;
+
+        $arUser = []; //все пользователи, которые связаны с диалогом.
+        $arUser [] = (int)$this->assigned_id;    //текущий ответсвенный
+        $arUser [] = (int)$this->created_by;     //кто добавил задачу
+        $arObAcc = $this->crmTaskAccomplices;
+        if(is_object($arObAcc))
+            foreach($arObAcc as $obAcc)
+                $arUser [] = (int)$obAcc->buser_id;
+        $arObWatch = $this->crmTaskWatchers;
+        if(is_object($arObWatch))
+            foreach($arObWatch as $obWatch)
+                $arUser [] = (int)$obAcc->buser_id;
+
+        if(empty($arUser))  //если пользователй нет, удалим всех
+            BUser::deleteAll('dialog_id = :dID',[':dID' => $obDialog->id]);
+        else{
+            $strU = implode(',',$arUser);
+            $arUsersForDelTMP = BuserToDialogs::find()->where('dialog_id = :dID AND buser_id not in ('.$strU.')',[
+                ':dID' => $obDialog->id
+            ])->all();  //пользователи которых нужно удалить
+
+            if(!empty($arUsersForDelTMP))
+            {
+                $arDelU = [];
+                foreach($arUsersForDelTMP as $del)
+                    $arDelU [] = $del->buser_id;
+
+                RedisNotification::removeDialogFromListForUsers($arDelU,$obDialog->id);    //удалим из редис оповещение для удаляемых пользователей
+                BuserToDialogs::deleteAll(['buser_id' => $arDelU,'dialog_id' => $obDialog->id]); //удаляем тех, кто не связан с задачей
+            }
+            unset($arUsersForDelTMP);
+            $arExistsTmp = BuserToDialogs::find()->select('buser_id')->where(['dialog_id' => $obDialog->id])->all();
+            $arExist = [];
+            foreach($arExistsTmp as $exist)
+            {
+                $arExist [] = $exist->buser_id;
+            }
+
+            $arBUIDs = [];
+            foreach($arUser as $user)
+            {
+                if(!in_array($user,$arExist))
+                    $arBUIDs []= $user;
+            }
+
+            if(!empty($arBUIDs))
+            {
+                $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
+                $rows = [];
+                foreach ($arBUIDs as $id) {
+                    $rows [] = [$id, $obDialog->id];
+                }
+
+                //групповое добавление
+                return Yii::$app->db->createCommand()
+                    ->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)
+                    ->execute();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
+    public function callTriggerUpdateDialog()
+    {
+        $this->trigger(self::EVENT_UPDATE_DIALOG);
     }
 
 }

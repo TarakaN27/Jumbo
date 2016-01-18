@@ -123,6 +123,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obAccmpl->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('error',Yii::t('app/crm','Accomplice successfully added'));
                 return $this->redirect(['view','id' => $id]);
             }
@@ -146,6 +147,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obWatcher->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Watcher successfully added'));
                 return $this->redirect(['view','id' => $id]);
             }
@@ -161,6 +163,7 @@ class TaskController extends AbstractBaseBackendController
         {
             if($model->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Assign successfully changed'));
                 return $this->redirect(['view','id' => $id]);
             }else{
@@ -374,6 +377,7 @@ class TaskController extends AbstractBaseBackendController
                     }
                 }
             }
+            $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
 

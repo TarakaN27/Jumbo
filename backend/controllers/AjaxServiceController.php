@@ -15,6 +15,7 @@ use common\models\Dialogs;
 use common\models\Messages;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
@@ -256,12 +257,17 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $dID = Yii::$app->request->post('dID');
         $obComm = (new DialogManager())->getCommentsForDialog($dID);
+        $type = Yii::$app->request->post('type');
+        $addConf = [];
+        if($type == 'task')
+            $addConf['disableClick'] = TRUE;
+
         return [
-            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
+            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',ArrayHelper::merge([
                 'models' => array_reverse($obComm->getModels()),
                 'pag' => $obComm->getPagination(),
                 'dID' => $dID
-            ]))
+            ],$addConf)))
         ];
     }
 

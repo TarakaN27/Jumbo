@@ -255,6 +255,16 @@ class RedisNotification
 	}
 
 	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeDialogFromListForUsers($arUsers,$value)
+	{
+		return static::removeItemFromListForUsers($arUsers,$value,'getDialogKey');
+	}
+
+	/**
 	 * @param $iUserID
 	 * @param $value
 	 * @return bool

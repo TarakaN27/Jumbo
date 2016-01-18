@@ -210,7 +210,6 @@ return [
 	'arrFiles' => 'Файлы',
 	'You have new task' => 'У вас новая задача',
 	'New dialog from {user}' => 'Новый диалог ({user})',
-	'New message from {user}' => 'Новое сообщение ({user})'
-
+	'New message from {user}' => 'Новое сообщение ({user})',
 
 ];

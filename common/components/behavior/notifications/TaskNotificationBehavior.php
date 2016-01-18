@@ -8,7 +8,7 @@
 
 namespace common\components\behavior\notifications;
 
-
+use common\components\managers\DialogManager;
 use common\components\notification\RedisNotification;
 use common\components\notification\TabledNotification;
 use common\models\AbstractActiveRecord;
@@ -19,6 +19,18 @@ use yii\helpers\Html;
 class TaskNotificationBehavior extends Behavior
 {
 	protected
+		$changedFields = [  //поля об изменении которых добавляется оповещение
+			'title' => false,
+            'description' => false,
+            'deadline' => false,
+            'priority' => 'getPriorityStr',
+            'type' => 'getTypeStr',
+            'time_estimate' => 'getFormatedTimeEstimate',
+			'status' => 'statusStr'
+		];
+
+	protected
+		$arChangedFieldsDescription,
 		$oldAssigned,
 		$oldAccomplices = [],
 		$arTmpUsers = [];
@@ -45,6 +57,24 @@ class TaskNotificationBehavior extends Behavior
 	 */
 	public function beforeUpdate()
 	{
+		$oldAttributes = $this->owner->getOldAttributes();
+		$oldModel = new $this->owner($oldAttributes);
+		foreach($this->changedFields as $field => $method)
+		{
+			if($this->owner->isAttributeChanged($field) )
+			{
+				$oldValue = $method ? $oldModel->$method() : $oldModel->$field;
+				$newValue = $method ? $this->owner->$method() : $this->owner->$field;
+				if($oldValue != $newValue)
+					$this->arChangedFieldsDescription []= \Yii::t('app/msg','Field {field} from {oldValue} to {newValue}',[
+						'field' => $this->owner->getAttributelabel($field),
+						'oldValue' => $oldValue,
+						'newValue' => $newValue
+					]);
+			}
+		}
+		unset($oldModel);
+
 		$this->oldAssigned = $this->owner->getOldAttribute('assigned_id'); //сохраняем старого отвественного
 		$tmp = $this->owner->crmTaskAccomplices;
 		if(!empty($tmp))
@@ -58,11 +88,31 @@ class TaskNotificationBehavior extends Behavior
 	 */
 	public function afterUpdate()
 	{
+		$obDialog = $this->owner->dialog;
+		//изменение ответсвенного
 		if($this->owner->assigned_id != $this->oldAssigned) //если изменился ответсвенный
 		{
 			RedisNotification::removeViewedNewTask($this->oldAssigned,$this->owner->id);    //удалим из списка новых тасков старого ответсвенного
-			RedisNotification::addNewTaskToList([$this->owner->assigned_id],$this->owner->id); //добавим новому
-			$this->addTabledNotification([$this->owner->assigned_id]);  //добавим реалтайм уведомление
+			RedisNotification::addNewTaskToList([(int)$this->owner->assigned_id],$this->owner->id); //добавим новому
+			$this->addTabledNotification([(int)$this->owner->assigned_id]);  //добавим реалтайм уведомление
+
+
+			DialogManager::actionChangeAssigned(
+				$obDialog,
+				(int)$this->owner->assigned_id,
+				(int)$this->oldAssigned,
+				' задачи "'.$this->owner->title.'"'
+			);
+		}
+
+		// изменение полей. добавляем комментарий
+		if(!empty($this->arChangedFieldsDescription) && is_object($obDialog))
+		{
+			$msg = \Yii::t('app/msg','User {user} make changes for {task}:',[
+				'user' => \Yii::$app->user->identity->getFio(),
+				'task' => Html::a($this->owner->title,['/crm/task/view','id' => $this->owner->id])
+			]).' </br>'.implode(',</br>',$this->arChangedFieldsDescription);
+			DialogManager::addMessageToDialog($obDialog->id,\Yii::$app->user->id,$msg);
 		}
 
 		return TRUE;
