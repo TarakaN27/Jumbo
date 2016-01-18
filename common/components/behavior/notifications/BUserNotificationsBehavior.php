@@ -32,6 +32,7 @@ class BUserNotificationsBehavior extends Behavior
 	public function afterDelete()
 	{
 		RedisNotification::removeListNewTaskForUsers([$this->owner->id]);
+		RedisNotification::removeDialogListForUsers([$this->owner->id]);
 		return TRUE;
 	}
 

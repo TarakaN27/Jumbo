@@ -296,10 +296,23 @@ class RedisNotification
 		return static::isValueInList($key,$value);
 	}
 
+	/**
+	 * @param $iUserID
+	 * @return int
+	 */
 	public static function countNewDialog($iUserID)
 	{
 		$key = static::getDialogKey($iUserID);
 		return static::countItem($key);
+	}
+
+	/**
+	 * @param $arUsers
+	 * @return bool
+	 */
+	public static function removeDialogListForUsers($arUsers)
+	{
+		return static::removeListForUsers($arUsers,'getDialogKey');
 	}
 
 }
