@@ -16,26 +16,14 @@ function proccessingMessages(data)
             bFound = true;
         }
     });
-
-
-
-    console.log(bFound);
-    console.log(data.type);
-    console.log(jQuery.inArray(wmu, data.wmu));
-
-
-
     if(data.type == TYPE_BROADCAST) //общевещательный канал
     {
-        console.log('1111');
         abstractTabletnotification(data.name,data.message,data.ntf_type);
     }
     if(data.type == TYPE_PRIVATE && bFound ) //только для определенного пользователя
     {
-        console.log('22222');
         abstractTabletnotification(data.name,data.message,data.ntf_type);
     }
-    console.log(data);
 }
 
 /**
