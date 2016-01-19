@@ -46,7 +46,7 @@ class RedisNotification
 	 */
 	public static function getNewContactKey($iUserID)
 	{
-		return self::COMPANY_KEY.':id:'.$iUserID;
+		return self::CONTACT_KEY.':id:'.$iUserID;
 	}
 
 	/**
@@ -313,6 +313,151 @@ class RedisNotification
 	public static function removeDialogListForUsers($arUsers)
 	{
 		return static::removeListForUsers($arUsers,'getDialogKey');
+	}
+
+	/********************COMPANY*********************************/
+
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function addNewCompanyToListForUsers($arUsers,$value)
+	{
+		return static::addItemToListForUsers($arUsers,$value,'getNewCompanyKey');
+	}
+
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeCompanyFromListForUsers($arUsers,$value)
+	{
+		return static::removeItemFromListForUsers($arUsers,$value,'getNewCompanyKey');
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeCompanyFromListForUser($iUserID,$value)
+	{
+		$key = self::getNewCompanyKey($iUserID);   //получаем ключ
+		return self::removeViewed($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return array
+	 */
+	public static function getCompanyListForUser($iUserID)
+	{
+		$key = static::getNewCompanyKey($iUserID);
+		return static::itemList($key);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return mixed
+	 */
+	public static function isCompanyInList($iUserID,$value)
+	{
+		$key = static::getNewCompanyKey($iUserID);
+		return static::isValueInList($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return int
+	 */
+	public static function countNewCompany($iUserID)
+	{
+		$key = static::getNewCompanyKey($iUserID);
+		return static::countItem($key);
+	}
+
+	/**
+	 * @param $arUsers
+	 * @return bool
+	 */
+	public static function removeCompanyListForUsers($arUsers)
+	{
+		return static::removeListForUsers($arUsers,'getNewCompanyKey');
+	}
+
+	/****************CONTACT ***************************************/
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function addNewContactToListForUsers($arUsers,$value)
+	{
+		return static::addItemToListForUsers($arUsers,$value,'getNewContactKey');
+	}
+
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeContactFromListForUsers($arUsers,$value)
+	{
+		return static::removeItemFromListForUsers($arUsers,$value,'getNewContactKey');
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removeContactFromListForUser($iUserID,$value)
+	{
+		$key = self::getNewContactKey($iUserID);   //получаем ключ
+		return self::removeViewed($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return array
+	 */
+	public static function getContactListForUser($iUserID)
+	{
+		$key = static::getNewContactKey($iUserID);
+		return static::itemList($key);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return mixed
+	 */
+	public static function isContactInList($iUserID,$value)
+	{
+		$key = static::getNewContactKey($iUserID);
+		return static::isValueInList($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return int
+	 */
+	public static function countNewContact($iUserID)
+	{
+		$key = static::getNewContactKey($iUserID);
+		return static::countItem($key);
+	}
+
+	/**
+	 * @param $arUsers
+	 * @return bool
+	 */
+	public static function removeContactListForUsers($arUsers)
+	{
+		return static::removeListForUsers($arUsers,'getNewContactKey');
 	}
 
 }

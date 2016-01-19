@@ -179,11 +179,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obDlgMng = new DialogManager();
         $obDialog = $obDlgMng->addNewDialogForCompany($iCmpID,$sMsg,$iAthID);
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => [$obDialog],
                 'pag' => NULL,
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
 
             ]),
             'uniqueStr' => $uniqStr
@@ -204,11 +206,14 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obDlgMng = new DialogManager();
         $obDialog = $obDlgMng->addNewDialogForContact($iCmpID,$sMsg,$iAthID);
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => [$obDialog],
                 'pag' => NULL,
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
+
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -221,11 +226,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $obDialogs = (new DialogManager())->getDialogsForCompany(Yii::$app->request->get('id'));
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => $obDialogs->getModels(),
                 'pag' => $obDialogs->getPagination(),
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -238,11 +245,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $obDialogs = (new DialogManager())->getDialogsForContact(Yii::$app->request->get('id'));
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => $obDialogs->getModels(),
                 'pag' => $obDialogs->getPagination(),
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
             ]),
             'uniqueStr' => $uniqStr
         ];

@@ -2,8 +2,12 @@
 
 namespace common\models;
 
+use common\components\behavior\Contact\ContactActionBehavior;
+use common\components\behavior\notifications\ContactNotificationBehavior;
 use Yii;
 use backend\models\BUser;
+use yii\helpers\ArrayHelper;
+
 /**
  * This is the model class for table "{{%crm_cmp_contacts}}".
  *
@@ -186,5 +190,17 @@ class CrmCmpContacts extends AbstractActiveRecord
         else
             $this->created_by = Yii::$app->user->id;
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            ContactActionBehavior::className(), //сообщения
+            ContactNotificationBehavior::className()    //уведомления
+        ]);
     }
 }

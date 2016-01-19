@@ -12,6 +12,7 @@ namespace app\modules\crm\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\widgets\Alert;
+use common\components\notification\RedisNotification;
 use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
@@ -94,9 +95,12 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 		}
 
+		$arCompanyRedisList = RedisNotification::getCompanyListForUser(Yii::$app->user->id);
+
 		return $this->render('index',[
 			'dataProvider' => $dataProvider,
-			'searchModel' => $searchModel
+			'searchModel' => $searchModel,
+			'arCompanyRedisList' => $arCompanyRedisList
 		]);
 	}
 
@@ -109,6 +113,7 @@ class CompanyController extends AbstractBaseBackendController
 		$model = new CUser();
 		$model->setDummyFields(); //@todo утановлены заглушки на имя пользователя и емаил. При необходимости убрать!
 		$model->manager_id = Yii::$app->user->id;
+		$model->created_by = Yii::$app->user->id;
 		$modelR = new CUserRequisites();
 		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
 
@@ -124,6 +129,7 @@ class CompanyController extends AbstractBaseBackendController
 					{
 						$model->link('requisites',$modelR);
 						$transaction->commit();
+						$model->callSaveDoneEvent();
 						Yii::$app->session->set('success',Yii::t('app/users','Contractor_successfully_added'));
 						return $this->redirect(['view', 'id' => $model->id]);
 					}else{
@@ -159,6 +165,12 @@ class CompanyController extends AbstractBaseBackendController
 		//Все данные по задаче
 		/** @var CUser $model */
 		$model = CUser::findOneByIDCached($id);
+
+		if(!$model)
+			throw new NotFoundHttpException('Company not found');
+
+		$model->callViewedEvent();  //событие просмотрено
+
 		/** @var CUserRequisites $obRequisite */
 		$obRequisite = $model->requisites;
 		$arContacts =  $model->crmContacts;
@@ -420,6 +432,7 @@ class CompanyController extends AbstractBaseBackendController
 				{
 					$transaction->rollBack();
 					Yii::$app->session->set('error',$e->getMessage());
+					return $this->redirect(['update', 'id' => $model->id]);
 				}
 			}else{
 				Yii::$app->session->set('error',Yii::t('app/users','Contractor_validate_error'));

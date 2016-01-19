@@ -347,7 +347,15 @@ class DialogManager extends Component{
      */
     public function addNewDialogForCompany($iCmpID,$sMsg,$iAthID)
     {
-        $arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);  //изменить?
+        //$arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);  //получал пользователй по правам
+
+        $obCMP = CUser::findOne($iCmpID);
+        if(empty($obCMP))
+            throw new NotFoundHttpException();
+
+        $arBUIDs = [(int)$obCMP->created_by,(int)$obCMP->manager_id,(int)$iAthID];
+        $arBUIDs = array_unique($arBUIDs);
+
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
@@ -393,22 +401,32 @@ class DialogManager extends Component{
     public function addNewDialogForContact($iCntID,$sMsg,$iAthID)
     {
         $obCmp = CrmCmpContacts::findOne($iCntID);
-        $arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp); //@todo только тем кто причастен к компании
+        //$arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp); //@todo только тем кто причастен к компании
+        $arBUIDs = [$iAthID,$obCmp->assigned_at,$obCmp->created_by];
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
             'type' => Dialogs::TYPE_COMPANY,
-            'crm_cmp_id' => empty($obCmp->cmp_id) ? ' ' : $obCmp->cmp_id,
+           // 'crm_cmp_id' => empty($obCmp->cmp_id) ? ' ' : $obCmp->cmp_id,
             'crm_cmp_contact_id' => $obCmp->id,
             'theme' => $sMsg
         ]);
+
+        if(!empty($obCmp->cmp_id))
+        {
+            $obDialog->crm_cmp_id = $obCmp->cmp_id;
+        }
+
         $tr = Yii::$app->db->beginTransaction();
 
-        if(!$obDialog->save())
+        if(!$obDialog->save()) {
             throw new ServerErrorHttpException('Can not save new dialog');
+        }
         try {
             $postModel = new BuserToDialogs();
             $rows = [];
+
+            $arBUIDs = array_unique($arBUIDs);
             foreach ($arBUIDs as $id) {
                 $rows [] = [$id, $obDialog->id];
             }

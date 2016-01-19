@@ -261,6 +261,8 @@ $menuItems[] = [
                                         <span class="fa fa-chevron-down"></span>
                                         <?= \common\components\notification\widget\TaskNewWidget::widget();?>
                                         <?=\common\components\notification\widget\DialogNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\CompanyNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\ContactNewWidget::widget();?>
 
                                     </a>
                                     <ul class="nav child_menu" style="display: none">
@@ -278,6 +280,7 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
+                                                <?=\common\components\notification\widget\CompanyNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php endif;?>
@@ -294,6 +297,7 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/crm/contact/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Contacts'); ?>
+                                                <?=\common\components\notification\widget\ContactNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php endif;?>

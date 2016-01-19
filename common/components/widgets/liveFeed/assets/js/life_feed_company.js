@@ -138,7 +138,7 @@ function showHideComments()
 
     if(viewed != undefined && viewed == 'no')
     {
-        jQuery.post(DIALOG_VIWED_ACTION,{dialog_id:dID},function(data){
+        jQuery.post(DIALOG_VIEWED_ACTION,{dialog_id:dID},function(data){
             if(data == 1)
             {
                 $('#dialogBlockId_'+dID).removeClass('dialog-not-viewed');

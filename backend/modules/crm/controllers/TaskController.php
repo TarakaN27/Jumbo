@@ -362,6 +362,7 @@ class TaskController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
             $model->unlinkAll('busersAccomplices',TRUE);
+            $arAccNew = [];
             if(!empty($model->arrAcc))
             {
                 //соисполнители.
@@ -373,10 +374,19 @@ class TaskController extends AbstractBaseBackendController
                     $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
                     if ($arAcc) {
                         foreach ($arAcc as $obAcc)
+                        {
+                            $arAccNew[] = $obAcc->id;
                             $model->link('busersAccomplices', $obAcc);
+                        }
+
                     }
                 }
             }
+            //нужно у удаленных соисполнителелй удалить балуны
+            $arAccDiff = array_diff($arAccObOld,$arAccNew);
+            if(!empty($arAccDiff))
+                RedisNotification::removeNewTaskFromList($arAccDiff,$model->id);
+
             $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
