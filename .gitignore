@@ -33,3 +33,4 @@ phpunit.phar
 *.log
 
 /backend/web/nodejs/pid
+/backend/web/nodejs/log

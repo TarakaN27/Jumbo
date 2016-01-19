@@ -230,10 +230,14 @@ class DialogManager extends Component{
         //@todo подумать как сделать кеширование
             $query = Dialogs::find()
                 ->joinWith('busers')
-                ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,Dialogs::tableName().'.buser_id' => $userID])
-                ->orWhere(
-                    Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.
-                    ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )')
+                ->where(Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.' AND ('.Dialogs::tableName().'.buser_id = :buserID OR '.
+                ' '.BUser::tableName().'.id = :buserID )'
+                )
+                ->params([':buserID' =>$userID ])
+                //->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,Dialogs::tableName().'.buser_id' => $userID])
+                //->orWhere(
+                //    Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.
+                //    ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )')
                 ->groupBy(Dialogs::tableName().'.id ')
             ;
             $countQuery = clone $query;
