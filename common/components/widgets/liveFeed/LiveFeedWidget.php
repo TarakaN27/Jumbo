@@ -10,7 +10,8 @@ namespace common\components\widgets\liveFeed;
 
 use common\components\managers\DialogManager;
 use yii\base\Widget;
-
+use common\components\notification\RedisNotification;
+use Yii;
 class LiveFeedWidget extends Widget{
 
     public
@@ -34,9 +35,12 @@ class LiveFeedWidget extends Widget{
         $arDialogs = $obDMan->loadLiveFeedDialogs(0);
         $pages = $obDMan->getPages();
 
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
+
         return $this->render('life_feed',[
             'arDialogs' => $arDialogs,
-            'pages' => $pages
+            'pages' => $pages,
+            'arRedisDialog' => $arRedisDialog
         ]);
     }
 

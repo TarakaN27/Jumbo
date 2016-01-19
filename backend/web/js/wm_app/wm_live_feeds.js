@@ -48,6 +48,7 @@ function fadeDialogBlock($this, blockName) {
     var
         tagI = $($this).find("i"),
         id = $($this).attr("data");
+
     if ($($this).hasClass("open")) {
         $("." + blockName + "[data-id='" + id + "']").fadeOut(500);
         $($this).removeClass("open");
@@ -58,6 +59,21 @@ function fadeDialogBlock($this, blockName) {
         $($this).addClass("open");
         $(tagI).removeClass("fa-chevron-down");
         $(tagI).addClass("fa-chevron-up");
+    }
+
+    var
+        viewed = $($this).attr('data-viewed');
+
+    if(viewed != undefined && viewed == 'no')
+    {
+        jQuery.post(DIALOG_VIEWED_ACTION,{dialog_id:id},function(data){
+            if(data == 1)
+            {
+                $('#dialogBlockId_'+id).removeClass('dialog-not-viewed');
+                $($this).removeAttr('data-viewed');
+            }
+
+        });  // отправим запрос, что просмотрели
     }
 }
 

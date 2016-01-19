@@ -18,32 +18,23 @@ use Yii;
 class LiveFeedTaskWidget extends Widget
 {
 	public
-		$iDialogID,
 		$iTaskID;
 
 	public function run()
 	{
-		$iDId = $this->iDialogID;
-		if(!empty($this->iTaskID))
-		{
-			$obTask = CrmTask::find()->select(['id','dialog_id'])->where(['id' => $this->iTaskID])->one();
-			if($obTask)
-				$iDId = $obTask->dialog_id;
-		}
-
-		if(empty($iDId))
+		if(empty($this->iTaskID))
 			return \Yii::t('app/crm','Error no dialog');
-
-		$obDialog = Dialogs::findOne($iDId);
+		/** @var Dialogs $obDialog */
+		$obDialog = Dialogs::find()->where(['crm_task_id' => $this->iTaskID])->one();
 		if(!$obDialog)
 			return \Yii::t('app/crm','Error no dialog');
 		$obDMan = new DialogManager();
 		$arMessages = $obDMan->getCommentsForDialog($obDialog->id);
-
+		$obDialog->callViewedEvent();
 		$this->renderAssets(); //регистрируем все скрипты
 		return $this->render('live_feed_task',[
 			'obDialog' => $obDialog,
-			'arMessages' => $arMessages->getModels(),
+			'arMessages' => array_reverse($arMessages->getModels()),
 			'pag' => $arMessages->getPagination(),
 			'uniqStr' => 'one_task'
 		]);
@@ -77,7 +68,6 @@ class LiveFeedTaskWidget extends Widget
 			    DIALOG_ERROR_ADD_MESSAGE = "'. Yii::t('app/common', 'DIALOG_ERROR_ADD_MESSAGE') .'",
 			    DIALOG_ERROR_ADD_DIALOG = "'.Yii::t('app/crm','DIALOG_ERROR_ADD_DIALOG').'";
 		',$view::POS_BEGIN);
-
 
 		LiveFeedTaskAssets::register($view);
 		//вешаем события

@@ -207,6 +207,19 @@ return [
 	'Add task' => 'Добавить задачу',
 	'File name' => 'Название файла',
 	'Src file' => 'Файл',
-	'arrFiles' => 'Файлы'
+	'arrFiles' => 'Файлы',
+	'You have new task' => 'У вас новая задача',
+	'New dialog from {user}' => 'Новый диалог ({user})',
+	'New message from {user}' => 'Новое сообщение ({user})',
+	'New company {user}' => 'Новая компания ({user})',
+	'Changed fields for {cmp_name}' => 'Изменение полей для компании {cmp_name}',
+	'Company {cmp_name}' => 'Компания "{cmp_name}"',
+	'New company {cmp_name}' => 'Новая компания "{cmp_name}"',
+	'User {user} make change fields' => 'Пользователь {user} изменил поля компании',
+	'Changed fields for contact {cmp_name}' => 'Изменение полей для контакта {cmp_name}',
+	'User {user} make change fields for contact' => 'Пользователь {user} изменил поля контакта',
+	'New contact {cmp_name}' => 'Новый контакт {cmp_name}',
+	'New contact {user}' => 'Новый контакт {user}',
+	'New contact ({user})' => 'Новый контакт ({user})'
 
 ];

@@ -182,7 +182,7 @@ $this->registerJs("
                                     <?=$model->getFormatedTimeEstimate()?>
                                 </span>
                             </div>
-                            <div class="col-md-8 col-sm-8 col-xs-12 ">
+                            <div class="col-md-7 col-sm-7 col-xs-12 ">
 
                                     <?=Html::button(Yii::t('app/crm','Pause task'),[
                                         'class' => 'btn btn-warning pause-task '.($model->status == CrmTask::STATUS_IN_PROGRESS ? '' : 'hide'),
@@ -253,7 +253,7 @@ $this->registerJs("
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
                                 <!--диалоги-->
                                 <?php echo \common\components\widgets\liveFeed\LiveFeedTaskWidget::widget([
-                                    'iDialogID' => $model->dialog_id
+                                    'iTaskID' => $model->id
                                 ]);?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">

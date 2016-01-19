@@ -4,6 +4,7 @@ namespace app\modules\crm\controllers;
 
 use backend\models\BUser;
 use backend\widgets\Alert;
+use common\components\notification\RedisNotification;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use common\models\search\CrmTaskSearch;
@@ -79,11 +80,14 @@ class ContactController extends AbstractBaseBackendController
         $cuserDesc = empty($searchModel->cmp_id) ? '' : \common\models\CUser::findOne($searchModel->cmp_id)->getInfo();
         $buserDesc = empty($searchModel->assigned_at) ? '' : \backend\models\BUser::findOne($searchModel->assigned_at)->getFio();
 
+        $arContactRedis = RedisNotification::getContactListForUser(Yii::$app->user->id);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'cuserDesc' => $cuserDesc,
-            'buserDesc' => $buserDesc
+            'buserDesc' => $buserDesc,
+            'arContactRedis' => $arContactRedis
         ]);
     }
 
@@ -96,6 +100,9 @@ class ContactController extends AbstractBaseBackendController
     {
         $iUserID = Yii::$app->user->id; //текущий пользователь
         $model = $this->findModel($id);
+
+        $model->callViewedEvent();  //событие просмотрено
+
         $arFiles = $model->files;
         $obFile = new CrmCmpFile();
 

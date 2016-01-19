@@ -19,15 +19,18 @@ $columns = [
 		'attribute' => 'corp_name',
 		'label' => Yii::t('app/users', 'Corp Name'),
 		'format' => 'html',
-		'value' => function($model){
+		'value' => function($model) use ($arCompanyRedisList){
 			/** @var CUserRequisites $obR */
 			$obR = $model->requisites;
+
+			$addStr =  in_array($model->id,$arCompanyRedisList) ? '<span class="label label-primary">New</span>' : '';
+
 			if(empty($obR))
-				return Html::a('N/A',['view','id' => $model->id],['class'=>'link-upd']);
+				return Html::a('N/A ',['view','id' => $model->id],['class'=>'link-upd']).' '.$addStr;
 			return Html::a(
 				CustomHelper::highlight('dummy',$obR->getCorpName()),
 				['view','id' => $model->id],
-				['class'=>'link-upd']);
+				['class'=>'link-upd']).' '.$addStr;
 		}
 	],
 	[

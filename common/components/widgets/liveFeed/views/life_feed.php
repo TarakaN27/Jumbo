@@ -15,6 +15,7 @@ $this->registerJs('
 var
     DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-comment']) . '",
     DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['/ajax-service/load-lf-dialogs']) . '",
+    DIALOG_VIEWED_ACTION =  "' . \yii\helpers\Url::to(['/ajax-service/viewed-dialog']) . '",
     DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
@@ -89,6 +90,10 @@ $this->registerJsFile('@web/js/wm_app/wm_live_feeds.js',
     </div>
                             <!-- -->
     <div class = "x_content msgBoxList">
-        <?= $this->render('_dialog_part', ['arDialogs' => $arDialogs,'pages' => isset($pages) ? $pages : NULL]) ?>
+        <?= $this->render('_dialog_part', [
+            'arDialogs' => $arDialogs,
+            'pages' => isset($pages) ? $pages : NULL,
+            'arRedisDialog' => $arRedisDialog
+        ]) ?>
     </div>
 </div>

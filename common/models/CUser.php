@@ -3,6 +3,8 @@
 namespace common\models;
 
 use backend\models\BUser;
+use common\components\behavior\Company\CompanyActionBehaviors;
+use common\components\behavior\notifications\CompanyNotificationBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
@@ -101,8 +103,8 @@ class CUser extends AbstractUser
     public static function getOpenedCloserArr()
     {
         return [
-            self::IS_CLOSED => Yii::t('app/users','Is closed'),
             self::IS_OPENED => Yii::t('app/users','Is opened'),
+            self::IS_CLOSED => Yii::t('app/users','Is closed')
         ];
     }
 
@@ -334,6 +336,8 @@ class CUser extends AbstractUser
                 'CacheableActiveRecord' => [
                     'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
                 ],
+                CompanyNotificationBehavior::className(),    //уведомления
+                CompanyActionBehaviors::className()
             ]);
     }
 

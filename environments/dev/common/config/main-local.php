@@ -28,6 +28,12 @@ return [
             'useSandbox' => TRUE,   // использовать ли песочницу для запросов
             'masterToken' => 'JGfT4DkoXc3x88su', //мастер тоукен для финансовых операций
             'contractID' => '11111/00'   //номер кредитного договора
-        ]
+        ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 2,
+        ],
     ],
 ];

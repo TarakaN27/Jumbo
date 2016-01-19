@@ -32,9 +32,6 @@ if(!empty($arContacts)) {
 				}
 			}
 		});
-
-
-
 	", \yii\web\View::POS_READY);
 }
 $this->registerJs("

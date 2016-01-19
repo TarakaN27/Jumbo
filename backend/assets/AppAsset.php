@@ -35,7 +35,9 @@ class AppAsset extends AssetBundle
         'js/notify/pnotify.core.js',
         'js/notify/pnotify.buttons.js',
         'js/notify/pnotify.nonblock.js',
-        'js/wm_app/custom_notify.js'
+        'js/wm_app/custom_notify.js',
+        //'js/socket_io/socket.io.js',
+        //'js/wm_app/notification.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -32,8 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'fio',
                             'format' => 'html',
-                            'value' => function($model){
-                                return Html::a($model->fio,['view','id' => $model->id],['class' => 'link-upd']);
+                            'value' => function($model) use ($arContactRedis){
+
+                                $addStr = in_array($model->id,$arContactRedis) ? '<span class="label label-info">New</span>' : '';
+                                return Html::a($model->fio,['view','id' => $model->id],['class' => 'link-upd']).' '.$addStr;
                             }
                         ],
                         'post',

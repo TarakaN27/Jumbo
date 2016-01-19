@@ -25,6 +25,12 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
         PUBLISHED = 1,
         UNPUBLISHED = 0;
 
+    CONST
+        EVENT_SAVE_DONE = 'save_done',
+        EVENT_VIEWED = 'viewed',
+        EVENT_UNLINK = 'unlink',
+        EVENT_LINK = 'link';
+
     /**
      * @return array
      */
@@ -163,4 +169,45 @@ abstract class AbstractActiveRecordWTB extends ActiveRecord{
     {
         return StringHelper::basename(self::className());
     }
+
+    /**
+     * Add event LINK to link function
+     * @param string $name
+     * @param \yii\db\ActiveRecordInterface $model
+     * @param array $extraColumns
+     */
+    public function link($name, $model, $extraColumns = [])
+    {
+        parent::link($name, $model, $extraColumns);
+        $this->trigger(self::EVENT_LINK);
+    }
+
+    /**
+     * Add event UNLINK to unlink function
+     * @param string $name
+     * @param \yii\db\ActiveRecordInterface $model
+     * @param bool|FALSE $delete
+     */
+    public function unlink($name, $model, $delete = false)
+    {
+        parent::unlink($name, $model, $delete);
+        $this->trigger(self::EVENT_UNLINK);
+    }
+
+    /**
+     *
+     */
+    public function callViewedEvent()
+    {
+        $this->trigger(self::EVENT_VIEWED);
+    }
+
+    /**
+     * Добавляем событие полное сохранение модели
+     */
+    public function callSaveDoneEvent()
+    {
+        $this->trigger(self::EVENT_SAVE_DONE);
+    }
+
 } 

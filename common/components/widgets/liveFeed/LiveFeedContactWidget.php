@@ -13,7 +13,7 @@ use yii\base\Widget;
 use common\components\managers\DialogManager;
 use common\components\widgets\liveFeed\assets\LifeFeedContactAssets;
 use Yii;
-
+use common\components\notification\RedisNotification;
 class LiveFeedContactWidget extends Widget
 {
 	public
@@ -22,12 +22,13 @@ class LiveFeedContactWidget extends Widget
 	public function run()
 	{
 		$obDialogs = (new DialogManager())->getDialogsForContact($this->iCntID);
-
+		$arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
 		$this->renderAssets();
 		return $this->render('live_feed_contact',[
 			'obDialogs' => $obDialogs,
 			'pagination' => $obDialogs->getPagination(),
-			'iCmpID' => $this->iCntID
+			'iCmpID' => $this->iCntID,
+			'arRedisDialog' => $arRedisDialog
 		]);
 	}
 
@@ -43,6 +44,8 @@ class LiveFeedContactWidget extends Widget
 				MSG_DIALOG_EMPTY_CONTENT = "'.Yii::t('app/crm','MSG_DIALOG_EMPTY_CONTENT').'",
 				DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-new-dialog-contact']) . '",
 			    DIALOG_SEND_CRM_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-crm-msg']) . '",
+			    DIALOG_VIEWED_ACTION =  "' . \yii\helpers\Url::to(['/ajax-service/viewed-dialog']) . '",
+			    DIALOG_LOAD_COMMENTS = "' . \yii\helpers\Url::to(['/ajax-service/load-dialog-comments']) . '",
 			    DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",

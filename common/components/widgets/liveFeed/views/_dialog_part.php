@@ -12,7 +12,11 @@ $page = isset($pages) && is_object($pages) ? $pages->getPage() : 0;
 
 <?php foreach($arDialogs as $dialog):?>
     <ul class = "list-unstyled timeline" data-pages = "<?=$page?>">
-            <li id="dialogBlockId_<?php echo $dialog['dialog']->id;?>">
+            <li id="dialogBlockId_<?php echo $dialog['dialog']->id;?>" class="
+            <?php if(in_array($dialog['dialog']->id,$arRedisDialog)):?>
+                    dialog-not-viewed
+            <?php endif;?>
+            ">
                 <div class = "block">
                     <div class = "tags">
                         <a href = "" class = "tag <?php echo $dialog['dialog']->getTagClass();?>">
@@ -27,7 +31,7 @@ $page = isset($pages) && is_object($pages) ? $pages->getPage() : 0;
                         <p class = "excerpt">
                             <?php echo $dialog['dialog']->theme;?>
                         </p>
-                        <button class = "btn btn-info btn-xs open_dialog_button" data = "<?php echo $dialog['dialog']->id;?>"><?= Yii::t('app/common', 'Dialog'); ?>
+                        <button data-viewed="<?php if(in_array($dialog['dialog']->id,$arRedisDialog)):?>no<?php endif;?>" class = "btn btn-info btn-xs open_dialog_button" data = "<?php echo $dialog['dialog']->id;?>"><?= Yii::t('app/common', 'Dialog'); ?>
                             <i class = "fa fa-chevron-down"></i>
                         </button>
                         <div class = "dialog_section" data-id = "<?php echo $dialog['dialog']->id;?>">

@@ -2,8 +2,10 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\TaskAccoplicesNotificationBehavior;
 use Yii;
 use backend\models\BUser;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%crm_task_accomplices}}".
@@ -60,5 +62,16 @@ class CrmTaskAccomplices extends AbstractActiveRecordWTB
     public function getBuser()
     {
         return $this->hasOne(BUser::className(), ['id' => 'buser_id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            TaskAccoplicesNotificationBehavior::className() //уведомления
+        ]);
     }
 }

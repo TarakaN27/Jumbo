@@ -15,10 +15,12 @@ use common\models\Dialogs;
 use common\models\Messages;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use Yii;
+use common\components\notification\RedisNotification;
 
 class AjaxServiceController extends AbstractBaseBackendController{
 
@@ -141,6 +143,10 @@ class AjaxServiceController extends AbstractBaseBackendController{
         throw new ServerErrorHttpException("Can't create dialog");
     }
 
+    /**
+     * @return null|string
+     * @throws NotFoundHttpException
+     */
     public function actionLoadLfDialogs()
     {
         $page = \Yii::$app->request->post('page');
@@ -150,9 +156,12 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obDMan = new DialogManager(['userID' => \Yii::$app->user->id]);
         $arDialogs= $obDMan->loadLiveFeedDialogs((int)$page);
 
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
+
         return $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_part.php',[
             'arDialogs' => $arDialogs,
-            'pages' => $obDMan->getPages()
+            'pages' => $obDMan->getPages(),
+            'arRedisDialog' => $arRedisDialog
         ]);
     }
 
@@ -170,11 +179,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obDlgMng = new DialogManager();
         $obDialog = $obDlgMng->addNewDialogForCompany($iCmpID,$sMsg,$iAthID);
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => [$obDialog],
                 'pag' => NULL,
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
 
             ]),
             'uniqueStr' => $uniqStr
@@ -195,11 +206,14 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obDlgMng = new DialogManager();
         $obDialog = $obDlgMng->addNewDialogForContact($iCmpID,$sMsg,$iAthID);
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => [$obDialog],
                 'pag' => NULL,
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
+
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -212,11 +226,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $obDialogs = (new DialogManager())->getDialogsForCompany(Yii::$app->request->get('id'));
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => $obDialogs->getModels(),
                 'pag' => $obDialogs->getPagination(),
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -229,11 +245,13 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $obDialogs = (new DialogManager())->getDialogsForContact(Yii::$app->request->get('id'));
         $uniqStr = uniqid();
+        $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
         return [
             'content' => $this->renderPartial('@common/components/widgets/liveFeed/views/_dialog_crm_msg.php',[
                 'models' => $obDialogs->getModels(),
                 'pag' => $obDialogs->getPagination(),
-                'uniqStr' => $uniqStr
+                'uniqStr' => $uniqStr,
+                'arRedisDialog' => $arRedisDialog
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -248,17 +266,23 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $dID = Yii::$app->request->post('dID');
         $obComm = (new DialogManager())->getCommentsForDialog($dID);
+        $type = Yii::$app->request->post('type');
+        $addConf = [];
+        if($type == 'task')
+            $addConf['disableClick'] = TRUE;
+
         return [
-            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
+            'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',ArrayHelper::merge([
                 'models' => array_reverse($obComm->getModels()),
                 'pag' => $obComm->getPagination(),
                 'dID' => $dID
-            ]))
+            ],$addConf)))
         ];
     }
 
     /**
      * @return array
+     * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
     public function actionAddCrmMsg()
@@ -266,6 +290,10 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $iAuthID = Yii::$app->request->post('author_id');
         $iDialogID = Yii::$app->request->post('dialog_id');
         $sMsg = trim(Yii::$app->request->post('redactor'));
+        /** @var Dialogs $obDialog */
+        $obDialog = Dialogs::findOne($iDialogID);
+        if(!$obDialog)
+            throw new NotFoundHttpException('Dialog not found');
 
         $obMsg = new Messages();
         $obMsg->buser_id = $iAuthID;
@@ -277,6 +305,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
         if(!$obMsg->save())
             throw new ServerErrorHttpException();
 
+        $obDialog->updateUpdatedAt();
+
         return [
             'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
                 'models' => [$obMsg],
@@ -287,6 +317,17 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
         return $_POST;
 
+    }
+
+    public function actionViewedDialog()
+    {
+        $iDialogID = Yii::$app->request->post('dialog_id');
+        /** @var Dialogs $obDialog */
+        $obDialog = Dialogs::findOne($iDialogID);
+        if(!$obDialog)
+            throw new NotFoundHttpException();
+        $obDialog->callViewedEvent();
+        return 1;
     }
 
 } 

@@ -9,7 +9,7 @@ use yii\bootstrap\Html;
 use vova07\imperavi\Widget as ImperaviWidget;
 ?>
 <?foreach($models as $model):?>
-<li>
+<li id="dialogBlockId_<?php echo $model->id;?>" class="<?php if(in_array($model->id,$arRedisDialog)):?>dialog-not-viewed<?php endif;?>">
 	<img src="/service/images/defaultUserAvatar.jpg" class="avatar" alt="Avatar">
 	<div class="message_date">
 		<h3 class="date text-info"><?=Date('d',$model->created_at);?></h3>
@@ -23,7 +23,9 @@ use vova07\imperavi\Widget as ImperaviWidget;
 		<br />
 		<p class="url">
 			<span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
-			<a data-id="<?=$model->id;?>" class="btn-show-hide"><span><?=Yii::t('app/common','SHOW_MSG_TEXT')?></span> <i class="fa fa-chevron-down"></i></a>
+			<a data-id="<?=$model->id;?>" class="btn-show-hide" data-viewed="<?php if(in_array($model->id,$arRedisDialog)):?>no<?php endif;?>">
+				<span><?=Yii::t('app/common','SHOW_MSG_TEXT')?></span> <i class="fa fa-chevron-down"></i>
+			</a>
 		</p>
 
 	</div>

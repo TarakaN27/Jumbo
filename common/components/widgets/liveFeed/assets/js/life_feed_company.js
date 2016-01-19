@@ -131,6 +131,22 @@ function showHideComments()
         text.html(SHOW_MSG_TEXT);
         $('.form-add-msg[data-id="'+dID+'"]').fadeOut(100);
     }
+
+    //если диалог не просмотрен и есть новое событие, то нужно вызвать действие "просмотрено" по открытию комментариев
+    var
+        viewed = $(this).attr('data-viewed');
+
+    if(viewed != undefined && viewed == 'no')
+    {
+        jQuery.post(DIALOG_VIEWED_ACTION,{dialog_id:dID},function(data){
+            if(data == 1)
+            {
+                $('#dialogBlockId_'+dID).removeClass('dialog-not-viewed');
+                $(this).removeAttr('data-viewed');
+            }
+
+        });  // отправим запрос, что просмотрели
+    }
 }
 
 function loadMoreComments(id,firstLoad,$this)

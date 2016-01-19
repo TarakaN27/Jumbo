@@ -9,6 +9,7 @@
 namespace common\components\managers;
 
 use backend\models\BUser;
+use common\models\AbstractActiveRecord;
 use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use common\models\BuserToDialogs;
@@ -33,6 +34,7 @@ use yii\web\NotFoundHttpException;
 use Yii;
 use yii\web\ServerErrorHttpException;
 use yii\widgets\LinkPager;
+use common\components\notification\RedisNotification;
 
 class DialogManager extends Component{
 
@@ -52,18 +54,13 @@ class DialogManager extends Component{
      */
     public function addNewComment()
     {
-        $obDlg = Dialogs::findOne($this->iDId);
-        if(empty($obDlg))
-            throw new NotFoundHttpException('Dialog not found');
-        $arRtn = ['status' => FALSE,'content'=>'','newDialog'=>FALSE,'dialogID' => ''];
-
-        if($obMsg = $this->newMessage($obDlg->id,$this->sMsg,$this->iAthID))
+        if($obMsg = $this->newMessage($this->iDId,$this->sMsg,$this->iAthID))
         {
             $cnt = \Yii::$app->view->renderFile(
                 '@common/components/widgets/liveFeed/views/_dialog_msg.php',
                 ['msg' => $obMsg ]
             );
-            $arRtn = ['status' => TRUE,'content'=>$cnt,'newDialog'=>FALSE,'dialogID' => $obDlg->id];
+            $arRtn = ['status' => TRUE,'content'=>$cnt,'newDialog'=>FALSE,'dialogID' => $obMsg->dialog_id];
         }
 
         return $arRtn;
@@ -95,14 +92,17 @@ class DialogManager extends Component{
                         }
                     }
                     $transaction->commit();
-
+                    $obDlg->callSaveDoneEvent();//вызываем событие
                     $arDialogs [] = ['dialog' => $obDlg,'msg' => []];
-
+                    $arRedisDialog = RedisNotification::getDialogListForUser(Yii::$app->user->id);
                     $arRtn = [
                         'status' => TRUE,
                         'content'=>
                             \Yii::$app->view->renderFile('@common/components/widgets/liveFeed/views/_dialog_part.php',
-                                ['arDialogs' => $arDialogs ]),
+                                [
+                                    'arDialogs' => $arDialogs,
+                                    'arRedisDialog' => $arRedisDialog
+                                ]),
                         'newDialog'=>TRUE,
                         'dialogID' => $obDlg->id];
                 }catch(Exception $e)
@@ -209,6 +209,7 @@ class DialogManager extends Component{
                     }
                 }
                 $transaction->commit();
+                $obDlg->callSaveDoneEvent();//вызываем событие
                 return $obDlg;
             }catch(Exception $e)
             {
@@ -226,21 +227,15 @@ class DialogManager extends Component{
             throw new NotFoundHttpException('User ID is not defined!');
         $userID = $this->userID;
 
-        $obDep = new TagDependency([
-            'tags' => [
-                NamingHelper::getCommonTag(Dialogs::className()),
-                NamingHelper::getCommonTag(BuserToDialogs::className())
-            ]
-        ]);
-
-        $arDialogs = Dialogs::getDb()->cache(function($db)use($userID,$page){
+        //@todo подумать как сделать кеширование
             $query = Dialogs::find()
                 ->joinWith('busers')
                 ->where([Dialogs::tableName().'.status' => Dialogs::PUBLISHED,Dialogs::tableName().'.buser_id' => $userID])
                 ->orWhere(
                     Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.
                     ' AND ('.BUser::tableName().'.id is NULL OR '.BUser::tableName().'.id = '.$userID.' )')
-                ->groupBy(Dialogs::tableName().'.id ');
+                ->groupBy(Dialogs::tableName().'.id ')
+            ;
             $countQuery = clone $query;
             $pages = new Pagination([
                 'totalCount' => $countQuery->count(),
@@ -249,14 +244,15 @@ class DialogManager extends Component{
             $pages->setPage($page);
             $models = $query->offset($pages->offset)
                 ->limit($pages->limit)
-                ->orderBy('id DESC')
+                ->orderBy('updated_at DESC')
                 ->all();
 
-            return [
+            $arDialogs =  [
                 'models' => $models,
                 'pages' => $pages
             ];
-        },3600*24,$obDep);//получаем диалоги для пользователя
+
+
 
         $arDlgs = isset($arDialogs['models']) && !empty($arDialogs['models']) ? $arDialogs['models'] : [];
         $this->pages = isset($arDialogs['pages']) && !empty($arDialogs['pages']) ? $arDialogs['pages'] : NULL;
@@ -326,7 +322,7 @@ class DialogManager extends Component{
      * @param $dID
      * @return ActiveDataProvider
      */
-    public function getCommentsForDialog($dID)
+    public function getCommentsForDialog($dID,$order = SORT_DESC)
     {
         $query = Messages::find()->where(['dialog_id' => $dID])->with('buser');
         $dataProvider = new ActiveDataProvider([
@@ -335,7 +331,7 @@ class DialogManager extends Component{
                 'pagesize' => 5,
                 'route' => '/ajax-service/load-dialog-comments'
             ],
-            'sort' => ['defaultOrder' => ['updated_at'=>SORT_DESC]]
+            'sort' => ['defaultOrder' => ['updated_at'=>$order]]
         ]);
         return $dataProvider;
     }
@@ -351,7 +347,15 @@ class DialogManager extends Component{
      */
     public function addNewDialogForCompany($iCmpID,$sMsg,$iAthID)
     {
-        $arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);
+        //$arBUIDs = CUserCrmRulesManager::getBuserIdsByPermission($iCmpID,$iAthID);  //получал пользователй по правам
+
+        $obCMP = CUser::findOne($iCmpID);
+        if(empty($obCMP))
+            throw new NotFoundHttpException();
+
+        $arBUIDs = [(int)$obCMP->created_by,(int)$obCMP->manager_id,(int)$iAthID];
+        $arBUIDs = array_unique($arBUIDs);
+
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
@@ -376,6 +380,7 @@ class DialogManager extends Component{
                 }
 
                 $tr->commit();
+                $obDialog->callSaveDoneEvent();//вызываем событие
         }catch (\Exception $e)
         {
             $tr->rollBack();
@@ -396,22 +401,32 @@ class DialogManager extends Component{
     public function addNewDialogForContact($iCntID,$sMsg,$iAthID)
     {
         $obCmp = CrmCmpContacts::findOne($iCntID);
-        $arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp);
+        //$arBUIDs = CUserCrmRulesManager::getBuserByPermissionsContact($iCntID,$iAthID,$obCmp); //@todo только тем кто причастен к компании
+        $arBUIDs = [$iAthID,$obCmp->assigned_at,$obCmp->created_by];
         $obDialog = New Dialogs([
             'buser_id' => $iAthID,
             'status' => Dialogs::PUBLISHED,
             'type' => Dialogs::TYPE_COMPANY,
-            'crm_cmp_id' => empty($obCmp->cmp_id) ? ' ' : $obCmp->cmp_id,
+           // 'crm_cmp_id' => empty($obCmp->cmp_id) ? ' ' : $obCmp->cmp_id,
             'crm_cmp_contact_id' => $obCmp->id,
             'theme' => $sMsg
         ]);
+
+        if(!empty($obCmp->cmp_id))
+        {
+            $obDialog->crm_cmp_id = $obCmp->cmp_id;
+        }
+
         $tr = Yii::$app->db->beginTransaction();
 
-        if(!$obDialog->save())
+        if(!$obDialog->save()) {
             throw new ServerErrorHttpException('Can not save new dialog');
+        }
         try {
             $postModel = new BuserToDialogs();
             $rows = [];
+
+            $arBUIDs = array_unique($arBUIDs);
             foreach ($arBUIDs as $id) {
                 $rows [] = [$id, $obDialog->id];
             }
@@ -422,12 +437,71 @@ class DialogManager extends Component{
             }
 
             $tr->commit();
+            $obDialog->callSaveDoneEvent();//вызываем событие
         }catch (\Exception $e)
         {
             $tr->rollBack();
             throw new ServerErrorHttpException('Can not save new dialog');
         }
         return $obDialog;
+    }
+
+    /**
+     * @param $iDialogID
+     * @param $iAuthor
+     * @param $msg
+     * @return bool
+     */
+    public static function addMessageToDialog($iDialogID,$iAuthor,$msg)
+    {
+        $obMsg = new Messages();
+        $obMsg->msg = $msg;
+        $obMsg->parent_id = 0;
+        $obMsg->lvl = 0;
+        $obMsg->buser_id = $iAuthor;
+        $obMsg->dialog_id = $iDialogID;
+        $obMsg->status = Messages::PUBLISHED;
+        return $obMsg->save();
+    }
+
+    /**
+     * Добавление сообщения
+     * @param $obDialog
+     * @param $newAssignedID
+     * @param $oldAssignedID
+     * @return bool
+     */
+    public static function actionChangeAssigned($obDialog,$newAssignedID,$oldAssignedID,$forItem)
+    {
+        $arBUsers = BUser::find()
+            ->select(['id','username','fname','lname','mname'])
+            ->where(['id' => [(int)$newAssignedID,(int)$oldAssignedID]])
+            ->all();
+        if(!empty($arBUsers) && count($arBUsers) == 2 && is_object($obDialog))
+        {
+            $arUsers = [];
+            foreach($arBUsers as $obBUser)
+                $arUsers[$obBUser->id] = $obBUser->getFio();
+
+            if(isset($arUsers[(int)$newAssignedID]) && isset($arUsers[(int)$oldAssignedID]))
+            {
+                $msg = \Yii::t('app/msg','{user} change assigned for {forItem} from {oldAss} to {newAss}',[
+                    'user' => \Yii::$app->user->identity->getFio(),
+                    'oldAss' => $arUsers[(int)$oldAssignedID],
+                    'newAss' => $arUsers[(int)$newAssignedID],
+                    'forItem' => $forItem
+                ]);
+                return DialogManager::addMessageToDialog($obDialog->id,\Yii::$app->user->id,$msg);
+            }
+        }
+
+        return FALSE;
+    }
+
+
+    public static function actionChangeField()
+    {
+
     }
 
 } 

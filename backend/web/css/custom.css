@@ -6333,7 +6333,7 @@ ul.notifications {
     text-transform: uppercase;
     width: 80%;
     float: left;
-    height: 20px;
+    height: 30px;
     text-overflow: ellipsis;
     overflow: hidden;
     display: block;

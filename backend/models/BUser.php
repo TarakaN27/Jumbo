@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use app\models\BindBuser;
+use common\components\behavior\notifications\BUserNotificationsBehavior;
 use common\models\AbstractUser;
 use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
@@ -284,6 +285,7 @@ class BUser extends AbstractUser
                 'CacheableActiveRecord' => [
                     'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
                 ],
+                BUserNotificationsBehavior::className()     //уведомления
             ]);
     }
 

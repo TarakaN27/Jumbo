@@ -256,11 +256,20 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
-                                <li><a><i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?> <span class="fa fa-chevron-down"></span></a>
+                                <li><a>
+                                        <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?>
+                                        <span class="fa fa-chevron-down"></span>
+                                        <?= \common\components\notification\widget\TaskNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\DialogNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\CompanyNewWidget::widget();?>
+                                        <?=\common\components\notification\widget\ContactNewWidget::widget();?>
+
+                                    </a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/crm/default/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'List feed'); ?>
+                                                <?=\common\components\notification\widget\DialogNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php if(
@@ -271,6 +280,7 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
+                                                <?=\common\components\notification\widget\CompanyNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php endif;?>
@@ -287,12 +297,14 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/crm/contact/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Contacts'); ?>
+                                                <?=\common\components\notification\widget\ContactNewWidget::widget();?>
                                             </a>
                                         </li>
                                         <?php endif;?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/task/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Tasks'); ?>
+                                                <?= \common\components\notification\widget\TaskNewWidget::widget();?>
                                             </a>
                                         </li>
 
@@ -350,12 +362,14 @@ $menuItems[] = [
 
         </div>
     </div>
-    <div id = "custom_notifications" class = "custom-notifications dsp_none no-print">
+    <!--div id = "custom_notifications" class = "custom-notifications dsp_none no-print">
         <ul class = "list-unstyled notifications clearfix" data-tabbed_notifications = "notif-group">
         </ul>
         <div class = "clearfix"></div>
         <div id = "notif-group" class = "tabbed_notifications"></div>
-    </div>
+    </div-->
+    <?php echo \common\components\notification\widget\TabledNotificationWidget::widget();?>
+
     <?php $this->endBody() ?>
     <?php if(!Yii::$app->user->isGuest):?>
         <!-- jira bug tracking -->
@@ -377,6 +391,7 @@ $menuItems[] = [
             };
         </script>
     <?php endif;?>
+
 </body>
 </html>
 <?php $this->endPage() ?>

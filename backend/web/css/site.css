@@ -149,4 +149,10 @@
 .atlwdg-TOP{z-index: 9999999;}
 .wm_right_tab{float:right !important;margin-right: 8px;}
 .wm_border_none{border: none;}
+.dialog-not-viewed .block_content,.dialog-not-viewed .message_wrapper{background-color: #FFFAF0;}
+.dialog-not-viewed .block_content h2.title::before{border: 3px solid #F39C12;}
+.tabled-notification-h2{font-size: 14px;}
+.bold-item{font-weight: bold;}
+.dialog-title-link{font-size: 16px;font-weight: bold;}
+
 

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\DialogNotificationBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
@@ -10,6 +11,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "{{%dialogs}}".
@@ -23,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property string $theme
  * @property integer $crm_cmp_id
  * @property integer $crm_cmp_contact_id
+ * @property integer $crm_task_id
  *
  * @property BuserToDialogs[] $buserToDialogs
  * @property BUser[] $busers
@@ -40,6 +43,10 @@ class Dialogs extends AbstractActiveRecord
         TYPE_OVERDUE_PP = 15,   //просороченный обещанный платеж
         TYPE_COMPANY = 20, //компания
         TYPE_TASK = 25;
+
+    public
+        $task_crm_id;
+
 
     /**
      * @return array
@@ -94,7 +101,12 @@ class Dialogs extends AbstractActiveRecord
     {
         return [
             [['buser_id'], 'required'],
-            [['buser_id', 'status', 'type', 'created_at', 'updated_at','crm_cmp_id','crm_cmp_contact_id'], 'integer'],
+            [[
+                'buser_id','task_crm_id' ,'status',
+                'type', 'created_at', 'updated_at',
+                'crm_cmp_id','crm_cmp_contact_id',
+                'crm_task_id'
+            ], 'integer'],
             [['theme'],'string']
         ];
     }
@@ -112,7 +124,19 @@ class Dialogs extends AbstractActiveRecord
             'created_at' => Yii::t('app/dialogs', 'Created At'),
             'updated_at' => Yii::t('app/dialogs', 'Updated At'),
             'theme' => Yii::t('app/dialogs', 'Theme'),
+            'task_crm_id' => Yii::t('app/dialogs','Task ID'),
+            'crm_task_id' => Yii::t('app/dialogs','Task')
         ];
+    }
+
+
+    /**
+     * Получаем связь задача пользователь. Можем получить IDS пользователей
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBusersIds()
+    {
+        return $this->hasMany(BuserToDialogs::className(), ['dialog_id' => 'id']);
     }
 
     /**
@@ -150,6 +174,11 @@ class Dialogs extends AbstractActiveRecord
         return $this->hasMany(Messages::className(), ['dialog_id' => 'id']);
     }
 
+    public function getTasks()
+    {
+        return $this->hasOne(CrmTask::className(),['id' => 'crm_task_id']);
+    }
+
     /**
      * @return array
      */
@@ -159,7 +188,7 @@ class Dialogs extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
-
+                DialogNotificationBehavior::className()
             ]);
     }
 
@@ -204,6 +233,29 @@ class Dialogs extends AbstractActiveRecord
                 ->all();
         },86400,$obDep);
         return $arDlg;
+    }
+
+    /**
+     * @return bool
+     */
+    public function updateUpdatedAt()
+    {
+        return $this->touch('updated_at');
+    }
+
+    /**
+     * Все пользователи диалога
+     * @return array
+     */
+    public function getUsersIdsForDialog()
+    {
+        $arUsers = [$this->buser_id];
+        $tmp = $this->busersIds;
+        if(!empty($tmp))
+            foreach($tmp as $t)
+                $arUsers[] = $t->buser_id;
+
+        return array_unique($arUsers);
     }
 }
 

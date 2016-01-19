@@ -3,6 +3,7 @@
 namespace app\modules\crm\controllers;
 
 use backend\models\BUser;
+use common\components\notification\RedisNotification;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
@@ -54,10 +55,13 @@ class TaskController extends AbstractBaseBackendController
         $searchModel = new CrmTaskSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$viewType);
 
+        $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'viewType' => $viewType
+            'viewType' => $viewType,
+            'arNewTasks' => $arNewTasks
         ]);
     }
 
@@ -69,6 +73,8 @@ class TaskController extends AbstractBaseBackendController
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $model->callViewedEvent();
+
         $arAccompl = $model->busersAccomplices; //помогают
         $arWatchers = $model->busersWatchers; //наблюдают
         $arFile = $model->taskFiles; //файлы
@@ -117,6 +123,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obAccmpl->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('error',Yii::t('app/crm','Accomplice successfully added'));
                 return $this->redirect(['view','id' => $id]);
             }
@@ -140,6 +147,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obWatcher->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Watcher successfully added'));
                 return $this->redirect(['view','id' => $id]);
             }
@@ -155,6 +163,7 @@ class TaskController extends AbstractBaseBackendController
         {
             if($model->save())
             {
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Assign successfully changed'));
                 return $this->redirect(['view','id' => $id]);
             }else{
@@ -238,7 +247,6 @@ class TaskController extends AbstractBaseBackendController
 
         return $data;
     }
-
 
     /**
      * @return mixed
@@ -342,16 +350,19 @@ class TaskController extends AbstractBaseBackendController
             throw new ForbiddenHttpException();
 
         $arAccOb = $model->busersAccomplices;
+        $arAccObOld = [];
         $data = [];
         if($arAccOb)
             foreach($arAccOb as $acc) {
                 $model->arrAcc [] = $acc->id;
+                $arAccObOld [] =  $acc->id;
                 $data[$acc->id] = $acc->getFio();
             }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
             $model->unlinkAll('busersAccomplices',TRUE);
+            $arAccNew = [];
             if(!empty($model->arrAcc))
             {
                 //соисполнители.
@@ -363,11 +374,20 @@ class TaskController extends AbstractBaseBackendController
                     $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
                     if ($arAcc) {
                         foreach ($arAcc as $obAcc)
+                        {
+                            $arAccNew[] = $obAcc->id;
                             $model->link('busersAccomplices', $obAcc);
+                        }
+
                     }
                 }
             }
-            
+            //нужно у удаленных соисполнителелй удалить балуны
+            $arAccDiff = array_diff($arAccObOld,$arAccNew);
+            if(!empty($arAccDiff))
+                RedisNotification::removeNewTaskFromList($arAccDiff,$model->id);
+
+            $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
 

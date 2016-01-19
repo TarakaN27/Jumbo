@@ -2,12 +2,18 @@
 
 namespace common\models;
 
+use common\components\behavior\notifications\TaskNotificationBehavior;
+use common\components\behavior\Task\TaskActionBehavior;
 use common\components\helpers\CustomHelper;
+use common\components\managers\DialogManager;
+use common\components\notification\RedisNotification;
 use common\models\managers\CUserCrmRulesManager;
 use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -31,7 +37,6 @@ use yii\web\UploadedFile;
  * @property integer $closed_date
  * @property integer $cmp_id
  * @property integer $contact_id
- * @property integer $dialog_id
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -71,8 +76,10 @@ class CrmTask extends AbstractActiveRecord
         TYPE_CALL = 3,
         TYPE_OTHER =4;
 
-    public
+    CONST
+        EVENT_UPDATE_DIALOG = 'upd_dialog';
 
+    public
         $arrAcc = [],
         $arrFiles = [],
         $hourEstimate = '',
@@ -187,7 +194,7 @@ class CrmTask extends AbstractActiveRecord
                 'parent_id', 'assigned_id', 'created_by',
                 'time_estimate', 'status', 'date_start',
                 'duration_fact', 'closed_by', 'closed_date',
-                'cmp_id', 'contact_id', 'dialog_id',
+                'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
                 'minutesEstimate'
             ], 'integer'],
@@ -225,7 +232,6 @@ class CrmTask extends AbstractActiveRecord
             'closed_date' => Yii::t('app/crm', 'Closed Date'),
             'cmp_id' => Yii::t('app/crm', 'Cmp ID'),
             'contact_id' => Yii::t('app/crm', 'Contact ID'),
-            'dialog_id' => Yii::t('app/crm', 'Dialog ID'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'hourEstimate' => Yii::t('app/crm', 'Hour'),
@@ -240,7 +246,7 @@ class CrmTask extends AbstractActiveRecord
      */
     public function getDialog()
     {
-        return $this->hasOne(Dialogs::className(), ['id' => 'dialog_id']);
+        return $this->hasOne(Dialogs::className(), ['crm_task_id' => 'id']);
     }
 
     /**
@@ -365,7 +371,6 @@ class CrmTask extends AbstractActiveRecord
 
         return parent::afterFind();
     }
-
     /**
      *
      */
@@ -374,6 +379,19 @@ class CrmTask extends AbstractActiveRecord
         if(!empty($this->hourEstimate) || !empty($this->minutesEstimate))
             $this->time_estimate = (int)$this->minutesEstimate*60 + (int)$this->hourEstimate*3600;
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Поведения
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            TaskNotificationBehavior::className(),    //уведомления
+            TaskActionBehavior::className() //поведение действий
+        ]);
     }
 
     /**
@@ -465,40 +483,10 @@ class CrmTask extends AbstractActiveRecord
     {
         $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
 
-        /** @var Dialogs $obDialog */
-        $obDialog = new Dialogs();  //новый диалог
-        $obDialog->buser_id = $iUserID; //кто создал
-        $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
-        $obDialog->theme = Yii::t('app/crm','User {user} create new task',[ //тема диалога
-                'user'=>Yii::$app->user->identity->getFio()
-            ]).' "'.$this->title.'"';
-
-        $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
-
-        if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
-            $obDialog->crm_cmp_id = $this->cmp_id;
-
-        $obContact = NULL;
-        if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
-        {
-            /** @var CrmCmpContacts $obContact */
-            $obContact = CrmCmpContacts::find()
-                ->select(['cmp_id'])
-                ->where(['id' => $this->contact_id])
-                ->one();   //находим контакт
-            if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
-            {
-                $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
-            }
-            $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
-        }
-
-        if($obDialog->save()) //сохраняем диалог
-        {
             $bNewRecord = $this->isNewRecord;   //если добавляем новую задачу
-            $this->dialog_id = $obDialog->id;
             if($this->save()) //сохраняем задачу
             {
+
                 if($bNewRecord)
                     if($this->addFiles()) //добавляем файлы при создании задачи
                     {
@@ -522,6 +510,47 @@ class CrmTask extends AbstractActiveRecord
                     }
                 }
 
+                /** @var Dialogs $obDialog */
+                $obDialog = new Dialogs();  //новый диалог
+                $obDialog->type = Dialogs::TYPE_TASK;
+                $obDialog->crm_task_id = $this->id;
+                $obDialog->buser_id = $iUserID; //кто создал
+                $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
+                $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
+
+                $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
+
+                if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
+                    $obDialog->crm_cmp_id = $this->cmp_id;
+
+                $obContact = NULL;
+                if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
+                {
+                    /** @var CrmCmpContacts $obContact */
+                    $obContact = CrmCmpContacts::find()
+                        ->select(['cmp_id'])
+                        ->where(['id' => $this->contact_id])
+                        ->one();   //находим контакт
+
+                    if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
+                    {
+                        $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
+                    }
+                    $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
+                }
+
+                if(!$obDialog->save())
+                {
+                    $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
+                    return FALSE;
+                }else{
+                    DialogManager::addMessageToDialog($obDialog->id,Yii::$app->user->id,Yii::t('app/crm',
+                        'User {user} create new task',[
+                            'user' => Yii::$app->user->identity->getFio()
+                        ]
+                        ));
+                }
+
                 if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
                     $arBUIDs = ArrayHelper::merge(
                         $arBUIDs,
@@ -531,7 +560,7 @@ class CrmTask extends AbstractActiveRecord
                         )
                     );
 
-                if(!empty($obDialog->crm_cmp_contact_id))   //ищем пользователй для контакта
+                if(!empty($this->contact_id))   //ищем пользователй для контакта
                     $arBUIDs = ArrayHelper::merge(
                         $arBUIDs,
                         CUserCrmRulesManager::getBuserByPermissionsContact(
@@ -557,7 +586,7 @@ class CrmTask extends AbstractActiveRecord
                     return TRUE;
                 }
             }
-        }
+
         $tr->rollBack();
         return FALSE;
     }
@@ -621,6 +650,89 @@ class CrmTask extends AbstractActiveRecord
             }
 
         return $bError;
+    }
+
+    /**
+     * @param null $obDialog
+     * @return bool|int
+     * @throws \yii\db\Exception
+     */
+    public function updateUserForDialog($obDialog = NULL)
+    {
+        if(!$obDialog)
+            $obDialog = $this->dialog;
+
+        if(!$obDialog)
+            return FALSE;
+
+        $arUser = []; //все пользователи, которые связаны с диалогом.
+        $arUser [] = (int)$this->assigned_id;    //текущий ответсвенный
+        $arUser [] = (int)$this->created_by;     //кто добавил задачу
+        $arObAcc = $this->crmTaskAccomplices;
+        if(is_object($arObAcc))
+            foreach($arObAcc as $obAcc)
+                $arUser [] = (int)$obAcc->buser_id;
+        $arObWatch = $this->crmTaskWatchers;
+        if(is_object($arObWatch))
+            foreach($arObWatch as $obWatch)
+                $arUser [] = (int)$obAcc->buser_id;
+
+        if(empty($arUser))  //если пользователй нет, удалим всех
+            BUser::deleteAll('dialog_id = :dID',[':dID' => $obDialog->id]);
+        else{
+            $strU = implode(',',$arUser);
+            $arUsersForDelTMP = BuserToDialogs::find()->where('dialog_id = :dID AND buser_id not in ('.$strU.')',[
+                ':dID' => $obDialog->id
+            ])->all();  //пользователи которых нужно удалить
+
+            if(!empty($arUsersForDelTMP))
+            {
+                $arDelU = [];
+                foreach($arUsersForDelTMP as $del)
+                    $arDelU [] = $del->buser_id;
+
+                RedisNotification::removeDialogFromListForUsers($arDelU,$obDialog->id);    //удалим из редис оповещение для удаляемых пользователей
+                BuserToDialogs::deleteAll(['buser_id' => $arDelU,'dialog_id' => $obDialog->id]); //удаляем тех, кто не связан с задачей
+            }
+            unset($arUsersForDelTMP);
+            $arExistsTmp = BuserToDialogs::find()->select('buser_id')->where(['dialog_id' => $obDialog->id])->all();
+            $arExist = [];
+            foreach($arExistsTmp as $exist)
+            {
+                $arExist [] = $exist->buser_id;
+            }
+
+            $arBUIDs = [];
+            foreach($arUser as $user)
+            {
+                if(!in_array($user,$arExist))
+                    $arBUIDs []= $user;
+            }
+
+            if(!empty($arBUIDs))
+            {
+                $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
+                $rows = [];
+                foreach ($arBUIDs as $id) {
+                    $rows [] = [$id, $obDialog->id];
+                }
+
+                //групповое добавление
+                return Yii::$app->db->createCommand()
+                    ->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)
+                    ->execute();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
+    public function callTriggerUpdateDialog()
+    {
+        $this->trigger(self::EVENT_UPDATE_DIALOG);
     }
 
 }
