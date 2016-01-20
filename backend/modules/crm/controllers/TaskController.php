@@ -72,7 +72,6 @@ class TaskController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
-
         $model = CrmTask::find()
                  ->with(
 				  'cmp','contact',
