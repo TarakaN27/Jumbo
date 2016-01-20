@@ -274,6 +274,36 @@ $this->registerJs("
                 </div>
                 <!-- start project-detail sidebar -->
                 <div class="col-md-3 col-sm-3 col-xs-12">
+                    <?php if(is_object($obCmp)):?>
+                        <section>
+                            <div class="x_title">
+                                <h2><?php echo Yii::t('app/crm','Company')?></h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li>
+                                        <?=Html::a($obCmp->getInfo(),['/crm/company/view','id' => $obCmp->id],[
+                                            'target' => '_blank'
+                                        ]);?>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </section>
+                    <?php endif;?>
+                    <?php if(is_object($obCnt)):?>
+                        <section>
+                            <div class="x_title">
+                                <h2><?php echo Yii::t('app/crm','Contact')?></h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li>
+                                        <?=Html::a($obCnt->fio,['/crm/contact/view','id' => $obCnt->id],[
+                                            'target' => '_blank'
+                                        ]);?>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </section>
+                    <?php endif;?>
                     <section>
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Created by')?></h2>

@@ -66,18 +66,31 @@ class TaskController extends AbstractBaseBackendController
     }
 
     /**
-     * Displays a single CrmTask model.
-     * @param integer $id
+     * @param $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
+
+        $model = CrmTask::find()
+                 ->with(
+				  'cmp','contact',
+				  'busersAccomplices','busersWatchers',
+				  'taskFiles'
+			  )
+            ->where(['id' => $id])->one();
+        if (!$model){
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $model->callViewedEvent();
 
         $arAccompl = $model->busersAccomplices; //помогают
         $arWatchers = $model->busersWatchers; //наблюдают
         $arFile = $model->taskFiles; //файлы
+        $obCmp = $model->cmp;
+        $obCnt = $model->contact;
 
         $obAccmpl = new CrmTaskAccomplices(); // модель для сооисполнитлей
         $obAccmpl->task_id = (int)$id;
@@ -200,6 +213,8 @@ class TaskController extends AbstractBaseBackendController
             'obLogWork' => $obLogWork,
             'obFile' => $obFile,
             'arFile' => $arFile,
+            'obCmp' => $obCmp,
+            'obCnt' => $obCnt
         ]);
     }
 
