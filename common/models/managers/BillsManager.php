@@ -12,6 +12,8 @@ namespace common\models\managers;
 use common\components\helpers\CustomHelper;
 use common\models\BillDocxTemplate;
 use common\models\Bills;
+use common\models\BillTemplate;
+use common\models\CuserServiceContract;
 use Yii;
 use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
@@ -122,6 +124,11 @@ class BillsManager extends Bills{
         /** @var CUser $obCUser */
         $obCUser = CUser::find()->with('requisites')->where(['id' => $this->cuser_id])->one();
 
+        /** @var CuserServiceContract $obServ */
+        $obServ = CuserServiceContract::findOne(['id' => $this->cuser_id,'service_id' => $this->service_id]);
+
+        $obBillTpl = BillTemplate::findOne($this->bill_template);
+
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
             $crp = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
@@ -174,7 +181,7 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
-            $doc->setValue('billSubject',$this->object_text);
+            $doc->setValue('billSubject',$this->object_text.' '.$this->offer_contract);
             $doc->setValue('billPrice',$billPrice);
             $doc->setValue('billSumm',$billSumm);
             $doc->setValue('billVatRate',$billVatRate);
