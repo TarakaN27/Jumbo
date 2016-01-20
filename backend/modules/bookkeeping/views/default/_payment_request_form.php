@@ -5,6 +5,25 @@ use kartik\select2\Select2;
 use yii\helpers\Html;
 
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+
+
+$this->registerJs("
+function checkResident()
+{
+    var
+        sel = $('#paymentrequest-is_unknown').val();
+
+    if(sel == '".\common\models\PaymentRequest::YES."')
+        {
+            $('.field-paymentrequest-user_name').removeClass('hide');
+        }else{
+            $('.field-paymentrequest-user_name').addClass('hide');
+        }
+}
+
+",\yii\web\View::POS_END);
+
+
 $this->registerJs('
 $("#paymentrequest-cntr_id").on("change",function(){
     var
@@ -23,12 +42,14 @@ $("#paymentrequest-cntr_id").on("change",function(){
         });
     }
 });
+checkResident();
+$(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResident);
 ',\yii\web\View::POS_READY);
 
 ?>
 <?php $form = ActiveForm::begin([
     'options' => [
-        'class' => 'form-horizontal form-label-left'
+        'class' => 'form-horizontal form-label-left form-payment-request'
     ],
     'fieldConfig' => [
         'template' => '{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
@@ -45,7 +66,7 @@ $("#paymentrequest-cntr_id").on("change",function(){
 ]); ?>
 
 <?php echo $form->field($model,'is_unknown')->dropDownList(\common\models\PaymentRequest::getYesNo());?>
-<?php echo $form->field($model,'user_name')->textInput();?>
+<?php echo $form->field($model,'user_name',['options' => ['class' => 'form-group hide']])->textInput();?>
 
 <?php  echo $form->field($model, 'manager_id')->widget(Select2::classname(), [
     'data' => \backend\models\BUser::getListManagers(),
@@ -85,6 +106,8 @@ $("#paymentrequest-cntr_id").on("change",function(){
 
 
 <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap()) ?>
+
+<?= $form->field($model,'payment_order')->textInput();?>
 
 <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 

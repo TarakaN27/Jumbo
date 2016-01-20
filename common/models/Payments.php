@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $prequest_id
+ * @property string $payment_order
  *
  * @property ExchangeRates $currency
  * @property CUser $cuser
@@ -49,7 +50,7 @@ class Payments extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
+            [['payment_order','cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
             [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id','updateWithNewCondition'], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string']
@@ -97,7 +98,8 @@ class Payments extends AbstractActiveRecord
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'prequest_id' => Yii::t('app/book', 'Payment request'),
             'condition_id' => Yii::t('app/book', 'Condition'),
-            'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition')
+            'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition'),
+            'payment_order' => Yii::t('app/book','Payment order')
         ];
     }
 

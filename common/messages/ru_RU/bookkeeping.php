@@ -152,7 +152,8 @@ return [
     'You have not selected acts' => 'Вы не выбрали акты для отправки',
     'Sent act request' => 'Отправка актов',
     'Acts successfully sent' => 'Акты успешно отправлены',
-    'Acts not sent' => 'Акты не отправлены'
+    'Acts not sent' => 'Акты не отправлены',
+    'Payment order' => 'Платежное поручение'
 
 
 ];

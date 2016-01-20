@@ -23,6 +23,7 @@ use Yii;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $payment_order
  */
 class PaymentRequest extends AbstractActiveRecord
 {
@@ -68,7 +69,7 @@ class PaymentRequest extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['owner_id','pay_date', 'currency_id', 'legal_id'],'required'],
+            [['owner_id','pay_date', 'currency_id', 'legal_id','payment_order'],'required'],
             [[
                  'cntr_id', 'manager_id', 'owner_id', 'is_unknown',
                   'currency_id', 'legal_id', 'dialog_id',
@@ -77,7 +78,7 @@ class PaymentRequest extends AbstractActiveRecord
             [['pay_date', 'pay_summ', 'currency_id', 'legal_id'], 'required'],
             [['pay_summ'], 'number'],
             [['description'], 'string'],
-            [['user_name'], 'string', 'max' => 255],
+            [['user_name','payment_order'], 'string', 'max' => 255],
             [['cntr_id','manager_id'],'required',
              'when' => function($model) {
                     return $model->is_unknown != self::YES;
@@ -119,6 +120,7 @@ class PaymentRequest extends AbstractActiveRecord
             'status' => Yii::t('app/book', 'Status'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'payment_order' => Yii::t('app/book','Payment order')
         ];
     }
 
@@ -193,4 +195,7 @@ class PaymentRequest extends AbstractActiveRecord
     {
         return date('d.m.Y H:i',$this->pay_date);
     }
+
+
+   // public function
 }
