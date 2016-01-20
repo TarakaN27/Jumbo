@@ -494,6 +494,7 @@ class CrmTask extends AbstractActiveRecord
                         return FALSE;
                     }
 
+                $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
                 //соисполнители.
                 if(!empty($this->arrAcc))
                 {
@@ -505,7 +506,10 @@ class CrmTask extends AbstractActiveRecord
                         $arAcc = BUser::find()->where(['id' => $this->arrAcc])->all(); //находим всех соисполнитлей
                         if ($arAcc) {
                             foreach ($arAcc as $obAcc)
+                            {
                                 $this->link('busersAccomplices', $obAcc);
+                                $arBUIDs []  = $obAcc->id;
+                            }
                         }
                     }
                 }
@@ -518,7 +522,7 @@ class CrmTask extends AbstractActiveRecord
                 $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
                 $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
 
-                $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
+
 
                 if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
                     $obDialog->crm_cmp_id = $this->cmp_id;
@@ -551,24 +555,25 @@ class CrmTask extends AbstractActiveRecord
                         ));
                 }
 
-                if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
-                    $arBUIDs = ArrayHelper::merge(
-                        $arBUIDs,
-                        CUserCrmRulesManager::getBuserIdsByPermission(
-                            $obDialog->crm_cmp_id,
-                            $iUserID
-                        )
-                    );
+                /*
+                    if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
+                        $arBUIDs = ArrayHelper::merge(
+                            $arBUIDs,
+                            CUserCrmRulesManager::getBuserIdsByPermission(
+                                $obDialog->crm_cmp_id,
+                                $iUserID
+                            )
+                        );
 
-                if(!empty($this->contact_id))   //ищем пользователй для контакта
-                    $arBUIDs = ArrayHelper::merge(
-                        $arBUIDs,
-                        CUserCrmRulesManager::getBuserByPermissionsContact(
-                            $obDialog->crm_cmp_contact_id,
-                            $iUserID,$obContact
-                        )
-                    );
-
+                    if(!empty($this->contact_id))   //ищем пользователй для контакта
+                        $arBUIDs = ArrayHelper::merge(
+                            $arBUIDs,
+                            CUserCrmRulesManager::getBuserByPermissionsContact(
+                                $obDialog->crm_cmp_contact_id,
+                                $iUserID,$obContact
+                            )
+                        );
+                */
                 $arBUIDs = array_unique($arBUIDs);
                 $arBUIDs = array_filter($arBUIDs);
                 $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
