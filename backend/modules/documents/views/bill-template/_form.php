@@ -38,7 +38,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'object_text')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model,'offer_contract')->textInput()?>
+
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+
+
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

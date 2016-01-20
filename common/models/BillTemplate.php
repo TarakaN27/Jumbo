@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $service_id
  * @property string $object_text
  * @property string $description
+ * @property string $offer_contract
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -39,7 +40,7 @@ class BillTemplate extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['name', 'l_person_id', 'service_id', 'object_text'], 'required'],
+            [['name', 'l_person_id', 'service_id', 'object_text','offer_contract'], 'required'],
             [['l_person_id', 'service_id',  'created_at', 'updated_at'], 'integer'],
             [['object_text', 'description'], 'string'],
             [['name'], 'string', 'max' => 255],
@@ -62,6 +63,7 @@ class BillTemplate extends AbstractActiveRecord
             'description' => Yii::t('app/documents', 'Description'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
+            'offer_contract' => Yii::t('app/documents','offer_contract')
         ];
     }
 
