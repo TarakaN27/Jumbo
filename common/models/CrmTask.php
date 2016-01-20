@@ -204,7 +204,6 @@ class CrmTask extends AbstractActiveRecord
             ['status','default','value'=>self::STATUS_OPENED],
             [['arrAcc'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
-
         ];
     }
 
