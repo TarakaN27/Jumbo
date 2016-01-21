@@ -89,6 +89,7 @@ $this->registerJs('
     }
 
     function findCondition($this){
+
         var
             serviceID = $($this).val(),
             lineID = $($this).attr("id"),

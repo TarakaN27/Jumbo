@@ -39,6 +39,7 @@ use yii\web\UploadedFile;
  * @property integer $contact_id
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $payment_request
  *
  * @property Dialogs $dialog
  * @property BUser $assigned
@@ -196,7 +197,7 @@ class CrmTask extends AbstractActiveRecord
                 'duration_fact', 'closed_by', 'closed_date',
                 'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
-                'minutesEstimate'
+                'minutesEstimate','payment_request'
             ], 'integer'],
             ['minutesEstimate','integer','min' => 0,'max' => 59],
 
@@ -237,6 +238,7 @@ class CrmTask extends AbstractActiveRecord
             'minutesEstimate' => Yii::t('app/crm', 'Minutes'),
             'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
             'arrFiles' => Yii::t('app/crm', 'arrFiles'),
+            'payment_request' => Yii::t('app/crm', 'Payment request')
         ];
     }
 
@@ -355,6 +357,14 @@ class CrmTask extends AbstractActiveRecord
     public function getTaskFiles()
     {
         return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayRequest()
+    {
+        return $this->hasOne(PaymentRequest::className(),['id' => 'payment_request']);
     }
 
     /**

@@ -109,6 +109,11 @@ $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResiden
 
 <?= $form->field($model,'payment_order')->textInput();?>
 
+<?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
+    'prompt' => Yii::t('app/book','Choose service')
+])?>
+
+
 <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
 <div class="form-group">

@@ -166,7 +166,8 @@ class CompanyActionBehaviors extends Behavior
 				$arUsers = array_unique($arUsers);
 				$rows = [];
 				foreach ($arUsers as $id) {
-					$rows [] = [$id, $obDialog->id];
+					if(!empty($id) && $id != 0)
+						$rows [] = [$id, $obDialog->id];
 				}
 
 				$postModel = new BuserToDialogs();

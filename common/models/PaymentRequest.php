@@ -3,7 +3,9 @@
 namespace common\models;
 
 use backend\models\BUser;
+use common\components\behavior\PaymentRequest\PaymentRequestBehavior;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%payment_request}}".
@@ -23,6 +25,7 @@ use Yii;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $service_id
  * @property string $payment_order
  */
 class PaymentRequest extends AbstractActiveRecord
@@ -32,6 +35,9 @@ class PaymentRequest extends AbstractActiveRecord
         STATUS_IN_PROCESS = 10,
         STATUS_CANCELED = 15,
         STATUS_FINISHED = 20;
+
+    CONST
+        EVENT_PIN_MANAGER = 'pin_manager';
 
     /**
      * @return array
@@ -73,7 +79,7 @@ class PaymentRequest extends AbstractActiveRecord
             [[
                  'cntr_id', 'manager_id', 'owner_id', 'is_unknown',
                   'currency_id', 'legal_id', 'dialog_id',
-                 'status', 'created_at', 'updated_at'
+                 'status', 'created_at', 'updated_at','service_id'
              ], 'integer'],
             [['pay_date', 'pay_summ', 'currency_id', 'legal_id'], 'required'],
             [['pay_summ'], 'number'],
@@ -120,11 +126,14 @@ class PaymentRequest extends AbstractActiveRecord
             'status' => Yii::t('app/book', 'Status'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
-            'payment_order' => Yii::t('app/book','Payment order')
+            'payment_order' => Yii::t('app/book','Payment order'),
+            'service_id' => Yii::t('app/book','Service id')
         ];
     }
 
-
+    /**
+     * @return bool
+     */
     public function beforeValidate()
     {
         if(!is_numeric($this->pay_date))
@@ -133,6 +142,10 @@ class PaymentRequest extends AbstractActiveRecord
         return parent::beforeValidate();
     }
 
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert)
     {
         if(!is_numeric($this->pay_date))
@@ -189,6 +202,22 @@ class PaymentRequest extends AbstractActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTask()
+    {
+        return $this->hasOne(CrmTask::className(),['payment_request' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getService()
+    {
+        return $this->hasOne(Services::className(),['id' => 'service_id']);
+    }
+
+    /**
      * @return bool|string
      */
     public function getFormatedPayDate()
@@ -197,5 +226,19 @@ class PaymentRequest extends AbstractActiveRecord
     }
 
 
-   // public function
+    public function behaviors()
+    {
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            PaymentRequestBehavior::className() //добавление задачи
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function callEventPinManager()
+    {
+        $this->trigger(self::EVENT_PIN_MANAGER);
+    }
 }

@@ -86,6 +86,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     public function actionAddPayment($pID)
     {
+        /** @var PaymentRequest $modelP */
         $modelP = PaymentRequest::findOne($pID);
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
@@ -93,8 +94,22 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if($modelP->manager_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action');
 
-        if(!Yii::$app->request->post('AddPaymentForm'))
-            $model = [new AddPaymentForm(['fullSumm' => $modelP->pay_summ])];
+
+        if(!Yii::$app->request->post('AddPaymentForm')) {
+
+            $formModel = new AddPaymentForm(['fullSumm' => $modelP->pay_summ, 'service' => $modelP->service_id]);
+            if(!empty($modelP->service_id))
+            {
+                $obCntrID = CUser::findOneByIDCached($modelP->cntr_id);
+
+                if(empty($obCntrID))
+                    throw new NotFoundHttpException('Contractor not found');
+                $cID = $this->getCondition($modelP->service_id,$modelP->legal_id,$obCntrID);
+                if(!empty($cID) && isset($cID['cID']) && !empty($cID['cID']))
+                    $formModel->condID = $cID['cID'];
+            }
+             $model = [$formModel];
+        }
         else
         {
             $model = AbstractModel::createMultiple(AddPaymentForm::classname());
@@ -129,8 +144,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'legal_id' => $modelP->legal_id,
                                 'description' => $p->comment,
                                 'prequest_id' => $modelP->id,
-                                'condition_id' => $p->condID
-
+                                'condition_id' => $p->condID,
+                                'payment_order' => $modelP->payment_order
                             ]);
 
                             if(!$obPay->save())
@@ -198,6 +213,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     public function actionPinPaymentToManager($pID)
     {
+        /** @var PaymentRequest $modelP */
         $modelP = PaymentRequest::find()
             ->where(['id' => $pID])
             ->one();
@@ -212,8 +228,10 @@ class PaymentRequestController extends AbstractBaseBackendController{
             if($obCUser->manager_id == Yii::$app->user->id)
             {
                 $modelP->manager_id = Yii::$app->user->id;
-                if($modelP->save())
-                    Yii::$app->session->setFlash('success',Yii::t('app/book','Payment successfully pined'));
+                if($modelP->save()) {
+                    $modelP->callEventPinManager();
+                    Yii::$app->session->setFlash('success', Yii::t('app/book', 'Payment successfully pined'));
+                }
                 else
                     Yii::$app->session->setFlash('error',Yii::t('app/book','Error. Cant save the model;'));
             }else{
@@ -232,6 +250,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $model = new SetManagerContractorForm(['obPR' => $modelP,'contractorMap' => $arContrMap]);
         if($model->load(Yii::$app->request->post()) && $model->makeRequest())
         {
+            $modelP->callEventPinManager();
             Yii::$app->session->setFlash('success',Yii::t('app/book','Payment successfully pined'));
             return $this->redirect(['index']);
         }
@@ -272,6 +291,19 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($obCntrID))
             throw new NotFoundHttpException('Contractor not found');
 
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return $this->getCondition($iServID,$lPID,$obCntrID);
+    }
+
+    /**
+     * @param $iServID
+     * @param $lPID
+     * @param $obCntrID
+     * @return array
+     */
+    protected function getCondition($iServID,$lPID,$obCntrID)
+    {
         $obCond = PaymentCondition::find()
             ->select('id')
             ->where([
@@ -281,7 +313,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
             ])
             ->orderBy('id DESC')
             ->all();
-        Yii::$app->response->format = Response::FORMAT_JSON;
+
 
         if(empty($obCond))
             return ['cID' =>  FALSE ];

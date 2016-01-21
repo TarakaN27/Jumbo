@@ -30,18 +30,25 @@ class PaymentRequestBehavior extends Behavior
 	public function events()
 	{
 		return [
-			AbstractActiveRecord::EVENT_AFTER_INSERT => 'afterInsert'
+			AbstractActiveRecord::EVENT_AFTER_INSERT => 'afterInsert',
+			PaymentRequest::EVENT_PIN_MANAGER => 'pinManager'
 		];
 	}
 
+	/**
+	 *
+	 */
 	public function afterInsert()
 	{
 		/** @var PaymentRequest $model */
 		$model = $this->owner;
 
+		/** @var CrmTask $obTask */
 		$obTask = new CrmTask();
+		$obTask->payment_request = $model->id;
 
 		$obTask->assigned_id = empty($model->manager_id) ? Yii::$app->user->id : $model->manager_id;
+		$obTask->created_by = Yii::$app->user->id;
 
 		$theme = Yii::t('app/crm','New payment request ');
 
@@ -50,15 +57,14 @@ class PaymentRequestBehavior extends Behavior
 			$obCnt = $model->cuser;
 			if(is_object($obCnt))
 			{
-				$theme.= ' '.Html::a($obCnt->getInfo());
+				$theme.= ' '.$obCnt->getInfo();
 			}
 		}else{
-			$theme.= ' '.Yii::t('app/crm','Unknown contractor');
+			$theme.= ' '.$model->user_name;
 		}
 
-		$theme = Html::a($theme,['/bookkeeping/payment-request/index']);
 		$obTask->title = $theme;
-		if(empty($model->manager_id))
+		if(empty($model->manager_id))   //если контрагент не известен, то вешаем всех менеджеров в соисполнители
 		{
 			$arManagers = BUser::getManagersArr();
 			if(!empty($arManagers))
@@ -66,7 +72,32 @@ class PaymentRequestBehavior extends Behavior
 					$obTask->arrAcc [] = $man->id;
 		}
 
+		$obTask->createTask(Yii::$app->user->id);
+	}
 
+	/**
+	 * После назначения менеджера нужно покорректировать задачу и диалог задачи.
+	 * @return bool
+	 */
+	public function pinManager()
+	{
+		/** @var PaymentRequest $model */
+		$model = $this->owner;
+
+		//$arUser = [$model->manager_id,$model->owner_id];
+
+		/** @var CrmTask $obTask */
+		$obTask = $model->task;
+
+		if(is_object($obTask))
+		{
+			$obTask->assigned_id = $model->manager_id;
+			$obTask->save();
+			$obTask->unlinkAll('busersAccomplices',TRUE);
+			$obTask->callTriggerUpdateDialog();
+		}
+
+		return TRUE;
 	}
 
 }
