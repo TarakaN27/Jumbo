@@ -145,7 +145,7 @@ class BillsManager extends Bills{
         if($this->use_vat)
         {
             $billSumm = $this->amount;
-            $billVatRate = $this->vat_rate;
+            $billVatRate = round($this->vat_rate,1);
             $billPrice = round($this->amount/(1+CustomHelper::getVat()/100),-3);
             $billVatSumm = $this->amount - $billPrice;
             $billTotalSumVat = $this->amount;
@@ -162,13 +162,12 @@ class BillsManager extends Bills{
             $totalSumm = $this->amount;
 
             $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
-                CustomHelper::ciRub($billTotalSumVat) .' без НДС ' ;
+                CustomHelper::ciRub($billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
 
         try{
 
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
-
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);

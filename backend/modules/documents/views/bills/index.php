@@ -96,8 +96,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{docx}{pdf}',
+                        'template' => '{pdf}',
                         'buttons' => [
+                            /*
                             'docx' => function($url, $model, $key){
                                     return Html::a('<i class="fa fa-file-word-o"></i>',[
                                         'get-bill',
@@ -108,6 +109,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'target' => '_blank'
                                     ]);
                                 },
+                            */
                             'pdf' => function($url, $model, $key){
                                     return Html::a('<i class="fa fa-file-pdf-o"></i>',[
                                             'get-bill',
