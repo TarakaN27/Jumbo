@@ -86,6 +86,7 @@ class BillsManager extends Bills{
             Pdf::convert($tryPath,$pdfTryPath); //конверитируем .docx => .pdf
             if(file_exists($pdfTryPath))
             {
+                @unlink($tryPath);
                 CustomHelper::getDocument($pdfTryPath,$name.'.pdf');
             }
         }
@@ -161,7 +162,7 @@ class BillsManager extends Bills{
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
 
