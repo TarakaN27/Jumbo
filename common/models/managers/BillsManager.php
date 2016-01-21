@@ -153,7 +153,7 @@ class BillsManager extends Bills{
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' c НДС ' ;
         }else{
             $billSumm = $this->amount;
