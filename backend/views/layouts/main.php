@@ -39,6 +39,16 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
     unset($subItems);
 }
 
+if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_bookkeeper'))
+{
+    $subItems[] = ['label' => Yii::t('app/common', 'Bill template'), 'url' => ['/documents/bill-template/index']];
+    $menuItems[] = [
+        'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),
+        'items' => $subItems,
+    ];
+    unset($subItems);
+}
+
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
     /*

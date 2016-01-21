@@ -12,6 +12,8 @@ namespace common\models\managers;
 use common\components\helpers\CustomHelper;
 use common\models\BillDocxTemplate;
 use common\models\Bills;
+use common\models\BillTemplate;
+use common\models\CuserServiceContract;
 use Yii;
 use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
@@ -84,6 +86,7 @@ class BillsManager extends Bills{
             Pdf::convert($tryPath,$pdfTryPath); //конверитируем .docx => .pdf
             if(file_exists($pdfTryPath))
             {
+                @unlink($tryPath);
                 CustomHelper::getDocument($pdfTryPath,$name.'.pdf');
             }
         }
@@ -122,6 +125,11 @@ class BillsManager extends Bills{
         /** @var CUser $obCUser */
         $obCUser = CUser::find()->with('requisites')->where(['id' => $this->cuser_id])->one();
 
+        /** @var CuserServiceContract $obServ */
+        $obServ = CuserServiceContract::findOne(['id' => $this->cuser_id,'service_id' => $this->service_id]);
+
+        $obBillTpl = BillTemplate::findOne($this->bill_template);
+
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
             $crp = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
@@ -138,14 +146,14 @@ class BillsManager extends Bills{
         if($this->use_vat)
         {
             $billSumm = $this->amount;
-            $billVatRate = $this->vat_rate;
+            $billVatRate = round($this->vat_rate,1);
             $billPrice = round($this->amount/(1+CustomHelper::getVat()/100),-3);
             $billVatSumm = $this->amount - $billPrice;
             $billTotalSumVat = $this->amount;
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' c НДС ' ;
         }else{
             $billSumm = $this->amount;
@@ -154,14 +162,13 @@ class BillsManager extends Bills{
             $totalSummVat = $this->amount;
             $totalSumm = $this->amount;
 
-            $totalSummInWords = CustomHelper::numPropis($billTotalSumVat).'белорусских '.
-                CustomHelper::ciRub($billTotalSumVat) .' без НДС ' ;
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
+                CustomHelper::ciRub($billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
 
         try{
 
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
-
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
@@ -174,7 +181,7 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
-            $doc->setValue('billSubject',$this->object_text);
+            $doc->setValue('billSubject',$this->object_text.' '.$this->offer_contract);
             $doc->setValue('billPrice',$billPrice);
             $doc->setValue('billSumm',$billSumm);
             $doc->setValue('billVatRate',$billVatRate);

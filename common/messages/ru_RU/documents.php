@@ -71,7 +71,8 @@ return [
     'Act Date' => 'Дата акта',
     'Buser ID' => 'Добавил акт',
     'Current file' => 'Текущий файл',
-    'Template field description' => 'Описание полей шаблона'
+    'Template field description' => 'Описание полей шаблона',
+    'offer_contract' => 'Договор оферты'
 
 
 ];

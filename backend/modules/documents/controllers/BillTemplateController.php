@@ -26,7 +26,7 @@ class BillTemplateController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['superadmin']
+                    'roles' => ['superadmin','bookkeeper']
                 ]
             ]
         ];

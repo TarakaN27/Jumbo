@@ -13,11 +13,13 @@ function fillBillDetail(obD)
 {
     $('#bills-description').val(obD.description);
     $('#bills-object_text').val(obD.object_text);
+    $('#bills-offer_contract').val(obD.offer_contract);
 }
 
 function getBillDetail()
 {
     var
+        iCntr = $('#bills-cuser_id').val(),
         iBTpl = $('#bills-bill_template').val();
 
     if(iBTpl != '')
@@ -28,7 +30,7 @@ function getBillDetail()
         cache: false,
         url: '".\yii\helpers\Url::to(['get-bill-template-detail'])."',
         dataType: 'json',
-        data: {iBTpl:iBTpl},
+        data: {iBTpl:iBTpl,iCntr:iCntr},
         success: function(msg){
             if(msg)
               {
@@ -53,6 +55,7 @@ function getBillDetail()
 function lPersonAndServiceState()
 {
     var
+        iCntr = $('#bills-cuser_id').val(),
         lPerson = $('#bills-l_person_id'),
         service = $('#bills-service_id');
 
@@ -63,7 +66,7 @@ function lPersonAndServiceState()
         cache: false,
         url: '".\yii\helpers\Url::to(['find-bill-template'])."',
         dataType: 'json',
-        data: {iServID:service.val(),lPID:lPerson.val()},
+        data: {iServID:service.val(),lPID:lPerson.val(),iCntr:iCntr},
         success: function(msg){
             $('#bills-bill_template').removeAttr('disabled');
             if(msg)
@@ -89,6 +92,7 @@ function lPersonAndServiceState()
 function checkUseVat()
 {
     var
+        iCntr = $('#bills-cuser_id').val(),
         lP = $('#bills-l_person_id');
 
     $('#bills-vat_rate').val('');
@@ -99,7 +103,7 @@ function checkUseVat()
         cache: false,
         url: '".\yii\helpers\Url::to(['find-legal-person'])."',
         dataType: 'json',
-        data: {lPID:lP.val()},
+        data: {lPID:lP.val(),iCntr:iCntr},
         success: function(msg){
             if(msg.id)
             {
@@ -214,6 +218,8 @@ $this->registerJs("
         <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
         <?= $form->field($model, 'object_text')->textarea(['rows' => 6]) ?>
+
+        <?= $form->field($model,'offer_contract')->textInput();?>
 
         <?= $form->field($model, 'buy_target')->textInput(['maxlength' => true]) ?>
     <?HideShowBlockWidget::end();?>

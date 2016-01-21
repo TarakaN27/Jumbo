@@ -69,6 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'vat_rate',
                         'description:ntext',
                         'object_text:ntext',
+                        'offer_contract',
                         'buy_target',
                         [
                             'attribute' => 'created_at',

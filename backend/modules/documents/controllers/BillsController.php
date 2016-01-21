@@ -3,6 +3,7 @@
 namespace backend\modules\documents\controllers;
 
 use common\models\BillTemplate;
+use common\models\CuserServiceContract;
 use common\models\LegalPerson;
 use common\models\managers\BillsManager;
 use Yii;
@@ -155,10 +156,21 @@ class BillsController extends AbstractBaseBackendController
     {
         $iServID = Yii::$app->request->post('iServID');
         $lPID = Yii::$app->request->post('lPID');
+        $iCntr = Yii::$app->request->post('iCntr');
 
         if(empty($iServID) || empty($lPID))
             throw new InvalidParamException();
+        /** @var BillTemplate $model */
         $model = BillTemplate::find()->where([ 'l_person_id' => $lPID,'service_id' => $iServID])->one();
+
+        if(!empty($model))
+        {
+            /** @var CuserServiceContract $obServ */
+            $obServ = CuserServiceContract::findOne(['cuser_id' => $iCntr,'service_id' => $iServID]);
+            if($obServ)
+                $model->offer_contract = '№'.$obServ->cont_number.' от '.$obServ->cont_date;
+        }
+
         Yii::$app->response->format = Response::FORMAT_JSON;
         return empty($model) ? '' : $model;
     }
@@ -170,10 +182,20 @@ class BillsController extends AbstractBaseBackendController
     public function actionGetBillTemplateDetail()
     {
         $iBTpl = Yii::$app->request->post('iBTpl');
+        $iCntr = Yii::$app->request->post('iCntr');
         if(empty($iBTpl))
             throw new InvalidParamException();
 
         $model = BillTemplate::findOneByIDCached($iBTpl);
+
+        if(!empty($model))
+        {
+            /** @var CuserServiceContract $obServ */
+            $obServ = CuserServiceContract::findOne(['cuser_id' => $iCntr,'service_id' => $model->service_id]);
+            if($obServ)
+                $model->offer_contract = '№ '.$obServ->cont_number.' от '.$obServ->cont_date;
+        }
+
         Yii::$app->response->format = Response::FORMAT_JSON;
         return empty($model) ? '' : $model;
     }

@@ -58,7 +58,7 @@ class Bills extends AbstractActiveRecord
             [[
                  'manager_id', 'cuser_id', 'l_person_id',
                  'service_id', 'docx_tmpl_id', 'amount',
-                 'object_text', 'buy_target'
+                 'object_text', 'buy_target','offer_contract'
              ], 'required'],
             [[
                  'manager_id', 'cuser_id', 'l_person_id',
@@ -70,7 +70,7 @@ class Bills extends AbstractActiveRecord
             [['bill_date'], 'safe'],
             [['vat_rate'], 'number'],
             [['description', 'object_text','bsk'], 'string'],
-            [['buy_target'], 'string', 'max' => 255]
+            [['buy_target','offer_contract'], 'string', 'max' => 255]
         ];
     }
 
@@ -99,6 +99,7 @@ class Bills extends AbstractActiveRecord
             'updated_at' => Yii::t('app/documents', 'Updated At'),
             'external' => Yii::t('app/documents', 'External'),
             'bsk' => Yii::t('app/documents', 'Bill secret key'),
+            'offer_contract' => Yii::t('app/documents','offer_contract')
         ];
     }
 
