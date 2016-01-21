@@ -132,7 +132,7 @@ class BillsManager extends Bills{
 
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
-            $crp = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
+            $crp = $obCUser->getInfo();
             $contractor = $crp;
             $payer = $crp.$obR->j_address;
             $bankDetail = 'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp;
