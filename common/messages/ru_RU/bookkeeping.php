@@ -155,7 +155,8 @@ return [
     'Acts not sent' => 'Акты не отправлены',
     'Payment order' => 'Платежное поручение',
     'Choose contractor' => 'Выберите контрагента',
-    'Contractor' => 'Контрагент'
+    'Contractor' => 'Контрагент',
+    'BOOK_choose_managers' => 'Выберите менеджера'
 
 
 
