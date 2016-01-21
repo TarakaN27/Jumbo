@@ -119,9 +119,6 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
-                ],
-                [
-                    'class' => PartnerPaymentBehavior::className()   // начисления партнеру в кошелек
                 ]
             ]);
     }

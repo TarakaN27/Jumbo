@@ -153,7 +153,10 @@ return [
     'Sent act request' => 'Отправка актов',
     'Acts successfully sent' => 'Акты успешно отправлены',
     'Acts not sent' => 'Акты не отправлены',
-    'Payment order' => 'Платежное поручение'
+    'Payment order' => 'Платежное поручение',
+    'Choose contractor' => 'Выберите контрагента',
+    'Contractor' => 'Контрагент'
+
 
 
 ];

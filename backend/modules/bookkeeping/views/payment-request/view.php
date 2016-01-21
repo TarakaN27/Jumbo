@@ -3,6 +3,9 @@
 /* @var $this yii\web\View */
 /* @var $model common\models\PaymentRequest */
 
+use yii\helpers\Html;
+use common\models\PaymentRequest;
+
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/book', 'Payment Requests'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -11,6 +14,38 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "row">
     <div class = "col-md-12">
         <div class = "x_panel">
+
+                <div class = "x_title">
+                    <h2><?= Html::encode($this->title) ?></h2>
+                    <section class="pull-right">
+                        <?php
+                        if(empty($model->manager_id) && $model->is_unknown == PaymentRequest::YES)
+                        {
+                            $options = [
+                                'title' => Yii::t('app/crm', 'Make mine payment'),
+                                'aria-label' => Yii::t('app/crm', 'Make mine payment'),
+                                'class' => 'btn btn-info'
+                            ];
+                            echo Html::a('<span class="color-white glyphicon glyphicon-pushpin"></span> '.Yii::t('app/crm', 'Make mine payment'),
+                            \yii\helpers\Url::to(['pin-payment-to-manager','pID' => $model->id]),
+                            $options);
+                        }
+                        elseif(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
+                            $options = [
+                                'title' => Yii::t('app/crm', 'Add payments'),
+                                'aria-label' => Yii::t('app/crm', 'Add payments'),
+                                'class' => 'btn btn-info'
+                            ];
+                            if(Yii::$app->user->can('only_manager'))
+                                echo Html::a('<span class="color-white glyphicon glyphicon-credit-card"></span> '.Yii::t('app/crm', 'Add payments'),
+                                \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                $options);
+                        }
+                        ?>
+                        <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
+                    </section>
+                    <div class = "clearfix"></div>
+                </div>
             <div class = "x_content">
                 <section class = "content invoice">
                     <div class = "row">

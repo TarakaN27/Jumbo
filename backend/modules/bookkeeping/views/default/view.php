@@ -18,7 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <section class="pull-right">
                     <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                     <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')): ?>
-                    <?= Html::a(Yii::t('app/book','Create payment'),['create'],['class'=>'btn btn-primary']);?>
                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                     <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
                         'class' => 'btn btn-danger',
@@ -28,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                     ]) ?>
                     <?php elseif(Yii::$app->user->can('only_manager')):?>
-                    <?= Html::a(Yii::t('app/book','Create payment'),['create'],['class'=>'btn btn-primary']);?>
                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                     <?php endif;?>
                 </section>

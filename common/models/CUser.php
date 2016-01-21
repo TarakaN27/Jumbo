@@ -467,7 +467,7 @@ class CUser extends AbstractUser
        return self::getDb()->cache(function($db) use ($iMngID){
             return self::find()
                 ->with('requisites')
-                ->where(['manager_id' => $iMngID])
+                ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
                 ->all($db);
         },3600*24,$dep);
     }

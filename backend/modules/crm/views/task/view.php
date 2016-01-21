@@ -274,6 +274,24 @@ $this->registerJs("
                 </div>
                 <!-- start project-detail sidebar -->
                 <div class="col-md-3 col-sm-3 col-xs-12">
+                    <?php if(!empty($model->payment_request)):?>
+                        <section>
+                            <div class="x_title">
+                                <h2><?php echo Yii::t('app/crm','Payment request')?></h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li>
+                                        <?=Html::a(Yii::t('app/crm','Follow to payment request'),
+                                            ['/bookkeeping/payment-request/view','id' => $model->payment_request],
+                                            [
+                                            'target' => '_blank'
+                                        ]);?>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </section>
+                    <?php endif;?>
+
                     <?php if(is_object($obCmp)):?>
                         <section>
                             <div class="x_title">

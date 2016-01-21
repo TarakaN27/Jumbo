@@ -46,6 +46,8 @@ class PaymentRequestBehavior extends Behavior
 		/** @var CrmTask $obTask */
 		$obTask = new CrmTask();
 		$obTask->payment_request = $model->id;
+		$obTask->type = CrmTask::TYPE_TASK;
+		$obTask->priority = CrmTask::PRIORITY_HIGH;
 
 		$obTask->assigned_id = empty($model->manager_id) ? Yii::$app->user->id : $model->manager_id;
 		$obTask->created_by = Yii::$app->user->id;
@@ -57,10 +59,10 @@ class PaymentRequestBehavior extends Behavior
 			$obCnt = $model->cuser;
 			if(is_object($obCnt))
 			{
-				$theme.= ' '.$obCnt->getInfo();
+				$theme.= ' "'.$obCnt->getInfo().'"';
 			}
 		}else{
-			$theme.= ' '.$model->user_name;
+			$theme.= ' "'.$model->user_name.'"';
 		}
 
 		$obTask->title = $theme;

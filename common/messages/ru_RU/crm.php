@@ -220,6 +220,11 @@ return [
 	'User {user} make change fields for contact' => 'Пользователь {user} изменил поля контакта',
 	'New contact {cmp_name}' => 'Новый контакт {cmp_name}',
 	'New contact {user}' => 'Новый контакт {user}',
-	'New contact ({user})' => 'Новый контакт ({user})'
+	'New contact ({user})' => 'Новый контакт ({user})',
+	'Follow to payment request' => 'Перейти к запросу',
+	'Payment request' => 'Запрос на платеж',
+	'New payment request ' => 'Новый запрос на платеж для ',
+	'Make mine payment' => 'Это мой платеж',
+	'Add payments' => 'Добавить платежи'
 
 ];

@@ -12,7 +12,7 @@ use yii\helpers\Html;
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2><?= Html::encode($this->title) ?><small>форма добавления платежа</small></h2>
+                <h2><?= Html::encode($this->title) ?><small>Назначение контрагента для запроса</small></h2>
                 <section class="pull-right">
                     <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                 </section>

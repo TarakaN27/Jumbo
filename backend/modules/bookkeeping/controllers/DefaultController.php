@@ -93,6 +93,7 @@ class DefaultController extends AbstractBaseBackendController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+    /*
     public function actionCreate()
     {
         $model = new Payments();
@@ -105,7 +106,7 @@ class DefaultController extends AbstractBaseBackendController
                 if($model->save())
                 {
                     /** @var PaymentCondition $obCond */
-                    $obCond = PaymentCondition::findOne($model->condition_id);
+ /*                   $obCond = PaymentCondition::findOne($model->condition_id);
                     if(empty($obCond))
                         throw new NotFoundHttpException("Condition not found");
 
@@ -150,7 +151,7 @@ class DefaultController extends AbstractBaseBackendController
             ]);
         }
     }
-
+*/
     /**
      * Updates an existing Payments model.
      * If update is successful, the browser will be redirected to the 'view' page.

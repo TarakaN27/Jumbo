@@ -33,9 +33,13 @@ $("#paymentrequest-cntr_id").on("change",function(){
     {
         $.post( "'.\yii\helpers\Url::to(['get-manager']).'", { cID: cID }, function( data ) {
            if(data.mID)
-                $("#paymentrequest-manager_id").select2("val", data.mID);
+           {
+                $("#paymentrequest-manager_id").val(data.mID).change();
+           }
            else
-                $("#paymentrequest-manager_id").select2("val", "");
+           {
+                $("#paymentrequest-manager_id").val("").change();
+           }
         }, "json")
         .fail(function() {
             addErrorNotify("'.Yii::t('app/common','Error').'","'.Yii::t('app/common','Can not load manager for contractor').'")
