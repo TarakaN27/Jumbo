@@ -59,16 +59,15 @@ class CompanyController extends AbstractBaseBackendController
 		//получаем уровень доступа на чтение компаний
 		$iAccessLevel = \Yii::$app->user->getCRMLevelAccess(CUser::getModelName(),BUserCrmRules::READ_ACTION);
 		$dataProvider = NULL;
-		$searchModel = NULL;
+
+		$searchModel = new CUserSearch();
 		switch($iAccessLevel)
 		{
 			case BUserCrmRules::RULE_ALL: //видны все
-				$searchModel = new CUserSearch();
 				$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 				break;
 
 			case BUserCrmRules::RULE_THEMSELF: //только свои. Ответственный и создал компанию
-				$searchModel = new CUserSearch();
 				$dataProvider = $searchModel->search(
 					Yii::$app->request->queryParams,
 					'('.CUser::tableName().'.manager_id = :userID OR '.CUser::tableName().'.created_by = :userID )' ,
@@ -79,7 +78,6 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 
 			case BUserCrmRules::RULE_OPENED: //только открытые
-				$searchModel = new CUserSearch();
 				$dataProvider = $searchModel->search(
 					Yii::$app->request->queryParams,
 					['is_opened' => CUser::IS_OPENED]
@@ -87,7 +85,6 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 
 			default:
-				$searchModel = new CUserSearch();
 				$dataProvider = $searchModel->search(
 					Yii::$app->request->queryParams,
 					'1=0'
