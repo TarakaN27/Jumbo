@@ -58,6 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'legal_id',
                             'value' => is_object($obLegal = $model->legal) ? $obLegal->name : 'N/A'
                         ],
+                        'payment_order',
                         'description:ntext',
                         [
                             'attribute' => 'created_at',

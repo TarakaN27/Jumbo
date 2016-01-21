@@ -72,7 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     },
                                 'filter' => \common\models\LegalPerson::getLegalPersonMap()
                             ],
-
+                            'payment_order',
                             'pay_summ',
                             [
                                 'attribute' => 'currency_id',

@@ -20,7 +20,7 @@ class PaymentsSearch extends Payments
         return [
             [['id', 'cuser_id','currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
             [['pay_summ'], 'number'],
-            [['pay_date','description'], 'safe'],
+            [['pay_date','description','payment_order'], 'safe'],
             [['pay_date'], 'default', 'value' => null],
         ];
     }
@@ -74,9 +74,11 @@ class PaymentsSearch extends Payments
             'legal_id' => $this->legal_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
         ]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
+        $query->andFilterWhere(['like','payment_order',$this->payment_order]);
 
         return $dataProvider;
     }
