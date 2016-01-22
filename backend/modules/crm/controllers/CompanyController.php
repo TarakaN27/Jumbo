@@ -299,7 +299,7 @@ class CompanyController extends AbstractBaseBackendController
 		$obFile = CrmCmpFile::findOne(['id' => $id]);
 		if(!$obFile)
 			throw new NotFoundHttpException('File not found');
-		return Yii::$app->response->sendFile($obFile->getFilePath());
+		return Yii::$app->response->sendFile($obFile->getFilePath(),$obFile->name.'.'.$obFile->ext);
 	}
 
 	/**
