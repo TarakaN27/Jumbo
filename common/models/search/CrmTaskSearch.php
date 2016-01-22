@@ -17,6 +17,7 @@ class CrmTaskSearch extends CrmTask
 {
 
     CONST
+        VIEW_TYPE_FULL_TASK = 'full_task', //все задачи
         VIEW_TYPE_ALL = 'all',          //все
         VIEW_TYPE_ASSIGN = 'assign',    //делаю
         VIEW_TYPE_ASSIST = 'assist',    //помогаю
@@ -28,13 +29,18 @@ class CrmTaskSearch extends CrmTask
      */
     public static function getViewTypeArr()
     {
-        return [
+        $arType = [
             self::VIEW_TYPE_ALL => Yii::t('app/crm','View type all'),
             self::VIEW_TYPE_ASSIGN => Yii::t('app/crm','View type assign'),
             self::VIEW_TYPE_ASSIST => Yii::t('app/crm','View type assist'),
             self::VIEW_TYPE_CREATE => Yii::t('app/crm','View type create'),
             self::VIEW_TYPE_WATCH => Yii::t('app/crm','View type watch')
         ];
+
+        if(Yii::$app->user->can('adminRights'))
+            $arType[self::VIEW_TYPE_FULL_TASK] = Yii::t('app/crm','View type users task');
+
+        return $arType;
     }
 
     /**
@@ -148,7 +154,14 @@ class CrmTaskSearch extends CrmTask
                 $query->joinWith('crmTaskWatchers')->orWhere([CrmTaskWatcher::tableName().'.buser_id' => $iUserID]);
                 break;
 
+            case self::VIEW_TYPE_FULL_TASK:
+                if(!Yii::$app->user->can('adminRights'))
+                {
+                    $query->where('1=0');
+                }
+            break;
             default:
+                $query->where('1=0');
                 break;
         }
 

@@ -9,6 +9,191 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app/crm', 'Crm Tasks');
 $this->params['breadcrumbs'][] = $this->title;
+if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
+{
+    $columns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'attribute' => 'title',
+            'format' => 'html',
+            'value' => function($model) use ($arNewTasks){
+
+                $postfix = in_array($model->id,$arNewTasks) ?
+                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                    :
+                    '';
+                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
+            }
+        ],
+        [
+            'attribute' => 'type',
+            'value' => function($model){
+                return $model->getTypeStr();
+            },
+            'filter' => \common\models\CrmTask::getTypeArr()
+        ],
+
+        [
+            'attribute' => 'deadline',
+            'filter' =>  \yii\jui\DatePicker::widget([
+                'model'=>$searchModel,
+                'attribute'=>'deadline',
+                'language' => 'ru',
+                'dateFormat' => 'yyyy-MM-dd',
+                'options' =>['class' => 'form-control'],
+                'clientOptions' => [
+                    'defaultDate' => date('y-m-d',time())
+                ],
+            ]),
+        ],
+        [
+            'attribute' => 'priority',
+            'value' => function($model){
+                return $model->getPriorityStr();
+            },
+            'filter' => \common\models\CrmTask::getPriorityArr()
+        ],
+        [
+            'attribute' => 'status',
+            'value' => function($model){
+                return $model->getStatusStr();
+            },
+            'filter' => \common\models\CrmTask::getStatusArr()
+        ],
+        [
+            'attribute' => 'assigned_id',
+            'value' => function($model){
+
+                return is_object($obUser = $model->assigned) ? $obUser->getFio() : $model->assigned_id;
+            },
+            'filter' => \backend\models\BUser::getAllMembersMap()
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{update}{view}',
+            'buttons' => [
+                'update' => function ($url, $model, $key) {
+
+                    if($model->created_by != Yii::$app->user->id)
+                        return NULL;
+
+                    $options = [
+                        'title' => Yii::t('yii', 'Update'),
+                        'aria-label' => Yii::t('yii', 'Update'),
+                        'data-pjax' => '0',
+                    ];
+                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options);
+                }
+            ]
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{delete}',
+            'buttons' => [
+                'delete' => function ($url, $model, $key) {
+                    if($model->created_by != Yii::$app->user->id)
+                        return NULL;
+                    $options = [
+                        'title' => Yii::t('yii', 'Delete'),
+                        'aria-label' => Yii::t('yii', 'Delete'),
+                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ];
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                }
+            ]
+        ],
+    ];
+}else{
+    $columns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'attribute' => 'title',
+            'format' => 'html',
+            'value' => function($model) use ($arNewTasks){
+
+                $postfix = in_array($model->id,$arNewTasks) ?
+                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                    :
+                    '';
+                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
+            }
+        ],
+        [
+            'attribute' => 'type',
+            'value' => function($model){
+                return $model->getTypeStr();
+            },
+            'filter' => \common\models\CrmTask::getTypeArr()
+        ],
+
+        [
+            'attribute' => 'deadline',
+            'filter' =>  \yii\jui\DatePicker::widget([
+                'model'=>$searchModel,
+                'attribute'=>'deadline',
+                'language' => 'ru',
+                'dateFormat' => 'yyyy-MM-dd',
+                'options' =>['class' => 'form-control'],
+                'clientOptions' => [
+                    'defaultDate' => date('y-m-d',time())
+                ],
+            ]),
+        ],
+        [
+            'attribute' => 'priority',
+            'value' => function($model){
+                return $model->getPriorityStr();
+            },
+            'filter' => \common\models\CrmTask::getPriorityArr()
+        ],
+        [
+            'attribute' => 'status',
+            'value' => function($model){
+                return $model->getStatusStr();
+            },
+            'filter' => \common\models\CrmTask::getStatusArr()
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{update}{view}',
+            'buttons' => [
+                'update' => function ($url, $model, $key) {
+
+                    if($model->created_by != Yii::$app->user->id)
+                        return NULL;
+
+                    $options = [
+                        'title' => Yii::t('yii', 'Update'),
+                        'aria-label' => Yii::t('yii', 'Update'),
+                        'data-pjax' => '0',
+                    ];
+                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options);
+                }
+            ]
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{delete}',
+            'buttons' => [
+                'delete' => function ($url, $model, $key) {
+                    if($model->created_by != Yii::$app->user->id)
+                        return NULL;
+                    $options = [
+                        'title' => Yii::t('yii', 'Delete'),
+                        'aria-label' => Yii::t('yii', 'Delete'),
+                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ];
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                }
+            ]
+        ],
+    ];
+}
+
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -36,109 +221,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-                        [
-                            'attribute' => 'title',
-                            'format' => 'html',
-                            'value' => function($model) use ($arNewTasks){
-
-                                $postfix = in_array($model->id,$arNewTasks) ?
-                                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
-                                    :
-                                    '';
-                                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
-                            }
-                        ],
-                        [
-                            'attribute' => 'type',
-                            'value' => function($model){
-                                return $model->getTypeStr();
-                            },
-                            'filter' => \common\models\CrmTask::getTypeArr()
-                        ],
-
-                        [
-                            'attribute' => 'deadline',
-                            'filter' =>  \yii\jui\DatePicker::widget([
-                                'model'=>$searchModel,
-                                'attribute'=>'deadline',
-                                'language' => 'ru',
-                                'dateFormat' => 'yyyy-MM-dd',
-                                'options' =>['class' => 'form-control'],
-                                'clientOptions' => [
-                                    'defaultDate' => date('y-m-d',time())
-                                ],
-                            ]),
-                        ],
-                        [
-                            'attribute' => 'priority',
-                            'value' => function($model){
-                                return $model->getPriorityStr();
-                            },
-                            'filter' => \common\models\CrmTask::getPriorityArr()
-                        ],
-                        [
-                            'attribute' => 'status',
-                            'value' => function($model){
-                                return $model->getStatusStr();
-                            },
-                            'filter' => \common\models\CrmTask::getStatusArr()
-                        ],
-                        //'priority',
-                        // 'type',
-                        // 'task_control',
-                        // 'parent_id',
-                        // 'assigned_id',
-                        // 'created_by',
-                        // 'time_estimate:datetime',
-                        // 'status',
-                        // 'date_start',
-                        // 'duration_fact',
-                        // 'closed_by',
-                        // 'closed_date',
-                        // 'cmp_id',
-                        // 'contact_id',
-                        // 'dialog_id',
-                        // 'created_at',
-                        // 'updated_at',
-                        [
-                            'class' => 'yii\grid\ActionColumn',
-                            'template' => '{update}{view}',
-                            'buttons' => [
-                                'update' => function ($url, $model, $key) {
-
-                                    if($model->created_by != Yii::$app->user->id)
-                                        return NULL;
-
-                                    $options = [
-                                        'title' => Yii::t('yii', 'Update'),
-                                        'aria-label' => Yii::t('yii', 'Update'),
-                                        'data-pjax' => '0',
-                                    ];
-                                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options);
-                                }
-                            ]
-                        ],
-                        [
-                            'class' => 'yii\grid\ActionColumn',
-                            'template' => '{delete}',
-                            'buttons' => [
-                                'delete' => function ($url, $model, $key) {
-                                    if($model->created_by != Yii::$app->user->id)
-                                        return NULL;
-                                    $options = [
-                                        'title' => Yii::t('yii', 'Delete'),
-                                        'aria-label' => Yii::t('yii', 'Delete'),
-                                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
-                                        'data-method' => 'post',
-                                        'data-pjax' => '0',
-                                    ];
-                                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
-                                }
-                            ]
-                        ],
-                    ],
+                    'columns' => $columns
                 ]); ?>
             </div>
         </div>

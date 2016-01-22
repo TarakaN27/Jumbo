@@ -227,6 +227,7 @@ return [
 	'Make mine payment' => 'Это мой платеж',
 	'Add payments' => 'Добавить платежи',
 	'Bill successfully copied' => 'Счет успешно скопирован',
-	'Error. Can not copy bill' => 'Ошибка. Не удалось скопировать счет'
+	'Error. Can not copy bill' => 'Ошибка. Не удалось скопировать счет',
+	'View type users task' => 'Задачи пользователей'
 
 ];
