@@ -3552,7 +3552,7 @@ ul.timeline li {
     border-left: 3px solid #e8e8e8;
     overflow: visible;
     padding: 10px 15px;
-    margin-left: 105px;
+    margin-left: 117px;
 }
 
 .timeline.widget {
@@ -3568,13 +3568,14 @@ ul.timeline li {
     position: absolute;
     top: 5px;
     left: 0;
-    width: 84px;
+    width: 101px;
 }
 
 .timeline .tag {
     display: block;
     height: 30px;
     font-size: 13px;
+    text-align: center;
 
 
     padding: 8px 2px 8px 4px;

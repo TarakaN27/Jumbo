@@ -12,6 +12,7 @@ use yii\db\ActiveQuery;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%dialogs}}".
@@ -256,6 +257,61 @@ class Dialogs extends AbstractActiveRecord
                 $arUsers[] = $t->buser_id;
 
         return array_unique($arUsers);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLinkForEntity()
+    {
+        if($this->type == self::TYPE_MSG) {
+            return Url::to(['/messenger/default/index']);
+        }
+
+        if($this->type == self::TYPE_TASK)
+        {
+            if(!empty($this->crm_task_id))
+            {
+                return Url::to(['/crm/task/view','id' => $this->crm_task_id]);
+            }
+        }
+
+        if($this->type == self::TYPE_COMPANY)
+        {
+            if(!empty($this->crm_cmp_id))
+                return Url::to(['/crm/company/view','id' => $this->crm_cmp_id]);
+        }
+
+
+        if($this->type == self::TYPE_REQUEST)
+        {
+            return Url::to(['/bookkeeping/payment-request/index']);
+        }
+
+        return NULL;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getNumber()
+    {
+
+        if($this->type == self::TYPE_TASK)
+        {
+            if(!empty($this->crm_task_id))
+            {
+                return $this->crm_task_id;
+            }
+        }
+
+        if($this->type == self::TYPE_COMPANY)
+        {
+            if(!empty($this->crm_cmp_id))
+                return $this->crm_cmp_id;
+        }
+
+        return NULL;
     }
 }
 

@@ -19,8 +19,8 @@ $page = isset($pages) && is_object($pages) ? $pages->getPage() : 0;
             ">
                 <div class = "block">
                     <div class = "tags">
-                        <a href = "" class = "tag <?php echo $dialog['dialog']->getTagClass();?>">
-                            <span><?php echo $dialog['dialog']->getTypeStr();?></span>
+                        <a target="_blank" href = "<?=$dialog['dialog']->getLinkForEntity();?>" class = "tag <?php echo $dialog['dialog']->getTagClass();?>">
+                            <span><?php echo $dialog['dialog']->getTypeStr();?> <small><?php echo $dialog['dialog']->getNumber();?></small></span>
                         </a>
                     </div>
                     <div class = "block_content">
