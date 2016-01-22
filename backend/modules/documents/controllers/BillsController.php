@@ -2,6 +2,7 @@
 
 namespace backend\modules\documents\controllers;
 
+use backend\widgets\Alert;
 use common\models\BillTemplate;
 use common\models\CuserServiceContract;
 use common\models\LegalPerson;
@@ -227,5 +228,30 @@ class BillsController extends AbstractBaseBackendController
             'docx_id' => $model->docx_id,
             'id' => $model->id
         ];
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionBillCopy($id)
+    {
+        /** @var Bills $obBills */
+        $obBills = Bills::findOne($id);
+        if(!$obBills)
+            throw new NotFoundHttpException('Bill not found');
+
+        $obBills->isNewRecord = TRUE;
+        $obBills->id = NULL;
+        $obBills->updateForCopy();
+        if(!$obBills->save()) {
+           Yii::$app->session->setFlash(Alert::TYPE_SUCCESS,Yii::t('app/crm','Bill successfully copied'));
+        }else
+        {
+            Yii::$app->session->setFlash(Alert::TYPE_ERROR,Yii::t('app/crm','Error. Can not copy bill'));
+        }
+
+        return $this->redirect(['index']);
     }
 }

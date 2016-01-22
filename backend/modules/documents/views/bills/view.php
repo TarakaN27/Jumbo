@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h2><?= Html::encode($this->title) ?></h2>
                 <section class="pull-right">
                     <?= Html::a(Yii::t('app/documents', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-                    <?= Html::a('<i class="fa fa-file-pdf-o"></i>'.Yii::t('app/documents', 'Get bill'),[
+                    <?= Html::a('<i class="fa fa-file-pdf-o"></i> '.Yii::t('app/documents', 'Get bill'),[
                         'get-bill',
                         'type' => \common\models\Bills::TYPE_DOC_PDF,
                         'id' => $model->id

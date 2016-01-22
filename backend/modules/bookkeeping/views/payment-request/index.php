@@ -36,6 +36,14 @@ function calculateTotalSumm()
 ",\yii\web\View::POS_END);
 
 $this->registerJs('calculateTotalSumm()',\yii\web\View::POS_READY);
+
+if(Yii::$app->user->can('adminRights'))
+{
+    $this->registerJs("
+        $('tr[data-tr-manager_id=\"".Yii::$app->user->id."\"]').addClass('admin-line');
+    ",\yii\web\View::POS_READY);
+}
+
 ?>
 <div class="payment-request-index">
 
@@ -46,7 +54,7 @@ $this->registerJs('calculateTotalSumm()',\yii\web\View::POS_READY);
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'filterSelector' => 'select[name="per-page"]',
-        'addTrData' => ['pay_summ','currency_id'],
+        'addTrData' => ['pay_summ','currency_id','manager_id'],
         'rowOptions' => [
           'class' => 'counters'
         ],

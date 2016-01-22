@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'aria-label' => Yii::t('app/crm', 'Add payments'),
                                 'class' => 'btn btn-info'
                             ];
-                            if(Yii::$app->user->can('only_manager'))
+                            if(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
                                 echo Html::a('<span class="color-white glyphicon glyphicon-credit-card"></span> '.Yii::t('app/crm', 'Add payments'),
                                 \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
                                 $options);

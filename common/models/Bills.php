@@ -199,4 +199,13 @@ class Bills extends AbstractActiveRecord
             return $this->bsk = $tmp;
     }
 
+    /**
+     *
+     */
+    public function updateForCopy()
+    {
+        $this->setBillNumberAndDate();
+        $this->getBSK();
+    }
+
 }

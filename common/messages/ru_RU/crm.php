@@ -225,6 +225,8 @@ return [
 	'Payment request' => 'Запрос на платеж',
 	'New payment request ' => 'Новый запрос на платеж для ',
 	'Make mine payment' => 'Это мой платеж',
-	'Add payments' => 'Добавить платежи'
+	'Add payments' => 'Добавить платежи',
+	'Bill successfully copied' => 'Счет успешно скопирован',
+	'Error. Can not copy bill' => 'Ошибка. Не удалось скопировать счет'
 
 ];
