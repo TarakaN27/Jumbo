@@ -87,13 +87,21 @@ class BillsManager extends Bills{
             if(file_exists($pdfTryPath))
             {
                 @unlink($tryPath);
-                CustomHelper::getDocument($pdfTryPath,$name.'.pdf');
+                $dName = $this->billNameForDownload();
+                CustomHelper::getDocument($pdfTryPath,$dName.'.pdf');
             }
         }
         echo 'Ошибка формирования счета';
         Yii::$app->end(500);
     }
 
+    /**
+     * @return string
+     */
+    protected function billNameForDownload()
+    {
+        return 'СЧЕТ №'.$this->bill_number.' от '.$this->bill_date;
+    }
 
     protected function generateDocument($name,$tryPath)
     {
