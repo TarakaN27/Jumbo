@@ -147,10 +147,11 @@ $this->registerJs("
         ],
     ]); ?>
 
-    <?
+    <?php
+    /*
         if(!Yii::$app->user->can('only_manager'))
             echo $form->field($model, 'manager_id')->widget(\kartik\select2\Select2::className(),[
-                'data' => \backend\models\BUser::getListManagers(),
+                'data' => \backend\models\BUser::getAllMembersMap(),
                 'options' => [
                     'placeholder' => Yii::t('app/documents','Choose manager')
                 ],
@@ -158,6 +159,7 @@ $this->registerJs("
                     'allowClear' => true
                 ],
             ]) ;
+    */
     ?>
 
     <?= $form->field($model, 'cuser_id')->widget(\kartik\select2\Select2::className(),[

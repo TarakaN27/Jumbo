@@ -34,7 +34,7 @@ class BillsController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['superadmin','moder']
+                    'roles' => ['admin','moder']
                 ]
             ]
         ];
@@ -86,8 +86,8 @@ class BillsController extends AbstractBaseBackendController
     {
         $model = new Bills();
 
-        if(Yii::$app->user->can('only_manager'))
-            $model->manager_id = Yii::$app->user->id;
+        //if(Yii::$app->user->can('only_manager'))
+       $model->manager_id = Yii::$app->user->id;
 
         $model->buy_target = Yii::t('app/documents','DefaultBuytarget');
         $model->external = Bills::NO;

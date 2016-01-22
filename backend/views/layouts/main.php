@@ -26,7 +26,7 @@ $menuItems[] = [
 ];
 unset($subItems);
 
-if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
+if(!Yii::$app->user->isGuest && (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights')))
 {
     $subItems[] = ['label' => Yii::t('app/common', 'Add bill'), 'url' => ['/documents/bills/create']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill list'), 'url' => ['/documents/bills/index']];
@@ -230,7 +230,7 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>
                                         <?php endif;?>
-                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
                                             </li>

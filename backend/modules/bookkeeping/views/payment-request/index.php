@@ -177,7 +177,8 @@ $this->registerJs('calculateTotalSumm()',\yii\web\View::POS_READY);
                                 'title' => Yii::t('yii', 'Add payments'),
                                 'aria-label' => Yii::t('yii', 'Add payments'),
                             ];
-                            if(Yii::$app->user->can('only_manager'))
+                            if(
+                                (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights')))
                                 return Html::a(
                                     '<span class="glyphicon glyphicon-credit-card"></span>',
                                     \yii\helpers\Url::to(['add-payment','pID' => $model->id]),

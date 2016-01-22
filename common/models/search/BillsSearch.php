@@ -2,6 +2,7 @@
 
 namespace common\models\search;
 
+use common\models\CUser;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -43,6 +44,12 @@ class BillsSearch extends Bills
     public function search($params)
     {
         $query = Bills::find()->with('service','cuser','lPerson','docxTmpl');
+
+        if(Yii::$app->user->can('only_manager'))
+        {
+            $query->joinWith('cuser');
+            $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

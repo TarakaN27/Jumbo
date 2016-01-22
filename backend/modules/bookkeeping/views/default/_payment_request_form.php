@@ -73,7 +73,7 @@ $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResiden
 <?php echo $form->field($model,'user_name',['options' => ['class' => 'form-group hide']])->textInput();?>
 
 <?php  echo $form->field($model, 'manager_id')->widget(Select2::classname(), [
-    'data' => \backend\models\BUser::getListManagers(),
+    'data' => \backend\models\BUser::getAllMembersMap(),
     'options' => ['placeholder' => Yii::t('app/book','BOOK_choose_managers')],
     'pluginOptions' => [
         'allowClear' => true

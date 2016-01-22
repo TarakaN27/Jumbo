@@ -2,6 +2,7 @@
 
 namespace common\models\search;
 
+use common\models\CUser;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -44,6 +45,14 @@ class PaymentsSearch extends Payments
     public function search($params)
     {
         $query = Payments::find()->with('legal','service','cuser','currency');
+
+
+        if(Yii::$app->user->can('only_manager'))
+        {
+            $query->joinWith('cuser');
+            $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
+        }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

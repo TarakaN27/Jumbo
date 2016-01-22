@@ -52,7 +52,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                // ],
                 [
                     'allow' => true,
-                    'roles' => ['superadmin','bookkeeper','moder']
+                    'roles' => ['admin','bookkeeper','moder']
                 ]
             ]
         ];
@@ -68,6 +68,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $searchModel = new PaymentRequestSearch();
         if(Yii::$app->user->can('only_manager'))
             $searchModel->managerID = Yii::$app->user->id;
+
         $searchModel->status = PaymentRequest::STATUS_NEW;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
@@ -91,7 +92,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
 
-        if($modelP->manager_id != Yii::$app->user->id)
+
+        if(!Yii::$app->user->can('adminRights') && $modelP->manager_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action');
 
 
