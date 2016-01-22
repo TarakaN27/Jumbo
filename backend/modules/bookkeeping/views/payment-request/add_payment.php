@@ -95,11 +95,14 @@ $this->registerJs('
             lineID = $($this).attr("id"),
             lPID = "'.$modelP->legal_id.'"
             contrID = "'.$modelP->cntr_id.'",
+            amount = $("#" + lineID.replace(/-service/gi,"-summ")).val(),
             condID = lineID.replace(/-service/gi,"-condid");
 
-        if(serviceID == "")
+        if(serviceID == "" || amount == " " || amount == undefined || amount == "")
         {
             $("#"+condID).val("");
+            $($this).val("");
+            addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You must set amount and choose service').'")
             return false;
         }
 
@@ -108,7 +111,7 @@ $this->registerJs('
             cache: false,
             url: "'.\yii\helpers\Url::to(['find-condition']).'",
             dataType: "json",
-            data: {iServID:serviceID,iContrID:contrID,lPID:lPID},
+            data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount},
             success: function(msg){
                 if(msg.cID)
                   {
@@ -185,6 +188,7 @@ $this->registerJs('
                 if(msg)
                   {
                     addWarningNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Bounds checking conditions FAIL').'");
+                  }else{
                   }
             },
             error: function(msg){

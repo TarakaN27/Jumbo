@@ -106,7 +106,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
                 if(empty($obCntrID))
                     throw new NotFoundHttpException('Contractor not found');
-                $cID = $this->getCondition($modelP->service_id,$modelP->legal_id,$obCntrID);
+                $cID = $this->getCondition($modelP->service_id,$modelP->legal_id,$obCntrID,$modelP->pay_summ);
                 if(!empty($cID) && isset($cID['cID']) && !empty($cID['cID']))
                     $formModel->condID = $cID['cID'];
             }
@@ -287,6 +287,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $iServID = Yii::$app->request->post('iServID');
         $iContrID = Yii::$app->request->post('iContrID');
         $lPID = Yii::$app->request->post('lPID');
+        $amount = Yii::$app->request->post('amount');
 
         $obCntrID = CUser::findOneByIDCached($iContrID);
 
@@ -295,7 +296,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return $this->getCondition($iServID,$lPID,$obCntrID);
+        return $this->getCondition($iServID,$lPID,$obCntrID,$amount);
     }
 
     /**
@@ -304,10 +305,20 @@ class PaymentRequestController extends AbstractBaseBackendController{
      * @param $obCntrID
      * @return array
      */
-    protected function getCondition($iServID,$lPID,$obCntrID)
+    protected function getCondition($iServID,$lPID,$obCntrID,$amount = 0)
     {
-        $obCond = PaymentCondition::find()
-            ->select('id')
+        $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
+            'cuser_id' => $obCntrID->id,
+            'service_id' => $iServID
+        ])->one();
+
+        if($obPPC)
+            return ['cID' => $obPPC->cond_id];
+
+        unset($obPPC);
+
+        $obCond = PaymentCondition::find()  //находим все условия
+            ->select(['id','summ_from','summ_to'])
             ->where([
                 'service_id' => (int)$iServID,
                 'l_person_id' => (int)$lPID,
@@ -316,30 +327,18 @@ class PaymentRequestController extends AbstractBaseBackendController{
             ->orderBy('id DESC')
             ->all();
 
-
         if(empty($obCond))
             return ['cID' =>  FALSE ];
-        elseif(count($obCond) == 1)
-            return ['cID' => $obCond[0]->id];
-        else
-        {
-            $obPPC = CuserPreferPayCond::find()->where([
-                'cuser_id' => $obCntrID->id,
-                'service_id' => $iServID
-            ])->one();
 
-            if(empty($obPPC))
-                return ['cID' =>  FALSE ];
-
-            foreach($obCond as $cond)
+        foreach($obCond as $cond)
             {
-                if($cond->id = $obPPC->cond_id)
+                if($cond->summ_from <= $amount && $cond->summ_to > $amount)
                 {
                     return ['cID' => $cond->id];
                 }
             }
-            return ['cID' => FALSE];
-        }
+
+        return ['cID' => FALSE];
     }
 
     /**
