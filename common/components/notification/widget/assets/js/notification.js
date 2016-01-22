@@ -30,10 +30,17 @@ function proccessingMessages(data)
  * Инициируем сокет
  */
 $( document ).ready(function() {
-    var socket = io.connect(host+':8890');
+
+    var port = ':8890';
+    if(wm_chanel == 'notification_test')
+        port = ':8889';
+    var socket = io.connect(host+port);
+    console.log('connect');
     socket.on(wm_chanel, function (data) { //мониторим канал notification
         var
             message = JSON.parse(data);
+        console.log('3423');
+        console.log(data);
         proccessingMessages(message);
     });
 });

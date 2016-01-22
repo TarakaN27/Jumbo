@@ -13,7 +13,7 @@ use common\components\notification\TabledNotification;
 use common\components\notification\widget\assets\TabledNotificationWidgetAssets;
 use common\components\notification\widget\assets\TNWAssets;
 use yii\base\Widget;
-
+use Yii;
 class TabledNotificationWidget extends Widget
 {
 	public function run()
@@ -30,11 +30,12 @@ class TabledNotificationWidget extends Widget
 		$host = \Yii::$app->getUrlManager()->getHostInfo();
 		$view = $this->getView();
 		TNWAssets::register($view);
+		$chanel = empty(Yii::$app->params['pubChanel']) ? TabledNotification::$chanel : Yii::$app->params['pubChanel'];
 		$view->registerJs("
 			var
 				host = '".$host."',
 				wmu = ".\Yii::$app->user->id.",
-				wm_chanel = '".TabledNotification::$chanel."',
+				wm_chanel = '".$chanel."',
 				TYPE_BROADCAST = '".TabledNotification::TYPE_BROADCAST."',
 				TYPE_PRIVATE = '".TabledNotification::TYPE_PRIVATE."';
 		",$view::POS_HEAD);

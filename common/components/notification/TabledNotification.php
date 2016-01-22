@@ -43,8 +43,11 @@ class TabledNotification
 	 */
 	public static function addMessage($title,$body,$type=self::TYPE_BROADCAST,$ntfType=self::NOTIF_TYPE_INFO,$wmu = [])
 	{
+
+		$chanel = empty(Yii::$app->params['pubChanel']) ? static::$chanel : Yii::$app->params['pubChanel'];
+
 		return Yii::$app->redis->executeCommand('PUBLISH', [
-			'channel' => static::$chanel,
+			'channel' => $chanel,
 			'message' => Json::encode([
 				'name' => $title,
 				'type' => $type,
