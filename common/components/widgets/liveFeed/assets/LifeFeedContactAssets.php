@@ -24,6 +24,7 @@ class LifeFeedContactAssets extends AssetBundle
 		'yii\web\JqueryAsset',
 		'yii\web\YiiAsset',
 		'yii\bootstrap\BootstrapAsset',
+		'vova07\imperavi\Asset',
 	],
 		$publishOptions = [
 		'forceCopy' => true

@@ -9,6 +9,7 @@
 namespace common\components\widgets\liveFeed\assets;
 
 
+use vova07\imperavi\Asset;
 use yii\web\AssetBundle;
 
 class LiveFeedTaskAssets extends AssetBundle
@@ -21,9 +22,10 @@ class LiveFeedTaskAssets extends AssetBundle
 			'js/live_feed_task.js'
 	],
 		$depends = [
-		'yii\web\JqueryAsset',
-		'yii\web\YiiAsset',
-		'yii\bootstrap\BootstrapAsset',
+			'yii\web\JqueryAsset',
+			'yii\web\YiiAsset',
+			'yii\bootstrap\BootstrapAsset',
+			'vova07\imperavi\Asset',
 	],
 		$publishOptions = [
 		'forceCopy' => true
