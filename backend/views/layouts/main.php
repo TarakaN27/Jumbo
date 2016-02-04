@@ -99,6 +99,7 @@ $menuItems[] = [
     'label' => '<i class="fa fa-university"></i> '.Yii::t('app/common','To dashboard'),
     'url' => Yii::$app->homeUrl
 ];
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -291,7 +292,8 @@ $menuItems[] = [
                                         <?php if(
                                         Yii::$app->user->can('adminRights') ||
                                         Yii::$app->user->can('only_bookkeeper') ||
-                                        Yii::$app->user->can('only_manager')
+                                        Yii::$app->user->can('only_manager') ||
+                                        Yii::$app->user->can('only_jurist')
                                         ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">

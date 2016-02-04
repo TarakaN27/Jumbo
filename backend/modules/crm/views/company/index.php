@@ -25,12 +25,14 @@ $columns = [
 
 			$addStr =  in_array($model->id,$arCompanyRedisList) ? '<span class="label label-primary">New</span>' : '';
 
-			if(empty($obR))
-				return Html::a('N/A ',['view','id' => $model->id],['class'=>'link-upd']).' '.$addStr;
-			return Html::a(
-				CustomHelper::highlight('dummy',$obR->getCorpName()),
-				['view','id' => $model->id],
-				['class'=>'link-upd']).' '.$addStr;
+			$corpName = empty($obR) ? 'N/A ' : CustomHelper::highlight('dummy',$obR->getCorpName());
+
+			if(Yii::$app->user->can('only_jurist'))
+			{
+				return $corpName;
+			}else{
+				return Html::a($corpName,['view','id' => $model->id],['class'=>'link-upd']).' '.$addStr;
+			}
 		}
 	],
 	[
@@ -87,20 +89,15 @@ $columns = [
 		'filter' => CUser::getContractorArr()
 	]
 ];
+
 $additionBlock = [];
-if(Yii::$app->user->can('adminRights')) {
+if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist')) {
 	array_push($columns,
 		[
 			'label' => '',
 			'format' => 'raw',
 			'value' => function ($model) {
-				return '
-               <div class="btn-group">
-                   <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
-                       ' . Yii::t('app/users', 'Settings') . ' <span class="caret"></span>
-                   </button>
-                   <ul class="dropdown-menu">
-                       <li>
+				$strAdmin = '<li>
                            ' . Html::a(Yii::t('app/users', 'Settings'), ['/users/contractor-settings/index', 'userID' => $model->id]) . '
                        </li>
                        <li>
@@ -111,7 +108,21 @@ if(Yii::$app->user->can('adminRights')) {
                        </li>
                        <li>
                            ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/contractor/services-contract', 'iCID' => $model->id]) . '
-                       </li>
+                       </li>';
+
+				$strJurist = '<li>
+                           ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/contractor/services-contract', 'iCID' => $model->id]) . '
+                       </li>';
+
+				$str = Yii::$app->user->can('only_jurist') ? $strJurist : $strAdmin;
+
+				return '
+               <div class="btn-group">
+                   <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
+                       ' . Yii::t('app/users', 'Settings') . ' <span class="caret"></span>
+                   </button>
+                   <ul class="dropdown-menu">
+                       '.$str.'
                    </ul>
                </div>
         ';
@@ -121,47 +132,63 @@ if(Yii::$app->user->can('adminRights')) {
 }
 
 array_push($columns,[
-	'class' => 'yii\grid\ActionColumn',
-	'template' => '{update}',
-	'buttons' => [
-		'update' => function($url, $model, $key){
-			$show = Yii::$app->user->crmCanEditModel(
-				$model,
-				'created_by',
-				'manager_id',
-				'is_opened'
-			);
-			$options = [
-				'title' => Yii::t('yii', 'Update'),
-				'aria-label' => Yii::t('yii', 'Update'),
-				'data-pjax' => '0',
-			];
-			return $show ? Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options) : NULL;
-		},
-	]
-]);
-array_push($columns,[
-	'class' => 'yii\grid\ActionColumn',
-	'template' => '{archive}',
-	'buttons' => [
-		'archive' => function($url, $model, $key){
-			$show = Yii::$app->user->crmCanDeleteModel(
-				$model,
-				'created_by',
-				'manager_id',
-				'is_opened'
-			);
+	'label' => '',
+	'format' => 'raw',
+	'value' => function($model){
+		return Html::a(
+			'<i class="fa fa-eye"></i>',
+			['view-requisites','id' => $model->id],
+			['target' => '_blank']);
+	}
 
-			$color = $model->archive == CUser::ARCHIVE_YES ? 'red' :'';
-			$options = [
-				'title' => Yii::t('app/crm', 'Archive'),
-				'aria-label' => Yii::t('app/crm', 'Archive'),
-				'data-pjax' => '0',
-			];
-			return $show ? Html::a('<i class="fa fa-archive '.$color.'"></i>', $url, $options) : NULL;
-		},
-	]
 ]);
+
+if(!Yii::$app->user->can('only_jurist'))
+{
+	array_push($columns,[
+		'class' => 'yii\grid\ActionColumn',
+		'template' => '{update}',
+		'buttons' => [
+			'update' => function($url, $model, $key){
+				$show = Yii::$app->user->crmCanEditModel(
+					$model,
+					'created_by',
+					'manager_id',
+					'is_opened'
+				);
+				$options = [
+					'title' => Yii::t('yii', 'Update'),
+					'aria-label' => Yii::t('yii', 'Update'),
+					'data-pjax' => '0',
+				];
+				return $show ? Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, $options) : NULL;
+			},
+		]
+	]);
+
+	array_push($columns,[
+		'class' => 'yii\grid\ActionColumn',
+		'template' => '{archive}',
+		'buttons' => [
+			'archive' => function($url, $model, $key){
+				$show = Yii::$app->user->crmCanDeleteModel(
+					$model,
+					'created_by',
+					'manager_id',
+					'is_opened'
+				);
+
+				$color = $model->archive == CUser::ARCHIVE_YES ? 'red' :'';
+				$options = [
+					'title' => Yii::t('app/crm', 'Archive'),
+					'aria-label' => Yii::t('app/crm', 'Archive'),
+					'data-pjax' => '0',
+				];
+				return $show ? Html::a('<i class="fa fa-archive '.$color.'"></i>', $url, $options) : NULL;
+			},
+		]
+	]);
+}
 
 if(Yii::$app->user->can('adminRights')) {
 	array_push($columns,[

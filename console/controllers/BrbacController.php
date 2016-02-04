@@ -59,6 +59,9 @@ class BrbacController extends AbstractConsoleController {
 		$onlyBookkeeper = $auth->createPermission('only_bookkeeper');
         $onlyBookkeeper->description = 'Только для бухгалтера';
 
+		$onlyJurist = $auth->createPermission('only_jurist');
+		$onlyJurist->description = 'Только для юриста';
+
         $rightdForAll = $auth->createPermission('forAll');
         $rightdForAll->description = 'Права для всех';
 
@@ -67,6 +70,7 @@ class BrbacController extends AbstractConsoleController {
 		$auth->add($superRights);
 		$auth->add($onlyManager);
         $auth->add($rightdForAll);
+		$auth->add($onlyJurist);
 
 		$this->stdout('OK'. PHP_EOL, Console::FG_GREEN);
 
@@ -84,6 +88,11 @@ class BrbacController extends AbstractConsoleController {
 		$user->description = 'Пользователь';
 		$user->ruleName = $rule->name;
 		$auth->add($user);
+
+		$jurist = $auth->createRole('jurist');
+		$jurist->description = 'Юрист';
+		$jurist->ruleName = $rule->name;
+		$auth->add($jurist);
 
 		//moder
 		$moder = $auth->createRole('moder');
@@ -110,6 +119,11 @@ class BrbacController extends AbstractConsoleController {
 		$auth->add($sadmin);
 
 		//Добавляем разрешения для ролей
+
+		//юрист
+		$auth->addChild($jurist,$onlyJurist);
+		$auth->addChild($jurist,$user);
+		$auth->addChild($jurist,$rightdForAll);
 
         //bookkeeper
         $auth->addChild($bookkeeper, $user);

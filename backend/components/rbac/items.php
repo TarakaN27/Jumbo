@@ -20,10 +20,24 @@ return [
         'type' => 2,
         'description' => 'Права для всех',
     ],
+    'only_jurist' => [
+        'type' => 2,
+        'description' => 'Только для юриста',
+    ],
     'user' => [
         'type' => 1,
         'description' => 'Пользователь',
         'ruleName' => 'userRole',
+    ],
+    'jurist' => [
+        'type' => 1,
+        'description' => 'Юрист',
+        'ruleName' => 'userRole',
+        'children' => [
+            'only_jurist',
+            'user',
+            'forAll',
+        ],
     ],
     'moder' => [
         'type' => 1,

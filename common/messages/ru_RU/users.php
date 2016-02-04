@@ -195,7 +195,9 @@ return [
     'Resend' => 'Отправить еще раз',
     'Contractor' => 'Контрагент',
     'Contractor YES' => 'Да',
-    'Contractor NO' => 'Нет'
+    'Contractor NO' => 'Нет',
+    'Contracts' => 'Контракты',
+    'USER_role_jurist' => 'Юрист'
 
 
 

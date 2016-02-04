@@ -18,8 +18,10 @@ use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use common\models\CUser;
+use common\models\CuserServiceContract;
 use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
+use common\models\Services;
 use Yii;
 use common\models\CUserRequisites;
 use yii\base\Exception;
@@ -47,7 +49,7 @@ class CompanyController extends AbstractBaseBackendController
 				],
 				[
 					'allow' => true,
-					'roles' => ['user','moder','bookkeeper','admin']
+					'roles' => ['user','jurist','moder','bookkeeper','admin']
 				]
 			]
 		];
@@ -444,6 +446,33 @@ class CompanyController extends AbstractBaseBackendController
 			'modelR' => $modelR
 		]);
 
+	}
+
+	/**
+	 * @param $id
+	 * @return string
+	 * @throws NotFoundHttpException
+	 */
+	public function actionViewRequisites($id)
+	{
+		/** @var CUser $model */
+		$model = CUser::findOne($id);
+		if(!$model)
+			throw new NotFoundHttpException('Company not found');
+		$obReq = $model->requisites;
+		$arServices  = Services::getServicesMap();
+		$arCSCTmp= CuserServiceContract::find()->where(['cuser_id' => $id])->all();
+
+		$arCSC = [];
+		foreach($arCSCTmp as $csc)
+			$arCSC[$csc->service_id] = $csc;
+
+		return $this->render('view_requisites',[
+			'model' => $model,
+			'modelR' => $obReq,
+			'arServices' => $arServices,
+			'arCSC' => $arCSC
+		]);
 	}
 
 }

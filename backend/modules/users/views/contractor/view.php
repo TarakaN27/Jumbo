@@ -40,7 +40,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'username',
-            //'ext_id',
             [
                 'attribute' => 'type',
                 'value' => is_object($obType = $model->userType) ? $obType->name : 'N/A'
@@ -79,7 +78,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <h4><?php echo Yii::t('app/users','Requisites')?></h4>
     <div class="ln_solid"></div>
     <?php if(is_object($modelR)):
-
         switch ($modelR->type_id) {
             case \common\models\CUserRequisites::TYPE_J_PERSON:
                 $dvConfig = [

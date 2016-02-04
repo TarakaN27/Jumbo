@@ -40,6 +40,7 @@ class BUser extends AbstractUser
      * описываем роли пользователей backend
      */
     CONST
+        ROLE_JURIST = 7,
         ROLE_MANAGER = 10,
         ROLE_BOOKKEEPER = 15,
         ROLE_ADMIN = 20,
@@ -66,7 +67,8 @@ class BUser extends AbstractUser
             self::ROLE_MANAGER => Yii::t('app/users','USER_role_manager'),
             self::ROLE_BOOKKEEPER => Yii::t('app/users','USER_role_bookkeeper'),
             self::ROLE_ADMIN => Yii::t('app/users','USER_role_admin'),
-            self::ROLE_SUPERADMIN => Yii::t('app/users','USER_role_superadmin')
+            self::ROLE_SUPERADMIN => Yii::t('app/users','USER_role_superadmin'),
+            self::ROLE_JURIST => Yii::t('app/users','USER_role_jurist')
         ];
     }
 

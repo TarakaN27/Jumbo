@@ -23,7 +23,7 @@ return [
         //для админик расскоментировать тут
         'authManager' => [
             'class' => 'yii\rbac\PhpManager',
-            'defaultRoles' => ['user','moder','bookkeeper','admin','superadmin'], //здесь прописываем роли
+            'defaultRoles' => ['user','jurist','moder','bookkeeper','admin','superadmin'], //здесь прописываем роли
             //зададим куда будут сохраняться наши файлы конфигураций RBAC
             'itemFile' => '@backend/components/rbac/items.php',
             'assignmentFile' => '@backend/components/rbac/assignments.php',
