@@ -347,7 +347,7 @@ $this->registerJs("
                             <ul class="nav navbar-right panel_toolbox">
                                 <li>
                                     <?php
-                                        Modal::begin([
+                                        \common\components\customComponents\Modal\CustomModal::begin([
                                             'header' => '<h2>'.Yii::t('app/crm','Change assigned').'</h2>',
                                             'size' => Modal::SIZE_DEFAULT,
                                             'toggleButton' => [
@@ -359,10 +359,10 @@ $this->registerJs("
 
                                         echo $this->render('part/_form_change_assigned',[
                                             'model' => $model,
-                                            'buserDesc' => is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_id
+                                            'sAssName' => is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_id,
                                         ]);
 
-                                        Modal::end();
+                                    \common\components\customComponents\Modal\CustomModal::end();
                                     ?>
                                 </li>
                             </ul>
@@ -388,7 +388,7 @@ $this->registerJs("
                             <ul class="nav navbar-right panel_toolbox">
                                 <li>
                                     <?php
-                                        Modal::begin([
+                                    \common\components\customComponents\Modal\CustomModal::begin([
                                             'header' => '<h2>'.Yii::t('app/crm','Add accomplice').'</h2>',
                                             'size' => Modal::SIZE_DEFAULT,
                                             'toggleButton' => [
@@ -402,7 +402,7 @@ $this->registerJs("
                                             'model' => $obAccmpl,
                                         ]);
 
-                                        Modal::end();
+                                    \common\components\customComponents\Modal\CustomModal::end();
                                     ?>
                                 </li>
                             </ul>
@@ -432,7 +432,7 @@ $this->registerJs("
                             <ul class="nav navbar-right panel_toolbox">
                                 <li>
                                     <?php
-                                    Modal::begin([
+                                    \common\components\customComponents\Modal\CustomModal::begin([
                                         'header' => '<h2>'.Yii::t('app/crm','Add watcher').'</h2>',
                                         'size' => Modal::SIZE_DEFAULT,
                                         'toggleButton' => [
@@ -446,7 +446,7 @@ $this->registerJs("
                                         'model' => $obWatcher,
                                     ]);
 
-                                    Modal::end();
+                                    \common\components\customComponents\Modal\CustomModal::end();
                                     ?>
                                 </li>
                             </ul>

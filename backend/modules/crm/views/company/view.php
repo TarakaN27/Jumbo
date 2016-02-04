@@ -34,6 +34,7 @@ if(!empty($arContacts)) {
 		});
 	", \yii\web\View::POS_READY);
 }
+
 $this->registerJs("
 	var
 			link_hash = window.location.hash; //получаем якорь из урл
@@ -273,7 +274,7 @@ $this->registerJs("
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 									<?php
-									Modal::begin([
+									\common\components\customComponents\Modal\CustomModal::begin([
 										'header' => '<h2>'.Yii::t('app/crm','Change assigned').'</h2>',
 										'size' => Modal::SIZE_DEFAULT,
 										'toggleButton' => [
@@ -282,8 +283,11 @@ $this->registerJs("
 											'label' => '<i class="fa fa-pencil"></i> '.Yii::t('app/crm','Change'),
 										]
 									]);
-									echo $this->render('_part_form_change_assigned',['model' => $model]);
-									Modal::end();
+									echo $this->render('_part_form_change_assigned',[
+										'model' => $model,
+										'sAssName' => is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id
+									]);
+									\common\components\customComponents\Modal\CustomModal::end();
 									?>
 								</li>
 							</ul>
