@@ -12,6 +12,7 @@ use Yii;
 class RedisNotification
 {
 	CONST
+		PAYMENT_REQUEST_KEY = 'pay_req',
 		DIALOG_KEY = 'udialog',
 		MSG_KEY = 'umsg',
 		FEED_KEY = 'ufeed',
@@ -74,6 +75,26 @@ class RedisNotification
 	public static function getDialogKey($iUserID)
 	{
 		return self::DIALOG_KEY.':id:'.$iUserID;
+	}
+
+	/**
+	 * Список для пользователй с запросами на платеж
+	 * @param $iUserID
+	 * @return string
+	 */
+	public static function getPaymentRequestKey($iUserID)
+	{
+		return self::PAYMENT_REQUEST_KEY.':id:'.$iUserID;
+	}
+
+	/**
+	 * Список для запроса на платеж с пользователями(для неизвестного контрагента)
+	 * @param $iRequestID
+	 * @return string
+	 */
+	public static function getPaymentRequestUsersKey($iRequestID)
+	{
+		return self::PAYMENT_REQUEST_KEY.':users:'.$iRequestID;
 	}
 
 	/**************************end ключи для redis **********************/
@@ -458,6 +479,113 @@ class RedisNotification
 	public static function removeContactListForUsers($arUsers)
 	{
 		return static::removeListForUsers($arUsers,'getNewContactKey');
+	}
+
+	/*********************** PaymentRequest *******************/
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function addNewPaymentRequestToListForUsers($arUsers,$value)
+	{
+		return static::addItemToListForUsers($arUsers,$value,'getPaymentRequestKey');
+	}
+
+	/**
+	 * @param $arUsers
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removePaymentRequestFromListForUsers($arUsers,$value)
+	{
+		return static::removeItemFromListForUsers($arUsers,$value,'getPaymentRequestKey');
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return bool
+	 */
+	public static function removePaymentRequestFromListForUser($iUserID,$value)
+	{
+		$key = self::getPaymentRequestKey($iUserID);   //получаем ключ
+		return self::removeViewed($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return array
+	 */
+	public static function getPaymentRequestListForUser($iUserID)
+	{
+		$key = static::getPaymentRequestKey($iUserID);
+		return static::itemList($key);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @param $value
+	 * @return mixed
+	 */
+	public static function isPaymentRequestInList($iUserID,$value)
+	{
+		$key = static::getPaymentRequestKey($iUserID);
+		return static::isValueInList($key,$value);
+	}
+
+	/**
+	 * @param $iUserID
+	 * @return int
+	 */
+	public static function countNewPaymentRequest($iUserID)
+	{
+		$key = static::getPaymentRequestKey($iUserID);
+		return static::countItem($key);
+	}
+
+	/**
+	 * @param $arUsers
+	 * @return bool
+	 */
+	public static function removePaymentRequestListForUsers($arUsers)
+	{
+		return static::removeListForUsers($arUsers,'getPaymentRequestKey');
+	}
+
+	/**
+	 * Добавляем пользователя в запрос на платеж
+	 * @param $iRequestID
+	 * @param $arUsers
+	 */
+	public static function addUsersToPaymentRequestList($iRequestID,$arUsers)
+	{
+		$key = self::getPaymentRequestUsersKey($iRequestID);
+		foreach($arUsers as $user)
+		{
+			\Yii::$app->redis->sadd($key,$user);
+		}
+	}
+
+	/**
+	 * Получаем пользователй для запроса на платеж
+	 * @param $iRequestID
+	 * @return mixed
+	 */
+	public static function getUsersToPaymentRequestList($iRequestID)
+	{
+		$key = self::getPaymentRequestUsersKey($iRequestID);
+		return self::itemList($key);
+	}
+
+	/**
+	 * Удаляем список пользователй для запроса на платеж
+	 * @param $iRequestID
+	 */
+	public static function removeAllUsersToPaymentRequest($iRequestID)
+	{
+		$key = self::getPaymentRequestUsersKey($iRequestID);
+		Yii::$app->redis->del($key);
 	}
 
 }

@@ -54,6 +54,7 @@ class PaymentRequestSearch extends PaymentRequest
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]]
         ]);
 
         $this->load($params);

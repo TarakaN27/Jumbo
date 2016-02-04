@@ -14,6 +14,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bookkeeping\form\AddPaymentForm;
 use backend\modules\bookkeeping\form\SetManagerContractorForm;
+use common\components\notification\RedisNotification;
 use common\components\payment\PaymentOperations;
 use common\models\AbstractModel;
 use common\models\CUser;
@@ -73,9 +74,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
+
+        $arRedisPaymentRequest = RedisNotification::getPaymentRequestListForUser(Yii::$app->user->id);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'arRedisPaymentRequest' => $arRedisPaymentRequest
         ]);
     }
 
@@ -91,7 +95,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $modelP = PaymentRequest::findOne($pID);
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
-
+        $modelP->callViewedEvent();
 
         if(!Yii::$app->user->can('adminRights') && $modelP->manager_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action');
@@ -221,6 +225,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
             ->one();
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
+        $modelP->callViewedEvent();
 
         if(!empty($modelP->cntr_id))
         {
@@ -268,11 +273,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     public function actionView($id)
     {
+        /** @var PaymentRequest $model */
         $model = PaymentRequest::find()
             ->where(['id' => $id])
             ->with('owner','legal','currency','cuser')
             ->one();
-
+        $model->callViewedEvent();
         return $this->render('view',[
             'model' => $model
         ]);

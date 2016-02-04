@@ -4,20 +4,18 @@
  * User: zhenya
  * Date: 20.1.16
  * Time: 12.53
+ * Поведение
+ * Создаем задачу и оповещения, когда создается запрос на платеж
  */
 
 namespace common\components\behavior\PaymentRequest;
 
-
 use backend\models\BUser;
 use common\models\AbstractActiveRecord;
 use common\models\CrmTask;
-use common\models\Dialogs;
 use common\models\PaymentRequest;
 use yii\base\Behavior;
-use common\models\BuserToDialogs;
 use Yii;
-use yii\helpers\Html;
 
 class PaymentRequestBehavior extends Behavior
 {

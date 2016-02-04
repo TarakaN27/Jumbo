@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\models\BUser;
+use common\components\behavior\notifications\PaymentRequestNotificationBehavior;
 use common\components\behavior\PaymentRequest\PaymentRequestBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -230,7 +231,8 @@ class PaymentRequest extends AbstractActiveRecord
     {
         $arParent = parent::behaviors();
         return ArrayHelper::merge($arParent,[
-            PaymentRequestBehavior::className() //добавление задачи
+            //PaymentRequestBehavior::className() //добавление задачи
+            PaymentRequestNotificationBehavior::className()
         ]);
     }
 

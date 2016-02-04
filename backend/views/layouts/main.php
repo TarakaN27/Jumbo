@@ -205,8 +205,11 @@ $menuItems[] = [
                                 Yii::$app->user->can('only_bookkeeper') ||
                                 Yii::$app->user->can('only_manager')
                                 ):?>
-                                <li><a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
-                                        <span class = "fa fa-chevron-down"></span></a>
+                                <li>
+                                    <a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
+                                        <span class = "fa fa-chevron-down"></span>
+                                        <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
+                                    </a>
                                     <ul class = "nav child_menu" style = "display: none">
 
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
@@ -236,7 +239,10 @@ $menuItems[] = [
                                             </li>
 
                                             <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_request'); ?></a>
+                                                <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>">
+                                                    <?php echo Yii::t('app/book', 'BOOK_payment_request'); ?>
+                                                    <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
+                                                </a>
                                             </li>
                                         <?php endif;?>
                                         <?php if(Yii::$app->user->can('superRights')):?>

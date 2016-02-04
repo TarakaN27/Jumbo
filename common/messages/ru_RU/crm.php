@@ -223,11 +223,11 @@ return [
 	'New contact ({user})' => 'Новый контакт ({user})',
 	'Follow to payment request' => 'Перейти к запросу',
 	'Payment request' => 'Запрос на платеж',
-	'New payment request ' => 'Новый запрос на платеж для ',
+	'New payment request ' => 'Новый запрос на платеж',
 	'Make mine payment' => 'Это мой платеж',
 	'Add payments' => 'Добавить платежи',
 	'Bill successfully copied' => 'Счет успешно скопирован',
 	'Error. Can not copy bill' => 'Ошибка. Не удалось скопировать счет',
-	'View type users task' => 'Задачи пользователей'
-
+	'View type users task' => 'Задачи пользователей',
+	'Payment request for {company}' => 'Запрос на платеж для компании {company}'
 ];
