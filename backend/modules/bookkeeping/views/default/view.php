@@ -36,14 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
-                        'id',
                         [
                             'attribute' => 'cuser_id',
                             'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : 'N/A'
                         ],
                         [
                             'attribute' => 'pay_date',
-                            'value' => $model->getFormatedPayDate()
+                            'value' => Yii::$app->formatter->asDate($model->pay_date)
                         ],
                         'pay_summ',
                         [
@@ -71,6 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ]) ?>
             </div>
+            <?php if(Yii::$app->user->can('adminRights')): ?>
             <div class = "x_content">
                 <h3><?=Yii::t('app/book','Payment detail')?></h3>
                 <?php
@@ -103,6 +103,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])?>
                 <?php endif;?>
             </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
