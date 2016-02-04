@@ -274,6 +274,10 @@ $this->registerJs('
                                               'attribute' => 'pay_summ',
                                               'value' => $modelP->pay_summ.' '.$sCurrn
                                          ],
+                                         [
+                                             'attribute' => 'pay_date',
+                                             'value' => Yii::$app->formatter->asDate($modelP->pay_date)
+                                         ],
 
                                      ]
                                 ])?>
