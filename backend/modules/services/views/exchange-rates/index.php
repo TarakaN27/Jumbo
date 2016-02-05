@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
                             return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
                         else
-                            $model->name;
+                            return $model->name;
                     }
             ],
             'code',
