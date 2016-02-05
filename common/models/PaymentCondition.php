@@ -8,6 +8,7 @@ use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "{{%payment_condition}}".
@@ -164,6 +165,48 @@ class PaymentCondition extends AbstractActiveRecord
                     'ignored' => ['created_at','updated_at']
                 ],
             ]);
+    }
+
+    /**
+     * Получение id условий, которые подходят под параметры
+     * @param $iServiceID
+     * @param $iLegalID
+     * @param $amount   -- в бел рублях
+     * @param $isResident
+     * @param $iPayDate  -- integer
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public static function getAppropriateConditions($iServiceID,$iLegalID,$amount,$isResident,$iPayDate)
+    {
+        $arResult = [];
+        //получаем все условия подходящие под параметры
+        $arConditions = self::find()
+            ->select(['id','summ_from','summ_to','currency_id'])
+            ->where([
+                'service_id' => (int)$iServiceID,
+                'l_person_id' => $iLegalID,
+                'is_resident' => $isResident
+            ])
+            ->all();
+
+        if(empty($arConditions))
+            return $arResult;
+
+        foreach($arConditions as $cond)
+        {
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$iPayDate),$cond->id);
+            if(empty($curr))
+                throw new NotFoundHttpException('Currency not found');
+
+            $leftBorder = (float)$cond->summ_from*(float)$curr;
+            $rightBorder = (float)$cond->summ_to*(float)$curr;
+
+            if($leftBorder<=$amount && $rightBorder >= $amount)
+                $arResult [] = $cond->id;
+        }
+
+        return $arResult;
     }
 
 }

@@ -183,7 +183,7 @@ $this->registerJs('
             cache: false,
             url: "'.\yii\helpers\Url::to(['bounds-checking-conditions']).'",
             dataType: "json",
-            data: {iCondID:iCondID,iSumm:iSumm},
+            data: {iCondID:iCondID,iSumm:iSumm,iCurr:"'.$modelP->currency_id.'",payDate:"'.$modelP->pay_date.'"},
             success: function(msg){
                 if(msg)
                   {

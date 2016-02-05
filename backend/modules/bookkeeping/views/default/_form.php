@@ -14,6 +14,9 @@ $this->registerJsFile('@web/js/wm_app/helpers.js',[
             'yii\bootstrap\BootstrapAsset'],
     ]
 );
+$this->registerJsFile('@web/js/php_functions/strtotime.js',[
+    'position' => \yii\web\View::POS_HEAD
+]);
 $this->registerJs('
 function findCondition()
 {
@@ -55,11 +58,12 @@ function findCondition()
     {
 
         var
+            payDate = $("#payments-pay_date").val(),
             iCondID = $("#payments-condition_id").val(),
             iSumm = $("#payments-pay_summ").val(),
             iCurr = $("#payments-currency_id").val();
 
-        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" || iCurr == undefined || iCurr == "")
+        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" || iCurr == undefined || iCurr == "" || payDate == undefined || payDate == "" )
             return false;
 
         $.ajax({
@@ -67,7 +71,7 @@ function findCondition()
             cache: false,
             url: "'.\yii\helpers\Url::to(['/bookkeeping/payment-request/bounds-checking-conditions']).'",
             dataType: "json",
-            data: {iCondID:iCondID,iSumm:iSumm,iCurr:iCurr},
+            data: {iCondID:iCondID,iSumm:iSumm,iCurr:iCurr,payDate:strtotime(payDate)},
             success: function(msg){
                 if(msg)
                   {

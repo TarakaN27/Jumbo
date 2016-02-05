@@ -70,4 +70,55 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
     {
         return $this->hasOne(ExchangeRates::className(), ['id' => 'currency_id']);
     }
+
+    /**
+     * Получение курса валюты на указанную дату
+     * @param $date
+     * @return mixed
+     */
+    public static function getCurrencyForDate($date,$iCurID)
+    {
+        $obDate = self::find()
+            ->where(' date <= :date AND currency_id = :iCurID ')
+            ->params([':date' => $date,':iCurID' => $iCurID])
+            ->orderBy(['id' => SORT_DESC])
+            ->one();
+        return $obDate;
+    }
+
+    /**
+     * получаем курс валюты в белорусских рублях на дату $date
+     * @param $date  format: 2016-2-15
+     * @param $iCurID
+     * @return float|null
+     */
+    public static function getCurrencyInBURForDate($date,$iCurID)
+    {
+        $returnValue = NULL;                            //возвращаеме значение
+        if(date('Y-m-d',time()) == $date)           //если дата равна текущей, то вернем текущее значение курса валюты
+        {
+            /** @var ExchangeRates $obCurr */
+            $obCurr = ExchangeRates::findOne($iCurID);  //курсы валют текущие
+            if(!empty($obCurr))
+            {
+                $returnValue = (float)$obCurr->nbrb_rate;
+            }
+        }else{                                          //иначе ищем в истории курсов валют
+            /** @var ExchangeCurrencyHistory $obECH */
+            $obECH = ExchangeCurrencyHistory::getCurrencyForDate($date,$iCurID);    //вытягиеваем курс из истории
+            if($obECH)
+            {
+                $returnValue = (float)$obECH->rate_nbrb;
+            }else{
+                /** @var ExchangeRates $obCurr */
+                $obCurr = ExchangeRates::findOne($iCurID);  //курсы валют текущие
+                if(!empty($obCurr))
+                {
+                    $returnValue = (float)$obCurr->nbrb_rate;
+                }
+            }
+        }
+
+        return $returnValue;
+    }
 }

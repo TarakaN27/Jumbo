@@ -8,6 +8,7 @@ use common\components\payment\PaymentOperations;
 use common\models\CUser;
 
 use common\models\Dialogs;
+use common\models\ExchangeCurrencyHistory;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
@@ -17,6 +18,7 @@ use common\models\Payments;
 use common\models\search\PaymentsSearch;
 
 use yii\filters\AccessControl;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -185,8 +187,18 @@ class DefaultController extends AbstractBaseBackendController
                     if(empty($obCond))
                         throw new NotFoundHttpException("Condition not found");
 
+                    $currSum = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$model->currency_id); //курс валюты в бел рублях на дату платежа
+
+                    if(is_null($currSum))
+                    {
+                        $trans->rollBack();
+                        throw new NotFoundHttpException('currency not found');
+                    }
+
+                    $paySumm = $model->pay_summ*$currSum;
+
                     $obPOp = new PaymentOperations(
-                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
                     );
 
                     $arCount = $obPOp->getFullCalculate();
@@ -210,14 +222,24 @@ class DefaultController extends AbstractBaseBackendController
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }elseif($obCalc->pay_cond_id != $model->condition_id || $model->updateWithNewCondition){
-                    //die();
+
                     /** @var PaymentCondition $obCond */
                     $obCond = PaymentCondition::findOne($model->condition_id);
                     if(empty($obCond))
                         throw new NotFoundHttpException("Condition not found");
 
+                    $currSum = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$model->currency_id); //курс валюты в бел рублях на дату платежа
+
+                    if(is_null($currSum))
+                    {
+                        $trans->rollBack();
+                        throw new NotFoundHttpException('currency not found');
+                    }
+
+                    $paySumm = $model->pay_summ*$currSum;
+
                     $obPOp = new PaymentOperations(
-                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
                     );
 
                     $arCount = $obPOp->getFullCalculate();
@@ -238,8 +260,19 @@ class DefaultController extends AbstractBaseBackendController
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }elseif($oldSumm != $model->pay_summ){
+
+                    $currSum = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$model->currency_id);    //курс валюты в бел рублях на дату платежа
+
+                    if(is_null($currSum))
+                    {
+                        $trans->rollBack();
+                        throw new NotFoundHttpException('currency not found');
+                    }
+
+                    $paySumm = $model->pay_summ*$currSum;
+
                     $obPOp = new PaymentOperations(
-                        $model->pay_summ,$obCalc->cnd_tax,$obCalc->cnd_commission,$obCalc->cnd_corr_factor,$obCalc->cnd_sale
+                        $paySumm,$obCalc->cnd_tax,$obCalc->cnd_commission,$obCalc->cnd_corr_factor,$obCalc->cnd_sale
                     );
 
                     $arCount = $obPOp->getFullCalculate();

@@ -20,6 +20,7 @@ use common\models\AbstractModel;
 use common\models\CUser;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
+use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
@@ -160,7 +161,19 @@ class PaymentRequestController extends AbstractBaseBackendController{
                             if(empty($obCond))
                                 throw new NotFoundHttpException("Condition not found");
 
-                            $obOp = new PaymentOperations($p->summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale);
+                            //курс валюты на дату платежа
+                            $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$modelP->pay_date),$modelP->currency_id);
+                            if(is_null($nCurr))
+                            {
+                                $bError = TRUE;
+                                break;
+                            }
+
+                            //переведем сумму в бел рубли.
+                            $paySumm = (float)$p->summ*(float)$nCurr;
+
+                            //расчет по бел рублям
+                            $obOp = new PaymentOperations($paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale);
                             $arCount = $obOp->getFullCalculate();
 
                             $obPayCalc = new PaymentsCalculations([
@@ -396,16 +409,16 @@ class PaymentRequestController extends AbstractBaseBackendController{
     {
         $iCondID = Yii::$app->request->post('iCondID');     // ID условия
         $iSumm = (float)Yii::$app->request->post('iSumm');     //сумма платежа
-        $iCurr = Yii::$app->request->post('iCurr');     //Валюта платежа
+        $iCurr = (int)Yii::$app->request->post('iCurr');     //Валюта платежа
+        $payDate = Yii::$app->request->post('payDate');
 
         if(!empty($iCurr))  //если указана валюта платежа, то переведем в бел. рубли.
         {
-            /** @var ExchangeRates $obCurrPay */
-            $obCurrPay = ExchangeRates::findOneByIDCached($iCurr);
-            if(!$obCurrPay)
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$payDate),$iCurr); //курс валюты на дату платежа для самого платежа
+            if(is_null($curr))
                 throw new NotFoundHttpException('Currency not found');
 
-            $iSumm = (int)($iSumm*$obCurrPay->nbrb_rate);
+            $iSumm = (float)$iSumm*(float)$curr;
         }
 
         /** @var PaymentCondition $obCond */
@@ -413,15 +426,14 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(!$obCond)
             throw new NotFoundHttpException('Condition not found');
 
-        $iLeftSumm = 0;
-        $iRightSumm = 0;
-        /** @var ExchangeRates $obCurr */
-        $obCurr = ExchangeRates::findOneByIDCached($obCond->currency_id);   //получаем курс валюты
-        if(!$obCurr)
+        //курс валюты для условия
+        $currCond = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$payDate),$obCond->currency_id); //курс валюты на дату платежа
+
+        if(!$currCond)
             throw new NotFoundHttpException('Currency not found');
 
-        $iLeftSumm = (float)$obCond->summ_from*(float)$obCurr->nbrb_rate;    //переводим в бел. рубли. Левая граница
-        $iRightSumm = (float)$obCond->summ_to*(float)$obCurr->nbrb_rate;     //переводим в бел. рубли. Правая граница
+        $iLeftSumm = (float)$obCond->summ_from*(float)$currCond;    //переводим в бел. рубли. Левая граница
+        $iRightSumm = (float)$obCond->summ_to*(float)$currCond;     //переводим в бел. рубли. Правая граница
 
         Yii::$app->response->format = Response::FORMAT_JSON;        //указываем,что возвращать будем в JSON
         if($iLeftSumm > $iSumm || $iSumm > $iRightSumm)    //соответсвует ли сумма границам.
