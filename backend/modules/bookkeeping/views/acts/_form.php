@@ -145,7 +145,8 @@ $('#acts-lp_id').on('change',function(){
         'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'yyyy-m-dd'
+            'format' => 'yyyy-m-dd',
+            'orientation' => 'top left'
         ]
     ])?>
 
@@ -157,7 +158,8 @@ $('#acts-lp_id').on('change',function(){
         'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'yyyy-m-dd'
+            'format' => 'yyyy-m-dd',
+            'orientation' => 'top left'
         ]
     ]) ?>
 
