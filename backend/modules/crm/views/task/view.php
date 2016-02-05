@@ -27,7 +27,7 @@ $this->registerJs("
 ",\yii\web\View::POS_HEAD);
 $this->registerJsFile('@web/js/wm_app/task.js', ['depends' => [\yii\web\JqueryAsset::className()]]);
 $this->registerJs("
-$('.table-time-log-area').on('click','.activity-update-link',
+$('#tab_content2').on('click','.activity-update-link',
 function() {
     $.post(
         '".\yii\helpers\Url::to(['update-log-time'])."',
@@ -62,6 +62,7 @@ $('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
 					addSuccessNotify(TASK,'".Yii::t('app/crm','Time successfully spent')."');
 					$('#activity-modal .modal-dialog button.close').click();
 					$('.user-time').html(res.timeSpend);
+				    $('.activity-update-link').removeClass('hidden');
                }else{
                     $('#activity-modal .modal-body').html(res);
 					addErrorNotify(TASK,'".Yii::t('app/crm','Error. Can not log time')."');
@@ -107,6 +108,8 @@ $this->registerJs("
     'header' => '<h2>'.Yii::t('app/crm','Edit log time').'</h2>',
     'size' => Modal::SIZE_DEFAULT,
 ]);?>
+
+
 
 <?php Modal::end();
 ?>

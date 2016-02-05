@@ -7,6 +7,7 @@
  */
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
+$disableHidden = isset($disableHidden) ? $disableHidden : FALSE;
 ?>
 <?=\yii\grid\GridView::widget([
 	'tableOptions' => [
@@ -37,12 +38,12 @@ use yii\helpers\Html;
 			//'headerOptions' => ['width' => '20%', 'class' => 'activity-view-link',],
 			//'contentOptions' => ['class' => 'padding-left-5px'],
 			'buttons' => [
-				'update' => function ($url, $model, $key) {
+				'update' => function ($url, $model, $key) use ($disableHidden) {
 					if($model->buser_id !== Yii::$app->user->id)
 						return '';
 
 					return Html::a('<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>','#', [
-						'class' => 'activity-update-link hidden',
+						'class' => 'activity-update-link '.($disableHidden ? '' : 'hidden') ,
 						'title' => Yii::t('yii', 'Update'),
 						'data-toggle' => 'modal',
 						'data-target' => '#activity-modal',

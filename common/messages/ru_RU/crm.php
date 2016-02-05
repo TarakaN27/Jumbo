@@ -229,5 +229,6 @@ return [
 	'Bill successfully copied' => 'Счет успешно скопирован',
 	'Error. Can not copy bill' => 'Ошибка. Не удалось скопировать счет',
 	'View type users task' => 'Задачи пользователей',
-	'Payment request for {company}' => 'Запрос на платеж для компании {company}'
+	'Payment request for {company}' => 'Запрос на платеж для компании {company}',
+	'Edit log time' => 'Редактирование затраченого времени'
 ];

@@ -492,7 +492,7 @@ class TaskController extends AbstractBaseBackendController
             return [
                 'error' => NULL,
                 'model' => $obLog,
-                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr]),
+                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr,'disableHidden' => TRUE]),
                 'timeSpend' => \common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)
             ];
         }

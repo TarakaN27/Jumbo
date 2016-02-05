@@ -27,6 +27,7 @@ $('body').on('beforeSubmit', 'form#logWorkID', function () {
 					addSuccessNotify(TASK,'".Yii::t('app/crm','Time successfully spent')."');
 					$('.company-time-control .modal-dialog button.close').click();
 					$('.user-time').html(res.timeSpend);
+					$('#tab_content2 a.activity-update-link').removeClass('hidden');
                }else{
 					addErrorNotify(TASK,'".Yii::t('app/crm','Error. Can not log time')."');
                }
