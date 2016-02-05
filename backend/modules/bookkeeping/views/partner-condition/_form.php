@@ -31,8 +31,7 @@ use yii\widgets\ActiveForm;
         'type' => \kartik\date\DatePicker::TYPE_INLINE,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'yyyy-m-dd',
-            'orientation' => 'top left'
+            'format' => 'yyyy-m-dd'
         ]
     ]) ?>
 

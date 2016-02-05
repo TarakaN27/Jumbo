@@ -56,8 +56,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                                     'pluginOptions' => [
                                         'autoclose' => TRUE,
                                         'format' => 'yyyy-mm-dd',
-                                        'defaultDate' => date('Y-m-d', time()),
-                                        'orientation' => 'top left'
+                                        'defaultDate' => date('Y-m-d', time())
                                     ]
                                 ])?>
                         </div>
@@ -69,8 +68,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                                 'pluginOptions' => [
                                     'autoclose' => TRUE,
                                     'format' => 'yyyy-mm-dd',
-                                    'defaultDate' => date('Y-m-d', time()),
-                                    'orientation' => 'top left'
+                                    'defaultDate' => date('Y-m-d', time())
                                 ]
                             ])?>
                         </div>
