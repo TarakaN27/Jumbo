@@ -46,11 +46,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
-               // [
-               //     'actions' => ['index','view','create','update'],
-               //     'allow' => true,
-               //     'roles' => ['moder']
-               // ],
                 [
                     'allow' => true,
                     'roles' => ['admin','bookkeeper','moder']
@@ -400,7 +395,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
     public function actionBoundsCheckingConditions()
     {
         $iCondID = Yii::$app->request->post('iCondID');     // ID условия
-        $iSumm = Yii::$app->request->post('iSumm');     //сумма платежа
+        $iSumm = (float)Yii::$app->request->post('iSumm');     //сумма платежа
         $iCurr = Yii::$app->request->post('iCurr');     //Валюта платежа
 
         if(!empty($iCurr))  //если указана валюта платежа, то переведем в бел. рубли.
@@ -425,11 +420,11 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(!$obCurr)
             throw new NotFoundHttpException('Currency not found');
 
-        $iLeftSumm = (int)$obCond->summ_from*$obCurr->nbrb_rate;    //переводим в бел. рубли. Левая граница
-        $iRightSumm = (int)$obCond->summ_to*$obCurr->nbrb_rate;     //переводим в бел. рубли. Правая граница
+        $iLeftSumm = (float)$obCond->summ_from*(float)$obCurr->nbrb_rate;    //переводим в бел. рубли. Левая граница
+        $iRightSumm = (float)$obCond->summ_to*(float)$obCurr->nbrb_rate;     //переводим в бел. рубли. Правая граница
 
         Yii::$app->response->format = Response::FORMAT_JSON;        //указываем,что возвращать будем в JSON
-        if($iLeftSumm >= $iSumm || $iSumm >= $iRightSumm)    //соответсвует ли сумма границам.
+        if($iLeftSumm > $iSumm || $iSumm > $iRightSumm)    //соответсвует ли сумма границам.
             return TRUE;
         else
             return FALSE;
