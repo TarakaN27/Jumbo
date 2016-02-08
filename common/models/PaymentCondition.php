@@ -199,7 +199,7 @@ class PaymentCondition extends AbstractActiveRecord
 
         foreach($arConditions as $cond)
         {
-            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$iPayDate),$cond->id);
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$iPayDate),$cond->currency_id);
             if(empty($curr))
                 throw new NotFoundHttpException('Currency not found');
 
