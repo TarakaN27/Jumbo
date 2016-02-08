@@ -35,6 +35,7 @@ class BUserSignupForm extends Model{
         return [
             ['role','integer'],
             ['username', 'filter', 'filter' => 'trim'],
+            ['username', 'match', 'pattern' => '#^[\w_-]+$#i'],
             ['username', 'required'],
             ['username', 'unique',
              'targetClass' => BUser::className(),
@@ -93,7 +94,6 @@ class BUserSignupForm extends Model{
             $user->setPassword($this->password);
             $user->generateAuthKey();
             $user->save();
-
             return $user;
         }
 

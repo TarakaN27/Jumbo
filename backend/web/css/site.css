@@ -157,5 +157,7 @@
 .color-white{color: #FFFFFF !important;}
 tr.admin-line{background-color: #CEF6E3 !important;}
 .pdd-left-15{padding-left: 15px;}
+.datepicker-dropdown.datepicker-orient-top:after,.datepicker-dropdown.datepicker-orient-bottom:before,
+.datepicker-dropdown.datepicker-orient-top:before,.datepicker-dropdown.datepicker-orient-bottom:after{display: none!important;}
 
 

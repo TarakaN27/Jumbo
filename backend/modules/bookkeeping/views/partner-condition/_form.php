@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'percent')->textInput() ?>
 
     <?= $form->field($model, 'start_date')->widget(\kartik\date\DatePicker::className(),[
-        'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
+        'type' => \kartik\date\DatePicker::TYPE_INLINE,
         'pluginOptions' => [
             'autoclose'=>true,
             'format' => 'yyyy-m-dd'
