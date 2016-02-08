@@ -15,6 +15,7 @@ use Yii;
 class AddPaymentForm extends AbstractModel{
 
     public
+        $showAll,
         $fullSumm,
         $comment,
         $service,
@@ -38,6 +39,7 @@ class AddPaymentForm extends AbstractModel{
     public function attributeLabels()
     {
         return [
+            'showAll' => Yii::t('app/book','Show all conditions'),
             'summ' => Yii::t('app/book', 'Summ'),
             'service' => Yii::t('app/book', 'Service'),
             'condID' => Yii::t('app/book', 'Condition'),

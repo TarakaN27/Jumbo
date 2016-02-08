@@ -111,8 +111,17 @@ $this->registerJs('
             cache: false,
             url: "'.\yii\helpers\Url::to(['find-condition']).'",
             dataType: "json",
-            data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount},
+            data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount,prID:"'.$modelP->id.'"},
             success: function(msg){
+                showOptions(msg.visable,"#"+condID);
+                if(msg.default != "" && msg.default  != null)
+                {
+                    $("#"+condID).val(msg.default);
+                    boundsCheckingConditions("#"+condID);
+                }
+
+
+            /*
                 if(msg.cID)
                   {
                     $("#"+condID).val(msg.cID);
@@ -123,7 +132,7 @@ $this->registerJs('
                     addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
                     $("#"+condID).val("");
                   }
-
+            */
             },
             error: function(msg){
                 addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
@@ -175,7 +184,7 @@ $this->registerJs('
             iCondID = $("#addpaymentform-"+ID+"-condid").val(),
             iSumm = $("#addpaymentform-"+ID+"-summ").val();
 
-        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "")
+        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" )
             return false;
 
         $.ajax({
@@ -198,6 +207,58 @@ $this->registerJs('
         });
     }
 
+    var
+        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionMap()).';
+
+    function showOptions(condID,lineID)
+    {
+        var
+            select = $(lineID);
+        select.val("");
+
+        showAll = $(lineID.replace(/-condid/gi,"-showall")).is(":checked");
+
+        select.find("option:not([value=\'\'])").remove();
+
+        $.each(conditions, function( index, value ) {
+            if(showAll || $.inArray(parseInt(index),condID) !== -1)
+                {
+                    select.append("<option value=\'"+index+"\'>"+value+"</option>")
+                }
+        });
+    }
+
+    // по дефолту инициализирцем
+    function initDefaultCondition()
+    {
+        var
+            defaultVal = $("#addpaymentform-0-condid").val(),
+            condID = '.\yii\helpers\Json::encode($arCondVisible).';
+        showOptions(condID,"#addpaymentform-0-condid");
+        if(defaultVal != undefined && defaultVal != "" && defaultVal != null )
+        {
+            $("#addpaymentform-0-condid").val(defaultVal);
+        }
+    }
+
+    // действия по клику
+    function showAllBtnActions()
+    {
+
+
+        if($(this).is(":checked"))
+        {
+            var
+                lineID = $(this).attr("id").replace(/-showall/gi,"-condid");
+            showOptions(new Array(),"#"+lineID);
+        }else{
+            var
+                lineID = $(this).attr("id").replace(/-showall/gi,"-service");
+            findCondition("#"+lineID);
+        }
+    }
+
+
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();
@@ -211,6 +272,8 @@ $this->registerJs('
     });
     $(document).on("submit", "form#dynamic-form", validateFormLogic);
     initPayment();
+    initDefaultCondition();
+    $(".dynamicform_wrapper").on("change",".showAllBtn",showAllBtnActions);
 ',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
@@ -304,7 +367,7 @@ $this->registerJs('
                                         <?= $form->field($m, "[{$i}]service")->dropDownList(
                                             \common\models\Services::getServicesMap(),[
                                             'prompt' => Yii::t('app/book','Choose service'),
-                                            'onchange' => 'findCondition(this);boundsCheckingConditions(this);',
+                                            'onchange' => 'findCondition(this);',
                                             'data-service-id' => $i
                                         ]) ?>
                                         <?= $form->field($m, "[{$i}]summ")->textInput([
@@ -318,6 +381,13 @@ $this->registerJs('
                                             'data-cond-id' => $i,
                                             'onchange' => 'boundsCheckingConditions(this);',
                                         ]) ?>
+                                        <div class="row">
+                                            <div class="col-md-offset-2 pdd-left-15">
+                                            <?= $form->field($m,"[{$i}]showAll")->checkbox([
+                                                'class' => 'showAllBtn'
+                                            ])?>
+                                                </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

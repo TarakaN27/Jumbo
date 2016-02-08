@@ -96,6 +96,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(!Yii::$app->user->can('adminRights') && $modelP->manager_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action');
 
+        $arCondVisible = [];
 
         if(!Yii::$app->request->post('AddPaymentForm')) {
 
@@ -106,9 +107,28 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
                 if(empty($obCntrID))
                     throw new NotFoundHttpException('Contractor not found');
-                $cID = $this->getCondition($modelP->service_id,$modelP->legal_id,$obCntrID,$modelP->pay_summ);
-                if(!empty($cID) && isset($cID['cID']) && !empty($cID['cID']))
-                    $formModel->condID = $cID['cID'];
+
+                //курс валюты на дату платежа
+                $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$modelP->pay_date),$modelP->currency_id);
+                $paySumm = (float)$modelP->pay_summ*$nCurr;
+                $arCondVisible = PaymentCondition::getAppropriateConditions(
+                    $modelP->service_id,
+                    $modelP->legal_id,
+                    $paySumm,
+                    $obCntrID->is_resident,
+                    $modelP->pay_date);
+
+                $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
+                    'cuser_id' => $obCntrID->id,
+                    'service_id' => $modelP->service_id
+                ])->one();
+
+                if($obPPC)
+                {
+                    $formModel->condID = $obPPC->cond_id;
+                    if(!in_array($obPPC->cond_id,$arCondVisible))
+                        $arCondVisible[] = $obPPC->cond_id;
+                }
             }
              $model = [$formModel];
         }
@@ -216,7 +236,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
         return $this->render('add_payment',[
             'model' => $model,
-            'modelP' => $modelP
+            'modelP' => $modelP,
+            'arCondVisible' => $arCondVisible
         ]);
     }
 
@@ -302,15 +323,37 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $iContrID = Yii::$app->request->post('iContrID');
         $lPID = Yii::$app->request->post('lPID');
         $amount = Yii::$app->request->post('amount');
+        $prID = (int)Yii::$app->request->post('prID');
 
         $obCntrID = CUser::findOneByIDCached($iContrID);
 
         if(empty($obCntrID))
             throw new NotFoundHttpException('Contractor not found');
 
+        $modelP = PaymentRequest::findOne($prID);
+        if(empty($modelP))
+            throw new NotFoundHttpException('Payment request not found');
+
+        $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$modelP->pay_date),$modelP->currency_id);
+        $paySumm = (float)$amount*$nCurr;
+        $arCondVisible = PaymentCondition::getAppropriateConditions(
+            $iServID,
+            $modelP->legal_id,
+            $paySumm,
+            $obCntrID->is_resident,
+            $modelP->pay_date);
+
+        $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
+            'cuser_id' => $obCntrID->id,
+            'service_id' => $iServID
+        ])->one();
+
+        if(!empty($obPPC) && !in_array($obPPC->cond_id,$arCondVisible))
+            $arCondVisible [] = $obPPC->cond_id;
+
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return $this->getCondition($iServID,$lPID,$obCntrID,$amount);
+        return ['visable' => $arCondVisible,'default' => empty($obPPC) ? NULL : $obPPC->cond_id];
     }
 
     /**

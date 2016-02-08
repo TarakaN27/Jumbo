@@ -23,6 +23,9 @@ function findCondition()
     var
        iServ = $("#payments-service_id").val(),
        iCuser = $("#payments-cuser_id").val(),
+       amount = $("#payments-pay_summ").val(),
+       iCurr = $("#payments-currency_id").val(),
+       payDate = $("#payments-pay_date").val(),
        iLP = $("#payments-legal_id").val();
 
     if(iServ == "" || iLP == "" || iCuser == "")
@@ -34,17 +37,16 @@ function findCondition()
     $.ajax({
         type: "POST",
         cache: false,
-        url: "'.\yii\helpers\Url::to(['/bookkeeping/payment-request/find-condition']).'",
+        url: "'.\yii\helpers\Url::to(['find-condition']).'",
         dataType: "json",
-        data: {iServID:iServ,iContrID:iCuser,lPID:iLP},
+        data: {iServID:iServ,iContrID:iCuser,lPID:iLP,amount:amount,iCurr:iCurr,payDate:payDate},
         success: function(msg){
-            if(msg.cID)
-              {
-                $("#payments-condition_id").val(msg.cID);
-                addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
-              }else{
-                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
-              }
+                showOptions(msg.visable,"#payments-condition_id");
+                if(msg.default != "" && msg.default  != null)
+                {
+                    $("#payments-condition_id").val(msg.default);
+                    boundsCheckingConditions("#"+condID);
+                }
         },
         error: function(msg){
             addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
@@ -53,7 +55,7 @@ function findCondition()
     });
 }
 
-// Проверка суммы на соотвествие границам условия.
+    // Проверка суммы на соотвествие границам условия.
     function boundsCheckingConditions()
     {
 
@@ -85,10 +87,51 @@ function findCondition()
         });
     }
 
+    var
+        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionMap()).';
+
+    function showOptions(condID,lineID)
+    {
+        var
+            select = $(lineID);
+        select.val("");
+
+        showAll = $("#show_all_id").is(":checked");
+
+        select.find("option:not([value=\'\'])").remove();
+
+        $.each(conditions, function( index, value ) {
+            if(showAll || $.inArray(parseInt(index),condID) !== -1)
+                {
+                    select.append("<option value=\'"+index+"\'>"+value+"</option>")
+                }
+        });
+    }
+
+    // действия по клику
+    function showAllBtnActions()
+    {
+        if($(this).is(":checked"))
+        {
+            showOptions(new Array(),"#payments-condition_id");
+        }else{
+            findCondition();
+        }
+    }
+    function initDefaultCondition()
+    {
+        var
+            condID = '.\yii\helpers\Json::encode([$model->condition_id]).';
+        showOptions(condID,"#payments-condition_id");
+        $("#payments-condition_id").val('.$model->condition_id.');
+    }
 ',\yii\web\View::POS_END);
 
 $this->registerJs('
 $("#payments-cuser_id").on("change",findCondition);
+ // по дефолту инициализирцем
+    initDefaultCondition();
+    $("#show_all_id").on("change",showAllBtnActions);
 ',\yii\web\View::POS_READY);
 
 ?>
@@ -154,10 +197,18 @@ $("#payments-cuser_id").on("change",findCondition);
         'onchange' => 'findCondition();'
     ]) ?>
 
-    <?= $form->field($model, 'condition_id')->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
+    <?= $form->field($model, 'condition_id')->dropDownList([],[
         'prompt' => Yii::t('app/book','BOOK_choose_payment_condition'),
         'onchange' => 'boundsCheckingConditions();'
     ]) ?>
+    <div class="row">
+        <div class="col-md-offset-3 pdd-left-15">
+            <?= $form->field($model,"showAll")->checkbox([
+                'class' => 'showAllBtn',
+                'id' => 'show_all_id'
+            ])?>
+        </div>
+    </div>
 
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>

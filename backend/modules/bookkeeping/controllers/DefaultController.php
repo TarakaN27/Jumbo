@@ -7,6 +7,7 @@ use backend\models\BUser;
 use common\components\payment\PaymentOperations;
 use common\models\CUser;
 
+use common\models\CuserPreferPayCond;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
 use common\models\PaymentCondition;
@@ -295,10 +296,52 @@ class DefaultController extends AbstractBaseBackendController
             $trans->rollBack();
             Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't update payment"));
         } else {
+
+
             return $this->render('update', [
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * @return array
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionFindCondition()
+    {
+        $iServID = Yii::$app->request->post('iServID');
+        $iContrID = Yii::$app->request->post('iContrID');
+        $lPID = (int)Yii::$app->request->post('lPID');
+        $amount = Yii::$app->request->post('amount');
+        $iCurr = (int)Yii::$app->request->post('iCurr');
+        $payDate = (int)Yii::$app->request->post('payDate');
+
+        $obCntrID = CUser::findOneByIDCached($iContrID);
+
+        if(empty($obCntrID))
+            throw new NotFoundHttpException('Contractor not found');
+
+        $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',strtotime($payDate)),$iCurr);
+        $paySumm = (float)$amount*$nCurr;
+        $arCondVisible = PaymentCondition::getAppropriateConditions(
+            $iServID,
+            $lPID,
+            $paySumm,
+            $obCntrID->is_resident,
+            strtotime($payDate));
+
+        $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
+            'cuser_id' => $obCntrID->id,
+            'service_id' => $iServID
+        ])->one();
+
+        if(!empty($obPPC) && !in_array($obPPC->cond_id,$arCondVisible))
+            $arCondVisible [] = $obPPC->cond_id;
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return ['visable' => $arCondVisible,'default' => empty($obPPC) ? NULL : $obPPC->cond_id];
     }
 
     /**

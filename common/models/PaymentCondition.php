@@ -35,6 +35,8 @@ use yii\web\NotFoundHttpException;
  */
 class PaymentCondition extends AbstractActiveRecord
 {
+
+
     /**
      * @inheritdoc
      */
@@ -63,6 +65,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','max' => 100],
+
         ];
     }
 
@@ -88,6 +91,7 @@ class PaymentCondition extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'cond_currency' => Yii::t('app/book', 'Condition currency'),
+
         ];
     }
 

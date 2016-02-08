@@ -158,6 +158,7 @@ return [
     'Contractor' => 'Контрагент',
     'BOOK_choose_managers' => 'Выберите менеджера',
     'You must set amount and choose service' => 'Вы должны указать сумму и выбрать услугу',
+    'Show all conditions' => 'Показать все условия'
 
 
 

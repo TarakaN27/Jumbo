@@ -5,6 +5,7 @@ namespace common\models;
 use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PartnerPaymentBehavior;
+use common\components\payment\PaymentPredefinedConditionBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -33,8 +34,10 @@ class Payments extends AbstractActiveRecord
 {
 
     public
+        $showAll,
         $updateWithNewCondition,
         $condition_id;
+
 
     /**
      * @inheritdoc
@@ -53,7 +56,8 @@ class Payments extends AbstractActiveRecord
             [['payment_order','cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
             [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id','updateWithNewCondition'], 'integer'],
             [['pay_summ'], 'number'],
-            [['description'], 'string']
+            [['description'], 'string'],
+            ['showAll','safe']
         ];
     }
 
@@ -99,7 +103,9 @@ class Payments extends AbstractActiveRecord
             'prequest_id' => Yii::t('app/book', 'Payment request'),
             'condition_id' => Yii::t('app/book', 'Condition'),
             'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition'),
-            'payment_order' => Yii::t('app/book','Payment order')
+            'payment_order' => Yii::t('app/book','Payment order'),
+            'showAll' => Yii::t('app/book','Show all conditions')
+
         ];
     }
 
@@ -119,6 +125,9 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
+                ],
+                [
+                    'class' => PaymentPredefinedConditionBehavior::className()  //устанавливаем предопределныеусловия для CUSER
                 ]
             ]);
     }
