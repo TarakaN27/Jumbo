@@ -151,15 +151,18 @@ class BillsManager extends Bills{
 
         $billVatRate  =  "Без НДС";
         $billVatSumm  =  "Без НДС";
+        $billTotalVat = '';
         if($this->use_vat)
         {
-            $billSumm = $this->amount;
+
             $billVatRate = round($this->vat_rate,1);
-            $billPrice = round($this->amount/(1+CustomHelper::getVat()/100),-3);
+            $billPrice = round($this->amount/(1+CustomHelper::getVat()/100));
             $billVatSumm = $this->amount - $billPrice;
+            $billTotalVat = $billVatSumm;
+            $billSumm = $billPrice;
             $billTotalSumVat = $this->amount;
             $totalSummVat = $this->amount;
-            $totalSumm = $this->amount;
+            $totalSumm = $billPrice;
 
             $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
                 CustomHelper::ciRub($billTotalSumVat) .' c НДС ' ;
@@ -199,6 +202,7 @@ class BillsManager extends Bills{
             $doc->setValue('totalSummVat',$totalSummVat);
             $doc->setValue('totalSummInWords',$totalSummInWords);
             $doc->setValue('description',$this->description);
+            $doc->setValue('billTotalVat',$billTotalVat);
 
 
             $doc->saveAs($tryPath);
