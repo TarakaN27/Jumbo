@@ -85,5 +85,6 @@ return [
     'DIALOG_task' => 'Задача',
     'Invite resend' => 'Приглашение отправлено',
     'Error, please try again!' => 'Ошибка. Попробуйте еще раз',
-    'by' => 'от'
+    'by' => 'от',
+    'Calendar' => 'Календарь'
 ];

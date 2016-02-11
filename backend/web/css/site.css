@@ -159,5 +159,12 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .pdd-left-15{padding-left: 15px;}
 .datepicker-dropdown.datepicker-orient-top:after,.datepicker-dropdown.datepicker-orient-bottom:before,
 .datepicker-dropdown.datepicker-orient-top:before,.datepicker-dropdown.datepicker-orient-bottom:after{display: none!important;}
+._calendar_hd{background-color: #f2dede;}
+._calendar_ed{background-color: #C1FFC1;}
+._calendar_shd{background-color: #fcf8e3;}
+
+.table-calendar td {font-size: 16px}
+.calendar-month{min-height: 330px;}
+.calendar-edit td.calendar_day:hover{background-color: #ddd;cursor: pointer;}
 
 

@@ -39,6 +39,14 @@ return [
     'Selected managers' => 'Выбранные менеджеры',
     'Generate excel' => 'Сгенерировать Excel',
     'Generate docx' => 'Сгенерировать Docx',
-    'No data' => 'Нет данных'
-
+    'No data' => 'Нет данных',
+    'Work day' => 'Рабочий день',
+    'Holiday' => 'Выходной',
+    '{workDay} working days; {holidays} holidays; {clockRate} clock rate' =>
+        '{workDay} рабочих дней; {holidays} выходных; {clockRate} рабочих часов',
+    'Date' => 'Дата',
+    'Type' => 'Тип',
+    'Work Hour' => 'Рабочие часы',
+    'Description' => 'Описание',
+    'Update date' => 'Редактирование дня'
 ];

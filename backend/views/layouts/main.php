@@ -261,18 +261,23 @@ $menuItems[] = [
                                         </li>
                                     </ul>
                                 </li-->
-                                <?php if(Yii::$app->user->can('adminRights')):?>
+
                                 <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
-                                         <li>
+                                        <li>
+                                            <a href="<?= Url::to(['/reports/calendar/index']); ?>"><?php echo Yii::t('app/common', 'Calendar'); ?></a>
+                                        </li>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <li>
                                             <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                         </li>
                                         <li>
                                             <a href="<?= Url::to(['/reports/units-reports/index']); ?>"><?php echo Yii::t('app/common', 'Units reports'); ?></a>
                                         </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
-                                <?php endif;?>
+
                                 <li><a>
                                         <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?>
                                         <span class="fa fa-chevron-down"></span>
