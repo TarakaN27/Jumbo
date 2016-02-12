@@ -75,8 +75,12 @@ class TimeSheet
 			foreach($arLogWorkDay as &$log)
 			{
 				$iTotalWorkDayTime+=(int)$log->spent_time;
-				$arWorkDayTooltip[$log->id] = \Yii::t('app/reports','Begin day').': '.\Yii::$app->formatter->asDatetime($log->begin_time).';'.
-					\Yii::t('app/reports','End day').': '.\Yii::$app->formatter->asDatetime($log->end_time).';'.
+
+				$begin = empty($log->begin_time) ? '' : \Yii::$app->formatter->asDatetime($log->begin_time);
+				$end = empty($log->end_time) ? '' : \Yii::$app->formatter->asDatetime($log->end_time);
+
+				$arWorkDayTooltip[$log->id] = \Yii::t('app/reports','Begin day').': '.$begin.';'.
+					\Yii::t('app/reports','End day').': '.$end.';'.
 					\Yii::t('app/reports','Description').': '.Html::encode($log->description);
 
 				$log->spent_time = round($log->spent_time/3600,2);
