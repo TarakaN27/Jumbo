@@ -33,4 +33,26 @@ class CalendarDaysManager extends CalendarDays
 
 		return $arReturn;
 	}
+
+	/**
+	 * @param $begin -- 2016-01-01 Y-m-d
+	 * @param $end -- 2016-02-01
+	 * @return array
+	 */
+	public static function getDaysForRange($begin,$end)
+	{
+		$arDays = self::find()  //выбираем все даты, которые записаны в бд
+		->where('date BETWEEN :startDate AND :endDate')
+			->params([
+				':startDate' => $begin,
+				':endDate' => $end
+			])
+			->all();
+
+		$arReturn = [];
+		foreach($arDays as $day)
+			$arReturn[$day->date] = $day;
+
+		return $arReturn;
+	}
 }

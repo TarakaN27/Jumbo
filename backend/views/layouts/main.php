@@ -267,6 +267,9 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/reports/calendar/index']); ?>"><?php echo Yii::t('app/common', 'Calendar'); ?></a>
                                         </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/reports/timesheet/index']); ?>"><?php echo Yii::t('app/common', 'Timesheet'); ?></a>
+                                        </li>
                                         <?php if(Yii::$app->user->can('adminRights')):?>
                                         <li>
                                             <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>

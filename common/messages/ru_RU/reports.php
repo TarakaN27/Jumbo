@@ -48,5 +48,16 @@ return [
     'Type' => 'Тип',
     'Work Hour' => 'Рабочие часы',
     'Description' => 'Описание',
-    'Update date' => 'Редактирование дня'
+    'Update date' => 'Редактирование дня',
+    'TIMESHEET_ERROR_LOAD' => 'Во время загрузки отчета произошла ошибка',
+    'Timesheet' => 'Timesheet',
+    'Without company' => 'Другие',
+    'Required' => 'Норма времени',
+    'Worked' => 'Отработано',
+    'Other' => 'Другое',
+    'Log work type' => 'Тип учета рабочего времени',
+    'Begin day' => 'Начало дня',
+    'End day' => 'Конец дня',
+    'Reports by work day' => 'Отчет по рабочим дням',
+    'Reports by task' => 'Отчет по задачам'
 ];
