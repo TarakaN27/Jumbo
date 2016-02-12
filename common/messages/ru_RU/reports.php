@@ -59,5 +59,8 @@ return [
     'Begin day' => 'Начало дня',
     'End day' => 'Конец дня',
     'Reports by work day' => 'Отчет по рабочим дням',
-    'Reports by task' => 'Отчет по задачам'
+    'Reports by task' => 'Отчет по задачам',
+    'Total' => 'Всего',
+    'Users' => 'Пользователи',
+    'To list' => 'К списку'
 ];

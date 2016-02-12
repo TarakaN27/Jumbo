@@ -94,3 +94,12 @@ $('#toListID').on('click',function(){
     contener.attr('data-user-id','');
     loadTimeSheet($('#reportrange').data('daterangepicker'));
 });
+$('#main-contener').on('click','.ts-user-col',function(){
+    var
+        contener = $('#main-contener');
+    contener.attr('data-type','one_user');
+    contener.attr('data-user-id',$(this).attr('data-id'));
+
+    loadTimeSheet($('#reportrange').data('daterangepicker'));
+    $('#toListID').removeClass('hide');
+});

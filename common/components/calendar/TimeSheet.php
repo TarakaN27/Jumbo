@@ -196,7 +196,7 @@ class TimeSheet
 	{
 		$arUsers = $this->getAllUsers();   //получаем всех пользователей;
 		$iTotalNeed = 0;
-		$arDays = $this->getCalendardays($iTotalNeed);
+		$arDays = $this->getCalendardays();
 		$arLogTask = $this->getLogTaskForUsers(array_keys($this->userByTask));
 		$arLogWorkDay = $this->getLogWorkDayForUsers(array_keys($this->userByWorkDay));
 		$arTotal = [];
@@ -213,9 +213,9 @@ class TimeSheet
 			}
 		}
 
-		foreach($arLogWorkDay as $key => $logWorkDay)
+		foreach($arLogWorkDay as $key => &$logWorkDay)
 		{
-			foreach($logWorkDay as $workDay)
+			foreach($logWorkDay as &$workDay)
 			{
 				if(isset($arTotal[$key])) {
 					$arTotal[$key] += $workDay;
@@ -225,6 +225,24 @@ class TimeSheet
 				$workDay = round($workDay/3600,2);
 			}
 		}
+
+		foreach($arDays as $day)
+		{
+			$iTotalNeed+=(int)$day['need'];
+		}
+
+		foreach($this->userByTask as $key => $value)
+		{
+			if(!isset($arTotal[$key]))
+				$arTotal[$key] = 0;
+		}
+
+		foreach($this->userByWorkDay as $key => $item)
+		{
+			if(!isset($arTotal[$key]))
+				$arTotal[$key] = 0;
+		}
+
 		return [
 			'iTotalNeed' => $iTotalNeed,
 			'arDays' => $arDays,
@@ -325,7 +343,7 @@ class TimeSheet
 		return $arReturn;
 	}
 
-	protected function getCalendardays($iTotalNeed)
+	protected function getCalendardays()
 	{
 		$arCDays = CalendarDaysManager::getDaysForRange($this->startDate,$this->endDate); //получаем не стандартные дни из календаря
 
@@ -344,7 +362,6 @@ class TimeSheet
 				}else{
 					$day['class'] = Calendar::WORK_DAY;
 					$day['need'] = (int)$model->work_hour;
-					$iTotalNeed+=(int)$model->work_hour;
 				}
 			}else{
 				$dayNum = (int)date('N',strtotime($key));
@@ -355,7 +372,6 @@ class TimeSheet
 				}else{
 					$day['class'] = Calendar::WORK_DAY;
 					$day['need'] = (int)Calendar::DEFAULT_WORK_HOUR;
-					$iTotalNeed+=(int)Calendar::DEFAULT_WORK_HOUR;
 				}
 			}
 		}

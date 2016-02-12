@@ -39,13 +39,18 @@ $this->registerJs("
 		<div class="x_panel">
 			<div class="x_title">
 				<h2><?= Html::encode($this->title) ?></h2>
-				<section class="pull-right">
-					<?=Html::button(Yii::t('app/reports','To list'),['class' => 'btn btn-warning hide','id' => 'toListID'])?>
-					<div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
-						<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-						<span></span> <b class="caret"></b>
-					</div>
-				</section>
+
+				<ul class="nav navbar-right panel_toolbox">
+					<li><?=Html::button(Yii::t('app/reports','To list'),['class' => 'btn btn-warning hide','id' => 'toListID'])?></li>
+					<li >
+						<div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+							<span></span> <b class="caret"></b>
+						</div>
+					</li>
+				</ul>
+
+			
 				<div class="clearfix"></div>
 			</div>
 			<div class="x_content" id="main-contener" data-type="user" data-user-id="">

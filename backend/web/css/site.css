@@ -169,3 +169,17 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .mrg-auto{margin: auto;}
 .ts_green{color: #5cb85c;}
 .ts_red{color: #90111A;}
+.ts_bg_task{background-color: #EBF5FB;}
+.ts_bg_work_day{background-color: #F4ECF7 ; }
+.table-time-users-sheet th,.table-time-users-sheet td{
+    padding: 2px !important;
+    vertical-align: middle !important;
+}
+.ts-user-col:hover{
+    background-color:#AEB6BF ;
+    cursor: pointer ;
+}
+.btn-back{
+    float:left;
+    margin-right: 20xp;
+}
