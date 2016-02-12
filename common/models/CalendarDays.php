@@ -60,7 +60,7 @@ class CalendarDays extends AbstractActiveRecord
         return [
             [['buser_id', 'type', 'work_hour', 'created_at', 'updated_at'], 'integer'],
             [['date'], 'safe'],
-            ['date','date','format'=>'Y-m-d'],
+            //['date','date','format'=>'Y-m-d'],
             [['description'], 'string'],
             ['work_hour','integer','min'=>0,'max'=>24],
             ['type','in', 'range' => array_keys(self::getTypeArr())],
