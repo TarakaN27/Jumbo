@@ -86,5 +86,6 @@ return [
     'Invite resend' => 'Приглашение отправлено',
     'Error, please try again!' => 'Ошибка. Попробуйте еще раз',
     'by' => 'от',
-    'Calendar' => 'Календарь'
+    'Calendar' => 'Календарь',
+    'Timesheet' => 'Рабочие отчеты'
 ];

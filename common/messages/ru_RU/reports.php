@@ -50,7 +50,6 @@ return [
     'Description' => 'Описание',
     'Update date' => 'Редактирование дня',
     'TIMESHEET_ERROR_LOAD' => 'Во время загрузки отчета произошла ошибка',
-    'Timesheet' => 'Timesheet',
     'Without company' => 'Другие',
     'Required' => 'Норма времени',
     'Worked' => 'Отработано',
@@ -62,5 +61,6 @@ return [
     'Reports by task' => 'Отчет по задачам',
     'Total' => 'Всего',
     'Users' => 'Пользователи',
-    'To list' => 'К списку'
+    'To list' => 'К списку',
+    'Timesheet' => 'Рабочие отчеты'
 ];
