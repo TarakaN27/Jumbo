@@ -39,6 +39,28 @@ return [
     'Selected managers' => 'Выбранные менеджеры',
     'Generate excel' => 'Сгенерировать Excel',
     'Generate docx' => 'Сгенерировать Docx',
-    'No data' => 'Нет данных'
-
+    'No data' => 'Нет данных',
+    'Work day' => 'Рабочий день',
+    'Holiday' => 'Выходной',
+    '{workDay} working days; {holidays} holidays; {clockRate} clock rate' =>
+        '{workDay} рабочих дней; {holidays} выходных; {clockRate} рабочих часов',
+    'Date' => 'Дата',
+    'Type' => 'Тип',
+    'Work Hour' => 'Рабочие часы',
+    'Description' => 'Описание',
+    'Update date' => 'Редактирование дня',
+    'TIMESHEET_ERROR_LOAD' => 'Во время загрузки отчета произошла ошибка',
+    'Timesheet' => 'Timesheet',
+    'Without company' => 'Другие',
+    'Required' => 'Норма времени',
+    'Worked' => 'Отработано',
+    'Other' => 'Другое',
+    'Log work type' => 'Тип учета рабочего времени',
+    'Begin day' => 'Начало дня',
+    'End day' => 'Конец дня',
+    'Reports by work day' => 'Отчет по рабочим дням',
+    'Reports by task' => 'Отчет по задачам',
+    'Total' => 'Всего',
+    'Users' => 'Пользователи',
+    'To list' => 'К списку'
 ];

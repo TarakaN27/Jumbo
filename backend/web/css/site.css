@@ -159,5 +159,27 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .pdd-left-15{padding-left: 15px;}
 .datepicker-dropdown.datepicker-orient-top:after,.datepicker-dropdown.datepicker-orient-bottom:before,
 .datepicker-dropdown.datepicker-orient-top:before,.datepicker-dropdown.datepicker-orient-bottom:after{display: none!important;}
+._calendar_hd{background-color: #f2dede;}
+._calendar_ed{background-color: #C1FFC1;}
+._calendar_shd{background-color: #fcf8e3;}
 
-
+.table-calendar td {font-size: 16px}
+.calendar-month{min-height: 330px;}
+.calendar-edit td.calendar_day:hover{background-color: #ddd;cursor: pointer;}
+.mrg-auto{margin: auto;}
+.ts_green{color: #5cb85c;}
+.ts_red{color: #90111A;}
+.ts_bg_task{background-color: #EBF5FB;}
+.ts_bg_work_day{background-color: #F4ECF7 ; }
+.table-time-users-sheet th,.table-time-users-sheet td{
+    padding: 2px !important;
+    vertical-align: middle !important;
+}
+.ts-user-col:hover{
+    background-color:#AEB6BF ;
+    cursor: pointer ;
+}
+.btn-back{
+    float:left;
+    margin-right: 20xp;
+}
