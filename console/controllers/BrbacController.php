@@ -62,6 +62,9 @@ class BrbacController extends AbstractConsoleController {
 		$onlyJurist = $auth->createPermission('only_jurist');
 		$onlyJurist->description = 'Только для юриста';
 
+		$onlyEMarketer = $auth->createPermission('only_e_marketer');
+		$onlyEMarketer->description = 'Только для емаил маркетолага';
+
         $rightdForAll = $auth->createPermission('forAll');
         $rightdForAll->description = 'Права для всех';
 
@@ -71,6 +74,7 @@ class BrbacController extends AbstractConsoleController {
 		$auth->add($onlyManager);
         $auth->add($rightdForAll);
 		$auth->add($onlyJurist);
+		$auth->add($onlyEMarketer);
 
 		$this->stdout('OK'. PHP_EOL, Console::FG_GREEN);
 
@@ -89,10 +93,18 @@ class BrbacController extends AbstractConsoleController {
 		$user->ruleName = $rule->name;
 		$auth->add($user);
 
+		//юрист
 		$jurist = $auth->createRole('jurist');
 		$jurist->description = 'Юрист';
 		$jurist->ruleName = $rule->name;
 		$auth->add($jurist);
+
+		//емаил маркетолог
+		$eMarketer = $auth->createRole('e_marketer');
+		$eMarketer->description = 'Емаил маркетолог';
+		$eMarketer->ruleName = $rule->name;
+		$auth->add($eMarketer);
+
 
 		//moder
 		$moder = $auth->createRole('moder');
@@ -119,6 +131,11 @@ class BrbacController extends AbstractConsoleController {
 		$auth->add($sadmin);
 
 		//Добавляем разрешения для ролей
+
+		//Емаил маркетолог
+		$auth->addChild($eMarketer,$onlyEMarketer);
+		$auth->addChild($eMarketer,$user);
+		$auth->addChild($eMarketer,$rightdForAll);
 
 		//юрист
 		$auth->addChild($jurist,$onlyJurist);

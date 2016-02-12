@@ -293,7 +293,8 @@ $menuItems[] = [
                                         Yii::$app->user->can('adminRights') ||
                                         Yii::$app->user->can('only_bookkeeper') ||
                                         Yii::$app->user->can('only_manager') ||
-                                        Yii::$app->user->can('only_jurist')
+                                        Yii::$app->user->can('only_jurist') ||
+                                        Yii::$app->user->can('only_e_marketer')
                                         ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">

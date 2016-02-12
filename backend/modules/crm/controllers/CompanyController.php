@@ -49,7 +49,7 @@ class CompanyController extends AbstractBaseBackendController
 				],
 				[
 					'allow' => true,
-					'roles' => ['user','jurist','moder','bookkeeper','admin']
+					'roles' => ['user','e_marketer','jurist','moder','bookkeeper','admin']
 				]
 			]
 		];

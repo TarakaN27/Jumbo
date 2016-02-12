@@ -24,6 +24,10 @@ return [
         'type' => 2,
         'description' => 'Только для юриста',
     ],
+    'only_e_marketer' => [
+        'type' => 2,
+        'description' => 'Только для емаил маркетолага',
+    ],
     'user' => [
         'type' => 1,
         'description' => 'Пользователь',
@@ -35,6 +39,16 @@ return [
         'ruleName' => 'userRole',
         'children' => [
             'only_jurist',
+            'user',
+            'forAll',
+        ],
+    ],
+    'e_marketer' => [
+        'type' => 1,
+        'description' => 'Емаил маркетолог',
+        'ruleName' => 'userRole',
+        'children' => [
+            'only_e_marketer',
             'user',
             'forAll',
         ],

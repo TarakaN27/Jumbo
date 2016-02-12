@@ -197,7 +197,8 @@ return [
     'Contractor YES' => 'Да',
     'Contractor NO' => 'Нет',
     'Contracts' => 'Контракты',
-    'USER_role_jurist' => 'Юрист'
+    'USER_role_jurist' => 'Юрист',
+    'USER_role_e_marketer' => 'Email маркетолог'
 
 
 

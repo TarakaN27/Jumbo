@@ -27,7 +27,7 @@ $columns = [
 
 			$corpName = empty($obR) ? 'N/A ' : CustomHelper::highlight('dummy',$obR->getCorpName());
 
-			if(Yii::$app->user->can('only_jurist'))
+			if(Yii::$app->user->can('only_jurist') || Yii::$app->user->can('only_e_marketer'))
 			{
 				return $corpName;
 			}else{
@@ -204,7 +204,9 @@ if(Yii::$app->user->can('adminRights')) {
 			<div class = "x_title">
 				<h2><?php echo Html::encode($this->title)?></h2>
 				<section class="pull-right">
-					<?php echo \yii\helpers\Html::a(Yii::t('app/crm','Add_new_company'),['create'],['class'=>'btn btn-primary']);?>
+					<?php if(!Yii::$app->user->can('only_e_marketer')):?>
+						<?php echo \yii\helpers\Html::a(Yii::t('app/crm','Add_new_company'),['create'],['class'=>'btn btn-primary']);?>
+					<?php endif;?>
 				</section>
 				<div class = "clearfix"></div>
 			</div>
