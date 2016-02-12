@@ -99,11 +99,16 @@ class TimeSheet
 			if(isset($arTaskTimeByDays[$logTime->task_id][$logTime->log_date]))
 			{
 				$arTaskTimeByDays[$logTime->task_id][$logTime->log_date]+=(int)$logTime->spend_time;
-				$arTotalLogTime[$logTime->log_date]+=(int)$logTime->spend_time;
+
 			}else{
 				$arTaskTimeByDays[$logTime->task_id][$logTime->log_date]=(int)$logTime->spend_time;
-				$arTotalLogTime[$logTime->log_date]=(int)$logTime->spend_time;
+
 			}
+
+			if(isset($arTotalLogTime[$logTime->log_date]))
+				$arTotalLogTime[$logTime->log_date]+=(int)$logTime->spend_time;
+			else
+				$arTotalLogTime[$logTime->log_date]=(int)$logTime->spend_time;
 
 			$iTotalLogTime+=(int)$logTime->spend_time;
 		}
@@ -121,13 +126,21 @@ class TimeSheet
 		$arDays = $this->getArDays();
 		foreach($arDays as $key => &$day)
 		{
-			if(isset($arTotalLogTime[$key]))
-				$day['total'] = $arTotalLogTime[$key];
+			if(isset($arTotalLogTime[$key])) {
+				if(isset($day['total']))
+					$day['total'] += $arTotalLogTime[$key];
+				else
+					$day['total'] = $arTotalLogTime[$key];
+			}
 			else
 				$day['total'] = 0;
 
-			if(isset($arLogWorkDay[$key]))
-				$day['wdTotal'] = $arLogWorkDay[$key]->spent_time;
+			if(isset($arLogWorkDay[$key])) {
+				if (isset($day['wdTotal']))
+					$day['wdTotal'] += $arLogWorkDay[$key]->spent_time;
+				else
+					$day['wdTotal'] = $arLogWorkDay[$key]->spent_time;
+			}
 			else
 				$day['wdTotal'] = 0;
 
