@@ -26,7 +26,7 @@ class TimesheetController extends AbstractBaseBackendController
 					[
 						'actions' => ['get-timesheet-users'],
 						'allow' => true,
-						'roles' => ['superadmin']
+						'roles' => ['admin']
 					],
 					[
 						'actions' => ['index','get-time-sheet'],
@@ -49,7 +49,7 @@ class TimesheetController extends AbstractBaseBackendController
 	 */
 	public function actionIndex()
 	{
-		$viewTemplate = \Yii::$app->user->can('superRights') ? 'index_admin' : 'index';
+		$viewTemplate = \Yii::$app->user->can('adminRights') ? 'index_admin' : 'index';
 		return $this->render($viewTemplate,[]);
 	}
 
@@ -63,7 +63,7 @@ class TimesheetController extends AbstractBaseBackendController
 		$startDate = \Yii::$app->request->post('startDate');
 		$endDate  = \Yii::$app->request->post('endDate');
 
-		if(!\Yii::$app->user->can('superRights') && $userID != \Yii::$app->user->id)
+		if(!\Yii::$app->user->can('adminRights') && $userID != \Yii::$app->user->id)
 			throw new ForbiddenHttpException('You are not allowed do this action');
 
 		$obTimesheet = new TimeSheet($userID,$startDate,$endDate);
