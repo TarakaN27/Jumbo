@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use common\components\validators\WorkDayEndValidators;
 use Yii;
+use backend\models\BUser;
 
 /**
  * This is the model class for table "{{%work_day}}".
@@ -21,6 +23,10 @@ use Yii;
  */
 class WorkDay extends AbstractActiveRecord
 {
+
+    CONST
+        SCENARIO_SAVE_END_TIME = 'save_end_time';
+
     /**
      * @inheritdoc
      */
@@ -39,9 +45,21 @@ class WorkDay extends AbstractActiveRecord
             [['buser_id', 'spent_time', 'created_at', 'updated_at'], 'integer'],
             [['log_date','begin_time','end_time'], 'safe'],
             [['description'], 'string'],
+            ['end_time','validateEndTime','on' => self::SCENARIO_SAVE_END_TIME]
            // ['begin_time','date','format' => 'php:y-m-d h:i','except' => 'insertLine']
         ];
     }
+
+    /**
+     * @param $attribute
+     * @param $param
+     */
+    public function validateEndTime($attribute,$param)
+    {
+        if($this->begin_time > $this->end_time)
+            $this->addError($attribute,'End day time can not be more then begin day time');
+    }
+
 
     /**
      * @inheritdoc
@@ -101,7 +119,9 @@ class WorkDay extends AbstractActiveRecord
      */
     public function getCurrentSpendTime()
     {
-        return $this->spent_time + (int)(time()-(int)$this->begin_time);
+        $time = $this->begin_time > $this->updated_at ? $this->updated_at : $this->begin_time;
+
+        return $this->spent_time + (int)(time()-(int)$time);
     }
 
     /**

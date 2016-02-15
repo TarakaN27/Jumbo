@@ -15,6 +15,7 @@ class WorkDayAssets extends AssetBundle
 			'css/work_day_widget.css',
 		],
 		$js = [
+
 			'js/work_day_widget.js'
 		],
 		$depends = [

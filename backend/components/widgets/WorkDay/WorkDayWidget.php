@@ -44,6 +44,7 @@ class WorkDayWidget extends Widget
 	protected function registerAssets()
 	{
 		$view = $this->getView();
+		$view->registerJsFile('@web/js/moment.min.js');
 		WorkDayAssets::register($view);
 	}
 }

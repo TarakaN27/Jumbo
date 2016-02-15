@@ -231,5 +231,6 @@ return [
 	'View type users task' => 'Задачи пользователей',
 	'Payment request for {company}' => 'Запрос на платеж для компании {company}',
 	'Edit log time' => 'Редактирование затраченого времени',
-	'Calendar' => 'Календарь'
+	'Calendar' => 'Календарь',
+	'WORK_DAY_ERROR_END_TIME' => 'Не верно задано время окончания рабочего дня'
 ];

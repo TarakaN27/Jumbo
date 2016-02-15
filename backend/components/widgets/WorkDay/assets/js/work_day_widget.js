@@ -102,6 +102,29 @@ $(document).ready(function() {
         if (form.find('.has-error').length) {
             return false;
         }
+
+        var
+            begin_time = form.find('#workday-begin_time'),
+            end_time = form.find('#workday-end_time');
+
+        if(begin_time == undefined || end_time == undefined)
+        {
+            return false;
+        }
+
+        if(begin_time.val() > moment(end_time.val()).unix())
+        {
+            addErrorNotify(WORK_DAY,WORK_DAY_ERROR_END_TIME);
+            return false;
+        }
+
+        if(moment().endOf('day').unix() < moment(end_time.val()).unix())
+        {
+            addErrorNotify(WORK_DAY,WORK_DAY_ERROR_END_TIME);
+            return false;
+        }
+
+
         // submit form
         $.ajax({
             url: form.attr('action'),

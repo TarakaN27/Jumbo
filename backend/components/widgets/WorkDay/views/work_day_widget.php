@@ -11,6 +11,7 @@ var
 	WORK_DAY_STARTED = '".Yii::t('app/crm','WORK_DAY_STARTED')."',
 	WORK_DAY_ENDED = '".Yii::t('app/crm','WORK_DAY_ENDED')."',
 	WORK_DAY_ERROR = '".Yii::t('app/crm','WORK_DAY_ERROR')."',
+	WORK_DAY_ERROR_END_TIME = '".Yii::t('app/crm','WORK_DAY_ERROR_END_TIME')."',
 	WORK_DAY_CONTINUE = '".Yii::t('app/crm','WORK_DAY_CONTINUE')."';
 
 ",\yii\web\View::POS_BEGIN);
@@ -61,12 +62,12 @@ var
 		]);
 		echo Html::activeHiddenInput($model,'log_date');
 		echo Html::activeHiddenInput($model,'id');
+		echo Html::activeHiddenInput($model,'begin_time');
 		?>
 
 		<?=$form->field($model,'end_time')->widget(\kartik\datetime\DateTimePicker::className(),[
-			'convertFormat' => true,
 			'pluginOptions' => [
-				'format' => 'yyyy-MM-dd hh:i',
+				'format' => 'yyyy-mm-dd hh:ii',
 				'todayHighlight' => true,
 				'autoclose' => true,
 			]
@@ -96,7 +97,7 @@ var
 				'toggleButton' => [
 					'tag' => 'button',
 					'class' => 'btn btn-app btn-begin',
-					'label' => '<i class="fa fa-pause"></i> ' . Yii::t('app/crm', 'Continue'),
+					'label' => '<i class="fa fa-play"></i> ' . Yii::t('app/crm', 'Continue'),
 				]
 			]);
 
@@ -159,9 +160,8 @@ var
 			?>
 
 			<?=$form->field($model,'begin_time')->widget(\kartik\datetime\DateTimePicker::className(),[
-				'convertFormat' => true,
 				'pluginOptions' => [
-					'format' => 'yyyy-MM-dd hh:i',
+					'format' => 'yyyy-mm-dd hh:ii',
 					'todayHighlight' => true,
 					'autoclose' => true,
 				]
@@ -179,10 +179,4 @@ var
 			Modal::end();
 		?>
 	<?php endif;?>
-	<!--
-	<a class="btn btn-app">
-		<i class="fa fa-stop"></i> Завершить
-		<i class="fa fa-play"></i> Начать
-	</a>
-	-->
 </div>

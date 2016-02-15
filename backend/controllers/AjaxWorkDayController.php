@@ -83,7 +83,7 @@ class AjaxWorkDayController extends AbstractBaseBackendController
 		$model = WorkDay::findOne($id);
 		if(!$model)
 			throw new NotFoundHttpException;
-
+		$model->setScenario(WorkDay::SCENARIO_SAVE_END_TIME);
 		$model->end_time = strtotime($modelTmp->end_time);
 		$model->description = $modelTmp->description;
 
@@ -96,7 +96,10 @@ class AjaxWorkDayController extends AbstractBaseBackendController
 		return ['error' => $model->getErrors(),'model' => $model];
 	}
 
-
+	/**
+	 * @return array
+	 * @throws NotFoundHttpException
+	 */
 	public function actionContinue()
 	{
 		$id = \Yii::$app->request->post('WorkDay');
@@ -110,7 +113,9 @@ class AjaxWorkDayController extends AbstractBaseBackendController
 		if(!$model)
 			throw new NotFoundHttpException;
 
-		$model->begin_time = strtotime($modelTmp->begin_time);
+		$beginTime = strtotime($modelTmp->begin_time) > $model->end_time ? strtotime($modelTmp->begin_time) : $model->end_time;
+
+		$model->begin_time = $beginTime;
 		$model->end_time = '';
 
 		if($model->save())
