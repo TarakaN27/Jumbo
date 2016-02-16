@@ -15,6 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string $description
  * @property integer $status
+ * @property number $rate
  * @property integer $created_at
  * @property integer $updated_at
  */
@@ -37,6 +38,7 @@ class Services extends AbstractActiveRecord
             [['name'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
+            ['rate','number','min' => 100],
             [['description'], 'string', 'max' => 32],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
@@ -51,6 +53,7 @@ class Services extends AbstractActiveRecord
         return [
             'id' => Yii::t('app/services', 'ID'),
             'name' => Yii::t('app/services', 'Name'),
+            'rate' => Yii::t('app/services','Rate'),
             'description' => Yii::t('app/services', 'Description'),
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),

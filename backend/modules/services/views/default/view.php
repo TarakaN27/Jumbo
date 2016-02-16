@@ -34,26 +34,26 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'description',
-            [
-                'attribute' => 'status',
-                'value' => $model->getStatusStr()
-            ],
-            [
-                'attribute' => 'created_at',
-                'value' => is_null($model->created_at) ? NULL : $model->getFormatedCreatedAt()
-            ],
-            [
-                'attribute' => 'updated_at',
-                'value' => is_null($model->updated_at) ? NULL : $model->getFormatedUpdatedAt()
-            ],
-        ],
-    ]) ?>
+                                    <?= DetailView::widget([
+                                        'model' => $model,
+                                        'attributes' => [
+                                            'name',
+                                            'description',
+                                            'rate',
+                                            [
+                                                'attribute' => 'status',
+                                                'value' => $model->getStatusStr()
+                                            ],
+                                            [
+                                                'attribute' => 'created_at',
+                                                'value' => is_null($model->created_at) ? NULL : $model->getFormatedCreatedAt()
+                                            ],
+                                            [
+                                                'attribute' => 'updated_at',
+                                                'value' => is_null($model->updated_at) ? NULL : $model->getFormatedUpdatedAt()
+                                            ],
+                                        ],
+                                    ]) ?>
 
                                 </div>
                             </div>

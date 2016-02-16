@@ -63,7 +63,8 @@ return [
     'save' => 'Сохранить',
     'Default Contracts' => 'Договора по-умолчанию',
     'Settings' => 'Настройки',
-    'Act template' => 'Шаблон для акта'
+    'Act template' => 'Шаблон для акта',
+    'Rate' => 'Ставка норма часа'
 
 
 
