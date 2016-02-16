@@ -62,4 +62,44 @@ class ServiceRateHist extends AbstractActiveRecord
     {
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
     }
+
+    /**
+     * @param $iServID
+     * @param $date
+     * @return null
+     */
+    public static function getRateForDate($iServID,$date)
+    {
+        $rate = NULL;
+        if($date == date('Y-mm-dd',time()))
+        {
+            $obService = Services::find()->select(['rate'])->where(['id' => $iServID])->one();
+            if(!$obService)
+                $rate = \Yii::$app->config->get('qh_rate',0);
+            else
+                $rate = $obService->rate;
+        }else{
+            $obHist = self::find()
+                ->select(['new_rate'])
+                ->where(['service_id' => $iServID])
+                ->andWhere('date <= :date')
+                ->params([
+                    ':date' => $date
+                ])
+                ->order(['id' => SORT_DESC])
+                ->one();
+
+            if($obHist)
+                $rate = $obHist->new_rate;
+            else{
+                $obService = Services::find()->select(['rate'])->where(['id' => $iServID])->one();
+                if(!$obService)
+                    $rate = \Yii::$app->config->get('qh_rate',0);
+                else
+                    $rate = $obService->rate;
+            }
+        }
+
+        return $rate;
+    }
 }

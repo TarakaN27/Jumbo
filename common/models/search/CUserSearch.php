@@ -71,7 +71,7 @@ class CUserSearch extends CUser
      */
     public function search($params,$addQuery = NULL,$addParams = [])
     {
-        $query = CUser::find()->with('manager','userType','requisites');
+        $query = CUser::find()->with('manager','userType','requisites','quantityHour');
         $query->joinWith('requisites');
         if(!is_null($addQuery))
             $query->where($addQuery,$addParams);

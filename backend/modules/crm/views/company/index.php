@@ -87,6 +87,25 @@ $columns = [
 			return $model->getContractorStr();
 		},
 		'filter' => CUser::getContractorArr()
+	],
+	[
+		'label' => Yii::t('app/users','Quantity hours'),
+		'format' => 'raw',
+		'value' => function($model){
+			$obQHour = $model->quantityHour;
+			if(!$obQHour)
+				return NULL;
+
+			$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
+			$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
+
+			$spanOpt = [];
+			if($hours < 5)
+				$spanOpt = ['class' => 'ts_red'];
+
+			return Html::tag('span',$hours,$spanOpt).'/'.$spent;
+		},
+		'filter' => false
 	]
 ];
 
