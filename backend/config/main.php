@@ -83,7 +83,7 @@ return [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => ['info','error', 'warning'],
+                    'levels' => YII_DEBUG ? ['info','error', 'warning'] : ['error', 'warning'],
                 ],
                 [
                     'class' => 'yii\log\FileTarget',
