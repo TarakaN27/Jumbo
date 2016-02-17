@@ -186,5 +186,5 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .horizontal-scroll{
     width: 100%;
     overflow: hidden;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
