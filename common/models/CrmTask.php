@@ -188,7 +188,7 @@ class CrmTask extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['title', 'assigned_id', 'created_by','cmp_id'], 'required'],
+            [['title', 'assigned_id', 'created_by','priority','cmp_id'], 'required'],
             [['description'], 'string'],
             [['deadline','arrFiles'], 'safe'],
             [[
