@@ -188,7 +188,7 @@ class CrmTask extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['title', 'assigned_id', 'created_by','priority','cmp_id'], 'required'],
+            [['title', 'assigned_id', 'created_by','priority','cmp_id'], 'required','except' => 'changeStatus'],
             [['description'], 'string'],
             [['deadline','arrFiles'], 'safe'],
             [[
@@ -424,7 +424,7 @@ class CrmTask extends AbstractActiveRecord
         $tmp = self::getStatusArr();
         if(!in_array($iStatus,array_keys($tmp)))
             throw new InvalidParamException('Invalid status');
-
+        $this->setScenario('changeStatus');
         switch($iStatus)
         {
             case self::STATUS_IN_PROGRESS: //статус "в процессе" можно перейти из статуса "открыт"
