@@ -101,8 +101,10 @@ $columns = [
 			$item = $hours-$spent;
 
 			$spanOpt = [];
-			if($item < 5)
+			if($item < 0)
 				$spanOpt = ['class' => 'ts_red'];
+			else
+				$spanOpt = ['class' => 'ts_green'];
 
 			return Html::tag('span',$item,$spanOpt);
 		},

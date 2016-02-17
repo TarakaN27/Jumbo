@@ -179,8 +179,10 @@ $this->registerJs("
 												$item = $hours-$spent;
 
 												$spanOpt = [];
-												if($item < 5)
+												if($item < 0)
 													$spanOpt = ['class' => 'ts_red'];
+												else
+													$spanOpt = ['class' => 'ts_green'];
 
 												echo Html::tag('span',$item,$spanOpt);
 
