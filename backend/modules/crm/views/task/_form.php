@@ -35,7 +35,11 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
 
     <?= $form->field($model, 'type')->dropDownList(CrmTask::getTypeArr()) ?>
 
-    <?= $form->field($model, 'priority')->dropDownList(CrmTask::getPriorityArr()) ?>
+    <?= $form->field($model, 'priority')->dropDownList(
+        CrmTask::getPriorityArr(),[
+            'prompt' => Yii::t('app/crm','Choose priority')
+        ]
+    ) ?>
 
     <div class = "form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="crmtask-time_estimate">
