@@ -90,6 +90,7 @@ $columns = [
 	],
 	[
 		'label' => Yii::t('app/users','Quantity hours'),
+		'attribute' => 'quantityHour',
 		'format' => 'raw',
 		'value' => function($model){
 			$obQHour = $model->quantityHour;
@@ -99,8 +100,7 @@ $columns = [
 			$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
 			$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
 			$item = $hours-$spent;
-
-			$spanOpt = [];
+			
 			if($item < 0)
 				$spanOpt = ['class' => 'ts_red'];
 			else
