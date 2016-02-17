@@ -100,7 +100,7 @@ $columns = [
 			$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
 			$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
 			$item = $hours-$spent;
-			
+
 			if($item < 0)
 				$spanOpt = ['class' => 'ts_red'];
 			else
