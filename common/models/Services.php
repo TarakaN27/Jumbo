@@ -7,7 +7,7 @@ use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
-
+use common\components\behavior\Service\ServiceRateBehavior;
 /**
  * This is the model class for table "{{%services}}".
  *
@@ -70,6 +70,7 @@ class Services extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
+                ServiceRateBehavior::className()    //история изменения ставки норма часа
             ]);
     }
 

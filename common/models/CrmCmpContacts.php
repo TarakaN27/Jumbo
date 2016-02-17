@@ -100,7 +100,7 @@ class CrmCmpContacts extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['type','fio', 'assigned_at'], 'required'],
+            [['type','fio', 'assigned_at','cmp_id'], 'required'],
             [['cmp_id', 'type', 'assigned_at', 'created_at', 'updated_at', 'is_opened','created_by'], 'integer'],
             [['description', 'addition_info','ext_id'], 'string'],
             [['fio', 'post', 'phone', 'email'], 'string', 'max' => 255],

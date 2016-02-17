@@ -71,10 +71,10 @@ class ServiceRateHist extends AbstractActiveRecord
     public static function getRateForDate($iServID,$date)
     {
         $rate = NULL;
-        if($date == date('Y-mm-dd',time()))
+        if($date == date('Y-m-d',time()))
         {
             $obService = Services::find()->select(['rate'])->where(['id' => $iServID])->one();
-            if(!$obService)
+            if(!$obService  || ($obService && empty($obService->new_rate)))
                 $rate = \Yii::$app->config->get('qh_rate',0);
             else
                 $rate = $obService->rate;
@@ -86,14 +86,14 @@ class ServiceRateHist extends AbstractActiveRecord
                 ->params([
                     ':date' => $date
                 ])
-                ->order(['id' => SORT_DESC])
+                ->orderBy(['id' => SORT_DESC])
                 ->one();
 
             if($obHist)
                 $rate = $obHist->new_rate;
             else{
                 $obService = Services::find()->select(['rate'])->where(['id' => $iServID])->one();
-                if(!$obService)
+                if(!$obService || ($obService && empty($obService->new_rate)))
                     $rate = \Yii::$app->config->get('qh_rate',0);
                 else
                     $rate = $obService->rate;

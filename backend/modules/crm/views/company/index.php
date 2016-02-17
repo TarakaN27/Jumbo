@@ -98,12 +98,13 @@ $columns = [
 
 			$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
 			$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
+			$item = $hours-$spent;
 
 			$spanOpt = [];
-			if($hours < 5)
+			if($item < 5)
 				$spanOpt = ['class' => 'ts_red'];
 
-			return Html::tag('span',$hours,$spanOpt).'/'.$spent;
+			return Html::tag('span',$item,$spanOpt);
 		},
 		'filter' => false
 	]

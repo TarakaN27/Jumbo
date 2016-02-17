@@ -119,9 +119,9 @@ class ContactController extends AbstractBaseBackendController
         $modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
         $modelTask->contact_id = $id;
+        $modelTask->cmp_id = $model->cmp_id;
         $data = [];
         $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
-
 
         /**
          * Добавление задачи

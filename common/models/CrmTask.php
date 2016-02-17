@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\components\behavior\notifications\TaskNotificationBehavior;
 use common\components\behavior\Task\TaskActionBehavior;
+use common\components\behavior\Task\TaskQuantityHoursBehavior;
 use common\components\helpers\CustomHelper;
 use common\components\managers\DialogManager;
 use common\components\notification\RedisNotification;
@@ -187,7 +188,7 @@ class CrmTask extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['title', 'assigned_id', 'created_by'], 'required'],
+            [['title', 'assigned_id', 'created_by','cmp_id'], 'required'],
             [['description'], 'string'],
             [['deadline','arrFiles'], 'safe'],
             [[
@@ -398,8 +399,8 @@ class CrmTask extends AbstractActiveRecord
     {
         $arParent = parent::behaviors();
         return ArrayHelper::merge($arParent,[
-            TaskNotificationBehavior::className(),    //уведомления
-            TaskActionBehavior::className() //поведение действий
+            TaskNotificationBehavior::className(),      //уведомления
+            TaskActionBehavior::className(),            //поведение действий
         ]);
     }
 

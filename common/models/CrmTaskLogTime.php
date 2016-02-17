@@ -2,9 +2,12 @@
 
 namespace common\models;
 
+use common\components\behavior\Task\TaskQuantityHoursBehavior;
 use common\components\helpers\CustomHelper;
 use Yii;
 use backend\models\BUser;
+use yii\helpers\ArrayHelper;
+
 /**
  * This is the model class for table "{{%crm_task_log_time}}".
  *
@@ -125,5 +128,16 @@ class CrmTaskLogTime extends AbstractActiveRecord
         $this->hour = (int)($this->spend_time/3600);
         $this->minutes = (int)(($this->spend_time % 3600)/60) ;
         return FALSE;
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        return ArrayHelper::merge($tmp,[
+            TaskQuantityHoursBehavior::className()      //норма часы
+        ]);
     }
 }

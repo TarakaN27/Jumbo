@@ -6,6 +6,7 @@ use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PartnerPaymentBehavior;
 use common\components\payment\PaymentPredefinedConditionBehavior;
+use common\components\payment\PaymentQuantityHoursBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -128,6 +129,9 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => PaymentPredefinedConditionBehavior::className()  //устанавливаем предопределныеусловия для CUSER
+                ],
+                [
+                    'class' => PaymentQuantityHoursBehavior::className()    //начисление норма часов
                 ]
             ]);
     }

@@ -174,6 +174,7 @@ class CompanyController extends AbstractBaseBackendController
 		$obRequisite = $model->requisites;
 		$arContacts =  $model->crmContacts;
 		$arFile = $model->crmFiles;
+		$obQHour = $model->quantityHour;
 
 		//Модель для контактов
 		$obModelContact = new CrmCmpContacts();
@@ -260,7 +261,7 @@ class CompanyController extends AbstractBaseBackendController
 		$obCrmTaskSearch = new CrmTaskSearch();
 		$dataProviderTask = $obCrmTaskSearch->search(
 			Yii::$app->request->queryParams,
-			CrmTaskSearch::VIEW_TYPE_ALL,
+			CrmTaskSearch::VIEW_TYPE_FULL_TASK_AND_OWNER,
 			['cmp_id' => $model->id]
 			);
 
@@ -286,7 +287,8 @@ class CompanyController extends AbstractBaseBackendController
 			'contactDesc' => $contactDesc,
 			'dataContact' => $dataContact,
 			'sAssName' => $sAssName,
-			'data' => $data
+			'data' => $data,
+			'obQHour' => $obQHour
 		]);
 	}
 
