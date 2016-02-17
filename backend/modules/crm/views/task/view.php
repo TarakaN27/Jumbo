@@ -141,7 +141,7 @@ $this->registerJs("
                         <div class="row">
                             <div class="col-md-8 col-sm-8 col-xs-12">
                             <h2><?=$model->title;?></h2>
-                            <section>
+                            <section class="horizontal-scroll">
                                 <?=$model->description;?>
                             </section>
                             </div>

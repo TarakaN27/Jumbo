@@ -183,3 +183,8 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     float:left;
     margin-right: 20xp;
 }
+.horizontal-scroll{
+    width: 100%;
+    overflow: hidden;
+    overflow-x: scroll;
+}
