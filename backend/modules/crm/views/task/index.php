@@ -55,10 +55,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         ],
         [
             'attribute' => 'status',
+            'format' => 'raw',
             'value' => function($model){
                 return $model->getStatusStr();
             },
-            'filter' => \common\models\CrmTask::getStatusArr()
+            //'filter' => \common\models\CrmTask::getStatusArr()
+            'filter' => \kartik\select2\Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'status',
+                'data' => \common\models\CrmTask::getStatusArr(),
+                'options' => [
+                    'multiple' => true
+                ],
+            ])
         ],
         [
             'attribute' => 'assigned_id',
@@ -150,10 +159,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         ],
         [
             'attribute' => 'status',
+            'format' => 'raw',
             'value' => function($model){
                 return $model->getStatusStr();
             },
-            'filter' => \common\models\CrmTask::getStatusArr()
+            //'filter' => \common\models\CrmTask::getStatusArr()
+            'filter' => \kartik\select2\Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'status',
+                'data' => \common\models\CrmTask::getStatusArr(),
+                'options' => [
+                    'multiple' => true
+                ],
+            ])
         ],
         [
             'class' => 'yii\grid\ActionColumn',

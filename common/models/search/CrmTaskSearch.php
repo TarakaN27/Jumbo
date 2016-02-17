@@ -16,6 +16,9 @@ use yii\db\ActiveQuery;
 class CrmTaskSearch extends CrmTask
 {
 
+    public
+        $test;
+
     CONST
         VIEW_TYPE_FULL_TASK = 'full_task', //все задачи
         VIEW_TYPE_ALL = 'all',          //все
@@ -49,8 +52,8 @@ class CrmTaskSearch extends CrmTask
     public function rules()
     {
         return [
-            [['id', 'priority', 'type', 'task_control', 'parent_id', 'assigned_id', 'created_by', 'time_estimate', 'status', 'date_start', 'duration_fact', 'closed_by', 'closed_date', 'cmp_id', 'contact_id', 'created_at', 'updated_at'], 'integer'],
-            [['title', 'description', 'deadline'], 'safe'],
+            [['id', 'priority', 'type', 'task_control', 'parent_id', 'assigned_id', 'created_by', 'time_estimate', 'date_start', 'duration_fact', 'closed_by', 'closed_date', 'cmp_id', 'contact_id', 'created_at', 'updated_at'], 'integer'],
+            [['title', 'description','status',  'deadline','test'], 'safe'],
         ];
     }
 
@@ -102,7 +105,7 @@ class CrmTaskSearch extends CrmTask
             'assigned_id' => $this->assigned_id,
             'created_by' => $this->created_by,
             'time_estimate' => $this->time_estimate,
-            'status' => $this->status,
+           // 'status' => $this->status,
             'date_start' => $this->date_start,
             'duration_fact' => $this->duration_fact,
             'closed_by' => $this->closed_by,
@@ -112,6 +115,12 @@ class CrmTaskSearch extends CrmTask
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        if(is_array($this->status))
+        {
+            //$query->andFilterWhere();
+        }
+
 
         if(!empty($this->deadline))
             $query->andWhere("DATE_FORMAT(deadline, '%Y-%m-%d') = :deadline",['deadline' => $this->deadline]);
