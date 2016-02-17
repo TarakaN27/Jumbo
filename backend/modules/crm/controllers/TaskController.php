@@ -53,7 +53,21 @@ class TaskController extends AbstractBaseBackendController
     public function actionIndex($viewType = CrmTaskSearch::VIEW_TYPE_ALL)
     {
         $searchModel = new CrmTaskSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$viewType);
+
+        //сохраним выбор пользователя
+        $query = Yii::$app->request->queryParams;
+        $key = 'task_search_'.Yii::$app->user->id;
+        if(empty($query))
+        {
+            $tmp = Yii::$app->session->get($key);
+            if(!empty($tmp))
+                $query = $tmp;
+        }else{
+            Yii::$app->session->set($key,$query);
+        }
+
+
+        $dataProvider = $searchModel->search($query,$viewType);
 
         $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
 

@@ -163,7 +163,6 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'value' => function($model){
                 return $model->getStatusStr();
             },
-            //'filter' => \common\models\CrmTask::getStatusArr()
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
                 'attribute' => 'status',
@@ -172,6 +171,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'multiple' => true
                 ],
             ])
+
         ],
         [
             'class' => 'yii\grid\ActionColumn',
