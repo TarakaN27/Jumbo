@@ -234,9 +234,11 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             // ИП
-            [['pasp_date','pasp_auth','pasp_ident','pasp_number',
-              'pasp_series', 'ch_account', 'b_name','b_code', 'p_address'
-             ],
+            [
+                [
+                //    'pasp_date','pasp_auth','pasp_ident','pasp_number', 'pasp_series',
+                    'ch_account', 'b_name','b_code', 'p_address'
+                ],
              'required',
              'when' => function($model) {
                  if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
