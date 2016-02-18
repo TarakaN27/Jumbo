@@ -55,10 +55,10 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
 
     <?= $form->field($model, 'deadline')->widget(\kartik\datetime\DateTimePicker::className(),[
         'options' => ['placeholder' => 'Select operating time ...'],
-        'convertFormat' => true,
+        //'convertFormat' => true,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'yyyy-M-d h:i:s',
+            'format' => 'yyyy-m-d h:i:s',
             'startDate' => date('d-m-yyyy h:i',time()),
             'todayHighlight' => true
         ]
