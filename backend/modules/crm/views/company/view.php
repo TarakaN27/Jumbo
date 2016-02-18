@@ -170,6 +170,25 @@ $this->registerJs("
 										<th><?=Yii::t('app/crm','Description')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->description : '';?></td>
 									</tr>
+									<?php if($obQHour):?>
+										<tr>
+											<th><?=YII::t('app/crm','Quantity hours')?>: </th>
+											<td><?php
+												$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
+												$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
+												$item = $hours-$spent;
+
+												$spanOpt = [];
+												if($item < 0)
+													$spanOpt = ['class' => 'ts_red'];
+												else
+													$spanOpt = ['class' => 'ts_green'];
+
+												echo Html::tag('span',$item,$spanOpt);
+
+												?></td>
+										</tr>
+									<?php endif;?>
 								</table>
 							</div>
 						</div>

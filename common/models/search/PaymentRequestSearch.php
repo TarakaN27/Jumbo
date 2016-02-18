@@ -44,9 +44,12 @@ class PaymentRequestSearch extends PaymentRequest
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$additionQuery = NULL)
     {
         $query = PaymentRequest::find();
+
+        if(!empty($additionQuery))
+            $query->where($additionQuery);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

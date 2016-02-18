@@ -53,7 +53,7 @@ $this->registerJs("
 			
 				<div class="clearfix"></div>
 			</div>
-			<div class="x_content" id="main-contener" data-type="user" data-user-id="">
+			<div class="x_content horizontal-scroll" id="main-contener" data-type="user" data-user-id="">
 				<div class="loader mrg-auto"></div>
 
 			</div>

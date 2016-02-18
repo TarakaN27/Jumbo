@@ -2,6 +2,7 @@
 
 namespace common\models\search;
 
+use common\models\CuserQuantityHour;
 use common\models\CUserRequisites;
 use Yii;
 use yii\base\Model;
@@ -15,6 +16,7 @@ use yii\helpers\ArrayHelper;
 class CUserSearch extends CUser
 {
     public
+        $quantityHour,
         $corp_name,
         $c_email,
         $phone,
@@ -49,7 +51,8 @@ class CUserSearch extends CUser
         return ArrayHelper::merge($arPLabel,[
             'fio' => Yii::t('app/users', 'FIO'),
             'corp_name' => Yii::t('app/users', 'Corp Name'),
-            'phone' => Yii::t('app/users', 'Phone')
+            'phone' => Yii::t('app/users', 'Phone'),
+            'quantityHour' => Yii::t('app/users','Quantity hours'),
         ]);
     }
 
@@ -71,8 +74,9 @@ class CUserSearch extends CUser
      */
     public function search($params,$addQuery = NULL,$addParams = [])
     {
-        $query = CUser::find()->with('manager','userType','requisites');
+        $query = CUser::find()->with('manager','userType','requisites','quantityHour');
         $query->joinWith('requisites');
+        $query->joinWith('quantityHour');
         if(!is_null($addQuery))
             $query->where($addQuery,$addParams);
 
@@ -85,8 +89,18 @@ class CUserSearch extends CUser
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
-            'sort'=> ['defaultOrder' => ['created_at'=>SORT_DESC]]
+            'sort'=> [
+                'defaultOrder' => [
+                    'created_at'=>SORT_DESC
+                ]
+            ]
         ]);
+
+        // сортировка по присоедененной таблице CuserQuantityHour
+        $dataProvider->sort->attributes['quantityHour'] = [
+            'asc'=>[CuserQuantityHour::tableName().'.hours IS NULL ' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_ASC],
+            'desc'=>[CuserQuantityHour::tableName().'.hours IS NULL' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_DESC],
+        ];
 
         $this->load($params);
 

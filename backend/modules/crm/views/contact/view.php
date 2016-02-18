@@ -133,9 +133,16 @@ $this->registerJs("
                                 </a>
                             </li>
                             <li role="presentation" class="wm_right_tab">
-                                <a href="#tab_content4" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
-                                    <h3 class="label label-primary"><?=Yii::t('app/crm','Add task');?></h3>
-                                </a>
+                                <?php if(!empty($model->cmp_id)):?>
+                                    <a href="#tab_content4" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
+                                        <h3 class="label label-primary"><?=Yii::t('app/crm','Add task');?></h3>
+                                    </a>
+                                <?php else:?>
+                                    <a onclick="addErrorNotify('<?=Yii::t('app/crm','Task');?>','<?=Yii::t('app/crm','You need bind cmp for contact');?>')">
+                                        <h3 class="label label-primary"><?=Yii::t('app/crm','Add task');?></h3>
+                                    </a>
+
+                                <?php endif;?>
                             </li>
                         </ul>
                         <div id="myTabContent" class="tab-content">

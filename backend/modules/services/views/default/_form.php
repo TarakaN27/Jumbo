@@ -24,6 +24,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'rate')->textInput();?>
+
     <?= $form->field($model, 'status')->dropDownList(\common\models\Services::getStatusArr()) ?>
 
 

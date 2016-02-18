@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
 class CrmTaskSearch extends CrmTask
 {
     CONST
+        VIEW_TYPE_FULL_TASK_AND_OWNER = 'full_task_with_owner',
         VIEW_TYPE_FULL_TASK = 'full_task', //все задачи
         VIEW_TYPE_ALL = 'all',          //все
         VIEW_TYPE_ASSIGN = 'assign',    //делаю
@@ -162,6 +163,19 @@ class CrmTaskSearch extends CrmTask
                     $query->where('1=0');
                 }
             break;
+
+            case self::VIEW_TYPE_FULL_TASK_AND_OWNER:
+                if(!Yii::$app->user->can('adminRights'))
+                {
+                    $query
+                        ->joinWith('crmTaskAccomplices')                                        //таблица помогаю
+                        ->joinWith('crmTaskWatchers')                                           //таблица наблюдаю
+                        ->where(['created_by' => $iUserID])                                     //все созданные
+                        ->orWhere(['assigned_id' => $iUserID])                                  //все за которые отвественный
+                        ->orWhere([CrmTaskAccomplices::tableName().'.buser_id' => $iUserID])    //все которым помогаю
+                        ->orWhere([CrmTaskWatcher::tableName().'.buser_id' => $iUserID]);       //все за которыми смотрю
+                }
+                break;
             default:
                 $query->where('1=0');
                 break;

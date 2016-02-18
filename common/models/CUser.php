@@ -325,6 +325,15 @@ class CUser extends AbstractUser
     }
 
     /**
+     * Информация по норма часам
+     * @return ActiveQuery
+     */
+    public function getQuantityHour()
+    {
+        return $this->hasOne(CuserQuantityHour::className(),['cuser_id' => 'id']);
+    }
+
+    /**
      * @return array
      */
     public function behaviors()

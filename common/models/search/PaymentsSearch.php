@@ -56,6 +56,9 @@ class PaymentsSearch extends Payments
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> [
+                'defaultOrder' => ['id'=>SORT_DESC]
+            ],
             'pagination' => [
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]

@@ -181,6 +181,12 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 }
 .btn-back{
     float:left;
-    margin-right: 20xp;
+    margin-right: 20px;
 }
 .line-through{text-decoration:line-through;color:#73879C;}
+.horizontal-scroll{
+    width: 100%;
+    overflow: hidden;
+    overflow-x: auto;
+}
+

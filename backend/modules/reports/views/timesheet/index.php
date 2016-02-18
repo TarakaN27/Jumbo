@@ -47,7 +47,7 @@ $this->registerJs("
 				</section>
 				<div class="clearfix"></div>
 			</div>
-			<div class="x_content" id="main-contener">
+			<div class="x_content horizontal-scroll" id="main-contener">
 				<div class="loader mrg-auto"></div>
 
 			</div>

@@ -87,17 +87,54 @@ $columns = [
 			return $model->getContractorStr();
 		},
 		'filter' => CUser::getContractorArr()
+	],
+	[
+		'label' => Yii::t('app/users','Quantity hours'),
+		'attribute' => 'quantityHour',
+		'format' => 'raw',
+		'value' => function($model){
+			$obQHour = $model->quantityHour;
+			if(!$obQHour)
+				return NULL;
+
+			$hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
+			$spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
+			$item = $hours-$spent;
+
+			if($item < 0)
+				$spanOpt = ['class' => 'ts_red'];
+			else
+				$spanOpt = ['class' => 'ts_green'];
+
+			return Html::tag('span',$item,$spanOpt);
+		},
+		'filter' => false
 	]
 ];
 
 $additionBlock = [];
-if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist')) {
+if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist') || Yii::$app->user->can('only_manager')) {
 	array_push($columns,
 		[
 			'label' => '',
 			'format' => 'raw',
 			'value' => function ($model) {
-				$strAdmin = '<li>
+
+				$str = '';
+
+				if(Yii::$app->user->can('only_manager'))
+				{
+					if($model->manager_id == Yii::$app->user->id)
+						$str = '<li>
+	                           ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/quantity-hours/index', 'iCID' => $model->id]) . '
+	                       </li>';
+				}elseif(Yii::$app->user->can('only_jurist'))
+				{
+					$str = '<li>
+                           ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/contractor/services-contract', 'iCID' => $model->id]) . '
+                       </li>';
+				}elseif(Yii::$app->user->can('adminRights')){
+					$str = '<li>
                            ' . Html::a(Yii::t('app/users', 'Settings'), ['/users/contractor-settings/index', 'userID' => $model->id]) . '
                        </li>
                        <li>
@@ -108,13 +145,12 @@ if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist')) {
                        </li>
                        <li>
                            ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/contractor/services-contract', 'iCID' => $model->id]) . '
-                       </li>';
-
-				$strJurist = '<li>
-                           ' . Html::a(Yii::t('app/users', 'Services contract'), ['/users/contractor/services-contract', 'iCID' => $model->id]) . '
-                       </li>';
-
-				$str = Yii::$app->user->can('only_jurist') ? $strJurist : $strAdmin;
+                       </li>
+                       <li>
+	                           ' . Html::a(Yii::t('app/users', 'Quantity hours'), ['/users/quantity-hours/index', 'iCID' => $model->id]) . '
+	                       </li>
+                       ';
+				}
 
 				return '
                <div class="btn-group">
