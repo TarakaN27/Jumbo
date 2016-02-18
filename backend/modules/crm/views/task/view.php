@@ -278,7 +278,7 @@ $this->registerJs("
                 <!-- start project-detail sidebar -->
                 <div class="col-md-3 col-sm-3 col-xs-12">
                     <?php if(!empty($model->payment_request)):?>
-                        <section>
+                        <section class="wm-side-bar-right">
                             <div class="x_title">
                                 <h2><?php echo Yii::t('app/crm','Payment request')?></h2>
                                 <ul class="nav navbar-right panel_toolbox">
@@ -296,7 +296,7 @@ $this->registerJs("
                     <?php endif;?>
 
                     <?php if(is_object($obCmp)):?>
-                        <section>
+                        <section class="wm-side-bar-right">
                             <div class="x_title">
                                 <h2><?php echo Yii::t('app/crm','Company')?></h2>
                                 <ul class="nav navbar-right panel_toolbox">
@@ -311,7 +311,7 @@ $this->registerJs("
                         </section>
                     <?php endif;?>
                     <?php if(is_object($obCnt)):?>
-                        <section>
+                        <section class="wm-side-bar-right">
                             <div class="x_title">
                                 <h2><?php echo Yii::t('app/crm','Contact')?></h2>
                                 <ul class="nav navbar-right panel_toolbox">
@@ -325,7 +325,7 @@ $this->registerJs("
                             </div>
                         </section>
                     <?php endif;?>
-                    <section>
+                    <section class="wm-side-bar-right">
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Created by')?></h2>
                             <div class="clearfix"></div>
@@ -344,7 +344,7 @@ $this->registerJs("
                             </div>
                         </div>
                     </section>
-                    <section>
+                    <section class="wm-side-bar-right">
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Assigned At')?></h2>
                             <ul class="nav navbar-right panel_toolbox">
@@ -385,7 +385,7 @@ $this->registerJs("
                             </div>
                         </div>
                     </section>
-                    <section>
+                    <section class="wm-side-bar-right" >
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Accomplices')?></h2>
                             <ul class="nav navbar-right panel_toolbox">
@@ -429,7 +429,7 @@ $this->registerJs("
                             <?php endforeach;?>
                         </div>
                     </section>
-                    <section>
+                    <section class="wm-side-bar-right">
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Watchers')?></h2>
                             <ul class="nav navbar-right panel_toolbox">
@@ -473,7 +473,7 @@ $this->registerJs("
                             <?php endforeach;?>
                         </div>
                     </section>
-                    <section class="panel">
+                    <section class="panel wm-side-bar-right">
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Task files')?></h2>
                             <ul class="nav navbar-right panel_toolbox">
@@ -495,7 +495,7 @@ $this->registerJs("
                             </ul>
                             <div class="clearfix"></div>
                         </div>
-                        <div class="panel-body">
+                        <div class="panel-body event">
                             <?php if(empty($arFile)):?>
                                 <?=Yii::t('app/crm','No crm file')?>
                             <?php else:?>

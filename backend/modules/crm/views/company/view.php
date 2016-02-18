@@ -287,7 +287,7 @@ $this->registerJs("
 				</div>
 				<!-- start project-detail sidebar -->
 				<div class="col-md-3 col-sm-3 col-xs-12">
-					<section>
+					<section class="wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Assigned At')?></h2>
 							<ul class="nav navbar-right panel_toolbox">
@@ -325,7 +325,7 @@ $this->registerJs("
 							</div>
 						</div>
 					</section>
-					<section>
+					<section class="wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Contacts')?></h2>
 							<ul class="nav navbar-right panel_toolbox">
@@ -347,6 +347,7 @@ $this->registerJs("
 							</ul>
 							<div class="clearfix"></div>
 						</div>
+						<div class="media event">
 							<?php if(!empty($arContacts)):?>
 
 							<?php
@@ -368,8 +369,9 @@ $this->registerJs("
 								<?=Yii::t('app/crm','No contacts');?>
 							<?php endif;?>
 							<br />
+						</div>
 					</section>
-					<section class="panel">
+					<section class="panel wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Project files')?></h2>
 							<ul class="nav navbar-right panel_toolbox">
@@ -391,7 +393,7 @@ $this->registerJs("
 							</ul>
 							<div class="clearfix"></div>
 						</div>
-						<div class="panel-body">
+						<div class="panel-body event">
 							<?php if(empty($arFile)):?>
 								<?=Yii::t('app/crm','No crm file')?>
 							<?php else:?>

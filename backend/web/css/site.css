@@ -189,4 +189,19 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     overflow: hidden;
     overflow-x: auto;
 }
+.wm-side-bar-right{
+    margin-bottom: 10px;
+}
+
+.wm-side-bar-right .x_title{
+    border-top: 2px solid #E6E9ED;
+    border-bottom: none;
+    padding-top: 10px;
+    margin-bottom: 0px;
+}
+
+.wm-side-bar-right .event{
+    padding-left: 10px;
+    margin-top: 0px;
+}
 
