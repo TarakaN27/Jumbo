@@ -200,9 +200,7 @@ return [
     'USER_role_jurist' => 'Юрист',
     'USER_role_e_marketer' => 'Email маркетолог',
     'Successfully saved' => 'Успешно сохранено',
-    'Quantity hours' => 'Баланс трудозатрат'
-
-
-
-
+    'Quantity hours' => 'Баланс трудозатрат',
+    'Spent quantity hours' => 'Оплаченное кол-во часов',
+    'Hours' => 'Часы'
 ];

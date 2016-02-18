@@ -7,7 +7,7 @@
  */
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-$this->title = Yii::t('app/users','Норма часы');
+$this->title = Yii::t('app/users','Spent quantity hours');
 ?>
 <div class = "row">
 	<div class = "col-md-12 col-sm-12 col-xs-12">
