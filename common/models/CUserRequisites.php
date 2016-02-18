@@ -340,4 +340,17 @@ class CUserRequisites extends AbstractActiveRecord
     {
         return $this->c_lname.' '.$this->c_fname.' '.$this->c_mname;
     }
+
+    /**
+     * @return string
+     */
+    public function getCorpNameWithSite()
+    {
+        $str = $this->getCorpName();
+
+        if(!empty($this->site))
+            $str.=' ('.$this->site.')';
+
+        return $str;
+    }
 }

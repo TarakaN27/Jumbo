@@ -87,11 +87,15 @@ class TaskController extends AbstractBaseBackendController
 
         $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
 
+        // Get the initial city description
+        $cuserDesc = empty($searchModel->cmp_id) ? '' : \common\models\CUser::findOne($searchModel->cmp_id)->getInfoWithSite();
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'viewType' => $viewType,
-            'arNewTasks' => $arNewTasks
+            'arNewTasks' => $arNewTasks,
+            'cuserDesc' => $cuserDesc
         ]);
     }
 
@@ -165,6 +169,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obAccmpl->save())
             {
+                $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('error',Yii::t('app/crm','Accomplice successfully added'));
                 return $this->redirect(['view','id' => $id]);
@@ -189,6 +194,7 @@ class TaskController extends AbstractBaseBackendController
 
             if($obWatcher->save())
             {
+                $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Watcher successfully added'));
                 return $this->redirect(['view','id' => $id]);
@@ -205,6 +211,7 @@ class TaskController extends AbstractBaseBackendController
         {
             if($model->save())
             {
+                $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','Assign successfully changed'));
                 return $this->redirect(['view','id' => $id]);
@@ -221,6 +228,7 @@ class TaskController extends AbstractBaseBackendController
         {
             if($obFile->save())
             {
+                $model->updateUpdatedAt();
                 Yii::$app->session->setFlash('success',Yii::t('app/crm','File successfully added'));
                 return $this->redirect(['view','id' => $id]);
             }else{

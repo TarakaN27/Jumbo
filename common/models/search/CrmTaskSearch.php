@@ -9,6 +9,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\CrmTask;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 
 /**
  * CrmTaskSearch represents the model behind the search form about `common\models\CrmTask`.
@@ -71,7 +72,7 @@ class CrmTaskSearch extends CrmTask
      */
     public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [])
     {
-        $query = CrmTask::find();
+        $query = CrmTask::find()->with('cmp','cmp.requisites');
         $query = $this->getAdditionQuery($query,$viewType);
         if(!is_null($addQuery)) //дополнительное условие
             $query->andWhere($addQuery,$addParams);

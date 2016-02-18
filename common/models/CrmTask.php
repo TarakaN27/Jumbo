@@ -749,4 +749,21 @@ class CrmTask extends AbstractActiveRecord
         $this->trigger(self::EVENT_UPDATE_DIALOG);
     }
 
+    /**
+     * @return bool
+     */
+    public function updateUpdatedAt()
+    {
+        return $this->touch('updated_at');
+    }
+
+    /**
+     * @param $id
+     * @return int
+     */
+    public static function updateUpdatedAtById($id)
+    {
+        return self::updateAll(['updated_at' => time()],['id' => $id]);
+    }
+
 }

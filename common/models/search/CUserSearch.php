@@ -121,6 +121,7 @@ class CUserSearch extends CUser
 
         if(!empty($this->corp_name))
             $query->andWhere('( '.
+                CUserRequisites::tableName().'.site LIKE "%'.$this->corp_name.'%" OR '.
                 CUserRequisites::tableName().'.corp_name LIKE "%'.$this->corp_name.'%" OR '.
                 CUserRequisites::tableName().'.j_lname LIKE "%'.$this->corp_name.'%" OR '.
                 CUserRequisites::tableName().'.j_fname LIKE "%'.$this->corp_name.'%" OR '.

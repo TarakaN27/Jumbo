@@ -301,7 +301,7 @@ $this->registerJs("
                                 <h2><?php echo Yii::t('app/crm','Company')?></h2>
                                 <ul class="nav navbar-right panel_toolbox">
                                     <li>
-                                        <?=Html::a($obCmp->getInfo(),['/crm/company/view','id' => $obCmp->id],[
+                                        <?=Html::a($obCmp->getInfoWithSite(),['/crm/company/view','id' => $obCmp->id],[
                                             'target' => '_blank'
                                         ]);?>
                                     </li>

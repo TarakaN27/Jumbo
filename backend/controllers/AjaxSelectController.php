@@ -76,6 +76,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
 				->limit(10)
 				->all()
 			;
@@ -83,13 +84,13 @@ class AjaxSelectController extends AbstractBaseBackendController
 			foreach($obCUser as $user)
 				$out['results'] []= [
 					'id' => $user->id,
-					'text' => $user->getInfo()
+					'text' => $user->getInfoWithSite()
 				];
 			$out['results'] = array_values($out['results']);
 
 		}
 		elseif ($id > 0) {
-			$out['results'] = ['id' => $id, 'text' => CUser::findOne($id)->getInfo()];
+			$out['results'] = ['id' => $id, 'text' => CUser::findOne($id)->getInfoWithSite()];
 		}
 		return $out;
 	}

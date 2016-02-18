@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\CrmTask;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\CrmTaskSearch */
@@ -14,6 +15,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
 {
     $columns = [
         ['class' => 'yii\grid\SerialColumn'],
+        //'id',
         [
             'attribute' => 'title',
             'format' => 'html',
@@ -31,6 +33,34 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
 
                 return Html::a($model->title,['view','id' => $model->id],$options).$postfix;
             }
+        ],
+        [
+            'attribute' => 'cmp_id',
+            'value' => function($model){
+
+                $obCmp = $model->cmp;
+                return $obCmp ? $obCmp->getInfoWithSite() : NULL;
+            },
+            'filter' => \kartik\select2\Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'cmp_id',
+                'initValueText' => $cuserDesc, // set the initial display text
+                'options' => [
+                    'placeholder' => Yii::t('app/crm','Search for a company ...')
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'minimumInputLength' => 3,
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                ],
+            ])
         ],
         [
             'attribute' => 'type',
@@ -163,6 +193,34 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 }
                 return Html::a($model->title,['view','id' => $model->id],$options).$postfix;
             }
+        ],
+        [
+            'attribute' => 'cmp_id',
+            'value' => function($model){
+
+                $obCmp = $model->cmp;
+                return $obCmp ? $obCmp->getInfoWithSite() : NULL;
+            },
+            'filter' => \kartik\select2\Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'cmp_id',
+                'initValueText' => $cuserDesc, // set the initial display text
+                'options' => [
+                    'placeholder' => Yii::t('app/crm','Search for a company ...')
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'minimumInputLength' => 3,
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                ],
+            ])
         ],
         [
             'attribute' => 'type',

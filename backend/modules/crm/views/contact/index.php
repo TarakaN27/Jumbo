@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'cmp_id',
                             'value' => function($model){
-                                return is_object($obCmp = $model->cmp) ? $obCmp->getInfo() : $model->cmp_id;
+                                return is_object($obCmp = $model->cmp) ? $obCmp->getInfoWithSite() : $model->cmp_id;
                             },
                             'filter' => \kartik\select2\Select2::widget([
                                 'model' => $searchModel,

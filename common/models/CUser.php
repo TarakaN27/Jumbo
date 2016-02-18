@@ -452,6 +452,16 @@ class CUser extends AbstractUser
             return $this->username;
     }
 
+    public function getInfoWithSite()
+    {
+        /** @var CUserRequisites $obRq */
+        $obRq = $this->requisites;
+        if($obRq)
+            return trim($obRq->getCorpNameWithSite());
+        else
+            return $this->username;
+    }
+
     /**
      * @param $iMngID
      * @return array

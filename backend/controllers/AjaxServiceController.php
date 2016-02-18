@@ -11,6 +11,7 @@ namespace backend\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
+use common\models\CrmTask;
 use common\models\Dialogs;
 use common\models\Messages;
 use yii\filters\AccessControl;
@@ -306,6 +307,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
             throw new ServerErrorHttpException();
 
         $obDialog->updateUpdatedAt();
+        if(!empty($obDialog->crm_task_id))
+            CrmTask::updateUpdatedAtById($obDialog->crm_task_id);
 
         return [
             'content' => trim($this->renderPartial('@common/components/widgets/liveFeed/views/_dialogs_crm_comment.php',[
