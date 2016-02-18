@@ -50,20 +50,36 @@ class TaskController extends AbstractBaseBackendController
      * Lists all CrmTask models.
      * @return mixed
      */
-    public function actionIndex($viewType = CrmTaskSearch::VIEW_TYPE_ALL)
+    public function actionIndex($viewType = NULL)
     {
         $searchModel = new CrmTaskSearch();
 
         //сохраним выбор пользователя
         $query = Yii::$app->request->queryParams;
         $key = 'task_search_'.Yii::$app->user->id;
-        if(empty($query))
+        if(
+            empty($query) ||
+            (!empty($query) && count($query) == 1 && isset($query['viewType'])) ||
+            (!empty($query) && count($query) == 1 && isset($query['sort']))
+        )
         {
             $tmp = Yii::$app->session->get($key);
             if(!empty($tmp))
                 $query = $tmp;
         }else{
             Yii::$app->session->set($key,$query);
+        }
+
+        $key_view = 'task_vt_'.Yii::$app->user->id;
+        if(is_null($viewType))
+        {
+            $tmp = Yii::$app->session->get($key_view);
+            if(!empty($tmp))
+                $viewType = $tmp;
+            else
+                $viewType = CrmTaskSearch::VIEW_TYPE_ALL;
+        }else{
+            Yii::$app->session->set($key_view,$viewType);
         }
 
 

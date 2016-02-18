@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use common\models\CrmTask;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\CrmTaskSearch */
@@ -17,12 +18,18 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'attribute' => 'title',
             'format' => 'html',
             'value' => function($model) use ($arNewTasks){
-
                 $postfix = in_array($model->id,$arNewTasks) ?
                     ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
                     :
                     '';
-                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
+                $options = ['class' => 'link-upd'];
+
+                if($model->status == CrmTask::STATUS_CLOSE)
+                {
+                    $options = ['class' => 'link-upd line-through'];
+                }
+
+                return Html::a($model->title,['view','id' => $model->id],$options).$postfix;
             }
         ],
         [
@@ -35,6 +42,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
 
         [
             'attribute' => 'deadline',
+            'format' => 'raw',
             'filter' =>  \yii\jui\DatePicker::widget([
                 'model'=>$searchModel,
                 'attribute'=>'deadline',
@@ -45,6 +53,28 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'defaultDate' => date('y-m-d',time())
                 ],
             ]),
+            'value' => function($model){
+                $options = [];
+                if(!empty($model->deadline))
+                {
+                    if(!in_array($model->status,[CrmTask::STATUS_NEED_ACCEPT,CrmTask::STATUS_CLOSE]))
+                    {
+                        $time = strtotime($model->deadline);
+                        $timeNow = time();
+                        if($time < $timeNow)
+                            $options = [
+                                'class' => 'red'
+                            ];
+                        elseif($time < time()+4*3600)
+                            $options = [
+                                'class' => 'yellow'
+                            ];
+                    }
+                }else{
+                    return NULL;
+                }
+                return Html::tag('span',$model->deadline,$options);
+            }
         ],
         [
             'attribute' => 'priority',
@@ -59,7 +89,6 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'value' => function($model){
                 return $model->getStatusStr();
             },
-            //'filter' => \common\models\CrmTask::getStatusArr()
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
                 'attribute' => 'status',
@@ -126,7 +155,13 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
                     :
                     '';
-                return Html::a($model->title,['view','id' => $model->id],['class' => 'link-upd']).$postfix;
+                $options = ['class' => 'link-upd'];
+
+                if($model->status == CrmTask::STATUS_CLOSE)
+                {
+                    $options = ['class' => 'link-upd line-through'];
+                }
+                return Html::a($model->title,['view','id' => $model->id],$options).$postfix;
             }
         ],
         [
@@ -139,6 +174,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
 
         [
             'attribute' => 'deadline',
+            'format' => 'raw',
             'filter' =>  \yii\jui\DatePicker::widget([
                 'model'=>$searchModel,
                 'attribute'=>'deadline',
@@ -149,6 +185,28 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'defaultDate' => date('y-m-d',time())
                 ],
             ]),
+            'value' => function($model){
+                $options = [];
+                if(!empty($model->deadline))
+                {
+                    if(!in_array($model->status,[CrmTask::STATUS_NEED_ACCEPT,CrmTask::STATUS_CLOSE]))
+                    {
+                        $time = strtotime($model->deadline);
+                        $timeNow = time();
+                        if($time < $timeNow)
+                            $options = [
+                                'class' => 'red'
+                            ];
+                        elseif($time < time()+4*3600)
+                            $options = [
+                                'class' => 'yellow'
+                            ];
+                    }
+                }else{
+                    return NULL;
+                }
+                return Html::tag('span',$model->deadline,$options);
+            }
         ],
         [
             'attribute' => 'priority',

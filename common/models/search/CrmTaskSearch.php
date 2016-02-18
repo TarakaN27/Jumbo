@@ -82,7 +82,7 @@ class CrmTaskSearch extends CrmTask
                 'pageSizeLimit' => [1,1000]
             ],
             'sort'=> [
-                'defaultOrder' => ['created_at'=>SORT_DESC]
+                'defaultOrder' => ['updated_at'=>SORT_DESC]
             ]
         ]);
 
