@@ -60,7 +60,8 @@ class TaskController extends AbstractBaseBackendController
         if(
             empty($query) ||
             (!empty($query) && count($query) == 1 && isset($query['viewType'])) ||
-            (!empty($query) && count($query) == 1 && isset($query['sort']))
+            (!empty($query) && count($query) == 1 && isset($query['sort'])) ||
+            (!empty($query) && count($query) == 1 && isset($query['page']))
         )
         {
             $tmp = Yii::$app->session->get($key);
