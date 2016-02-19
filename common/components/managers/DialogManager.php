@@ -375,7 +375,8 @@ class DialogManager extends Component{
                 $postModel = new BuserToDialogs();
                 $rows = [];
                 foreach ($arBUIDs as $id) {
-                    $rows [] = [$id, $obDialog->id];
+                    if($id > 0)
+                        $rows [] = [$id, $obDialog->id];
                 }
 
                 if (!Yii::$app->db->createCommand()->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)->execute()) {
@@ -432,7 +433,8 @@ class DialogManager extends Component{
 
             $arBUIDs = array_unique($arBUIDs);
             foreach ($arBUIDs as $id) {
-                $rows [] = [$id, $obDialog->id];
+                if($id > 0)
+                    $rows [] = [$id, $obDialog->id];
             }
 
             if (!Yii::$app->db->createCommand()->batchInsert(BuserToDialogs::tableName(), $postModel->attributes(), $rows)->execute()) {

@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2><?= Html::encode($this->title) ?></h2>
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/services', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-                                    <?= Html::a(Yii::t('app/services','Create Services'),['create'],['class'=>'btn btn-primary']);?>
+                                    <?= Html::a(Yii::t('app/services','Create expense Categories'),['create'],['class'=>'btn btn-primary']);?>
                                     <?= Html::a(Yii::t('app/services', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                                     <?= Html::a(Yii::t('app/services', 'Delete'), ['delete', 'id' => $model->id], [
                                         'class' => 'btn btn-danger',

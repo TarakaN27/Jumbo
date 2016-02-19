@@ -64,7 +64,8 @@ return [
     'Default Contracts' => 'Договора по-умолчанию',
     'Settings' => 'Настройки',
     'Act template' => 'Шаблон для акта',
-    'Rate' => 'Ставка норма часа'
+    'Rate' => 'Ставка норма часа',
+    'Create expense Categories' => 'Добавить категорию затрат'
 
 
 
