@@ -150,6 +150,14 @@ $this->registerJs("
 										<th><?=YII::t('app/crm','FIO')?>: <th>
 										<td><?=is_object($obRequisite) ? $obRequisite->getContactFIO() : '';?></td>
 									</tr>
+									<tr>
+										<th><?=YII::t('app/crm','Type')?>: <th>
+										<td><?=is_object($obType = $model->userType) ? $obType->name : '';?></td>
+									</tr>
+									<tr>
+										<th><?=YII::t('app/crm','Prospects')?>: <th>
+										<td><?=is_object($obPr = $model->prospects) ? $obPr->name : '';?></td>
+									</tr>
 								</table>
 							</div>
 							<div class="col-md-6 col-sm-6 col-xs-12">
@@ -189,6 +197,17 @@ $this->registerJs("
 												?></td>
 										</tr>
 									<?php endif;?>
+									<?php
+										$addFields = $model->getDisplayEntityValues();
+										if(!empty($addFields))
+											foreach($addFields as $field):
+									?>
+										<tr>
+											<th><?=$field['name']?>: </th>
+											<td><?=$field['value'];?></td>
+
+										</tr>
+									<?php endforeach;?>
 								</table>
 							</div>
 						</div>

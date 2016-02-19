@@ -30,7 +30,7 @@ class CUserSearch extends CUser
         return [
             [[
 
-                'id', 'ext_id', 'type', 'manager_id',
+                'id', 'ext_id', 'type', 'manager_id','prospects_id',
                 'role', 'status', 'created_at', 'updated_at','contractor'
             ], 'integer'],
             [[
@@ -118,6 +118,7 @@ class CUserSearch extends CUser
             'role' => $this->role,
             'status' => $this->status,
             'contractor' => $this->contractor,
+            'prospects_id' => $this->prospects_id,
             CUser::tableName().'created_at' => $this->created_at,
             CUser::tableName().'updated_at' => $this->updated_at,
         ]);

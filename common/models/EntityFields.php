@@ -103,6 +103,7 @@ class EntityFields extends AbstractActiveRecord
     {
         return [
             Acts::getModelName() => Yii::t('app/crm', 'Acts'),
+            CUser::getModelName() => Yii::t('app/users','Cuser')
         ];
     }
 

@@ -13,7 +13,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-
+use common\components\entityFields\EntityFieldsTrait;
 /**
  * This is the model class for table "{{%c_user}}".
  *
@@ -37,10 +37,12 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_by
  * @property integer $contractor
  * @property integer $archive
+ * @property integer $prospects_id
  */
 class CUser extends AbstractUser
 {
     use \DevGroup\TagDependencyHelper\TagDependencyTrait;
+    use EntityFieldsTrait; //подключаем доп настройки
     CONST
         ARCHIVE_YES = 1,
         ARCHIVE_NO = 0,
@@ -210,7 +212,10 @@ class CUser extends AbstractUser
             ['contractor','in','range' => array_keys(self::getContractorArr())],
 
             ['archive','default','value' => self::ARCHIVE_NO],
-            ['archive','in','range' => array_keys(self::getArchiveArr())]
+            ['archive','in','range' => array_keys(self::getArchiveArr())],
+
+            [['entityFields'], 'safe'],
+            ['prospects_id','required']
         ];
     }
 
@@ -240,7 +245,8 @@ class CUser extends AbstractUser
             'is_opened' => Yii::t('app/users','Is opened'),
             'created_by' => Yii::t('app/users','Created by'),
             'contractor' => Yii::t('app/users','Contractor'),
-            'archive' => Yii::t('app/users','Archive')
+            'archive' => Yii::t('app/users','Archive'),
+            'prospects_id' => Yii::t('app/users','Prospects')
         ];
     }
 
@@ -331,6 +337,11 @@ class CUser extends AbstractUser
     public function getQuantityHour()
     {
         return $this->hasOne(CuserQuantityHour::className(),['cuser_id' => 'id']);
+    }
+
+    public function getProspects()
+    {
+        return $this->hasOne(CuserProspects::className(),['id' => 'prospects_id']);
     }
 
     /**

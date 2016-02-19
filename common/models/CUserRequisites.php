@@ -126,10 +126,6 @@ class CUserRequisites extends AbstractActiveRecord
             ['c_email', 'email'],
             [['reg_date','birthday','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
 
-
-
-
-
             // обязательные поля для физика
             [[
                  'pasp_date','pasp_auth','pasp_ident',

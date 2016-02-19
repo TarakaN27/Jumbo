@@ -32,6 +32,10 @@ use yii\widgets\DetailView;
 							'value' => is_object($obType = $model->userType) ? $obType->name : 'N/A'
 						],
 						[
+							'attribute' => 'prospects_id',
+							'value' => is_object($obPr = $model->prospects) ? $obPr->name : NULL
+						],
+						[
 							'attribute' => 'manager_id',
 							'value' => is_object($obMng) ? $obMng->getFio() : NULL
 						],

@@ -458,7 +458,7 @@ class CompanyController extends AbstractBaseBackendController
 	public function actionViewRequisites($id)
 	{
 		/** @var CUser $model */
-		$model = CUser::findOne($id);
+		$model = CUser::find()->where(['id' => $id])->with('prospects')->one();
 		if(!$model)
 			throw new NotFoundHttpException('Company not found');
 		$obReq = $model->requisites;

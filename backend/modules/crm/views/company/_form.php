@@ -145,6 +145,17 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 					'prompt' => Yii::t('app/users','Choose_user_type')
 				]) ?>
 		</div>
+
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'prospects_id', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])
+				->dropDownList(\common\models\CuserProspects::getProspectsTypeMap(),[
+					'prompt' => Yii::t('app/users','Choose_user_prospects_type')
+				]) ?>
+		</div>
 		<div class = "col-md-4 col-sm-4 col-xs-12">
 			<?= $form->field($model, 'manager_id', [
 				'template' => $fieldTempl,
@@ -509,6 +520,11 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 			'labelOptions'=>['class' => 'control-label']])->textarea()?>
 	</section>
 	<!-- END description-->
+
+	<?= \common\components\entityFields\widget\EntityFieldsFormWidget::widget([
+		'form' => $form,
+		'model' => $model
+	]);?>
 
 	<div class="form-group">
 		<div class = "col-md-offset-8 pull-right">

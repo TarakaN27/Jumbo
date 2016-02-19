@@ -202,5 +202,11 @@ return [
     'Successfully saved' => 'Успешно сохранено',
     'Quantity hours' => 'Баланс трудозатрат',
     'Spent quantity hours' => 'Оплаченное кол-во часов',
-    'Hours' => 'Часы'
+    'Hours' => 'Часы',
+    'Cuser' => 'Компании',
+    'USER_cuser_prospects' => 'Типы перспективности',
+    'Create Cuser Prospects' => 'Добавить',
+    'Cuser Prospects' => 'Типы перспективности компаний',
+    'Choose_user_prospects_type' => 'Выбрать перспективность компании',
+    'Prospects' => 'Перспективность компании'
 ];

@@ -235,5 +235,6 @@ return [
 	'WORK_DAY_ERROR_END_TIME' => 'Не верно задано время окончания рабочего дня',
 	'You need bind cmp for contact' => 'Для добавления задачи, необходимо задать компанию для контакта',
 	'Quantity hours' => 'Баланс трудозатрат',
-	'Choose priority' => 'Выбрать приоритет'
+	'Choose priority' => 'Выбрать приоритет',
+	'Prospects' => 'Перспективность',
 ];

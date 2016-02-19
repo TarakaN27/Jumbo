@@ -254,14 +254,6 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
-                                <!--li><a><i class="fa fa-envelope"></i> <?php echo Yii::t('app/common', 'MSG_dialogs'); ?> <span class="fa fa-chevron-down"></span></a>
-                                    <ul class="nav child_menu" style="display: none">
-                                        <li>
-                                            <a href="<?= Url::to(['/messenger/default/index']); ?>"><?php echo Yii::t('app/common', 'MSG_messages'); ?></a>
-                                        </li>
-                                    </ul>
-                                </li-->
-
                                 <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
@@ -314,6 +306,9 @@ $menuItems[] = [
                                         <?php if(Yii::$app->user->can('adminRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
+                                            </li>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/cuser-prospects/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_prospects'); ?></a>
                                             </li>
                                         <?php endif;?>
                                         <?php if(

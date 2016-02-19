@@ -61,6 +61,13 @@ $columns = [
 		}
 	],
 	[
+		'attribute' => 'prospects_id',
+		'value' => function($model){
+			return is_object($obPr = $model->prospects) ? $obPr->name : '';
+		},
+		'filter' => \common\models\CuserProspects::getProspectsTypeMap()
+	],
+	[
 		'attribute' => 'c_email',
 		'label' => Yii::t('app/users','Email'),
 		'format' => 'html',
