@@ -71,22 +71,47 @@ class CrmTaskSearch extends CrmTask
      *
      * @return ActiveDataProvider
      */
-    public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [])
+    public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [],$cachePageSize = FALSE)
     {
         $query = CrmTask::find()->with('cmp','cmp.requisites');
         $query = $this->getAdditionQuery($query,$viewType);
         if(!is_null($addQuery)) //дополнительное условие
             $query->andWhere($addQuery,$addParams);
+
+        $defaultPageSize = Yii::$app->params['defaultPageSize'];
+
+        if($cachePageSize)
+        {
+            $key_per_page = 'task_per_page_'.Yii::$app->user->id;
+            if(!isset($params['per-page']))
+            {
+                $tmp = Yii::$app->session->get($key_per_page);
+                if(!empty($tmp)) {
+                    $params['per-page'] = $tmp;
+                    $_GET['per-page'] = $tmp;
+                }
+            }else{
+                Yii::$app->session->set($key_per_page,$params['per-page']);
+                if(!isset($_GET['per-page']))
+                    $_GET['per-page'] = $params['per-page'];
+            }
+
+            if(isset($params['per-page']))
+                $defaultPageSize = $params['per-page'];
+        }
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                'defaultPageSize' => $defaultPageSize,
                 'pageSizeLimit' => [1,1000]
             ],
             'sort'=> [
                 'defaultOrder' => ['updated_at'=>SORT_DESC]
             ]
         ]);
+
+
 
         $this->load($params);
 

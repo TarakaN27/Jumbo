@@ -62,7 +62,9 @@ class TaskController extends AbstractBaseBackendController
             empty($query) ||
             (!empty($query) && count($query) == 1 && isset($query['viewType'])) ||
             (!empty($query) && count($query) == 1 && isset($query['sort'])) ||
-            (!empty($query) && count($query) == 1 && isset($query['page']))
+            (!empty($query) && count($query) == 1 && isset($query['page']))// ||
+        //    (!empty($query) && count($query) == 1 && isset($query['per-page']))
+
         )
         {
             $tmp = Yii::$app->session->get($key);
@@ -85,7 +87,7 @@ class TaskController extends AbstractBaseBackendController
         }
 
 
-        $dataProvider = $searchModel->search($query,$viewType);
+        $dataProvider = $searchModel->search($query,$viewType,NULL,[],TRUE);
 
         $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
 

@@ -66,6 +66,7 @@ if(Yii::$app->user->can('adminRights'))
               'format' => 'html',
               'value' => function($model) use ($arRedisPaymentRequest){
                   $postfix = in_array($model->id,$arRedisPaymentRequest) ? ' <span class="label label-primary">New</span>' : '';
+                  $paySumm = Yii::$app->formatter->asDecimal($model->pay_summ,Yii::$app->params['decimalRound']);
                   if(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
                           $options = [
                               'title' => Yii::t('yii', 'Add payments'),
@@ -74,13 +75,13 @@ if(Yii::$app->user->can('adminRights'))
                           ];
                           if(Yii::$app->user->can('only_manager'))
                               return Html::a(
-                                  $model->pay_summ.$postfix,
+                                  $paySumm.$postfix,
                                   \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
                                   $options);
                           else
-                              return $model->pay_summ.$postfix;
+                              return $paySumm.$postfix;
                       }else{
-                          return $model->pay_summ.$postfix;
+                          return $paySumm.$postfix;
                       }
                   }
             ],

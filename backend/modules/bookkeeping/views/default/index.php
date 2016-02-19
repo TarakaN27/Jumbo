@@ -92,7 +92,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'filter' => \common\models\LegalPerson::getLegalPersonMap()
                             ],
                             'payment_order',
-                            'pay_summ',
+                            [
+                                'attribute' => 'pay_summ',
+                                'format'=>['decimal',Yii::$app->params['decimalRound']]
+                            ],
                             [
                                 'attribute' => 'currency_id',
                                 'value' => function($model){
