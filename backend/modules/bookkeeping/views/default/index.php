@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PaymentsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -56,7 +56,26 @@ $this->params['breadcrumbs'][] = $this->title;
                                         else
                                             return $name;
                                     },
-                                'filter' => \common\models\CUser::getContractorMap()
+                                'filter' => \kartik\select2\Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'cuser_id',
+                                    'initValueText' => $cuserDesc, // set the initial display text
+                                    'options' => [
+                                        'placeholder' => Yii::t('app/crm','Search for a company ...')
+                                    ],
+                                    'pluginOptions' => [
+                                        'allowClear' => true,
+                                        'minimumInputLength' => 3,
+                                        'ajax' => [
+                                            'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                                            'dataType' => 'json',
+                                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                                        ],
+                                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                                    ],
+                                ]),
                             ],
                             [
                                 'attribute' => 'service_id',

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use \common\models\PaymentRequest;
+use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PaymentRequestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -110,14 +111,35 @@ if(Yii::$app->user->can('adminRights'))
                         }else{
                             return is_object($obCUser = $model->cuser) ? $obCUser->getInfo() : NULL;
                         }
-                    }
+                    },
+                'filter' => \kartik\select2\Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'cntr_id',
+                    'initValueText' => $cuserDesc, // set the initial display text
+                    'options' => [
+                        'placeholder' => Yii::t('app/crm','Search for a company ...')
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                    ],
+                ]),
             ],
             [
                 'attribute' => 'legal_id',
                 'format' => 'html',
                 'value' => function($model){
                         return is_object($obLegal = $model->legal) ? $obLegal->name : NULL;
-                    }
+                    },
+                'filter' => \common\models\LegalPerson::getLegalPersonMap()
             ],
             [
                 'attribute' => 'is_unknown',
@@ -149,7 +171,27 @@ if(Yii::$app->user->can('adminRights'))
                 'attribute' => 'owner_id',
                 'value' => function($model){
                         return is_object($obOn = $model->owner) ? $obOn->getFio() : NULL;
-                    }
+                    },
+                'filter' => \kartik\select2\Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'owner_id',
+                    'initValueText' => $buserDesc, // set the initial display text
+                    'options' => [
+                        'placeholder' => Yii::t('app/crm','Search for a users ...')
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                    ],
+                ]),
             ],
 
             // 'legal_id',

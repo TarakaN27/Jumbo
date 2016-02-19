@@ -18,7 +18,7 @@ use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\db\Query;
 use common\models\CUserRequisites;
-
+use Yii;
 class AjaxSelectController extends AbstractBaseBackendController
 {
 	/**
@@ -38,12 +38,10 @@ class AjaxSelectController extends AbstractBaseBackendController
 				'verbs' => [
 					'class' => VerbFilter::className(),
 					'actions' => [
-						'add-comment' => ['post'],
-						'add-message' => ['post'],
-						'load-dialog' => ['post'],
-						'add-new-message' => ['post'],
-						'add-dialog' => ['post'],
-						'add-new-dialog' => ['post']
+						'get-cmp' => ['post'],
+						'get-contractor' => ['post'],
+						'get-b-user' => ['post'],
+						'get-crm-contact' => ['post'],
 					],
 				],
 			]
@@ -91,6 +89,38 @@ class AjaxSelectController extends AbstractBaseBackendController
 		}
 		elseif ($id > 0) {
 			$out['results'] = ['id' => $id, 'text' => CUser::findOne($id)->getInfoWithSite()];
+		}
+		return $out;
+	}
+
+	public function actionGetContractor($q = null, $id = null)
+	{
+		$out = ['results' => ['id' => '', 'text' => '']];
+		if (!is_null($q)) {
+
+			$obCUser = CUser::find()
+				->select([CUser::tableName().'.id','requisites_id'])
+				->joinWith('requisites')
+				->where(['like',CUserRequisites::tableName().'.corp_name',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
+				->andWhere(['contractor' => CUser::CONTRACTOR_YES])
+				->limit(10)
+				->all()
+			;
+
+			foreach($obCUser as $user)
+				$out['results'] []= [
+					'id' => $user->id,
+					'text' => $user->getInfoWithSite()
+				];
+			$out['results'] = array_values($out['results']);
+
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => CUser::find()->where(['contractor' => CUser::CONTRACTOR_YES,'id' => $id])->one()->getInfoWithSite()];
 		}
 		return $out;
 	}

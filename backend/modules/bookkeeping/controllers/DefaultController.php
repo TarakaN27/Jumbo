@@ -73,9 +73,11 @@ class DefaultController extends AbstractBaseBackendController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
+        $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cuserDesc' => $cuserDesc
         ]);
     }
 
