@@ -193,8 +193,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         [
             'attribute' => 'status',
             'format' => 'raw',
+            'contentOptions' => [
+                'class' => 'task-status-td'
+            ],
             'value' => function($model){
-                return $model->getStatusStr();
+                return Html::a($model->getStatusStr(),'#',[
+                    'class' => 'editable',
+                    'data-value' => $model->status,
+                    'data-type' => "select",
+                    'data-pk' => $model->id,
+                    // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+                    'data-url' => \yii\helpers\Url::to(['update-status']),
+                    'data-title' => Yii::t('app/common','change status')
+                ]).'<i class="fa fa-cog"></i>';
             },
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
