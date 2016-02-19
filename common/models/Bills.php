@@ -160,7 +160,7 @@ class Bills extends AbstractActiveRecord
         $this->getBSK();
         if(parent::beforeSave($insert))
         {
-            $this->setBillNumberAndDate();
+            $this->setBillNumberAndDate($insert);
             return TRUE;
         }
         return FALSE;
@@ -169,22 +169,25 @@ class Bills extends AbstractActiveRecord
     /**
      *
      */
-    protected function setBillNumberAndDate()
+    protected function setBillNumberAndDate($insert = TRUE)
     {
         $this->bill_date = date('Y-m-d');
 
-        $iBNmr = (new Query())
-            ->select('MAX(bill_number) as s')
-            ->from(self::tableName())
-            ->where(['l_person_id' => $this->l_person_id])
-            ->scalar();
+        if($insert)
+        {
+            $iBNmr = (new Query())
+                ->select('MAX(bill_number) as s')
+                ->from(self::tableName())
+                ->where(['l_person_id' => $this->l_person_id])
+                ->scalar();
 
-        if(empty($iBNmr) || !is_numeric($iBNmr))
-            $iBNmr = 1;
-        else
-            $iBNmr++;
+            if(empty($iBNmr) || !is_numeric($iBNmr))
+                $iBNmr = 1;
+            else
+                $iBNmr++;
 
-        $this->bill_number = $iBNmr;
+            $this->bill_number = $iBNmr;
+        }
     }
 
     /**
