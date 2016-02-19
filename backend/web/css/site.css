@@ -204,4 +204,6 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     padding-left: 10px;
     margin-top: 0px;
 }
+.task-status-td i.fa{  display: none; margin-left: 5px; }
+.task-status-td a:hover ~ i.fa{  display: inline-block;  }
 

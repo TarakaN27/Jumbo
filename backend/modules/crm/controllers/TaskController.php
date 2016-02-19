@@ -22,6 +22,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\AccessControl;
+use yii\web\ServerErrorHttpException;
 
 /**
  * TaskController implements the CRUD actions for CrmTask model.
@@ -609,5 +610,25 @@ class TaskController extends AbstractBaseBackendController
             throw new NotFoundHttpException('File not found');
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $obFile->delete();
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\base\ExitException
+     */
+    public function actionUpdateStatus()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $value = Yii::$app->request->post('value');
+
+        $obTask = CrmTask::findOne($pk);
+        if(!$obTask)
+            throw new NotFoundHttpException('Task not found');
+
+        if(!$obTask->changeTaskStatus((int)$value))
+            throw new ServerErrorHttpException('Error');
+
+        Yii::$app->end(200);
     }
 }

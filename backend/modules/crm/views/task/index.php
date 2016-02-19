@@ -11,6 +11,83 @@ use yii\web\JsExpression;
 
 $this->title = Yii::t('app/crm', 'Crm Tasks');
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css');
+$this->registerJsFile(
+    '//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js',
+    ['depends' => [
+        'yii\web\JqueryAsset',
+        'yii\web\YiiAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
+    ]]
+);
+
+$this->registerJs("
+$('.editable').editable({
+    clear: false,
+    source: ".\yii\helpers\Json::encode(CrmTask::getStatusArr()).",
+    validate: function(value) {
+		if($.trim(value) == '') {
+			return 'This field is required';
+		}
+	},
+});
+
+function getAvailableStatus(value)
+{
+    var
+        value = parseInt(value),
+        arStatus = [];
+    switch (value) {
+      case ".CrmTask::STATUS_OPENED.":
+        arStatus = [".CrmTask::STATUS_IN_PROGRESS.",value];
+        break
+      case ".CrmTask::STATUS_IN_PROGRESS.":
+        arStatus = [".CrmTask::STATUS_OPENED.",".CrmTask::STATUS_CLOSE.",value];
+        break
+      case ".CrmTask::STATUS_CLOSE.":
+        arStatus = [".CrmTask::STATUS_OPENED.",value];
+        break
+      case ".CrmTask::STATUS_NEED_ACCEPT.":
+        arStatus = [".CrmTask::STATUS_OPENED.",".CrmTask::STATUS_CLOSE.",value];
+        break
+      default:
+        break;
+    }
+
+    return arStatus;
+}
+
+$('.editable').on('shown', function(e, editableObj) {
+    var
+        value = editableObj.input.\$input.val(),
+        arAvSts = getAvailableStatus(value),
+        id = $(this).attr('aria-describedby');
+
+    $('#'+id).find('option').each(function(){
+
+        if(jQuery.inArray( parseInt($( this ).attr('value')), arAvSts ) == -1)
+        {
+            $(this).addClass('hide');
+        }else{
+            $(this).removeClass('hide');
+        }
+    });
+});
+
+$('.editable').on('save', function(e, params) {
+    var
+        pk = $(this).data('editable').options.pk;
+    if(parseInt(params.newValue) == ".CrmTask::STATUS_CLOSE.")
+    {
+        $('.x_content tr[data-key=\"'+pk+'\"] .link-upd').addClass('line-through');
+    }else{
+         $('.x_content tr[data-key=\"'+pk+'\"] .link-upd').removeClass('line-through');
+    }
+});
+
+",\yii\web\View::POS_READY);
+
+
 if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
 {
     $columns = [
@@ -276,8 +353,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         [
             'attribute' => 'status',
             'format' => 'raw',
+            'contentOptions' => [
+                'class' => 'task-status-td'
+            ],
             'value' => function($model){
-                return $model->getStatusStr();
+                return Html::a($model->getStatusStr(),'#',[
+                    'class' => 'editable',
+                    'data-value' => $model->status,
+                    'data-type' => "select",
+                    'data-pk' => $model->id,
+                   // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+                    'data-url' => \yii\helpers\Url::to(['update-status']),
+                    'data-title' => Yii::t('app/common','change status')
+                ]).'<i class="fa fa-cog"></i>';
             },
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
@@ -287,7 +375,6 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'multiple' => true
                 ],
             ])
-
         ],
         [
             'class' => 'yii\grid\ActionColumn',
