@@ -117,9 +117,6 @@ if(Yii::$app->user->can('adminRights'))
                     'model' => $searchModel,
                     'attribute' => 'cntr_id',
                     'initValueText' => $cuserDesc, // set the initial display text
-                    'options' => [
-                        'placeholder' => Yii::t('app/crm','Search for a company ...')
-                    ],
                     'pluginOptions' => [
                         'allowClear' => true,
                         'minimumInputLength' => 2,
@@ -177,9 +174,6 @@ if(Yii::$app->user->can('adminRights'))
                     'model' => $searchModel,
                     'attribute' => 'owner_id',
                     'initValueText' => $buserDesc, // set the initial display text
-                    'options' => [
-                        'placeholder' => Yii::t('app/crm','Search for a users ...')
-                    ],
                     'pluginOptions' => [
                         'allowClear' => true,
                         'minimumInputLength' => 2,
@@ -198,6 +192,7 @@ if(Yii::$app->user->can('adminRights'))
             // 'legal_id',
             // 'description:ntext',
             // 'dialog_id',
+            /*
              [
                  'attribute' => 'status',
                  'value' => function($model){
@@ -205,6 +200,7 @@ if(Yii::$app->user->can('adminRights'))
                      },
                  'filter' =>false
              ],
+            */
             // 'created_at',
             // 'updated_at',
 
