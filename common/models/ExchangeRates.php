@@ -134,7 +134,11 @@ class ExchangeRates extends AbstractActiveRecord
     {
         $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         $models = self::getDb()->cache(function ($db) {
-            return ExchangeRates::find()->orderBy(['is_default' => SORT_DESC])->all($db);
+            return ExchangeRates::find()
+                ->where(' use_rur_for_byr != :useRurForByr or use_rur_for_byr is null')
+                ->params([':useRurForByr' => self::YES])
+                ->orderBy(['is_default' => SORT_DESC])
+                ->all($db);
         },86400,$dep);
 
         return $models;
