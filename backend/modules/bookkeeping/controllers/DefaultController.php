@@ -153,6 +153,7 @@ class DefaultController extends AbstractBaseBackendController
         } else {
             return $this->render('create', [
                 'model' => $model,
+                //'obCalc' => $obCalc
             ]);
         }
     }
@@ -169,6 +170,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = $this->findModel($id);
         $oldSumm = $model->pay_summ;
 
+
         /** @var PaymentsCalculations $obCalc */
         $obCalc = $model->calculate;
 
@@ -177,6 +179,13 @@ class DefaultController extends AbstractBaseBackendController
         else
             $obCalc = new PaymentsCalculations();
 
+        if(!empty($obCalc->pay_cond_id))
+        {
+            $obCondTmp = $obCalc->payCond;
+            if(is_object($obCondTmp) && $obCondTmp->type == PaymentCondition::TYPE_CUSTOM)
+                $model->customProd = $obCalc->production;
+        }
+        $oldCustomProd = $model->customProd;
         if ($model->load(Yii::$app->request->post()) ) {
 
             $trans = Yii::$app->db->beginTransaction();
@@ -199,9 +208,10 @@ class DefaultController extends AbstractBaseBackendController
                     }
 
                     $paySumm = $model->pay_summ*$currSum;
+                    $customProd = $model->customProd*$currSum;
 
                     $obPOp = new PaymentOperations(
-                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale,$obCond->type,$customProd
                     );
 
                     $arCount = $obPOp->getFullCalculate();
@@ -240,9 +250,10 @@ class DefaultController extends AbstractBaseBackendController
                     }
 
                     $paySumm = $model->pay_summ*$currSum;
+                    $customProd = $model->customProd*$currSum;
 
                     $obPOp = new PaymentOperations(
-                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
+                        $paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale,$obCond->type,$customProd
                     );
 
                     $arCount = $obPOp->getFullCalculate();
@@ -262,9 +273,14 @@ class DefaultController extends AbstractBaseBackendController
                         Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully updated"));
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
-                }elseif($oldSumm != $model->pay_summ){
+                }elseif($oldSumm != $model->pay_summ || $oldCustomProd != $model->customProd){
 
                     $currSum = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$model->currency_id);    //курс валюты в бел рублях на дату платежа
+
+                    /** @var PaymentCondition $obCond */
+                    $obCond = PaymentCondition::findOne($model->condition_id);
+                    if(empty($obCond))
+                        throw new NotFoundHttpException("Condition not found");
 
                     if(is_null($currSum))
                     {
@@ -273,9 +289,11 @@ class DefaultController extends AbstractBaseBackendController
                     }
 
                     $paySumm = $model->pay_summ*$currSum;
+                    $customProd = $model->customProd*$currSum;
+
 
                     $obPOp = new PaymentOperations(
-                        $paySumm,$obCalc->cnd_tax,$obCalc->cnd_commission,$obCalc->cnd_corr_factor,$obCalc->cnd_sale
+                        $paySumm,$obCalc->cnd_tax,$obCalc->cnd_commission,$obCalc->cnd_corr_factor,$obCalc->cnd_sale,$obCond->type,$customProd
                     );
 
                     $arCount = $obPOp->getFullCalculate();
@@ -301,7 +319,7 @@ class DefaultController extends AbstractBaseBackendController
 
 
             return $this->render('update', [
-                'model' => $model,
+                'model' => $model
             ]);
         }
     }
@@ -430,6 +448,21 @@ class DefaultController extends AbstractBaseBackendController
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return ['mID' => $obCtr->manager_id];
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionGetConditions()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $date = Yii::$app->request->post('date');
+        if(!$date)
+            throw new NotFoundHttpException();
+
+        $time = strtotime($date);
+        return PaymentCondition::getConditionWithCurrency(date('Y-m-d',$time));
     }
 
 

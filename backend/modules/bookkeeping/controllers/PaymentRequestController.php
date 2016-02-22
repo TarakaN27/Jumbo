@@ -159,7 +159,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 try {
 
                         $bError = FALSE;
-                        foreach($model as $p) // добавляем патежи
+                    /** @var AddPaymentForm $p */
+                    foreach($model as $p) // добавляем патежи
                         {
                             $obPay = new Payments([
                                 'cuser_id' => $modelP->cntr_id,
@@ -196,8 +197,10 @@ class PaymentRequestController extends AbstractBaseBackendController{
                             //переведем сумму в бел рубли.
                             $paySumm = (float)$p->summ*(float)$nCurr;
 
+                            $customProd = (float)$p->customProduction*(float)$nCurr;
+
                             //расчет по бел рублям
-                            $obOp = new PaymentOperations($paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale);
+                            $obOp = new PaymentOperations($paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale,$p->condType,$customProd);
                             $arCount = $obOp->getFullCalculate();
 
                             $obPayCalc = new PaymentsCalculations([

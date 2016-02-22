@@ -10,11 +10,14 @@ namespace backend\modules\bookkeeping\form;
 
 
 use common\models\AbstractModel;
+use common\models\PaymentCondition;
 use Yii;
 
 class AddPaymentForm extends AbstractModel{
 
     public
+        $condType,
+        $customProduction,
         $showAll,
         $fullSumm,
         $comment,
@@ -26,9 +29,15 @@ class AddPaymentForm extends AbstractModel{
     {
         return [
             [['summ','service','condID'],'required'],
-            [['service','condID'], 'integer'],
-            [['summ','fullSumm'], 'number'],
-            [['comment'], 'string']
+            [['service','condID','condType'], 'integer'],
+            [['summ','fullSumm','customProduction'], 'number'],
+            [['comment'], 'string'],
+
+            ['condType','required','when' => function($model) {
+                if($this->condType == PaymentCondition::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
+                    return FALSE;
+                return TRUE;
+            }]
         ];
     }
 
@@ -44,6 +53,8 @@ class AddPaymentForm extends AbstractModel{
             'service' => Yii::t('app/book', 'Service'),
             'condID' => Yii::t('app/book', 'Condition'),
             'comment' => Yii::t('app/book', 'Comment'),
+            'customProduction' => Yii::t('app/book','Custom amount production'),
+            'condType' => Yii::t('app/book','Condition type')
         ];
     }
 

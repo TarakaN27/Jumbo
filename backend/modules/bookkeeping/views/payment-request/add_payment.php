@@ -119,20 +119,12 @@ $this->registerJs('
                     $("#"+condID).val(msg.default);
                     boundsCheckingConditions("#"+condID);
                 }
-
-
-            /*
-                if(msg.cID)
-                  {
-                    $("#"+condID).val(msg.cID);
-                    boundsCheckingConditions(parseNum(condID));
-
-                    addSuccessNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Condition found').'");
-                  }else{
-                    addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Cant found condition').'");
-                    $("#"+condID).val("");
-                  }
-            */
+                var
+                    lineIDCT = lineID.replace(/-service/gi,"-condtype"),
+                    lineIDCP = lineID.replace(/-service/gi,"-customproduction");
+                $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
+                $("#"+lineIDCP).attr("disabled","disabled");
+                $("#"+lineIDCP).val("");
             },
             error: function(msg){
                 addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
@@ -208,7 +200,8 @@ $this->registerJs('
     }
 
     var
-        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionMap()).';
+        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date))).',
+        keys = '.\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).';
 
     function showOptions(condID,lineID)
     {
@@ -220,12 +213,15 @@ $this->registerJs('
 
         select.find("option:not([value=\'\'])").remove();
 
-        $.each(conditions, function( index, value ) {
-            if(showAll || $.inArray(parseInt(index),condID) !== -1)
+        $.each(keys, function( index, key ) {
+            var
+                value = conditions[parseInt(key)];
+            if(showAll || $.inArray(parseInt(key),condID) !== -1)
                 {
-                    select.append("<option value=\'"+index+"\'>"+value+"</option>")
+                    select.append("<option value=\'"+key+"\'>"+value+"</option>")
                 }
         });
+
     }
 
     // по дефолту инициализирцем
@@ -244,8 +240,6 @@ $this->registerJs('
     // действия по клику
     function showAllBtnActions()
     {
-
-
         if($(this).is(":checked"))
         {
             var
@@ -258,7 +252,32 @@ $this->registerJs('
         }
     }
 
+    function actionByCondType()
+    {
+        var
+            lineIDCT = $(this).attr("id").replace(/-condid/gi,"-condtype"),
+            lineIDCP = $(this).attr("id").replace(/-condid/gi,"-customproduction"),
+            value = $(this).val(),
+            condType = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap()).';
+       if(value == undefined || value == "")
+            {
+                $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
+                $("#"+lineIDCP).attr("disabled","disabled");
+                $("#"+lineIDCP).val("");
 
+            }else{
+
+               if(condType[value] == '.\common\models\PaymentCondition::TYPE_CUSTOM.')
+                {
+                    $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_CUSTOM.');
+                    $("#"+lineIDCP).removeAttr("disabled");
+                }else{
+                    $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
+                    $("#"+lineIDCP).attr("disabled","disabled");
+                    $("#"+lineIDCP).val("");
+                }
+            }
+    }
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();
@@ -274,6 +293,13 @@ $this->registerJs('
     initPayment();
     initDefaultCondition();
     $(".dynamicform_wrapper").on("change",".showAllBtn",showAllBtnActions);
+    $(".dynamicform_wrapper").on("change",".cond-class",actionByCondType);
+    $(".dynamicform_wrapper").on("change",".psumm",function(){
+        var
+            lineID = $(this).attr("id"),
+            service = "#" + lineID.replace(/-summ/gi,"-service");
+        findCondition(service);
+    });
 ',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
@@ -364,6 +390,7 @@ $this->registerJs('
                                 </div>
                                 <div class="x_content">
                                     <div class="panel-body">
+                                        <?= Html::activeHiddenInput($m, "[{$i}]condType")?>
                                         <?= $form->field($m, "[{$i}]service")->dropDownList(
                                             \common\models\Services::getServicesMap(),[
                                             'prompt' => Yii::t('app/book','Choose service'),
@@ -375,18 +402,22 @@ $this->registerJs('
                                             'class' => 'form-control psumm',
                                             'onchange' => 'boundsCheckingConditions(this);',
                                         ]) ?>
+                                        <?= $form->field($m,"[{$i}]customProduction")->textInput([
+                                            'disabled' => 'disabled'
+                                        ])?>
                                         <?= $form->field($m, "[{$i}]comment")->textarea() ?>
-                                        <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionMap(),[
+                                        <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date)),[
                                             'prompt' => Yii::t('app/book','Choose condition'),
                                             'data-cond-id' => $i,
                                             'onchange' => 'boundsCheckingConditions(this);',
+                                            'class' => 'form-control cond-class'
                                         ]) ?>
                                         <div class="row">
                                             <div class="col-md-offset-2 pdd-left-15">
-                                            <?= $form->field($m,"[{$i}]showAll")->checkbox([
-                                                'class' => 'showAllBtn'
-                                            ])?>
-                                                </div>
+                                                <?= $form->field($m,"[{$i}]showAll")->checkbox([
+                                                    'class' => 'showAllBtn'
+                                                ])?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

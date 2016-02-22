@@ -42,7 +42,7 @@ class PaymentsCalculations extends AbstractActiveRecord
     {
         return [
             [['payment_id', 'pay_cond_id', 'created_at', 'updated_at'], 'integer'],
-            [['tax', 'production', 'cnd_corr_factor', 'cnd_sale'], 'required'],
+            [['tax', 'production'], 'required'],
             [['tax', 'profit', 'production', 'cnd_corr_factor', 'cnd_commission', 'cnd_sale', 'cnd_tax'], 'number'],
             [['payment_id'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/book','This payment already calculated.')]

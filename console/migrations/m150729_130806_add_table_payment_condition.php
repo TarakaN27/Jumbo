@@ -23,9 +23,9 @@ class m150729_130806_add_table_payment_condition extends Migration
             'summ_from' => ' decimal (19,4) NOT NULL',
             'summ_to' => ' decimal (19,4) NOT NULL',
             'currency_id' => Schema::TYPE_INTEGER . ' NOT NULL ',
-            'corr_factor' =>  ' decimal (19,10) NOT NULL',
+            'corr_factor' =>  ' decimal (19,10)',
             'commission' => ' decimal (19,10) DEFAULT 0',
-            'sale' =>  ' decimal (19,10) NOT NULL',
+            'sale' =>  ' decimal (19,10)',
             'tax' => ' decimal (19,10) DEFAULT 0',
 
             'created_at' => Schema::TYPE_INTEGER ,

@@ -204,4 +204,8 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .task-status-td i.fa{  display: none; margin-left: 5px; }
 .task-status-td a:hover ~ i.fa{  display: inline-block;  }
 .grid-view .select2-selection__rendered{margin-top: -4px;}
-
+@media screen and (min-width:480px) and (max-width:1500px) {
+    .select2-container--krajee {
+        max-width: 200px;
+    }
+}

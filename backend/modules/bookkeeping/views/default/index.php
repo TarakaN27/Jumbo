@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
                         'filterSelector' => 'select[name="per-page"]',
+                        'tableOptions' => ['class' => 'table table-striped table-bordered table-responsive'],
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
                             [

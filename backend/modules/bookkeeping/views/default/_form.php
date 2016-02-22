@@ -11,13 +11,31 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 $this->registerJsFile('@web/js/wm_app/helpers.js',[
         'depends' => [
             'yii\web\YiiAsset',
-            'yii\bootstrap\BootstrapAsset'],
+            'yii\bootstrap\BootstrapAsset'
+        ],
     ]
 );
 $this->registerJsFile('@web/js/php_functions/strtotime.js',[
     'position' => \yii\web\View::POS_HEAD
 ]);
 $this->registerJs('
+
+function condTypeAction()
+{
+    var
+        condTypes = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap()).'
+        condID = $("#payments-condition_id").val();
+
+    if(condTypes[condID] == '.\common\models\PaymentCondition::TYPE_CUSTOM.')
+        {
+            $("#payments-customprod").removeAttr("disabled");
+        }else{
+            $("#payments-customprod").val("");
+            $("#payments-customprod").attr("disabled","disabled");
+        }
+}
+
+
 function findCondition()
 {
     var
@@ -46,6 +64,7 @@ function findCondition()
                 {
                     $("#payments-condition_id").val(msg.default);
                     boundsCheckingConditions("#"+condID);
+                    condTypeAction();
                 }
         },
         error: function(msg){
@@ -88,7 +107,8 @@ function findCondition()
     }
 
     var
-        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionMap()).';
+        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$model->pay_date))).',
+        keys = '.\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).';
 
     function showOptions(condID,lineID)
     {
@@ -100,10 +120,12 @@ function findCondition()
 
         select.find("option:not([value=\'\'])").remove();
 
-        $.each(conditions, function( index, value ) {
-            if(showAll || $.inArray(parseInt(index),condID) !== -1)
+        $.each(keys, function( index, key ) {
+            var
+                value = conditions[parseInt(key)];
+            if(showAll || $.inArray(parseInt(key),condID) !== -1)
                 {
-                    select.append("<option value=\'"+index+"\'>"+value+"</option>")
+                    select.append("<option value=\'"+key+"\'>"+value+"</option>")
                 }
         });
     }
@@ -124,14 +146,45 @@ function findCondition()
             condID = '.\yii\helpers\Json::encode([$model->condition_id]).';
         showOptions(condID,"#payments-condition_id");
         $("#payments-condition_id").val('.$model->condition_id.');
+        condTypeAction();
     }
 ',\yii\web\View::POS_END);
 
 $this->registerJs('
-$("#payments-cuser_id").on("change",findCondition);
- // по дефолту инициализирцем
-    initDefaultCondition();
-    $("#show_all_id").on("change",showAllBtnActions);
+    $("#payments-cuser_id").on("change",findCondition);
+     // по дефолту инициализирцем
+        initDefaultCondition();
+        $("#show_all_id").on("change",showAllBtnActions);
+        $("#payments-condition_id").on("change",function(){
+            condTypeAction();
+        });
+        $("#payments-pay_summ").on("change",function(){
+            findCondition();
+        });
+
+     $("#payments-pay_date").on("change",function(){
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['get-conditions']).'",
+            dataType: "json",
+            data: {date:$(this).val()},
+            success: function(msg){
+                conditions = msg;
+                $.each( $("#payments-condition_id").find("option:not([value=\'\'])"), function( key1, value ) {
+                    var
+                        key = $(value).attr("value");
+
+                     $(value).html(conditions[key]);
+                });
+            },
+            error: function(msg){
+                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
+     });
+
 ',\yii\web\View::POS_READY);
 
 ?>
@@ -188,6 +241,8 @@ $("#payments-cuser_id").on("change",findCondition);
                 ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
         </div>
     </div>
+    <?= $form->field($model,'customProd')->textInput()?>
+
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
         'prompt' => Yii::t('app/book','BOOK_choose_service'),
         'onchange' => 'findCondition()'

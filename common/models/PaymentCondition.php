@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\helpers\CustomHelper;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
@@ -29,6 +30,7 @@ use yii\web\NotFoundHttpException;
  * @property integer $updated_at
  * @property integer $currency_id
  * @property integer $cond_currency
+ * @property integer $type
  *
  * @property Services $service
  * @property LegalPerson $lPerson
@@ -36,6 +38,29 @@ use yii\web\NotFoundHttpException;
 class PaymentCondition extends AbstractActiveRecord
 {
 
+    CONST
+        TYPE_USUAL = 5,
+        TYPE_CUSTOM = 10;
+
+    /**
+     * @return array
+     */
+    public static function getTypeArr()
+    {
+        return [
+            self::TYPE_USUAL => Yii::t('app/book','Type usual'),
+            self::TYPE_CUSTOM => Yii::t('app/book','Type custom')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeStr()
+    {
+        $tmp = self::getTypeArr();
+        return isset($tmp[$this->type]) ? $tmp[$this->type] : 'N/A';
+    }
 
     /**
      * @inheritdoc
@@ -52,20 +77,45 @@ class PaymentCondition extends AbstractActiveRecord
     {
         return [
             [[
-                 'name', 'description', 'service_id',
-                 'l_person_id', 'summ_from', 'summ_to',
-                 'corr_factor', 'sale','currency_id','commission', 'tax'
+                'name',
+                'description',
+                'service_id',
+                'l_person_id',
+                'summ_from',
+                'summ_to',
+                'currency_id',
+
+                'tax',
+                'type',
+                'cond_currency'
              ], 'required'],
+            [[
+                'corr_factor',
+                'sale',
+                'commission'
+            ],'required','when' => function($model) {
+                if($this->type == self::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
+                    return FALSE;
+                return TRUE;
+            },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        type = $('#paymentcondition-type input:checked').val();
+
+                    if(type != undefined && type == '".self::TYPE_CUSTOM."')
+                    {
+                        return false;
+                    }
+                    return true;
+                }"],
             [['name'],'unique','targetClass' => self::className(),
                 'message' => Yii::t('app/book','This name has already been taken.')],
             [['description'], 'string'],
-            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id'], 'integer'],
-            //[['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],
+            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','max' => 100],
-
         ];
     }
 
@@ -91,7 +141,7 @@ class PaymentCondition extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'cond_currency' => Yii::t('app/book', 'Condition currency'),
-
+            'type' => Yii::t('app/book','Type')
         ];
     }
 
@@ -141,7 +191,7 @@ class PaymentCondition extends AbstractActiveRecord
 
         return self::getDb()->cache(function($db){
            // return self::find()->with('service','currency','person')->all($db);
-            return self::find()->all($db);
+            return self::find()->orderBy(['service_id' => SORT_ASC,'name' => SORT_ASC])->all($db);
         },24 * 3600,$obDep);
     }
 
@@ -153,6 +203,45 @@ class PaymentCondition extends AbstractActiveRecord
     {
         $arTemp = self::getAllCondition();
         return ArrayHelper::map($arTemp,'id','name');
+    }
+
+    /**
+     * @return array
+     */
+    public static function getConditionTypeMap()
+    {
+        $arTemp = self::getAllCondition();
+        return ArrayHelper::map($arTemp,'id','type');
+    }
+
+    /**
+     * @param $date
+     * @return array
+     */
+    public static function getConditionWithCurrency($date)
+    {
+        $arTmp = self::getAllCondition();
+        $arCurrency = [];
+        foreach($arTmp as $tmp)
+            if(!in_array($tmp->cond_currency,$arCurrency))
+                $arCurrency [] = $tmp->cond_currency;
+
+        $arCurrency = array_filter($arCurrency);
+        $arExch = [];
+        if(!empty($arCurrency))
+            foreach($arCurrency as $curr)
+            {
+                $arExch[$curr] = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$curr);
+            }
+
+        $arReturn = [];
+        foreach($arTmp as $tmp)
+        {
+            $strExh = isset($arExch[$tmp->cond_currency]) ? ' <'.$arExch[$tmp->cond_currency].'>' : '';
+            $arReturn[$tmp->id] = $tmp->name.$strExh;
+        }
+
+        return $arReturn;
     }
 
     /**

@@ -8,6 +8,23 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+$this->registerJs("
+function initFieldsByType(){
+    var
+        type = $('#paymentcondition-type input:checked').val();
+
+    if(type != ".\common\models\PaymentCondition::TYPE_CUSTOM.")
+        {
+            $('.usual_type_block').fadeIn(100);
+        }else{
+            $('.usual_type_block').fadeOut(100);
+        }
+}
+",\yii\web\View::POS_END);
+$this->registerJs("
+initFieldsByType();
+    $('#paymentcondition-type').on('click','input',initFieldsByType);
+",\yii\web\View::POS_READY);
 ?>
 
 <div class="payment-condition-form">
@@ -16,7 +33,7 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         'options' => [
             'class' => 'form-horizontal form-label-left'
         ],
-        'enableClientValidation' => false,
+        'enableClientValidation' => true,
         'fieldConfig' => [
             'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
             'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
@@ -24,6 +41,8 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
     ]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model,'type')->radioList(\common\models\PaymentCondition::getTypeArr())?>
 
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
         'prompt' => Yii::t('app/book','Choose service')
@@ -61,11 +80,14 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         </div>
     </div>
 
-    <?= $form->field($model, 'corr_factor')->textInput(['maxlength' => true]) ?>
+    <span class="usual_type_block">
+        <?= $form->field($model, 'corr_factor')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'commission')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'commission')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'sale')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'sale')->textInput(['maxlength' => true]) ?>
+    </span>
+
 
     <?= $form->field($model, 'tax')->textInput(['maxlength' => true]) ?>
 

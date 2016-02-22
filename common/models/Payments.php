@@ -35,6 +35,7 @@ class Payments extends AbstractActiveRecord
 {
 
     public
+        $customProd,
         $showAll,
         $updateWithNewCondition,
         $condition_id;
@@ -54,9 +55,20 @@ class Payments extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['payment_order','cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id','condition_id'], 'required'],
-            [['cuser_id', 'currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','prequest_id','condition_id','updateWithNewCondition'], 'integer'],
-            [['pay_summ'], 'number'],
+            [[
+                'payment_order','cuser_id',
+                'pay_date', 'pay_summ',
+                'currency_id', 'service_id',
+                'legal_id','condition_id'
+            ], 'required'],
+            [[
+                'cuser_id', 'currency_id',
+                'service_id', 'legal_id',
+                'created_at', 'updated_at',
+                'prequest_id','condition_id',
+                'updateWithNewCondition'
+            ], 'integer'],
+            [['pay_summ','customProd'], 'number'],
             [['description'], 'string'],
             ['showAll','safe']
         ];
@@ -105,8 +117,8 @@ class Payments extends AbstractActiveRecord
             'condition_id' => Yii::t('app/book', 'Condition'),
             'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition'),
             'payment_order' => Yii::t('app/book','Payment order'),
-            'showAll' => Yii::t('app/book','Show all conditions')
-
+            'showAll' => Yii::t('app/book','Show all conditions'),
+            'customProd' => Yii::t('app/book','Custom amount production')
         ];
     }
 

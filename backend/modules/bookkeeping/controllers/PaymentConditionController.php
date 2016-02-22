@@ -69,6 +69,7 @@ class PaymentConditionController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new PaymentCondition();
+        $model->type = PaymentCondition::TYPE_USUAL;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

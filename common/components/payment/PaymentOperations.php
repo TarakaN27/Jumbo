@@ -9,11 +9,14 @@
  */
 namespace common\components\payment;
 
+use common\models\PaymentCondition;
 use yii\base\InvalidParamException;
 
 class PaymentOperations {
 
     public
+        $customProd ,
+        $condType,
         $tax,           // налог указывается в процентах 0-100
         $paySumm,       // сумма платежа
         $commission,    // коммиссия
@@ -29,8 +32,10 @@ class PaymentOperations {
      * @param $corrFactor
      * @param $sale
      */
-    public function __construct($paySumm,$tax,$commission,$corrFactor,$sale)
+    public function __construct($paySumm,$tax,$commission,$corrFactor,$sale,$condType,$customProd)
     {
+        $this->customProd = $customProd;
+        $this->condType = $condType;
         $this->paySumm = $paySumm;
         $this->tax = $tax;
         $this->commission = $commission;
@@ -44,17 +49,25 @@ class PaymentOperations {
      */
     protected function validate()
     {
-        if($this->sale > 100 || $this->sale < 0)
-            throw new InvalidParamException("Sale must be more than 0 and less then 100 (0 <= sale <= 100)");
+        if($this->condType != PaymentCondition::TYPE_CUSTOM)
+        {
+            if($this->sale > 100 || $this->sale < 0)
+                throw new InvalidParamException("Sale must be more than 0 and less then 100 (0 <= sale <= 100)");
 
-        if($this->commission > 100 || $this->commission < 0)
-            throw new InvalidParamException("Commission must be more than 0 and less then 100 (0 <= commission <= 100)");
+            if($this->commission > 100 || $this->commission < 0)
+                throw new InvalidParamException("Commission must be more than 0 and less then 100 (0 <= commission <= 100)");
+
+            if($this->corrFactor < 0)
+                throw new InvalidParamException("Correction factor must be more than 0  (0 <= correction factor )");
+        }else{
+            if($this->customProd < 0)
+                throw new InvalidParamException("Production amount must be more than 0");
+        }
+
 
         if($this->tax > 100 || $this->tax < 0)
             throw new InvalidParamException("Tax must be more than 0 and less then 100 (0 <= tax <= 100)");
 
-        if($this->corrFactor < 0)
-            throw new InvalidParamException("Correction factor must be more than 0  (0 <= correction factor )");
 
         if($this->paySumm < 0)
             throw new InvalidParamException("Payment summ factor must be more than 0  (0 <= payment summ )");
@@ -88,16 +101,33 @@ class PaymentOperations {
     }
 
     /**
+     * Прибыль через кастомное введение производственных затрат
+     * @return float
+     */
+    public function getProfitValueCustom()
+    {
+        return round($this->paySumm - $this->getTaxValue() - $this->customProd,self::ROUND_SIGN);
+    }
+
+    /**
      * Получение всех рассчетов
      * @return array
      */
     public function getFullCalculate()
     {
-        return [
-            'tax' => $this->getTaxValue(),
-            'production' => $this->getProductionCostsValue(),
-            'profit' => $this->getProfitValue()
-        ];
+        if($this->condType != PaymentCondition::TYPE_CUSTOM)
+            return [
+                'tax' => $this->getTaxValue(),
+                'production' => $this->getProductionCostsValue(),
+                'profit' => $this->getProfitValue()
+            ];
+        else{
+            return [
+                'tax' => $this->getTaxValue(),
+                'production' => $this->customProd,
+                'profit' => $this->getProfitValueCustom()
+            ];
+        }
     }
 
 } 
