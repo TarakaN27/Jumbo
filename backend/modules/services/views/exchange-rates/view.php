@@ -46,6 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'nbrb_rate',
             'cbr_rate',
             [
+                'attribute' => 'use_rur_for_byr',
+                'value' => $model->getYesNoStr($model->use_rur_for_byr)
+            ],
+            [
               'attribute' => 'use_base',
               'value' => $model->getYesNoStr($model->use_base)
             ],

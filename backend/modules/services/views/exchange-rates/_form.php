@@ -96,6 +96,13 @@ $('#exchangerates-use_exchanger').on('change',checkStateUseExchanger);
         <div class="control-label col-md-3 col-sm-3 col-xs-12">
 
         </div>
+        <?= $form->field($model,'use_rur_for_byr')->checkbox();?>
+    </div>
+
+    <div>
+        <div class="control-label col-md-3 col-sm-3 col-xs-12">
+
+        </div>
         <?= $form->field($model,'use_base')->checkbox();?>
     </div>
     <?=$form->field($model,'base_id')->dropDownList(

@@ -65,7 +65,8 @@ return [
     'Settings' => 'Настройки',
     'Act template' => 'Шаблон для акта',
     'Rate' => 'Ставка норма часа',
-    'Create expense Categories' => 'Добавить категорию затрат'
+    'Create expense Categories' => 'Добавить категорию затрат',
+    'Use currency rur for count byr' => 'Рассчет курсов по ЦБРФ'
 
 
 

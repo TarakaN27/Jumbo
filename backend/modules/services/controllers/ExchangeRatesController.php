@@ -183,6 +183,33 @@ class ExchangeRatesController extends AbstractBaseBackendController
             }else{
                 Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
             }
+        }elseif($model->use_rur_for_byr){
+            if($model->cbr != 0)
+            {
+                $crb = new ExchangeRatesCBRF($model->cbr);
+                $crbRate = $crb->makeRequest();
+            }else{
+                $crbRate = 1;
+            }
+
+            $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
+            $curr = $crb->getRURcurrencyInBur();
+
+            $nbrbRate = $crbRate*$curr; //курс по ЦБРФ
+
+            if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
+            {
+                $model->cbr_rate = $crbRate;
+                $model->nbrb_rate= $nbrbRate;
+                if($model->save())
+                {
+                    Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
+                }else{
+                    Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
+                }
+            }else{
+                Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
+            }
         }else{
             if($model->nbrb != 0)
             {
