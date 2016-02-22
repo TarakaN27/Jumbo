@@ -56,6 +56,7 @@ if(Yii::$app->user->can('adminRights'))
         'filterModel' => $searchModel,
         'filterSelector' => 'select[name="per-page"]',
         'addTrData' => ['pay_summ','currency_id','manager_id'],
+        'tableOptions' => ['class' => 'table table-striped table-bordered table-responsive'],
         'rowOptions' => [
           'class' => 'counters'
         ],
