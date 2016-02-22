@@ -18,7 +18,7 @@ class PaymentConditionSearch extends PaymentCondition
     public function rules()
     {
         return [
-            [['id', 'service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','type'], 'integer'],
             [['name', 'description'], 'safe'],
             [['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],
         ];
@@ -73,6 +73,7 @@ class PaymentConditionSearch extends PaymentCondition
             'tax' => $this->tax,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'type' => $this->type
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

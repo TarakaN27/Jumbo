@@ -34,8 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
-                        'id',
                         'name',
+                        [
+                            'attribute' => 'type',
+                            'value' => $model->getTypeStr()
+                        ],
                         'description:ntext',
                         [
                             'attribute' => 'service_id',
@@ -59,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'commission',
                         'sale',
                         'tax',
+
                         [
                             'attribute' => 'created_at',
                             'value' => Yii::$app->formatter->asDatetime($model->created_at)

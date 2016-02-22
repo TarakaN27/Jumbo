@@ -61,6 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \common\models\ExchangeRates::getRatesCodes()
                         ],
+                        [
+                            'attribute' => 'type',
+                            'value' => function($model){
+                                return $model->getTypeStr();
+                            },
+                            'filter' => \common\models\PaymentCondition::getTypeArr()
+                        ],
                         // 'corr_factor',
                         // 'commission',
                         // 'sale',
