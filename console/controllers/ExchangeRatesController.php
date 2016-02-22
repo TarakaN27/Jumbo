@@ -50,19 +50,28 @@ class ExchangeRatesController extends AbstractConsoleController{
                 $nbrbRate = $model->nbrb_rate;
                 $crbRate = $model->cbr_rate;
 
-                if($model->nbrb != 0)
-                {
-                    if(isset($arCurrNBRB[$model->nbrb]))
-                        $nbrbRate = $arCurrNBRB[$model->nbrb];
-                }else{
-                    $nbrbRate = 1;
-                }
                 if($model->cbr != 0)
                 {
                     if(isset($arCurrCBRF[$model->cbr]))
                         $crbRate = $arCurrCBRF[$model->cbr];
                 }else{
                     $crbRate = 1;
+                }
+
+                if($model->use_rur_for_byr)
+                {
+                    $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
+                    $curr = $crb->getRURcurrencyInBur();
+
+                    $nbrbRate = $crbRate*$curr; //курс по ЦБРФ
+                }else{
+                    if($model->nbrb != 0)
+                    {
+                        if(isset($arCurrNBRB[$model->nbrb]))
+                            $nbrbRate = $arCurrNBRB[$model->nbrb];
+                    }else{
+                        $nbrbRate = 1;
+                    }
                 }
 
                 if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))

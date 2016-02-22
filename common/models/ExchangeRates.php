@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $use_exchanger
  * @property integer $bank_id
  * @property string $factor
+ * @property integer $use_rur_for_byr
  */
 class ExchangeRates extends AbstractActiveRecord
 {
@@ -60,7 +61,7 @@ class ExchangeRates extends AbstractActiveRecord
             [[
                  'nbrb', 'cbr', 'created_at', 'updated_at',
                  'need_upd','is_default','use_base','base_id',
-                 'use_exchanger','bank_id'
+                 'use_exchanger','bank_id','use_rur_for_byr'
             ],'integer'],
             [['nbrb_rate', 'cbr_rate','factor'], 'number'],
             [['name', 'code'], 'string', 'max' => 255],
@@ -107,7 +108,8 @@ class ExchangeRates extends AbstractActiveRecord
             'base_id' => Yii::t('app/services', 'Base ID'),
             'factor' => Yii::t('app/services', 'Factor'),
             'bank_id' => Yii::t('app/services', 'Bank ID'),
-            'use_exchanger' => Yii::t('app/services', 'Use exchanger')
+            'use_exchanger' => Yii::t('app/services', 'Use exchanger'),
+            'use_rur_for_byr' => Yii::t('app/services', 'Use currency rur for count byr')
         ];
     }
 

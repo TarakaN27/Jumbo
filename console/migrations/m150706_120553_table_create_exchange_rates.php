@@ -19,7 +19,7 @@ class m150706_120553_table_create_exchange_rates extends Migration
             'code' => Schema::TYPE_STRING . ' NOT NULL',
             'nbrb' => Schema::TYPE_INTEGER.' NOT NULL',
             'cbr' => Schema::TYPE_INTEGER.' NOT NULL',
-            'nbrb_rate' => Schema::TYPE_DECIMAL.' NOT NULL',
+            'nbrb_rate' => Schema::TYPE_MONEY.' NOT NULL',
             'cbr_rate' => Schema::TYPE_MONEY.' NOT NULL',
             'created_at' => Schema::TYPE_INTEGER ,
             'updated_at' => Schema::TYPE_INTEGER ,

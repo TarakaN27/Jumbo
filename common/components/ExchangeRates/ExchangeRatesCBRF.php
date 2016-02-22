@@ -11,6 +11,10 @@ namespace common\components\ExchangeRates;
 
 class ExchangeRatesCBRF extends AbstractExchangeRates{
 
+
+    CONST
+        BUR_IN_CBR_CODE = 974;  //код бел рубля в ЦБРФ
+
     public
         $date,
         $codeID;
@@ -74,6 +78,29 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     {
         return round(str_replace(',','.',$val),4);
 
+    }
+
+    /**
+     * Курс российского рубля в бел. рублях по ЦБРФ
+     * @return float|null
+     */
+    public function getRURcurrencyInBur()
+    {
+        try{
+            $sxml = $this->loadFile();
+
+            if(!is_object($sxml)) {
+                return NULL;
+            }
+            foreach($sxml->Valute as $ar) {
+                if($ar->NumCode == self::BUR_IN_CBR_CODE)
+                    return  round($ar->Nominal/$this->convertValue($ar->Value),6);
+            }
+            return NULL;
+        }catch (\Exception $e)
+        {
+            return NULL;
+        }
     }
 
 
