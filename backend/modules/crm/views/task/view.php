@@ -297,16 +297,16 @@ $this->registerJs("
 
                     <?php if(is_object($obCmp)):?>
                         <section class="wm-side-bar-right">
-                            <div class="x_title">
+                            <div class="">
                                 <h2><?php echo Yii::t('app/crm','Company')?></h2>
-                                <ul class="nav navbar-right panel_toolbox">
+                                <ul class="right-bar-cmp">
                                     <li>
                                         <?=Html::a($obCmp->getInfoWithSite(),['/crm/company/view','id' => $obCmp->id],[
                                             'target' => '_blank'
                                         ]);?>
 
                                     </li>
-                                    <li class="pdd-left-5">
+                                    <li >
                                         <?php
                                         $obQHour = $obCmp->quantityHour;
                                         if($obQHour)
