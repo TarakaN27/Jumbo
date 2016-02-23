@@ -27,6 +27,7 @@ use common\models\PaymentRequest;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
 use common\models\search\PaymentRequestSearch;
+use Faker\Provider\el_GR\Payment;
 use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
@@ -129,6 +130,10 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
                 if($obPPC)
                 {
+                    $obCondition = PaymentCondition::find()->select('type')->where(['id' => $obPPC->cond_id])->one();
+                    if(!$obCondition)
+                        throw new NotFoundHttpException();
+                    $formModel->condType = empty($obCondition->type) ? PaymentCondition::TYPE_USUAL : $obCondition->type;
                     $formModel->condID = $obPPC->cond_id;
                     if(!in_array($obPPC->cond_id,$arCondVisible))
                         $arCondVisible[] = $obPPC->cond_id;
