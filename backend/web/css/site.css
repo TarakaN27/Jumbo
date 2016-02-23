@@ -167,8 +167,8 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .calendar-month{min-height: 330px;}
 .calendar-edit td.calendar_day:hover{background-color: #ddd;cursor: pointer;}
 .mrg-auto{margin: auto;}
-.ts_green{color: #5cb85c;}
-.ts_red{color: #90111A;}
+.ts_green{color: #5cb85c !important;}
+.ts_red{color: #90111A !important;}
 .ts_bg_task{background-color: #EBF5FB;}
 .ts_bg_work_day{background-color: #F4ECF7 ; }
 .table-time-users-sheet th,.table-time-users-sheet td{
@@ -209,3 +209,4 @@ tr.admin-line{background-color: #CEF6E3 !important;}
         max-width: 200px;
     }
 }
+.pdd-left-5{padding-left: 5px;}

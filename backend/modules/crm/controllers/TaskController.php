@@ -114,7 +114,7 @@ class TaskController extends AbstractBaseBackendController
                  ->with(
 				  'cmp','contact',
 				  'busersAccomplices','busersWatchers',
-				  'taskFiles'
+				  'taskFiles','cmp.quantityHour'
 			  )
             ->where(['id' => $id])->one();
         if (!$model){
