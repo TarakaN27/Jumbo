@@ -225,6 +225,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 $bError = TRUE;
                                 break;
                             }
+                            $obPay->callSaveDoneEvent();
 
                             unset($obPay,$obPayCalc,$obCond,$obOp);
                         }

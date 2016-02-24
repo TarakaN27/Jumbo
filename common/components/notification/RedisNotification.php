@@ -12,6 +12,7 @@ use Yii;
 class RedisNotification
 {
 	CONST
+        ENROLLMENT_REQUEST_KEY = 'enrollreq',
 		PAYMENT_REQUEST_KEY = 'pay_req',
 		DIALOG_KEY = 'udialog',
 		MSG_KEY = 'umsg',
@@ -96,6 +97,15 @@ class RedisNotification
 	{
 		return self::PAYMENT_REQUEST_KEY.':users:'.$iRequestID;
 	}
+
+    /**
+     * @param $iUserID
+     * @return string
+     */
+    public static function getEnrollmentRequestKey($iUserID)
+    {
+        return self::ENROLLMENT_REQUEST_KEY.':id:'.$iUserID;
+    }
 
 	/**************************end ключи для redis **********************/
 	/************************** общие методы ***************************/
@@ -587,5 +597,80 @@ class RedisNotification
 		$key = self::getPaymentRequestUsersKey($iRequestID);
 		Yii::$app->redis->del($key);
 	}
+
+    /****************** enrollment request *********************/
+
+    /**
+     * @param $arUsers
+     * @param $value
+     * @return bool
+     */
+    public static function addNewEnrollmentRequestToListForUsers($arUsers,$value)
+    {
+        return static::addItemToListForUsers($arUsers,$value,'getEnrollmentRequestKey');
+    }
+
+    /**
+     * @param $arUsers
+     * @param $value
+     * @return bool
+     */
+    public static function removeEnrollmentRequestFromListForUsers($arUsers,$value)
+    {
+        return static::removeItemFromListForUsers($arUsers,$value,'getEnrollmentRequestKey');
+    }
+
+    /**
+     * @param $iUserID
+     * @param $value
+     * @return bool
+     */
+    public static function removeEnrollmentRequestFromListForUser($iUserID,$value)
+    {
+        $key = self::getEnrollmentRequestKey($iUserID);   //получаем ключ
+        return self::removeViewed($key,$value);
+    }
+
+    /**
+     * @param $iUserID
+     * @return array
+     */
+    public static function getEnrollmentRequestListForUser($iUserID)
+    {
+        $key = static::getEnrollmentRequestKey($iUserID);
+        return static::itemList($key);
+    }
+
+    /**
+     * @param $iUserID
+     * @param $value
+     * @return mixed
+     */
+    public static function isEnrollmentRequestInList($iUserID,$value)
+    {
+        $key = static::getEnrollmentRequestKey($iUserID);
+        return static::isValueInList($key,$value);
+    }
+
+    /**
+     * @param $iUserID
+     * @return int
+     */
+    public static function countNewEnrollmentRequest($iUserID)
+    {
+        $key = static::getEnrollmentRequestKey($iUserID);
+        return static::countItem($key);
+    }
+
+    /**
+     * @param $arUsers
+     * @return bool
+     */
+    public static function removeEnrollmentRequestListForUsers($arUsers)
+    {
+        return static::removeListForUsers($arUsers,'getEnrollmentRequestKey');
+    }
+
+
 
 }

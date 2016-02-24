@@ -88,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                                 'pluginOptions' => [
                                     'allowClear' => true,
-                                    'minimumInputLength' => 3,
+                                    'minimumInputLength' => 2,
                                     'ajax' => [
                                         'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
                                         'dataType' => 'json',

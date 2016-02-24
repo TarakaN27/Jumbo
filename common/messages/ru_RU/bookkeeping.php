@@ -161,7 +161,11 @@ return [
     'Show all conditions' => 'Показать все условия',
     'Type usual' => 'Стандартное',
     'Type custom' => 'Кастомное с ручными затратами',
-    'Custom amount production' => 'Произв. затраты'
+    'Custom amount production' => 'Произв. затраты',
+    'Enrollment Requests' => 'Запрос на зачисление средств',
+    'Assigned ID' => 'Ответсвенный',
+    'Unit amount' => 'Кол-во единиц',
+    'New enrollment request' => 'Новый запрос на зачисление',
 
 
 

@@ -210,6 +210,7 @@ $menuItems[] = [
                                     <a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
                                         <span class = "fa fa-chevron-down"></span>
                                         <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
+                                        <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
                                     </a>
                                     <ul class = "nav child_menu" style = "display: none">
 
@@ -238,13 +239,17 @@ $menuItems[] = [
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
                                             </li>
-
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>">
                                                     <?php echo Yii::t('app/book', 'BOOK_payment_request'); ?>
                                                     <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
                                                 </a>
                                             </li>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common','Enrollment request'),['/bookkeeping/enrollment-request/index'])?>
+                                                <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
+                                            </li>
+
                                         <?php endif;?>
                                         <?php if(Yii::$app->user->can('superRights')):?>
                                             <li>

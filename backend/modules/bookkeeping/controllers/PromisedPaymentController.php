@@ -84,13 +84,20 @@ class PromisedPaymentController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new PromisedPayment();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
+        $tr = Yii::$app->db->beginTransaction();
+        try{
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                $tr->commit();
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }catch (\Exception $e){
+            $tr->rollBack();
+            Yii::$app->session->setFlash('error','Error');
+            return $this->redirect(['create']);
+        }
+        return $this->render('create', [
                 'model' => $model,
             ]);
-        }
     }
 
     /**

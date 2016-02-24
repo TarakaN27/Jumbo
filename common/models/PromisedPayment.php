@@ -3,6 +3,7 @@
 namespace common\models;
 
 use backend\models\BUser;
+use common\components\behavior\PromisedPayment\PromisedpaymentBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PromisedPaymentHelper;
 use Yii;
@@ -129,6 +130,7 @@ class PromisedPayment extends AbstractActiveRecord
         return ArrayHelper::merge(
             $arBhvrs,
             [
+                PromisedpaymentBehavior::className(),   //добавление запроса на зачисление
                 [
                     'class' => LogModelBehavior::className(),       //логирование платежей
                     'ignored' => ['created_at','updated_at']

@@ -32,7 +32,7 @@ $gridView = [
         'format' => 'raw',
         'value' => function($model){
             return Html::tag('i','',[
-                'class' => "fa fa-check-circle paid-control " . ($model->paid ? "paid-green" : "paid-red"),
+                'class' => "fa fa-check-circle " . ($model->paid ? "paid-green" : "paid-red"),
                 'data' => $model->paid ? 1 : 0,
                 'data-id' => $model->id
             ]);

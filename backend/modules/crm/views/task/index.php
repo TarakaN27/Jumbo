@@ -127,7 +127,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
-                    'minimumInputLength' => 3,
+                    'minimumInputLength' => 2,
                     'ajax' => [
                         'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
                         'dataType' => 'json',

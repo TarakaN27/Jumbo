@@ -5,6 +5,7 @@ namespace common\models;
 use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PartnerPaymentBehavior;
+use common\components\payment\PaymentEnrollmentBehavior;
 use common\components\payment\PaymentPredefinedConditionBehavior;
 use common\components\payment\PaymentQuantityHoursBehavior;
 use Yii;
@@ -144,6 +145,9 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => PaymentQuantityHoursBehavior::className()    //начисление норма часов
+                ],
+                [
+                    'class' => PaymentEnrollmentBehavior::className()   //запрос на зачисление
                 ]
             ]);
     }
@@ -170,6 +174,11 @@ class Payments extends AbstractActiveRecord
     public function getLegal()
     {
         return $this->hasOne(LegalPerson::className(), ['id' => 'legal_id']);
+    }
+
+    public function getCondition()
+    {
+        return $this->hasOne(PaymentCondition::className(),['id' => 'condition_id']);
     }
 
     /**

@@ -87,5 +87,6 @@ return [
     'Error, please try again!' => 'Ошибка. Попробуйте еще раз',
     'by' => 'от',
     'Calendar' => 'Календарь',
-    'Timesheet' => 'Рабочие отчеты'
+    'Timesheet' => 'Рабочие отчеты',
+    'Enrollment request' => 'Запрос на зачисление',
 ];
