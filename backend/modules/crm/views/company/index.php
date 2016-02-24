@@ -128,7 +128,6 @@ if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist') ||
 			'value' => function ($model) {
 
 				$str = '';
-
 				if(Yii::$app->user->can('only_manager'))
 				{
 					if($model->manager_id == Yii::$app->user->id)
@@ -158,12 +157,11 @@ if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist') ||
 	                       </li>
                        ';
 				}
-
 				return '
                <div class="btn-group">
-                   <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
-                       ' . Yii::t('app/users', 'Settings') . ' <span class="caret"></span>
-                   </button>
+                   <a data-toggle="dropdown" class="link-btn-cursor dropdown-toggle" type="button" aria-expanded="false">
+                       <i class="glyphicon glyphicon-cog"></i>
+                   </a>
                    <ul class="dropdown-menu">
                        '.$str.'
                    </ul>

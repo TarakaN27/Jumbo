@@ -47,8 +47,8 @@ class PromisedPayment extends AbstractActiveRecord
             [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id'], 'integer'],
             [['amount'], 'number', 'min' => 0],
             ['paid','default', 'value' => self::NO],
-            ['cuser_id','customValidate','on' => [self::SCENARIO_NEW]],
-            ['amount','customValAmount']
+            //['cuser_id','customValidate','on' => [self::SCENARIO_NEW]],
+            //['amount','customValAmount']
         ];
     }
 
@@ -56,6 +56,7 @@ class PromisedPayment extends AbstractActiveRecord
      * @param $attribute
      * @param $params
      */
+    /*
     public function customValAmount($attribute,$params)
     {
         $obPPHelp = new PromisedPaymentHelper($this->cuser_id,$this->service_id);
@@ -63,11 +64,12 @@ class PromisedPayment extends AbstractActiveRecord
         if($this->amount > $maxAmount)
             $this->addError($attribute,Yii::t('app/book','Amount can not be more than ').$maxAmount);
     }
-
+*/
     /**
      * @param $attribute
      * @param $params
      */
+    /*
     public function customvalidate($attribute, $params)
     {
         if(self::find()
@@ -75,7 +77,7 @@ class PromisedPayment extends AbstractActiveRecord
             ->andWhere('paid != :paid or paid is NULL',[':paid' => self::YES])->exists())
             $this->addError($attribute,Yii::t('app/book','Can not add new promised payment,user has an unpaid promised payment.'));
     }
-
+*/
     /**
      * @inheritdoc
      */
@@ -85,7 +87,7 @@ class PromisedPayment extends AbstractActiveRecord
             'id' => Yii::t('app/book', 'ID'),
             'cuser_id' => Yii::t('app/book', 'Cuser ID'),
             'buser_id_p' => Yii::t('app/book', 'Buser Id P'),
-            'amount' => Yii::t('app/book', 'Amount'),
+            'amount' => Yii::t('app/book', 'Unit amount'),
             'paid_date' => Yii::t('app/book', 'Paid Date'),
             'paid' => Yii::t('app/book', 'Paid'),
             'created_at' => Yii::t('app/book', 'Created At'),

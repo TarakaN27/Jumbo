@@ -68,37 +68,35 @@ if(!Yii::$app->user->isManager())
         'template' => '{view}'
     ];
 }
-
+/*
 $this->registerJs("
-$('table').on('click','.paid-control',function(){
-    var
-        id = $(this).attr('data-id'),
-        paidControl = $('.paid-control[data-id = \"'+id+'\"]');
-    console.log(id);
-    $.ajax({
-   type: \"POST\",
-   url: '".\yii\helpers\Url::to(['change-paid'])."',
-   data: { pk: id},
-   dataType: 'json',
-   success: function(msg){
-        if(msg == 1)
-        {
-            paidControl.removeClass('paid-red');
-            paidControl.addClass('paid-green');
-        }else{
-            paidControl.removeClass('paid-green');
-            paidControl.addClass('paid-red');
-        }
-   },
-   error: function(err){
-    alert('Error');
-   }
- });
-
-
-});
+    $('table').on('click','.paid-control',function(){
+        var
+            id = $(this).attr('data-id'),
+            paidControl = $('.paid-control[data-id = \"'+id+'\"]');
+        console.log(id);
+        $.ajax({
+       type: \"POST\",
+       url: '".\yii\helpers\Url::to(['change-paid'])."',
+       data: { pk: id},
+       dataType: 'json',
+       success: function(msg){
+            if(msg == 1)
+            {
+                paidControl.removeClass('paid-red');
+                paidControl.addClass('paid-green');
+            }else{
+                paidControl.removeClass('paid-green');
+                paidControl.addClass('paid-red');
+            }
+       },
+       error: function(err){
+        alert('Error');
+       }
+     });
+    });
 ",\yii\web\View::POS_READY);
-
+*/
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -111,12 +109,11 @@ $('table').on('click','.paid-control',function(){
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => $gridView,
-    ]); ?>
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'columns' => $gridView,
+            ]); ?>
             </div>
         </div>
     </div>

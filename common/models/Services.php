@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\BUser;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
@@ -18,6 +19,9 @@ use common\components\behavior\Service\ServiceRateBehavior;
  * @property number $rate
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $allow_enrollment
+ * @property integer $b_user_enroll
+ * @property string $enroll_unit
  */
 class Services extends AbstractActiveRecord
 {
@@ -36,12 +40,25 @@ class Services extends AbstractActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['status', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'string', 'max' => 255],
+            [['status', 'created_at', 'updated_at','b_user_enroll','allow_enrollment'], 'integer'],
+            [['name','enroll_unit'], 'string', 'max' => 255],
             ['rate','number','min' => 100],
             [['description'], 'string', 'max' => 32],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
+
+            [['b_user_enroll','enroll_unit'],'required','when' => function($model) {
+                if($model->allow_enrollment)
+                    return TRUE;
+                return FALSE;
+            },
+                'whenClient' => "function (attribute, value) {
+                    if($('#services-allow_enrollment').is(':checked'))
+                    {
+                        return true;
+                    }
+                    return false;
+                }"]
         ];
     }
 
@@ -58,6 +75,9 @@ class Services extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
+            'allow_enrollment' => Yii::t('app/services', 'Allow enrollment'),
+            'b_user_enroll' => Yii::t('app/services', 'Responsibility for enrollment'),
+            'enroll_unit' => Yii::t('app/services', 'Unit enrollment'),
         ];
     }
 
@@ -89,6 +109,21 @@ class Services extends AbstractActiveRecord
     }
 
     /**
+     * Услуги для которых разршено зачисление
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getServiceWithAllowEnrollment()
+    {
+        $dep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+        return self::getDb()->cache(function($db){
+            return self::find()->where(['allow_enrollment' => self::YES])->all();
+        },86400,$dep);
+    }
+
+    /**
      * вернем массив id => name
      * @return array
      */
@@ -96,5 +131,13 @@ class Services extends AbstractActiveRecord
     {
         $tmp = self::getAllServices();
         return ArrayHelper::map($tmp,'id','name');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getResponsibilityUser()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'b_user_enroll']);
     }
 }

@@ -52,6 +52,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'attribute' => 'updated_at',
                                                 'value' => is_null($model->updated_at) ? NULL : $model->getFormatedUpdatedAt()
                                             ],
+                                            [
+                                                'attribute' => 'allow_enrollment',
+                                                'value' => $model->getYesNoStr($model->allow_enrollment)
+                                            ],
+                                            [
+                                                'attribute' => 'b_user_enroll',
+                                                'value' => is_object($obUser = $model->responsibilityUser) ? $obUser->getFio() : NULL
+                                            ],
+                                            'enroll_unit'
                                         ],
                                     ]) ?>
 

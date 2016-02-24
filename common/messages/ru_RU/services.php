@@ -66,7 +66,10 @@ return [
     'Act template' => 'Шаблон для акта',
     'Rate' => 'Ставка норма часа',
     'Create expense Categories' => 'Добавить категорию затрат',
-    'Use currency rur for count byr' => 'Рассчет курсов по ЦБРФ'
+    'Use currency rur for count byr' => 'Рассчет курсов по ЦБРФ',
+    'Allow enrollment' => 'Разрешить зачисление средств',
+    'Responsibility for enrollment' => 'Ответственный за зачисление',
+    'Unit enrollment' => 'Единица зачисления'
 
 
 

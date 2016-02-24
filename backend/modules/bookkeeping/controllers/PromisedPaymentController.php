@@ -84,8 +84,6 @@ class PromisedPaymentController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new PromisedPayment();
-
-        $model->setScenario(PromisedPayment::SCENARIO_NEW); //устанавливаем сценарий для валидации
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {

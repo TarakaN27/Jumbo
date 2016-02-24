@@ -38,7 +38,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'buser_id_p',
                 'value' => is_object($obBuser = $model->buser) ? $obBuser->getFio() : 'N/A'
             ],
-            'amount',
+            [
+                'attribute' => 'amount',
+                'value' => $model->amount.' '.(is_object($obServ = $model->service) ? $obServ->enroll_unit : '')
+            ],
+            [
+                'attribute' => 'service_id',
+                'value' => is_object($obServ = $model->service) ? $obServ->name : 'N/A'
+            ],
             [
                 'attribute' => 'paid_date',
                 'format' => 'html',

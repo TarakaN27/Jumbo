@@ -3,6 +3,7 @@
 namespace backend\modules\services\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
 use common\models\LegalPerson;
 use common\models\ServiceDefaultContract;
 use Yii;
@@ -82,8 +83,14 @@ class DefaultController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+
+           $sAssName = '';
+            if(!empty($model->b_user_enroll))
+                $sAssName = is_object($obUser = BUser::findOne($model->b_user_enroll)) ? $obUser->getFio() : '';
+
             return $this->render('create', [
                 'model' => $model,
+                'sAssName' => $sAssName
             ]);
         }
     }
@@ -101,8 +108,12 @@ class DefaultController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            $sAssName = '';
+            if(!empty($model->b_user_enroll))
+                $sAssName = is_object($obUser = BUser::findOne($model->b_user_enroll)) ? $obUser->getFio() : '';
             return $this->render('update', [
                 'model' => $model,
+                'sAssName' => $sAssName
             ]);
         }
     }

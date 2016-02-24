@@ -72,28 +72,35 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'label' => '',
                     'format' => 'raw',
+                    'contentOptions' => ['class' => 'text-center'],
+                    'headerOptions' => ['class' => 'text-center'],
+
                     'value' => function($model){
                         return '
-                                                            <div class="btn-group">
-                                                <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">
-                                                    '.Yii::t('app/services','Settings').' <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                     <li>
-                                                        '.Html::a(Yii::t('app/services','Default Contracts'),['default-contracts','id' => $model->id]).'
-                                                    </li>
-                                                </ul>
-                                            </div>
+                        <div class="btn-group">
+                             <a data-toggle="dropdown" class="dropdown-toggle link-btn-cursor" type="button" aria-expanded="false">
+                                 <i class="glyphicon glyphicon-cog"></i>
+                             </a>
+                             <ul class="dropdown-menu">
+                                 <li>
+                                     '.Html::a(Yii::t('app/services','Default Contracts'),['default-contracts','id' => $model->id]).'
+                                 </li>
+                             </ul>
+                        </div>
                                                             ';
                     }
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',
-                    'template'=>$viewTpl
+                    'template'=>$viewTpl,
+                    'contentOptions' => ['class' => 'text-center'],
+                    'headerOptions' => ['class' => 'text-center'],
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',
-                    'template'=> $tpl
+                    'template'=> $tpl,
+                    'contentOptions' => ['class' => 'text-center'],
+                    'headerOptions' => ['class' => 'text-center'],
                 ]
             ]
         ]); ?>
