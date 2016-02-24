@@ -230,7 +230,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'buttons' => [
                 'update' => function ($url, $model, $key) {
 
-                    if($model->created_by != Yii::$app->user->id)
+                    if($model->created_by != Yii::$app->user->id  && !Yii::$app->user->can('adminRights'))
                         return NULL;
 
                     $options = [
@@ -247,7 +247,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'template' => '{delete}',
             'buttons' => [
                 'delete' => function ($url, $model, $key) {
-                    if($model->created_by != Yii::$app->user->id)
+                    if($model->created_by != Yii::$app->user->id  && !Yii::$app->user->can('adminRights'))
                         return NULL;
                     $options = [
                         'title' => Yii::t('yii', 'Delete'),
@@ -393,7 +393,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'buttons' => [
                 'update' => function ($url, $model, $key) {
 
-                    if($model->created_by != Yii::$app->user->id)
+                    if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights'))
                         return NULL;
 
                     $options = [
@@ -410,7 +410,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             'template' => '{delete}',
             'buttons' => [
                 'delete' => function ($url, $model, $key) {
-                    if($model->created_by != Yii::$app->user->id)
+                    if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights'))
                         return NULL;
                     $options = [
                         'title' => Yii::t('yii', 'Delete'),

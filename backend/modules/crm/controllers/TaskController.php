@@ -402,7 +402,7 @@ class TaskController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        if($model->created_by != Yii::$app->user->id) //редактировать задачу может только автор
+        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //редактировать задачу может только автор
             throw new ForbiddenHttpException();
 
         $arAccOb = $model->busersAccomplices;
@@ -476,7 +476,7 @@ class TaskController extends AbstractBaseBackendController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        if($model->created_by != Yii::$app->user->id) //удалить задачу может только тот кто создал
+        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //удалить задачу может только тот кто создал
             throw new ForbiddenHttpException();
 
         $model->delete();
