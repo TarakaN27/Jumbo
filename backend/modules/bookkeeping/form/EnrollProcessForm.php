@@ -25,7 +25,7 @@ class EnrollProcessForm extends Model{
     {
         return [
             ['isPayment','integer'],
-            [['enroll','repay','number']]
+            [['enroll','repay'],'number']
         ];
     }
 

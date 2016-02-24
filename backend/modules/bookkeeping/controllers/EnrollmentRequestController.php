@@ -6,6 +6,9 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bookkeeping\form\EnrollProcessForm;
 use common\models\CUser;
+use common\models\ExchangeRates;
+use common\models\PaymentsCalculations;
+use common\models\PromisedPayment;
 use Yii;
 use common\models\EnrollmentRequest;
 use common\models\search\EnrollmentRequestSearch;
@@ -148,6 +151,10 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $obForm->request = $model;
 
         $obPrPay = NULL;
+        $obCalc = NULL;
+        $obCurr = NULL;
+        $obCond = NULL;
+        $arPromised = [];
         if(!empty($model->pr_payment_id))
         {
             $obPrPay = $model->prPayment;
@@ -156,6 +163,10 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
         }else{
             $obForm->isPayment = true;
+            $obCalc = PaymentsCalculations::find()->where(['payment_id' => $model->payment_id])->one();
+            $obCurr = ExchangeRates::findOne($model->pay_currency);
+            $obCond = is_object($obCalc) ? $obCalc->payCond : NULL;
+            $arPromised = PromisedPayment::find()->where(['cuser_id' => $model->cuser_id,'service_id' => $model->service_id])->all();
         }
 
 
@@ -163,6 +174,11 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         return $this->render('process',[
             'model' => $model,
             'obPrPay' => $obPrPay,
+            'obCalc' => $obCalc,
+            'obCurr' => $obCurr,
+            'obCond' => $obCond,
+            'obForm' => $obForm,
+            'arPromised' => $arPromised
         ]);
 
     }
