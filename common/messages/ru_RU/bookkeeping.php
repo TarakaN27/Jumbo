@@ -161,7 +161,8 @@ return [
     'Show all conditions' => 'Показать все условия',
     'Type usual' => 'Стандартное',
     'Type custom' => 'Кастомное с ручными затратами',
-    'Custom amount production' => 'Произв. затраты'
+    'Custom amount production' => 'Произв. затраты',
+    'Payment request already processed' => 'Запрос на платеж уже обработан.'
 
 
 

@@ -101,6 +101,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(!Yii::$app->user->can('adminRights') && $modelP->manager_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action');
 
+        if($modelP->status != PaymentRequest::STATUS_NEW)
+        {
+            Yii::$app->session->setFlash('error',Yii::t('app/book','Payment request already processed'));
+            return $this->redirect(['/bookkeeping/default/index']);
+        }
+
         $arCondVisible = [];
 
         if(!Yii::$app->request->post('AddPaymentForm')) {
