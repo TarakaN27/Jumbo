@@ -230,6 +230,13 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>
                                             </li>
                                         <?php endif; ?>
+
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common','Enrollments'),['/bookkeeping/enrolls/index'])?>
+                                            </li>
+                                        <?php endif;?>
+
                                         <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>

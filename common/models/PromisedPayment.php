@@ -22,6 +22,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $service_id
+ * @property integer $owner
+ * @property string $description
  */
 class PromisedPayment extends AbstractActiveRecord
 {
@@ -45,9 +47,10 @@ class PromisedPayment extends AbstractActiveRecord
     {
         return [
             [['cuser_id', 'amount','service_id'], 'required'],
-            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id'], 'integer'],
+            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id','owner'], 'integer'],
             [['amount'], 'number', 'min' => 0],
             ['paid','default', 'value' => self::NO],
+            ['description','string','max' => 255]
             //['cuser_id','customValidate','on' => [self::SCENARIO_NEW]],
             //['amount','customValAmount']
         ];
@@ -93,7 +96,9 @@ class PromisedPayment extends AbstractActiveRecord
             'paid' => Yii::t('app/book', 'Paid'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
-            'service_id' => Yii::t('app/book', 'Service id')
+            'service_id' => Yii::t('app/book', 'Service id'),
+            'owner' => Yii::t('app/book','Added by'),
+            'description' => Yii::t('app/book','Description')
         ];
     }
 
@@ -119,6 +124,22 @@ class PromisedPayment extends AbstractActiveRecord
     public function getBuser()
     {
         return $this->hasOne(BUser::className(),['id' => 'buser_id_p']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAddedBy()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'owner']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRepay()
+    {
+        return $this->hasMany(PromisedPayRepay::className(),['pr_pay_id' => 'id']);
     }
 
     /**

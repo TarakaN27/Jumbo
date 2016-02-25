@@ -89,4 +89,5 @@ return [
     'Calendar' => 'Календарь',
     'Timesheet' => 'Рабочие отчеты',
     'Enrollment request' => 'Запрос на зачисление',
+    'Enrollments' => 'Зачисления'
 ];

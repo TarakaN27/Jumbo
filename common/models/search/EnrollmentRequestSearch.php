@@ -18,7 +18,10 @@ class EnrollmentRequestSearch extends EnrollmentRequest
     public function rules()
     {
         return [
-            [['id', 'payment_id', 'pr_payment_id', 'service_id', 'assigned_id', 'cuser_id', 'pay_currency', 'pay_date', 'created_at', 'updated_at'], 'integer'],
+            [[
+                'id', 'payment_id', 'pr_payment_id',
+                'service_id', 'assigned_id', 'cuser_id',
+                'pay_currency', 'pay_date', 'created_at', 'updated_at','status'], 'integer'],
             [['amount', 'pay_amount'], 'number'],
         ];
     }
@@ -50,6 +53,16 @@ class EnrollmentRequestSearch extends EnrollmentRequest
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'defaultPageSize' => Yii::$app->params['defaultPageSize'],
+                'pageSizeLimit' => [1,1000]
+            ],
+            'sort'=> [
+                'defaultOrder' => [
+                    'status'=>SORT_ASC,
+                    'created_at' => SORT_DESC
+                ]
+            ]
         ]);
 
         $this->load($params);
@@ -73,6 +86,7 @@ class EnrollmentRequestSearch extends EnrollmentRequest
             'pay_date' => $this->pay_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'status' => $this->status
         ]);
 
         return $dataProvider;

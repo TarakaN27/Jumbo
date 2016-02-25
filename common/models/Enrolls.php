@@ -41,10 +41,17 @@ class Enrolls extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['amount', 'repay', 'enroll'], 'number'],
+            [['amount', 'repay', 'enroll'], 'number','min'=>0],
             [['enr_req_id', 'service_id', 'cuser_id', 'buser_id', 'created_at', 'updated_at'], 'integer'],
-            [['description'], 'string', 'max' => 255]
+            [['description'], 'string', 'max' => 255],
+            ['enroll','validateAmount']
         ];
+    }
+
+    public function validateAmount($attribute,$param)
+    {
+        if(($this->enroll + $this->repay) > $this->amount)
+            $this->addError($attribute,\Yii::t('app/book','Summ of Enroll and repay must be less or equal available amount'));
     }
 
     /**
@@ -54,7 +61,7 @@ class Enrolls extends AbstractActiveRecord
     {
         return [
             'id' => Yii::t('app/book', 'ID'),
-            'amount' => Yii::t('app/book', 'Amount'),
+            'amount' => Yii::t('app/book', 'Unit amount'),
             'repay' => Yii::t('app/book', 'Repay'),
             'enroll' => Yii::t('app/book', 'Enroll'),
             'enr_req_id' => Yii::t('app/book', 'Enr Req ID'),

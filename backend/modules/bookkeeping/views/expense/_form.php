@@ -16,7 +16,7 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         'options' => [
             'class' => 'form-horizontal form-label-left'
         ],
-        'enableClientValidation' => false,
+        'enableClientValidation' => true,
         'fieldConfig' => [
             'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
             'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],

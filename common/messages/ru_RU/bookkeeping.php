@@ -166,6 +166,23 @@ return [
     'Assigned ID' => 'Ответсвенный',
     'Unit amount' => 'Кол-во единиц',
     'New enrollment request' => 'Новый запрос на зачисление',
+    'Enrollment request detail' => 'Детали запроса',
+    'Promised payments' => 'Обещанные платежи',
+    'Payment condition' => 'Условие платежа',
+    'Pay Amount' => 'Сумма платежа',
+    'Process enrollment request' => 'Обработка зачислений',
+    'Summ of Enroll and repay must be less or equal available amount' => 'Сумма зачисления и погашения должна быть меньше или равна доступной суммы',
+    'Request already processed' => 'Запрос уже обработан',
+    'Added by' => 'Кто добавил',
+    'Promised payment detail' => 'Детали обещенного платежа',
+    'Enroll request proccess' => 'Обработка зачисления',
+    'Enrollments' => 'Зачисления',
+    'Status processed' => 'Обработан',
+    'Enrolls' => 'Зачисления',
+    'Enroll' => 'Кол-во зачисленных единиц',
+    'Repay' => 'Погашение ОП',
+    'Prepay history' => 'История погашений'
+
 
 
 

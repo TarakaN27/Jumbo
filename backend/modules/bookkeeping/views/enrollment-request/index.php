@@ -102,6 +102,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                 ])
                         ],
+                        [
+                            'attribute' => 'status',
+                            'value' => function($model){
+                                return $model->getStatusStr();
+                            },
+                            'filter' => \common\models\EnrollmentRequest::getStatusArr()
+                        ],
                         'created_at:date',
 
 

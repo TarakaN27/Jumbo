@@ -76,6 +76,8 @@ $serviceTemplate = '<div class="form-group">{label}<div class="col-md-6 col-sm-6
 
     <?= $form->field($model, 'amount',['template' => $serviceTemplate])->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model,'description')->textarea()?>
+
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

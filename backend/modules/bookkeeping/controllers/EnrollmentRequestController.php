@@ -14,13 +14,33 @@ use common\models\EnrollmentRequest;
 use common\models\search\EnrollmentRequestSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-
+use yii\filters\AccessControl;
 
 /**
  * EnrollmentRequestController implements the CRUD actions for EnrollmentRequest model.
  */
 class EnrollmentRequestController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper','moder']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
     /**
      * Lists all EnrollmentRequest models.
      * @return mixed
@@ -31,7 +51,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
         $additionQuery = [];
         if(!Yii::$app->user->can('adminRights'))    //показываем админам все запросы, другим только свои
-            $additionQuery = ['assigned_id' => Yii::$app->user->id];
+            $additionQuery = ['assigned_id' => Yii::$app->user->id,'status' => EnrollmentRequest::STATUS_NEW];
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$additionQuery);
 
@@ -147,29 +167,74 @@ class EnrollmentRequestController extends AbstractBaseBackendController
     public function actionProcess($id)
     {
         $model = $this->findModel($id);
+        if($model->status == EnrollmentRequest::STATUS_PROCESSED)
+        {
+            Yii::$app->session->setFlash('error',Yii::t('app/book','Request already processed'));
+        }
+        $model->callViewedEvent();
+
+
         $obForm = new EnrollProcessForm();
         $obForm->request = $model;
+        $obForm->availableAmount = $model->amount;
 
         $obPrPay = NULL;
         $obCalc = NULL;
         $obCurr = NULL;
         $obCond = NULL;
+        $obPayment = NULL;
         $arPromised = [];
+        $countPromised = NULL;
         if(!empty($model->pr_payment_id))
         {
             $obPrPay = $model->prPayment;
             if(!$obPrPay)
                 throw new NotFoundHttpException('Promised payment not found');
 
+            $obForm->availableAmount = $obPrPay->amount;
+            $obForm->enroll = $obPrPay->amount;
+
         }else{
             $obForm->isPayment = true;
             $obCalc = PaymentsCalculations::find()->where(['payment_id' => $model->payment_id])->one();
             $obCurr = ExchangeRates::findOne($model->pay_currency);
             $obCond = is_object($obCalc) ? $obCalc->payCond : NULL;
-            $arPromised = PromisedPayment::find()->where(['cuser_id' => $model->cuser_id,'service_id' => $model->service_id])->all();
+            $arPromised = PromisedPayment::find()->where([
+                'cuser_id' => $model->cuser_id,
+                'service_id' => $model->service_id
+            ])->andWhere('(paid is NULL OR paid = 0)')->all();
+            $obPayment = $model->payment;
+            $obForm->arPromised = $arPromised;
+
+            if(!empty($arPromised))
+            {
+                foreach($arPromised as $pro)
+                    $countPromised+=$pro->amount;
+            }
+
+            if(!empty($countPromised))
+            {
+                if($countPromised >= $model->amount)
+                {
+                    $obForm->enroll = 0;
+                    $obForm->repay = $model->amount;
+                }else{
+                    $obForm->repay = $countPromised;
+                    $obForm->enroll = $model->amount - $countPromised;
+                }
+            }else{
+                $obForm->enroll = $model->amount;
+            }
         }
 
+        if($obForm->load(Yii::$app->request->post()))
+        {
+            if($obForm->makeRequest())
+            {
 
+                return $this->redirect(['/bookkeeping/enrolls/index']);
+            }
+        }
 
         return $this->render('process',[
             'model' => $model,
@@ -178,7 +243,8 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             'obCurr' => $obCurr,
             'obCond' => $obCond,
             'obForm' => $obForm,
-            'arPromised' => $arPromised
+            'arPromised' => $arPromised,
+            'obPayment' => $obPayment
         ]);
 
     }

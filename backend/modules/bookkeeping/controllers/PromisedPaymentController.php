@@ -71,8 +71,11 @@ class PromisedPaymentController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $obRepay = $model->repay;
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'obRepay' => $obRepay
         ]);
     }
 
@@ -84,6 +87,7 @@ class PromisedPaymentController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new PromisedPayment();
+        $model->owner = Yii::$app->user->id;
         $tr = Yii::$app->db->beginTransaction();
         try{
             if ($model->load(Yii::$app->request->post()) && $model->save()) {

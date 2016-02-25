@@ -7,10 +7,27 @@
  * Time: 4:15 PM
  */
 use yii\helpers\Html;
-$this->title = Yii::t('app/book','Process enrollment request')
+$this->title = Yii::t('app/book','Process enrollment request');
+
+$this->registerJs("
+$('#enrollprocessform-repay').on('change',function(){
+    var
+        delta = 0,
+        amount =  $('#enrollprocessform-availableamount').val(),
+        repay = $(this).val(),
+        enroll = $('#enrollprocessform-enroll');
+
+    delta = amount-repay;
+    if(delta < 0)
+        {
+            enroll.val(0);
+        }else{
+            enroll.val(delta);
+        }
+})
+",\yii\web\View::POS_READY);
+
 ?>
-
-
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
         <div class = "x_panel">
@@ -83,7 +100,11 @@ $this->title = Yii::t('app/book','Process enrollment request')
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Production'),
-                                    'value' => is_object($obCalc) ? $obCalc->production : NULL
+                                    'value' => is_object($obCalc) ? $obCalc->production.' BYR' : NULL
+                                ],
+                                [
+                                    'label' => Yii::t('app/book','Description'),
+                                    'value' => is_object($obPayment) ? $obPayment->description : NULL
                                 ]
                             ]
                         ]);?>
@@ -94,24 +115,73 @@ $this->title = Yii::t('app/book','Process enrollment request')
 
                 </div>
                 </div>
-                <?php if($model->payment_id):?>
                 <div class="row">
-                    <?=Html::tag('h3',Yii::t('app/book','Promised payment'))?>
-                    <?=\yii\grid\GridView::widget([
-                        'dataProvider' => new \yii\data\ArrayDataProvider([
-                              'allModels' => $arPromised
-                          ])
-                    ])?>
+                    <div class="col-md-6">
+                        <?php if($model->payment_id):?>
 
+                            <?=Html::tag('h3',Yii::t('app/book','Promised payments'))?>
+                            <?=\yii\grid\GridView::widget([
+                                'dataProvider' => new \yii\data\ArrayDataProvider([
+                                    'allModels' => $arPromised,
+                                ]),
+                                'columns' => [
+                                    'amount',
+                                    'description',
+                                    [
+                                        'attribute' => 'owner',
+                                        'value' => function($model){
+                                            return is_object($obBuser = $model->addedBy) ? $obBuser->getFio() : NULL;
+                                        }
+                                    ],
+                                ]
+
+                            ])?>
+
+                        <?php endif;?>
+                    </div>
                 </div>
-                <?php endif;?>
+
 
                 <div class="row">
-                    <?php $form = \yii\bootstrap\ActiveForm::begin();?>
+
+                        <?=Html::tag('h3',Yii::t('app/book','Enroll request proccess'))?>
+                        <?php
+                        $form = \yii\bootstrap\ActiveForm::begin([
+                            'options' => [
+                                'class' => 'form-horizontal form-label-left'
+                            ],
+                            'fieldConfig' => [
+                                'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+                                'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
+                            ],
+                        ]);
+                        echo Html::activeHiddenInput($obForm,'availableAmount');
+
+                        ?>
                         <?= $form->field($obForm,'enroll')->textInput();?>
+                        <?php
+                        if($obForm->isPayment)
+                        {
+                            $arOptions = [];
+                            if(is_null($arPromised) || count($arPromised) == 0)
+                                $arOptions['disabled'] = 'disabled';
 
-                    <?php \yii\bootstrap\ActiveForm::end();?>
+                            echo $form->field($obForm,'repay')->textInput($arOptions);
+                        }
+                        ?>
+
+                        <?= $form->field($obForm,'description')->textarea()?>
+
+                        <div class="form-group">
+                            <div class = "col-md-offset-8 ">
+                                <?= Html::submitButton(Yii::t('app/book', 'Save'), ['class' => 'btn btn-success']) ?>
+                            </div>
+                        </div>
+                        <?php \yii\bootstrap\ActiveForm::end();?>
+
                 </div>
+
+
             </div>
         </div>
     </div>

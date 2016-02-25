@@ -12,6 +12,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $gridView = [
     ['class' => 'yii\grid\SerialColumn'],
+    [
+        'attribute' => 'amount',
+        'format' => 'html',
+        'value' => function($model){
+            if($model->paid == \common\models\PromisedPayment::YES)
+                return $model->amount;
+            else{
+                $obRepay = $model->repay;
+                $paid = 0;
+                foreach($obRepay as $rep)
+                {
+                    $paid+=$rep->amount;
+                }
+                return $model->amount.'<span class="pp_paid">/'.$paid.'</span>';
+            }
+        }
+    ],
     'amount',
     [
         'attribute' => 'service_id',
