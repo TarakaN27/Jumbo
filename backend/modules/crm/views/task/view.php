@@ -297,13 +297,32 @@ $this->registerJs("
 
                     <?php if(is_object($obCmp)):?>
                         <section class="wm-side-bar-right">
-                            <div class="x_title">
+                            <div class="">
                                 <h2><?php echo Yii::t('app/crm','Company')?></h2>
-                                <ul class="nav navbar-right panel_toolbox">
+                                <ul class="right-bar-cmp">
                                     <li>
                                         <?=Html::a($obCmp->getInfoWithSite(),['/crm/company/view','id' => $obCmp->id],[
                                             'target' => '_blank'
                                         ]);?>
+
+                                    </li>
+                                    <li >
+                                        <?php
+                                        $obQHour = $obCmp->quantityHour;
+                                        if($obQHour)
+                                        {
+                                            $hours = empty($obQHour->hours) ? 0 : $obQHour->hours;
+                                            $spent = empty($obQHour->spent_time) ? 0 : $obQHour->spent_time;
+                                            $item = $hours-$spent;
+
+                                            if($item < 0)
+                                                $spanOpt = ['class' => 'ts_red'];
+                                            else
+                                                $spanOpt = ['class' => 'ts_green'];
+
+                                            echo  YII::t('app/crm','Quantity hours').' '.Html::tag('span',$item,$spanOpt);
+                                        }
+                                        ?>
                                     </li>
                                 </ul>
                                 <div class="clearfix"></div>

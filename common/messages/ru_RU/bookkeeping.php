@@ -182,7 +182,8 @@ return [
     'Enroll' => 'Кол-во зачисленных единиц',
     'Repay' => 'Погашение ОП',
     'Prepay history' => 'История погашений',
-    'Enr Req ID' => 'Запрос на зачисление'
+    'Enr Req ID' => 'Запрос на зачисление',
+    'Payment request already processed' => 'Запрос на платеж уже обработан.'
 
 
 
