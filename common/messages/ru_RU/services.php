@@ -70,8 +70,8 @@ return [
     'Allow enrollment' => 'Разрешить зачисление средств',
     'Responsibility for enrollment' => 'Ответственный за зачисление',
     'Unit enrollment' => 'Единица зачисления',
-    'Not use sale with counting unit enrollment' => 'Не учитывать скидку при рассчете единиц',
-    'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при рассчете единиц'
+    'Not use sale with counting unit enrollment' => 'Не учитывать скидку при расчете единиц',
+    'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при расчете единиц'
 
 
 
