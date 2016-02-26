@@ -16,6 +16,7 @@ use common\models\PaymentCondition;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
 use common\models\Services;
+use frontend\widgets\Alert;
 use yii\base\Behavior;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -51,12 +52,18 @@ class PaymentEnrollmentBehavior extends Behavior{
 
         if(!$obSrv->b_user_enroll)
             throw new InvalidParamException('You must set responsibility for enrollment at service');
-
+        /** @var PaymentCondition $obCond */
         $obCond = $model->condition;
         $obCalc = $model->calculate;
 
         if(empty($obCond) || empty($obCalc))
             throw new NotFoundHttpException();
+
+        if($obCond->type == PaymentCondition::TYPE_CUSTOM)
+        {
+            \Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_ERROR,\Yii::t('app/book','Can not create enroll request, because condition mark as custom'));
+            return TRUE;
+        }
 
 
         $obEnrollReq = new EnrollmentRequest();

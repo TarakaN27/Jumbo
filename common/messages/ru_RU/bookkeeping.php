@@ -195,7 +195,8 @@ return [
     'Total' => 'Всего',
     'Unit enroll name' => 'Еденица зачисления',
     'Legal person' => 'Юр. лицо',
-    'Is residen' => 'Резидент'
+    'Is residen' => 'Резидент',
+    'Can not create enroll request, because condition mark as custom' => 'Невозможно создать запрос на зачисление, так как для условия задам кастомный тип'
 
 
 
