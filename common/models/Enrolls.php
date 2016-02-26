@@ -44,7 +44,7 @@ class Enrolls extends AbstractActiveRecord
             [['amount', 'repay', 'enroll'], 'number','min'=>0],
             [['enr_req_id', 'service_id', 'cuser_id', 'buser_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string', 'max' => 255],
-            ['enroll','validateAmount']
+    //        ['enroll','validateAmount']
         ];
     }
 

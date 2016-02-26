@@ -57,6 +57,7 @@ class PromisedpaymentBehavior extends Behavior {
         $obReq->cuser_id = $model->cuser_id;
         $obReq->pr_payment_id = $model->id;
         $obReq->status = EnrollmentRequest::STATUS_NEW;
+        $obReq->added_by = \Yii::$app->user->id;
         if(!$obReq->save())
         {
             throw new ServerErrorHttpException('Error. Save record');

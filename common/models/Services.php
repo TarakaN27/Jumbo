@@ -22,6 +22,8 @@ use common\components\behavior\Service\ServiceRateBehavior;
  * @property integer $allow_enrollment
  * @property integer $b_user_enroll
  * @property string $enroll_unit
+ * @property integer $not_use_sale
+ * @property integer $not_use_corr_factor
  */
 class Services extends AbstractActiveRecord
 {
@@ -40,7 +42,12 @@ class Services extends AbstractActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['status', 'created_at', 'updated_at','b_user_enroll','allow_enrollment'], 'integer'],
+            [[
+                'status', 'created_at',
+                'updated_at','b_user_enroll',
+                'allow_enrollment','not_use_sale',
+                'not_use_corr_factor'
+            ], 'integer'],
             [['name','enroll_unit'], 'string', 'max' => 255],
             ['rate','number','min' => 100],
             [['description'], 'string', 'max' => 32],
@@ -78,6 +85,8 @@ class Services extends AbstractActiveRecord
             'allow_enrollment' => Yii::t('app/services', 'Allow enrollment'),
             'b_user_enroll' => Yii::t('app/services', 'Responsibility for enrollment'),
             'enroll_unit' => Yii::t('app/services', 'Unit enrollment'),
+            'not_use_sale' => Yii::t('app/services','Not use sale with counting unit enrollment'),
+            'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment')
         ];
     }
 

@@ -38,10 +38,23 @@ class EnrollProcessForm extends Model{
             [['description'],'string','max' => 255],
             ['isPayment','integer'],
             [['enroll','repay','availableAmount'],'number'],
-            ['enroll','validateAmount']
+    //        ['enroll','validateAmount']
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'enroll' => \Yii::t('app/book','Unit enroll amount'),
+            'repay' => \Yii::t('app/book','Unit repay amount'),
+            'description' => \Yii::t('app/book','Description')
+        ];
+    }
+
+    /**
+     * @param $attribute
+     * @param $param
+     */
     public function validateAmount($attribute,$param)
     {
         if(($this->enroll+$this->repay) > $this->availableAmount)

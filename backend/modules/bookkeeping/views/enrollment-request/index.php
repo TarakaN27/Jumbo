@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \yii\helpers\ArrayHelper::map(\common\models\Services::getServiceWithAllowEnrollment(),'id','name')
                         ],
-                        'amount',
+                        'amount:decimal',
                         [
                             'attribute' => 'assigned_id',
                             'visible' => Yii::$app->user->can('adminRights'),

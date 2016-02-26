@@ -15,6 +15,7 @@ use common\models\ExchangeCurrencyHistory;
 use common\models\PaymentCondition;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
+use common\models\Services;
 use yii\base\Behavior;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -59,7 +60,7 @@ class PaymentEnrollmentBehavior extends Behavior{
 
 
         $obEnrollReq = new EnrollmentRequest();
-        $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc);
+        $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc,$obSrv);
         $obEnrollReq->service_id = $obSrv->id;
         $obEnrollReq->assigned_id = $obSrv->b_user_enroll;
         $obEnrollReq->payment_id = $model->id;
@@ -68,17 +69,36 @@ class PaymentEnrollmentBehavior extends Behavior{
         $obEnrollReq->pay_currency = $model->currency_id;
         $obEnrollReq->pay_date = $model->pay_date;
         $obEnrollReq->status = EnrollmentRequest::STATUS_NEW;
+        $obEnrollReq->added_by = \Yii::$app->user->id;
         if(!$obEnrollReq->save())
         {
             throw new ServerErrorHttpException('Error. Save record');
         }
     }
 
-
-    protected function countAmoutForEnrollment(Payments $model,PaymentCondition $obCond,PaymentsCalculations $obCalc)
+    /**
+     * Расчет кол-ва единиц
+     * @param Payments $model
+     * @param PaymentCondition $obCond
+     * @param PaymentsCalculations $obCalc
+     * @return float
+     */
+    protected function countAmoutForEnrollment(Payments $model,PaymentCondition $obCond,PaymentsCalculations $obCalc,Services $obSrv)
     {
         $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$obCond->cond_currency);
-        return round($obCalc->production/$curr,2);
+        $amount =  $obCalc->production;
+
+        if($obSrv->not_use_sale)
+        {
+            $amount = $amount/(1 - $obCond->sale/100);
+        }
+
+        if($obSrv->not_use_corr_factor)
+        {
+            $amount = $amount/$obCond->corr_factor;
+        }
+
+        return round($amount/$curr,2);
     }
 
 } 

@@ -183,7 +183,19 @@ return [
     'Repay' => 'Погашение ОП',
     'Prepay history' => 'История погашений',
     'Enr Req ID' => 'Запрос на зачисление',
-    'Payment request already processed' => 'Запрос на платеж уже обработан.'
+    'Payment request already processed' => 'Запрос на платеж уже обработан.',
+    'Unit enroll amount' => 'Кол-во единиц к зачислению',
+    'Unit repay amount' => 'Кол-во единиц для погашения ОП',
+    'Owner' => 'Кто добавил',
+    'PaymentID' => 'ID платежа ',
+    'Processing' => 'Обработать',
+    'Counting unit amount' => 'Расчетное кол-во единиц',
+    'Enrollment request successfully processed' => 'Запрос на зачисление успешно обработан. Не заудьте зачислить в систему!',
+    'Processing date' => 'Дата обработки',
+    'Total' => 'Всего',
+    'Unit enroll name' => 'Еденица зачисления',
+    'Legal person' => 'Юр. лицо',
+    'Is residen' => 'Резидент'
 
 
 

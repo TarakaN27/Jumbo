@@ -61,8 +61,13 @@ $('#enrollprocessform-repay').on('change',function(){
                                 'value' => !empty($model->created_at) ? Yii::$app->formatter->asDatetime($model->created_at) : NULL
                             ],
                             [
+                                'attribute' => 'added_by',
+                                'value' => is_object($obAUser = $model->added) ? $obAUser->getFio() : NULL
+                            ],
+                            [
                                 'attribute' => 'amount',
-                                'value' => $model->amount .' '.(is_object($obServ = $model->service) ? $obServ->enroll_unit : NULL)
+                                'label' => Yii::t('app/book','Counting unit amount'),
+                                'value' => Yii::$app->formatter->asDecimal($model->amount) .' '.(is_object($obServ = $model->service) ? $obServ->enroll_unit : NULL)
                             ],
                         ]
                     ])?>
@@ -85,7 +90,10 @@ $('#enrollprocessform-repay').on('change',function(){
                         <?= \yii\widgets\DetailView::widget([
                             'model' => $model,
                             'attributes' => [
-                                'payment_id',
+                                [
+                                    'attribute' => 'payment_id',
+                                    'label' => Yii::t('app/book','PaymentID')
+                                ],
                                 [
                                     'label' => Yii::t('app/book','Payment condition'),
                                     'value' => is_object($obCond) ? $obCond->name : NULL
@@ -96,15 +104,23 @@ $('#enrollprocessform-repay').on('change',function(){
                                 ],
                                 [
                                     'attribute' => 'pay_amount',
-                                    'value' => $model->pay_amount.' '.(is_object($obCurr) ? $obCurr->code : '')
+                                    'value' => Yii::$app->formatter->asDecimal($model->pay_amount).' '.(is_object($obCurr) ? $obCurr->code : '')
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Production'),
-                                    'value' => is_object($obCalc) ? $obCalc->production.' BYR' : NULL
+                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYR'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Description'),
                                     'value' => is_object($obPayment) ? $obPayment->description : NULL
+                                ],
+                                [
+                                    'label' => Yii::t('app/book','Legal person'),
+                                    'value' => !is_object($obPayment) ? NULL : is_object($obLegal = $obPayment->legal) ? $obLegal->name : NULL
+                                ],
+                                [
+                                    'label' => Yii::t('app/book','Is residen'),
+                                    'value' => is_object($obCond) ? $obCond->getYesnoStr($obCond->is_resident) : NULL
                                 ]
                             ]
                         ]);?>
@@ -125,10 +141,18 @@ $('#enrollprocessform-repay').on('change',function(){
                                     'allModels' => $arPromised,
                                 ]),
                                 'columns' => [
-                                    'amount',
-                                    'description',
+                                    [
+                                        'attribute' => 'amount',
+                                        'label' => Yii::t('app/book','Unit amount'),
+
+                                    ],
+                                    [
+                                        'attribute' => 'description',
+                                        'label' => Yii::t('app/book','Description')
+                                    ],
                                     [
                                         'attribute' => 'owner',
+                                        'label' => Yii::t('app/book','Owner'),
                                         'value' => function($model){
                                             return is_object($obBuser = $model->addedBy) ? $obBuser->getFio() : NULL;
                                         }
@@ -174,7 +198,7 @@ $('#enrollprocessform-repay').on('change',function(){
 
                         <div class="form-group">
                             <div class = "col-md-offset-8 ">
-                                <?= Html::submitButton(Yii::t('app/book', 'Save'), ['class' => 'btn btn-success']) ?>
+                                <?= Html::submitButton(Yii::t('app/book', 'Processing'), ['class' => 'btn btn-success']) ?>
                             </div>
                         </div>
                         <?php \yii\bootstrap\ActiveForm::end();?>

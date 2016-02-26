@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $status
+ * @property integer $added_by
  *
  * @property CUser $cuser
  * @property BUser $assigned
@@ -80,7 +81,8 @@ class EnrollmentRequest extends AbstractActiveRecord
                 'pay_date',
                 'created_at',
                 'updated_at',
-                'status'
+                'status',
+                'added_by'
             ], 'integer'],
             [['service_id', 'cuser_id'], 'required'],
             [['amount', 'pay_amount'], 'number'],
@@ -106,7 +108,8 @@ class EnrollmentRequest extends AbstractActiveRecord
             'pay_date' => Yii::t('app/book', 'Pay Date'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
-            'status' => Yii::t('app/book','Status')
+            'status' => Yii::t('app/book','Status'),
+            'added_by' => Yii::t('app/book','Added by')
         ];
     }
 
@@ -150,6 +153,17 @@ class EnrollmentRequest extends AbstractActiveRecord
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdded()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'added_by']);
+    }
+
+    /**
+     * @return array
+     */
     public function behaviors()
     {
         $arTmp = parent::behaviors();

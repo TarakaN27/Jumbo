@@ -6,7 +6,7 @@ use common\models\CUser;
 use common\models\Services;
 use Yii;
 use common\models\Enrolls;
-use common\models\EnrollsSearch;
+use common\models\search\EnrollsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
@@ -75,10 +75,29 @@ class EnrollsController extends Controller
                 $cuserDesc = $obUser->getInfo();
         }
 
+        $arTotal = [];
+
+        foreach($dataProvider->getModels() as $item)
+        {
+            /** @var Services $obServ */
+            $obServ = $item->service;
+            if(is_object($obServ))
+            {
+                $idKey = !empty($obServ->enroll_unit) ? $obServ->enroll_unit : 'na';
+                if(isset($arTotal[$idKey]))
+                {
+                    $arTotal[$idKey]+=$item->amount;
+                }else{
+                    $arTotal[$idKey]=$item->amount;
+                }
+            }
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'cuserDesc' => $cuserDesc
+            'cuserDesc' => $cuserDesc,
+            'arTotal' => $arTotal
         ]);
     }
 

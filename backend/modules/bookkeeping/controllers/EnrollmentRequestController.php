@@ -5,8 +5,11 @@ namespace backend\modules\bookkeeping\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bookkeeping\form\EnrollProcessForm;
+use backend\widgets\Alert;
 use common\models\CUser;
+use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
+use common\models\PaymentCondition;
 use common\models\PaymentsCalculations;
 use common\models\PromisedPayment;
 use Yii;
@@ -185,6 +188,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $obPayment = NULL;
         $arPromised = [];
         $countPromised = NULL;
+        $exchRate = NULL;
         if(!empty($model->pr_payment_id))
         {
             $obPrPay = $model->prPayment;
@@ -198,6 +202,8 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             $obForm->isPayment = true;
             $obCalc = PaymentsCalculations::find()->where(['payment_id' => $model->payment_id])->one();
             $obCurr = ExchangeRates::findOne($model->pay_currency);
+
+            /** @var PaymentCondition $obCond */
             $obCond = is_object($obCalc) ? $obCalc->payCond : NULL;
             $arPromised = PromisedPayment::find()->where([
                 'cuser_id' => $model->cuser_id,
@@ -225,13 +231,19 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             }else{
                 $obForm->enroll = $model->amount;
             }
+
+            if(!empty($obCond) && !empty($obPayment))
+            {
+                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$obPayment->pay_date),$obCond->cond_currency);
+            }
+
         }
 
         if($obForm->load(Yii::$app->request->post()))
         {
             if($obForm->makeRequest())
             {
-
+                Yii::$app->session->setFlash(Alert::TYPE_SUCCESS,Yii::t('app/book','Enrollment request successfully processed'));
                 return $this->redirect(['/bookkeeping/enrolls/index']);
             }
         }
@@ -244,7 +256,8 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             'obCond' => $obCond,
             'obForm' => $obForm,
             'arPromised' => $arPromised,
-            'obPayment' => $obPayment
+            'obPayment' => $obPayment,
+            'exchRate' => $exchRate
         ]);
 
     }
