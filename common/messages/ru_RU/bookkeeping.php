@@ -193,7 +193,7 @@ return [
     'Enrollment request successfully processed' => 'Запрос на зачисление успешно обработан. Не заудьте зачислить в систему!',
     'Processing date' => 'Дата обработки',
     'Total' => 'Всего',
-    'Unit enroll name' => 'Еденица зачисления',
+    'Unit enroll name' => 'Единица зачисления',
     'Legal person' => 'Юр. лицо',
     'Is residen' => 'Резидент',
     'Can not create enroll request, because condition mark as custom' => 'Невозможно создать запрос на зачисление, так как для условия задам кастомный тип'

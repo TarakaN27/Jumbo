@@ -55,6 +55,8 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $additionQuery = [];
         if(!Yii::$app->user->can('adminRights'))    //показываем админам все запросы, другим только свои
             $additionQuery = ['assigned_id' => Yii::$app->user->id,'status' => EnrollmentRequest::STATUS_NEW];
+        else
+            $additionQuery = ['status' => EnrollmentRequest::STATUS_NEW];
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$additionQuery);
 

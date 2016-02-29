@@ -76,6 +76,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'amount:decimal',
                         [
+                            'label' => Yii::t('app/book','Unit enroll name'),
+                            'value' =>  function($model){
+                                return is_object($obServ = $model->service) ? $obServ->enroll_unit : NULL;
+                            },
+                        ],
+                        [
                             'attribute' => 'assigned_id',
                             'visible' => Yii::$app->user->can('adminRights'),
                             'value' => function($model){
@@ -102,6 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                 ])
                         ],
+                        /*
                         [
                             'attribute' => 'status',
                             'value' => function($model){
@@ -109,6 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\EnrollmentRequest::getStatusArr()
                         ],
+                        */
                         'created_at:date',
 
 
