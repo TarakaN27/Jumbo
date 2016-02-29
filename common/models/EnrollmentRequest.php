@@ -24,6 +24,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $status
  * @property integer $added_by
+ * @property integer $parent_id
+ * @property integer $part_enroll
  *
  * @property CUser $cuser
  * @property BUser $assigned
@@ -82,7 +84,9 @@ class EnrollmentRequest extends AbstractActiveRecord
                 'created_at',
                 'updated_at',
                 'status',
-                'added_by'
+                'added_by',
+                'parent_id',
+                'part_enroll'
             ], 'integer'],
             [['service_id', 'cuser_id'], 'required'],
             [['amount', 'pay_amount'], 'number'],
@@ -109,7 +113,9 @@ class EnrollmentRequest extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'status' => Yii::t('app/book','Status'),
-            'added_by' => Yii::t('app/book','Added by')
+            'added_by' => Yii::t('app/book','Added by'),
+            'parent_id' => Yii::t('app/book','Parent'),
+            'part_enroll' => Yii::t('app/book','Partial enrollment')
         ];
     }
 
@@ -162,13 +168,61 @@ class EnrollmentRequest extends AbstractActiveRecord
     }
 
     /**
+     * Получение родительского запроса
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(self::className(),['id' => 'parent_id']);
+    }
+
+    /**
+     * Получение дочарнего запроса
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChild()
+    {
+        return $this->hasOne(self::className(),['parent_id' => 'id']);
+    }
+
+    /**
      * @return array
      */
     public function behaviors()
     {
         $arTmp = parent::behaviors();
         return ArrayHelper::merge($arTmp,[
-            EnrollmentRequestNotificationBehavior::className()
+            EnrollmentRequestNotificationBehavior::className(),     //уведомления
         ]);
     }
+
+
+    /**
+     * @return array
+     */
+    public function getTreeDown()
+    {
+        return $this->treeDown($this);
+    }
+
+
+    /**
+     * Получаем все дочерние элементы относительно текущего
+     * @param $obj
+     * @return array
+     */
+    protected function treeDown($obj)
+    {
+        $arReturn = [];
+        $child = $obj->child;
+        if(is_object($child))
+        {
+            $arReturn[] = $child;
+            $childs = $this->getTreeDown($child);
+            if(!empty($childs))
+                $arReturn = ArrayHelper::merge($arReturn,$childs);
+        }
+        return $arReturn;
+    }
+
 }

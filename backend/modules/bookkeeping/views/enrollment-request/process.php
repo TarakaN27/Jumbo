@@ -184,15 +184,17 @@ $('#enrollprocessform-repay').on('change',function(){
                         ?>
                         <?= $form->field($obForm,'enroll')->textInput();?>
                         <?php
-                        if($obForm->isPayment)
-                        {
-                            $arOptions = [];
-                            if(is_null($arPromised) || count($arPromised) == 0)
-                                $arOptions['disabled'] = 'disabled';
+                            if($obForm->isPayment)
+                            {
+                                $arOptions = [];
+                                if(is_null($arPromised) || count($arPromised) == 0)
+                                    $arOptions['disabled'] = 'disabled';
 
-                            echo $form->field($obForm,'repay')->textInput($arOptions);
-                        }
+                                echo $form->field($obForm,'repay')->textInput($arOptions);
+                            }
                         ?>
+
+                        <?= $form->field($obForm,'part_enroll')->checkbox()?>
 
                         <?= $form->field($obForm,'description')->textarea()?>
 

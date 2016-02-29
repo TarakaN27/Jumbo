@@ -197,7 +197,8 @@ return [
     'Legal person' => 'Юр. лицо',
     'Is residen' => 'Резидент',
     'Can not create enroll request, because condition mark as custom' => 'Невозможно создать запрос на зачисление, так как для условия задам кастомный тип',
-    'Condition info' => 'Информация по условиям'
+    'Condition info' => 'Информация по условиям',
+    'Not enough amount for create partition request' => 'Не достаточно единиц для создания подзапроса на зачисление'
 
 
 
