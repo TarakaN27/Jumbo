@@ -9,6 +9,7 @@
 namespace console\controllers;
 
 
+use common\models\CUserTypes;
 use console\components\AbstractConsoleController;
 
 use common\models\CrmCmpContacts;
@@ -17,6 +18,7 @@ use common\models\CUserRequisites;
 use common\components\helpers\CustomHelper;
 use Yii;
 use backend\models\BUser;
+use yii\db\Query;
 
 
 class DataBaseController extends AbstractConsoleController{
@@ -309,6 +311,37 @@ class DataBaseController extends AbstractConsoleController{
 			fclose($handle);
 		}
 		return $data;
+	}
+
+	public function actionExportUser()
+	{
+		$obUser = (new Query())
+			->from(CUser::tableName().' cu ')
+			->leftJoin(CUserRequisites::tableName().' as re','cu.requisites_id = re.id')
+			->leftJoin(CUserTypes::tableName().'as ty','ty.id = cu.type')
+			->leftJoin(BUser::tableName().'as bu','cu.manager_id = bu.id')
+			->select('
+			cu.id,cu.manager_id,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname,cu.status,
+			cu.created_at,cu.is_resident,cu.r_country,cu.is_opened,cu.contractor,cu.archive,cu.prospects_id,ty.name as type,
+			,re.*')
+
+		//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
+	//	echo $obUser;die('2');
+			->all();
+		$arrHead = [];
+		if(isset($obUser[0]))
+			$arrHead = array_keys($obUser[0]);
+
+		//preDump($arData);die;
+		$fp = fopen(Yii::getAlias('@app/runtime/cuser.csv'), 'w');
+		fputcsv($fp,$arrHead,';');
+//fputcsv($fp, $arHeader,';');
+		foreach ($obUser as $fields) {
+			fputcsv($fp, $fields,';');
+		}
+		fclose($fp);
+
+		echo 'done';
 	}
 
 } 
