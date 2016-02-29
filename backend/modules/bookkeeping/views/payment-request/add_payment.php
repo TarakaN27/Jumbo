@@ -29,7 +29,7 @@ $this->registerJs('
             var
                 val = $(value).val();
             if($.isNumeric(val))
-                tmpSumm+=parseInt(val);
+                tmpSumm+=parseFloat(val);
         });
 
         $tmp = aSumm.val() - tmpSumm;
@@ -77,7 +77,7 @@ $this->registerJs('
             var
                 val = $(value).val();
             if($.isNumeric(val))
-                tmpSumm+=parseInt(val);
+                tmpSumm+=parseFloat(val);
         });
 
         if(aSumm.val() != tmpSumm)
