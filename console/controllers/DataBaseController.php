@@ -315,6 +315,7 @@ class DataBaseController extends AbstractConsoleController{
 
 	public function actionExportUser()
 	{
+		/**
 		$obUser = (new Query())
 			->from(CUser::tableName().' cu ')
 			->leftJoin(CUserRequisites::tableName().' as re','cu.requisites_id = re.id')
@@ -324,6 +325,12 @@ class DataBaseController extends AbstractConsoleController{
 			cu.id,cu.manager_id,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname,cu.status,
 			cu.created_at,cu.is_resident,cu.r_country,cu.is_opened,cu.contractor,cu.archive,cu.prospects_id,ty.name as type,
 			,re.*')
+		 */
+
+		$obUser = (new Query())
+			->from(CrmCmpContacts::tableName().' co')
+			->leftJoin(BUser::tableName().'as bu','co.assigned_at = bu.id')
+			->select('co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
 
 		//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
 	//	echo $obUser;die('2');
@@ -333,7 +340,7 @@ class DataBaseController extends AbstractConsoleController{
 			$arrHead = array_keys($obUser[0]);
 
 		//preDump($arData);die;
-		$fp = fopen(Yii::getAlias('@app/runtime/cuser.csv'), 'w');
+		$fp = fopen(Yii::getAlias('@app/runtime/contact.csv'), 'w');
 		fputcsv($fp,$arrHead,';');
 //fputcsv($fp, $arHeader,';');
 		foreach ($obUser as $fields) {
