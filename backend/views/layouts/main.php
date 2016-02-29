@@ -213,7 +213,53 @@ $menuItems[] = [
                                         <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
                                     </a>
                                     <ul class = "nav child_menu" style = "display: none">
-
+                                        <!---Запросы на платеж -->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>">
+                                                    <?php echo Yii::t('app/book', 'BOOK_payment_request'); ?>
+                                                    <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
+                                                </a>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Платежи ------->
+                                        <?php if(Yii::$app->user->can('forAll')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
+                                        <!---Запросы на зачисление ------->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common','Enrollment request'),['/bookkeeping/enrollment-request/index'])?>
+                                                <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Зачисления---------------->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common','Enrollments'),['/bookkeeping/enrolls/index'])?>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Обещанные платежи-------->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Условия для платежей---------->
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/payment-condition/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_condition'); ?></a>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Затраты ---------------------->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
+                                            </li>
+                                        <?php endif;?>
+                                        <!---Акты и вывод средст партнера--------->
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/acts/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_acts'); ?></a>
@@ -222,45 +268,6 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/partner-withdrawal/index']); ?>">
                                                     <?php echo Yii::t('app/book', 'BOOK_partner_withdrawal'); ?>
                                                 </a>
-                                            </li>
-                                        <?php endif;?>
-
-                                        <?php if(Yii::$app->user->can('forAll')):?>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/default/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payments'); ?></a>
-                                            </li>
-                                        <?php endif; ?>
-
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
-                                            <li>
-                                                <?=Html::a(Yii::t('app/common','Enrollments'),['/bookkeeping/enrolls/index'])?>
-                                            </li>
-                                        <?php endif;?>
-
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
-                                            </li>
-                                        <?php endif;?>
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
-                                            </li>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/payment-request/index']); ?>">
-                                                    <?php echo Yii::t('app/book', 'BOOK_payment_request'); ?>
-                                                    <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <?=Html::a(Yii::t('app/common','Enrollment request'),['/bookkeeping/enrollment-request/index'])?>
-                                                <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
-                                            </li>
-
-                                        <?php endif;?>
-                                        <?php if(Yii::$app->user->can('superRights')):?>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/payment-condition/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_condition'); ?></a>
                                             </li>
                                         <?php endif;?>
                                     </ul>
