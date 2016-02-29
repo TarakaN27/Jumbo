@@ -414,9 +414,19 @@ $this->registerJs('
                                         ]) ?>
                                         <div class="row">
                                             <div class="col-md-offset-2 pdd-left-15">
-                                                <?= $form->field($m,"[{$i}]showAll")->checkbox([
+                                                <div class="col-md-6">
+                                                <?= $form->field($m,"[{$i}]showAll",[
+
+                                                ])->checkbox([
                                                     'class' => 'showAllBtn'
                                                 ])?>
+                                                </div>
+                                                <div class="col-md-6 pdd-top-10">
+                                                    <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
+                                                        'target' => 'blank'
+                                                    ])?>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>

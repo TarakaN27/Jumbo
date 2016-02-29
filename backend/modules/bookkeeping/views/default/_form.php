@@ -258,12 +258,20 @@ $this->registerJs('
     ]) ?>
     <div class="row">
         <div class="col-md-offset-3 pdd-left-15">
+            <div class="col-md-6">
             <?= $form->field($model,"showAll")->checkbox([
                 'class' => 'showAllBtn',
                 'id' => 'show_all_id'
             ])?>
+            </div>
+            <div class="col-md-6">
+                <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
+                    'target' => 'blank'
+                ])?>
+            </div>
         </div>
     </div>
+
 
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
