@@ -64,6 +64,7 @@ $('#enrollprocessform-repay').on('change',function(){
                                 'attribute' => 'added_by',
                                 'value' => is_object($obAUser = $model->added) ? $obAUser->getFio() : NULL
                             ],
+                            'parent_id',
                             [
                                 'attribute' => 'amount',
                                 'label' => Yii::t('app/book','Counting unit amount'),
@@ -193,8 +194,11 @@ $('#enrollprocessform-repay').on('change',function(){
                                 echo $form->field($obForm,'repay')->textInput($arOptions);
                             }
                         ?>
-
-                        <?= $form->field($obForm,'part_enroll')->checkbox()?>
+                        <div class="form-group">
+                            <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                <?= $form->field($obForm,'part_enroll')->checkbox()?>
+                            </div>
+                        </div>
 
                         <?= $form->field($obForm,'description')->textarea()?>
 

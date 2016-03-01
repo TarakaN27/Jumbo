@@ -197,8 +197,8 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             if(!$obPrPay)
                 throw new NotFoundHttpException('Promised payment not found');
 
-            $obForm->availableAmount = $obPrPay->amount;
-            $obForm->enroll = $obPrPay->amount;
+            $obForm->availableAmount = $model->amount;
+            $obForm->enroll = $model->amount;
 
         }else{
             $obForm->isPayment = true;

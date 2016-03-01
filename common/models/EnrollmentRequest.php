@@ -114,7 +114,7 @@ class EnrollmentRequest extends AbstractActiveRecord
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'status' => Yii::t('app/book','Status'),
             'added_by' => Yii::t('app/book','Added by'),
-            'parent_id' => Yii::t('app/book','Parent'),
+            'parent_id' => Yii::t('app/book','Parent request'),
             'part_enroll' => Yii::t('app/book','Partial enrollment')
         ];
     }

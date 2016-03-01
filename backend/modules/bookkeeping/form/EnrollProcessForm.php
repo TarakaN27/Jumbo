@@ -87,7 +87,7 @@ class EnrollProcessForm extends Model{
 
             if($this->part_enroll)  //частичное зачисление
             {
-                $partAmount = $this->availableAmount - (float)$this->enroll - (float)$this->enroll;
+                $partAmount = (float)$this->availableAmount - (float)$this->enroll - (float)$this->repay;
                 if($partAmount > 0)
                 {
                     /** @var EnrollmentRequest $obRequest */
