@@ -143,7 +143,7 @@ class BillsManager extends Bills{
             $crp = $obCUser->getInfo();
             $contractor = $crp;
             $payer = $crp.$obR->j_address;
-            $bankDetail = 'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp;
+            $bankDetail = 'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' код '.$obR->b_code.', УНП:'.$obR->ynp;
             $contractorEmail = $obR->c_email;
             $contractorSite = $obR->site;
         }

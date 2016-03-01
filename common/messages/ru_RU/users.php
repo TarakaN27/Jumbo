@@ -208,5 +208,6 @@ return [
     'Create Cuser Prospects' => 'Добавить',
     'Cuser Prospects' => 'Типы перспективности компаний',
     'Choose_user_prospects_type' => 'Выбрать перспективность компании',
-    'Prospects' => 'Перспективность компании'
+    'Prospects' => 'Перспективность компании',
+    'Bank address' => 'Адрес банка'
 ];

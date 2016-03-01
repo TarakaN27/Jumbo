@@ -132,6 +132,11 @@ use yii\widgets\DetailView;
 									'value' => CustomHelper::highlight('dummy',$modelR->b_name)
 								],
 								[
+									'attribute' => 'bank_address',
+									'format' => 'html',
+									'value' => CustomHelper::highlight('dummy',$modelR->bank_address)
+								],
+								[
 									'attribute' => 'b_code',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->b_code)
@@ -187,12 +192,6 @@ use yii\widgets\DetailView;
 										'format' => 'html',
 										'value' => CustomHelper::highlight('dummy',$modelR->ynp)
 									],
-									[
-										'attribute' => 'okpo',
-										'format' => 'html',
-										'value' => CustomHelper::highlight('dummy',$modelR->okpo)
-									],
-
 								]);
 							}else{
 								$dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
@@ -258,6 +257,11 @@ use yii\widgets\DetailView;
 									'value' => CustomHelper::highlight('dummy',$modelR->b_name)
 									],
 									[
+										'attribute' => 'bank_address',
+										'format' => 'html',
+										'value' => CustomHelper::highlight('dummy',$modelR->bank_address)
+									],
+									[
 									'attribute' => 'b_code',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->b_code)
@@ -301,11 +305,6 @@ use yii\widgets\DetailView;
 									],
 
 									[
-									'attribute' => 'birthday',
-									'format' => 'html',
-									'value' => CustomHelper::highlight('dummy',$modelR->birthday)
-									],
-									[
 									'attribute' => 'pasp_series',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->pasp_series)
@@ -339,11 +338,6 @@ use yii\widgets\DetailView;
 									'attribute' => 'ynp',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->ynp)
-									],
-									[
-									'attribute' => 'okpo',
-									'format' => 'html',
-									'value' => CustomHelper::highlight('dummy',$modelR->okpo)
 									],
 									]);
 									}else{
@@ -424,12 +418,6 @@ use yii\widgets\DetailView;
 									'attribute' => 'p_address',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->p_address)
-									],
-
-									[
-									'attribute' => 'birthday',
-									'format' => 'html',
-									'value' => CustomHelper::highlight('dummy',$modelR->birthday)
 									],
 									[
 									'attribute' => 'pasp_series',

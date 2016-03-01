@@ -31,14 +31,12 @@ use yii\helpers\ArrayHelper;
  * @property string $c_phone
  * @property string $c_fax
  * @property string $ynp
- * @property string $okpo
  * @property string $inn
  * @property string $kpp
  * @property string $ogrn
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $type_id
- * @property string $birthday
  * @property string $pasp_series
  * @property integer $pasp_number
  * @property string $pasp_ident
@@ -46,6 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property string $pasp_date
  * @property string $site
  * @property string $description
+ * @property string $bank_address
  */
 class CUserRequisites extends AbstractActiveRecord
 {
@@ -120,11 +119,11 @@ class CUserRequisites extends AbstractActiveRecord
                  'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
                  'reg_number', 'reg_auth', 'ch_account', 'b_name', 'b_code',
                  'c_fname', 'c_lname', 'c_mname', 'c_email', 'c_phone', 'c_fax',
-                 'ynp', 'okpo', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident','site'
+                 'ynp', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident','site','bank_address'
              ], 'string', 'max' => 255],
             [['pasp_series'], 'string', 'max' => 4],
             ['c_email', 'email'],
-            [['reg_date','birthday','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
+            [['reg_date','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
 
             // обязательные поля для физика
             [[
@@ -181,7 +180,7 @@ class CUserRequisites extends AbstractActiveRecord
             ],
 
             // юрик или ИП резидент
-            [['ynp', 'okpo'],
+            [['ynp'],
              'required',
              'when' => function($model) {
                      if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
@@ -285,14 +284,13 @@ class CUserRequisites extends AbstractActiveRecord
             'c_phone' => Yii::t('app/users', 'C Phone'),
             'c_fax' => Yii::t('app/users', 'C Fax'),
             'ynp' => Yii::t('app/users', 'Ynp'),
-            'okpo' => Yii::t('app/users', 'Okpo'),
             'inn' => Yii::t('app/users', 'Inn'),
             'kpp' => Yii::t('app/users', 'Kpp'),
             'ogrn' => Yii::t('app/users', 'Ogrn'),
+            'bank_address' => Yii::t('app/users','Bank address'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'type_id' => Yii::t('app/users', 'Type_id'),
-            'birthday' => Yii::t('app/users', 'Birthday'),
             'pasp_date' => Yii::t('app/users', 'Passport_date'),
             'pasp_series' => Yii::t('app/users', 'Passport_series'),
             'pasp_number' => Yii::t('app/users', 'Passport_number'),

@@ -137,7 +137,6 @@ class LoadXmlFileForm extends Model{
                 $modelR -> kpp = 'dummy';
                 $modelR -> ogrn = 'dummy';
                 $modelR -> ynp = $contr['ynp'];
-                $modelR -> okpo = 'dummy';
 
                 if($contr['type'] == 15)
                 {

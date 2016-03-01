@@ -193,12 +193,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'html',
                             'value' => CustomHelper::highlight('dummy',$modelR->ynp)
                         ],
-                        [
-                            'attribute' => 'okpo',
-                            'format' => 'html',
-                            'value' => CustomHelper::highlight('dummy',$modelR->okpo)
-                        ],
-
                     ]);
                 }else{
                     $dvConfig = \yii\helpers\ArrayHelper::merge($dvConfig,[
@@ -306,11 +300,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => CustomHelper::highlight('dummy',$modelR->p_address)
                     ],
 
-                    [
-                        'attribute' => 'birthday',
-                        'format' => 'html',
-                        'value' => CustomHelper::highlight('dummy',$modelR->birthday)
-                    ],
+
                     [
                         'attribute' => 'pasp_series',
                         'format' => 'html',
@@ -345,11 +335,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'ynp',
                             'format' => 'html',
                             'value' => CustomHelper::highlight('dummy',$modelR->ynp)
-                        ],
-                        [
-                            'attribute' => 'okpo',
-                            'format' => 'html',
-                            'value' => CustomHelper::highlight('dummy',$modelR->okpo)
                         ],
                     ]);
                 }else{
@@ -432,11 +417,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => CustomHelper::highlight('dummy',$modelR->p_address)
                     ],
 
-                    [
-                        'attribute' => 'birthday',
-                        'format' => 'html',
-                        'value' => CustomHelper::highlight('dummy',$modelR->birthday)
-                    ],
                     [
                         'attribute' => 'pasp_series',
                         'format' => 'html',

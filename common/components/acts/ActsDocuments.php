@@ -158,7 +158,7 @@ class ActsDocuments
         {
             $this->cntrInfo = [   //параметры контрагента
                 'contrCorpName' => !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo(),
-                'contrRequisites' =>'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' код '.$obR->b_code.', УНП:'.$obR->ynp,
+                'contrRequisites' =>'Р/сч: '.$obR->ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' код '.$obR->b_code.', УНП:'.$obR->ynp,
                 'contrAddress' => $obR->j_address,
                 'contrEmail' => $obR->c_email,
                 'contrSite' => $obR->site

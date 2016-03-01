@@ -187,18 +187,7 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
                         ]
                     ]);?>
                 </div>
-                <div class = "col-md-4 col-sm-4 col-xs-12">
-                    <?=$form->field($modelR, 'birthday', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->widget(DatePicker::className(), [
-                        'options' => [
-                            'class' => 'form-control'
-                        ],
-                        'pluginOptions' => [
-                            'autoclose' => TRUE,
-                            'format' => 'yyyy-mm-dd',
-                            'defaultDate' => date('Y-m-d', time())
-                        ]
-                    ]);?>
-                </div>
+
             </div>
         </section>
         <!---END passport section-->
@@ -210,11 +199,7 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 
                     <div class = "col-md-4 col-sm-4 col-xs-12 RRB">
                     <?= $form->field($modelR, 'ynp', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => TRUE]) ?>
-                </div>
-                    <div class = "col-md-4 col-sm-4 col-xs-12 RRB">
-                    <?= $form->field($modelR, 'okpo', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => TRUE]) ?>
-                </div>
-
+                    </div>
                     <div class = "col-md-4 col-sm-4 col-xs-12 NORRB">
                     <?= $form->field($modelR, 'inn', ['template' => $fieldTempl,'labelOptions'=>['class' => 'control-label']])->textInput(['maxlength' => TRUE]) ?>
                 </div>
