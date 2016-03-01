@@ -54,15 +54,30 @@ class DialogMessagesBehavior extends Behavior
 		{
 			RedisNotification::addNewDialogToListForUsers($arUsers,$obDialog->id);   //добавляем балун
 
-			$title = $this->owner->msg;
+			$title = strip_tags(CustomHelper::cuttingString($this->owner->msg));
 			if(!empty($obDialog->crm_task_id))
+			{
+				if(empty($title))
+					$title = Yii::t('app/crm','Go to task');
 				$title = Html::a($title,['/crm/task/view','id' => $obDialog->crm_task_id]);
+			}
+
 
 			if(!empty($obDialog->crm_cmp_contact_id))
+			{
+				if(empty($title))
+					$title = Yii::t('app/crm','Go to contact');
 				$title = Html::a($title,['/crm/contact/view','id' => $obDialog->crm_cmp_contact_id]);
+			}
+
 
 			if(!empty($obDialog->crm_cmp_id))
+			{
+				if(empty($title))
+					$title = Yii::t('app/crm','Go to company');
 				$title = Html::a($title,['/crm/company/view','id' => $obDialog->crm_cmp_id]);
+			}
+
 
 			$obUser = Yii::$app->user->identity->getFio();
 
@@ -70,7 +85,7 @@ class DialogMessagesBehavior extends Behavior
 				Yii::t('app/crm','New message from {user}',[
 					'user' => $obUser
 				]),
-				CustomHelper::cuttingString($title),
+				$title,
 				TabledNotification::TYPE_PRIVATE,
 				TabledNotification::NOTIF_TYPE_WARNING,
 				array_values($arUsers)

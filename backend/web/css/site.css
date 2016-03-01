@@ -217,3 +217,7 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 }
 .right-bar-cmp a{color:#C5C7CB;}
 .pdd-top-10{padding-top: 10px;}
+.message_wrapper .message img,
+.message_wrapper .message video,
+.msgBoxList .block_content .inner_dialog_section_msg img
+{max-width: 100%;}
