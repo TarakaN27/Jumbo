@@ -190,14 +190,17 @@ return [
     'PaymentID' => 'ID платежа ',
     'Processing' => 'Обработать',
     'Counting unit amount' => 'Расчетное кол-во единиц',
-    'Enrollment request successfully processed' => 'Запрос на зачисление успешно обработан. Не заудьте зачислить в систему!',
+    'Enrollment request successfully processed' => 'Запрос на зачисление успешно обработан. Не забудьте зачислить в систему!',
     'Processing date' => 'Дата обработки',
     'Total' => 'Всего',
     'Unit enroll name' => 'Единица зачисления',
     'Legal person' => 'Юр. лицо',
     'Is residen' => 'Резидент',
     'Can not create enroll request, because condition mark as custom' => 'Невозможно создать запрос на зачисление, так как для условия задам кастомный тип',
-    'Condition info' => 'Информация по условиям'
+    'Condition info' => 'Информация по условиям',
+    'Not enough amount for create partition request' => 'Не достаточно единиц для создания подзапроса на зачисление',
+    'Parent request' => 'ID родительского запроса',
+    'Partial enrollment' => 'Частичное зачисление'
 
 
 

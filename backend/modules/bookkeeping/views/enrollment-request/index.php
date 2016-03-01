@@ -117,6 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'filter' => \common\models\EnrollmentRequest::getStatusArr()
                         ],
                         */
+                        'parent_id',
                         'created_at:date',
 
 

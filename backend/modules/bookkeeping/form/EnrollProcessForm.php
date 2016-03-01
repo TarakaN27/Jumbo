@@ -10,6 +10,7 @@
 namespace backend\modules\bookkeeping\form;
 
 
+use backend\widgets\Alert;
 use common\models\EnrollmentRequest;
 use common\models\Enrolls;
 use common\models\PromisedPayment;
@@ -23,6 +24,7 @@ use yii\web\ServerErrorHttpException;
 class EnrollProcessForm extends Model{
 
     public
+        $part_enroll,
         $availableAmount,
         $description,
         $isPayment,
@@ -36,7 +38,7 @@ class EnrollProcessForm extends Model{
     {
         return [
             [['description'],'string','max' => 255],
-            ['isPayment','integer'],
+            [['isPayment','part_enroll'],'integer'],
             [['enroll','repay','availableAmount'],'number'],
     //        ['enroll','validateAmount']
         ];
@@ -47,7 +49,8 @@ class EnrollProcessForm extends Model{
         return [
             'enroll' => \Yii::t('app/book','Unit enroll amount'),
             'repay' => \Yii::t('app/book','Unit repay amount'),
-            'description' => \Yii::t('app/book','Description')
+            'description' => \Yii::t('app/book','Description'),
+            'part_enroll' => \Yii::t('app/book','Partial enrollment')
         ];
     }
 
@@ -70,8 +73,6 @@ class EnrollProcessForm extends Model{
     {
         $tr = \Yii::$app->db->beginTransaction();
         try {
-
-
             $obEnroll = new Enrolls();
             $obEnroll->buser_id = \Yii::$app->user->id;
             $obEnroll->cuser_id = $this->request->cuser_id;
@@ -83,6 +84,26 @@ class EnrollProcessForm extends Model{
             $obEnroll->description = $this->description;
             if(!$obEnroll->save())
                 throw new ServerErrorHttpException();
+
+            if($this->part_enroll)  //частичное зачисление
+            {
+                $partAmount = (float)$this->availableAmount - (float)$this->enroll - (float)$this->repay;
+                if($partAmount > 0)
+                {
+                    /** @var EnrollmentRequest $obRequest */
+                    $obRequest = clone $this->request;
+                    $obRequest->id = NULL;
+                    $obRequest->isNewRecord = TRUE;
+                    $obRequest->amount = $partAmount;
+                    $obRequest->parent_id = $this->request->id;
+                    if(!$obRequest->save())
+                    {
+                        throw new ServerErrorHttpException();
+                    }
+                }else{
+                    \Yii::$app->session->setFlash(Alert::TYPE_ERROR,\Yii::t('app/book','Not enough amount for create partition request'));
+                }
+            }
 
             if ($this->repay > 0 && $this->isPayment)    //гасим обещанные платежи платежи
             {
@@ -122,8 +143,10 @@ class EnrollProcessForm extends Model{
                 }
             }
 
-
+            //редактируем текущий запрос
             $this->request->status = EnrollmentRequest::STATUS_PROCESSED;
+            if($this->part_enroll)  //частичное зачисление
+                $this->request->part_enroll = $this->part_enroll;
             if(!$this->request->save())
                 throw new ServerErrorHttpException();
 
