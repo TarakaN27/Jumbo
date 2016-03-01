@@ -476,7 +476,7 @@ class TaskController extends AbstractBaseBackendController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //удалить задачу может только тот кто создал
+        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //удалить задачу может только тот кто создал и админ
             throw new ForbiddenHttpException();
 
         $model->delete();

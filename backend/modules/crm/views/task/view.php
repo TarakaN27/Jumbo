@@ -121,7 +121,7 @@ $this->registerJs("
                 <section class="pull-right">
                     <?=  Html::a(Yii::t('app/crm', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                     <?= Html::a(Yii::t('app/crm', 'Create Crm Task'), ['create'], ['class' => 'btn btn-success']) ?>
-                    <?php if($model->created_by == Yii::$app->user->id):?>
+                    <?php if($model->created_by == Yii::$app->user->id || Yii::$app->user->can('adminRights')):?>
                         <?= Html::a(Yii::t('app/crm', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                         <?= Html::a(Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
                             'class' => 'btn btn-danger',
