@@ -10,6 +10,7 @@ namespace console\controllers;
 
 
 use common\models\CUserTypes;
+use common\models\PaymentCondition;
 use console\components\AbstractConsoleController;
 
 use common\models\CrmCmpContacts;
@@ -333,22 +334,78 @@ class DataBaseController extends AbstractConsoleController{
 			->select('co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
 
 		//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
-	//	echo $obUser;die('2');
 			->all();
 		$arrHead = [];
 		if(isset($obUser[0]))
 			$arrHead = array_keys($obUser[0]);
 
-		//preDump($arData);die;
 		$fp = fopen(Yii::getAlias('@app/runtime/contact.csv'), 'w');
 		fputcsv($fp,$arrHead,';');
-//fputcsv($fp, $arHeader,';');
 		foreach ($obUser as $fields) {
 			fputcsv($fp, $fields,';');
 		}
 		fclose($fp);
 
 		echo 'done';
+	}
+
+	/**
+	 * @return int
+	 */
+	public function actionImportPayConditions()
+	{
+		$file = Yii::getAlias('@app/runtime/jumbo_cond.csv');
+		$arData = CustomHelper::csv_to_array($file,';');
+		$serviceID = 12;
+		$summFrom = 0;
+		$summTo = 9999999999999999999999;
+		$currencyID = 2;
+		$arNames = [];
+
+
+		if(!empty($arData)) {
+			$tr = Yii::$app->db->beginTransaction();
+			foreach ($arData as $data) {
+
+				$name = $data['name'];
+				if(isset($arNames[$name]))
+				{
+					$name = $name.$arNames[$name];
+					$arNames[$name]++;
+				}else{
+					$arNames[$name] = 1;
+				}
+
+
+				$obCond = new PaymentCondition(['is_console' => TRUE]);
+				$obCond->name = $data['name'];
+				$obCond->description = $data['description'];
+				$obCond->l_person_id = (int)$data['id_legal'];
+				$obCond->service_id = $serviceID;
+				$obCond->is_resident = (int)$data['is_resident'];
+				$obCond->summ_from = $summFrom;
+				$obCond->summ_to = $summTo;
+				$obCond->tax = (float)$data['tax'];
+				$obCond->sale = (float)$data['sale'];
+				$obCond->commission = (float)$data['commission'];
+				$obCond->currency_id = $currencyID;
+				$obCond->corr_factor = (float)$data['corr_factor'];
+				$obCond->cond_currency = (int)$data['curr_enroll_id'];
+				$obCond->type = PaymentCondition::TYPE_USUAL;
+				if (!$obCond->save()) {
+					$tr->rollBack();
+					var_dump($obCond->getErrors());
+					die;
+				}
+			}
+
+			$tr->commit();
+		}
+
+		print_r($arData);
+
+
+		return self::EXIT_CODE_NORMAL;
 	}
 
 } 

@@ -38,9 +38,13 @@ use yii\web\NotFoundHttpException;
 class PaymentCondition extends AbstractActiveRecord
 {
 
+    public
+        $is_console = false;
+
     CONST
         TYPE_USUAL = 5,
         TYPE_CUSTOM = 10;
+
 
     /**
      * @return array
@@ -116,6 +120,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','max' => 100],
+            ['is_console','integer']
         ];
     }
 
@@ -251,13 +256,14 @@ class PaymentCondition extends AbstractActiveRecord
     {
         $arBhvrs = parent::behaviors();
         return ArrayHelper::merge(
-            $arBhvrs,
-            [
+                $arBhvrs,
                 [
-                    'class' => LogModelBehavior::className(),
-                    'ignored' => ['created_at','updated_at']
-                ],
-            ]);
+                    [
+                        'class' => LogModelBehavior::className(),
+                        'ignored' => ['created_at','updated_at'],
+                        'active' => !$this->is_console
+                    ],
+                ]);
     }
 
     /**

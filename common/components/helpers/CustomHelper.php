@@ -419,4 +419,38 @@ class CustomHelper {
 
         return $string;
     }
+
+    /**
+     * @param string $filename
+     * @param string $delimiter
+     * @param bool|FALSE $convert
+     * @return array|bool
+     */
+    public static function csv_to_array($filename='', $delimiter=',',$convert = FALSE)
+    {
+        if(!file_exists($filename) || !is_readable($filename))
+            return FALSE;
+
+        $header = NULL;
+        $data = array();
+        if (($handle = fopen($filename, 'r')) !== FALSE)
+        {
+            while (($row = fgetcsv($handle, 10000, $delimiter)) !== FALSE)
+            {
+                //if($convert)
+                //    foreach($row as &$r)
+                //        $r = iconv('windows-1251', 'utf-8',$r);
+
+                foreach($row as &$r)
+                    $r = trim($r);
+                if(!$header)
+                    $header = $row;
+                else
+                    $data[] = array_combine($header, $row);
+                //$data[] = $row;
+            }
+            fclose($handle);
+        }
+        return $data;
+    }
 }
