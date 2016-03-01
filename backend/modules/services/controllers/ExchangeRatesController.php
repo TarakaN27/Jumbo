@@ -159,7 +159,7 @@ class ExchangeRatesController extends AbstractBaseBackendController
             $factor = empty($model->factor) ? 1 : $model->factor;
 
             $model->cbr_rate = $data['rur']*$factor;
-            $model->nbrb_rate = round($data['bur']*$factor);
+            $model->nbrb_rate = round($data['bur']*$factor,4);
             if($model->save())
             {
                 Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
@@ -175,7 +175,7 @@ class ExchangeRatesController extends AbstractBaseBackendController
                 throw new NotFoundHttpException('Base currency not found');
 
             $model->cbr_rate = round($obBase->cbr_rate*$model->factor,4);
-            $model->nbrb_rate = round($obBase->nbrb_rate*$model->factor);
+            $model->nbrb_rate = round($obBase->nbrb_rate*$model->factor,4);
 
             if($model->save())
             {
@@ -195,7 +195,7 @@ class ExchangeRatesController extends AbstractBaseBackendController
             $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
             $curr = $crb->getRURcurrencyInBur();
 
-            $nbrbRate = round($crbRate*$curr); //курс по ЦБРФ
+            $nbrbRate = round($crbRate*$curr,4); //курс по ЦБРФ
 
             if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
             {

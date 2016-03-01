@@ -63,7 +63,7 @@ class ExchangeRatesController extends AbstractConsoleController{
                     $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
                     $curr = $crb->getRURcurrencyInBur();
 
-                    $nbrbRate = round($crbRate*$curr); //курс по ЦБРФ
+                    $nbrbRate = round($crbRate*$curr,4); //курс по ЦБРФ
                 }else{
                     if($model->nbrb != 0)
                     {
@@ -99,7 +99,7 @@ class ExchangeRatesController extends AbstractConsoleController{
                         throw new NotFoundHttpException('Base currency not found');
 
                     $item->cbr_rate = round($obBase->cbr_rate*$item->factor,4);
-                    $item->nbrb_rate = round($obBase->nbrb_rate*$item->factor);
+                    $item->nbrb_rate = round($obBase->nbrb_rate*$item->factor,4);
 
                     if(!$item->save())
                     {

@@ -34,7 +34,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
             }
             foreach($sxml->Currency as $ar) {
                 if($ar->NumCode == $this->codeID)
-                    return (int) $ar->Rate;
+                    return (float) $ar->Rate;
            }
            return NULL;
         }catch (\Exception $e)
@@ -55,7 +55,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
                 return NULL;
             }
             foreach($sxml->Currency as $ar) {
-                $result[(int)$ar->NumCode] = (int) $ar->Rate;
+                $result[(int)$ar->NumCode] = (float) $ar->Rate;
             }
       //  }catch (\Exception $e)
       //  {
