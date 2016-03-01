@@ -31,6 +31,8 @@ use yii\web\NotFoundHttpException;
  * @property integer $currency_id
  * @property integer $cond_currency
  * @property integer $type
+ * @property integer $not_use_sale
+ * @property integer $not_use_corr_factor
  *
  * @property Services $service
  * @property LegalPerson $lPerson
@@ -120,7 +122,8 @@ class PaymentCondition extends AbstractActiveRecord
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','min' => 0],
             [['commission', 'sale', 'tax'],'number','max' => 100],
-            ['is_console','integer']
+            ['is_console','safe'],
+            [['not_use_sale', 'not_use_corr_factor'],'integer']
         ];
     }
 
@@ -146,7 +149,9 @@ class PaymentCondition extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'cond_currency' => Yii::t('app/book', 'Condition currency'),
-            'type' => Yii::t('app/book','Type')
+            'type' => Yii::t('app/book','Type'),
+            'not_use_sale' => Yii::t('app/services','Not use sale with counting unit enrollment'),
+            'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment')
         ];
     }
 

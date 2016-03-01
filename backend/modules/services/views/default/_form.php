@@ -11,8 +11,6 @@ $this->registerJs("
 function enrollmentAction(clean)
 {
     var
-        corr_factor = $('#services-not_use_corr_factor'),
-        sale = $('#services-not_use_sale'),
         check = $('#services-allow_enrollment'),
         sel = $('#services-b_user_enroll'),
         text = $('#services-enroll_unit');
@@ -21,8 +19,6 @@ function enrollmentAction(clean)
     {
         sel.removeAttr('disabled');
         text.removeAttr('disabled');
-        corr_factor.removeAttr('disabled');
-        sale.removeAttr('disabled');
     }else{
         if(clean)
         {
@@ -31,8 +27,6 @@ function enrollmentAction(clean)
         }
         sel.attr('disabled','disabled');
         text.attr('disabled','disabled');
-        corr_factor.attr('disabled','disabled');
-        sale.attr('disabled','disabled');
     }
 }
 ",\yii\web\View::POS_END);
@@ -91,20 +85,6 @@ $('#services-allow_enrollment').on('change',function(){
     <?= $form->field($model,'enroll_unit')->textInput([
         'disabled' => 'disabled'
     ])?>
-    <div class="form-group">
-        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-            <?= $form->field($model,'not_use_sale')->checkbox([
-                'disabled' => 'disabled'
-            ])?>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-            <?= $form->field($model,'not_use_corr_factor')->checkbox([
-                'disabled' => 'disabled'
-            ])?>
-        </div>
-    </div>
     <div class="form-group">
          <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= Html::submitButton(

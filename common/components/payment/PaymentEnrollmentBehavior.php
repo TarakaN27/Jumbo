@@ -67,7 +67,7 @@ class PaymentEnrollmentBehavior extends Behavior{
 
 
         $obEnrollReq = new EnrollmentRequest();
-        $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc,$obSrv);
+        $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc);
         $obEnrollReq->service_id = $obSrv->id;
         $obEnrollReq->assigned_id = $obSrv->b_user_enroll;
         $obEnrollReq->payment_id = $model->id;
@@ -90,17 +90,17 @@ class PaymentEnrollmentBehavior extends Behavior{
      * @param PaymentsCalculations $obCalc
      * @return float
      */
-    protected function countAmoutForEnrollment(Payments $model,PaymentCondition $obCond,PaymentsCalculations $obCalc,Services $obSrv)
+    protected function countAmoutForEnrollment(Payments $model,PaymentCondition $obCond,PaymentsCalculations $obCalc)
     {
         $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$obCond->cond_currency);
         $amount =  $obCalc->production;
 
-        if($obSrv->not_use_sale)
+        if($obCond->not_use_sale)
         {
             $amount = $amount/(1 - $obCond->sale/100);
         }
 
-        if($obSrv->not_use_corr_factor)
+        if($obCond->not_use_corr_factor)
         {
             $amount = $amount/$obCond->corr_factor;
         }

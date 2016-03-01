@@ -95,6 +95,17 @@ initFieldsByType();
         'prompt' => Yii::t('app/book','Choose currency')
     ])?>
 
+    <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+            <?= $form->field($model,'not_use_sale')->checkbox()?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+            <?= $form->field($model,'not_use_corr_factor')->checkbox()?>
+        </div>
+    </div>
+
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
