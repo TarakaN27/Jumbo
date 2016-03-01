@@ -356,7 +356,7 @@ class DataBaseController extends AbstractConsoleController{
 	{
 		$file = Yii::getAlias('@app/runtime/jumbo_cond.csv');
 		$arData = CustomHelper::csv_to_array($file,';');
-		$serviceID = 12;
+		$serviceID = 16;
 		$summFrom = 0;
 		$summTo = 9999999999999999999999;
 		$currencyID = 2;

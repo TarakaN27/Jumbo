@@ -564,7 +564,7 @@ class CrmTask extends AbstractActiveRecord
                         ]
                         ));
                 }
-                
+
                 $arBUIDs = array_unique($arBUIDs);
                 $arBUIDs = array_filter($arBUIDs);
                 $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
