@@ -564,26 +564,7 @@ class CrmTask extends AbstractActiveRecord
                         ]
                         ));
                 }
-
-                /*
-                    if(!empty($obDialog->crm_cmp_id))   //ищем пользователй для компании
-                        $arBUIDs = ArrayHelper::merge(
-                            $arBUIDs,
-                            CUserCrmRulesManager::getBuserIdsByPermission(
-                                $obDialog->crm_cmp_id,
-                                $iUserID
-                            )
-                        );
-
-                    if(!empty($this->contact_id))   //ищем пользователй для контакта
-                        $arBUIDs = ArrayHelper::merge(
-                            $arBUIDs,
-                            CUserCrmRulesManager::getBuserByPermissionsContact(
-                                $obDialog->crm_cmp_contact_id,
-                                $iUserID,$obContact
-                            )
-                        );
-                */
+                
                 $arBUIDs = array_unique($arBUIDs);
                 $arBUIDs = array_filter($arBUIDs);
                 $postModel = new BuserToDialogs(); //привязываем диалог к пользователям
@@ -684,13 +665,13 @@ class CrmTask extends AbstractActiveRecord
         $arUser [] = (int)$this->assigned_id;    //текущий ответсвенный
         $arUser [] = (int)$this->created_by;     //кто добавил задачу
         $arObAcc = $this->crmTaskAccomplices;
-        if(is_object($arObAcc))
+        if(!empty($arObAcc))
             foreach($arObAcc as $obAcc)
                 $arUser [] = (int)$obAcc->buser_id;
         $arObWatch = $this->crmTaskWatchers;
-        if(is_object($arObWatch))
+        if(!empty($arObWatch))
             foreach($arObWatch as $obWatch)
-                $arUser [] = (int)$obAcc->buser_id;
+                $arUser [] = (int)$obWatch->buser_id;
 
         if(empty($arUser))  //если пользователй нет, удалим всех
             BUser::deleteAll('dialog_id = :dID',[':dID' => $obDialog->id]);

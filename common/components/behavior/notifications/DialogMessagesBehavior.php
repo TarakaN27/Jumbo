@@ -9,10 +9,12 @@
 namespace common\components\behavior\notifications;
 
 use common\components\helpers\CustomHelper;
+use common\models\CrmTaskAccomplices;
 use common\models\Dialogs;
 use yii\base\Behavior;
 use common\models\AbstractActiveRecord;
 use common\components\notification\RedisNotification;
+use yii\db\Query;
 use yii\helpers\Html;
 use common\components\notification\TabledNotification;
 use Yii;
@@ -37,6 +39,7 @@ class DialogMessagesBehavior extends Behavior
 	 */
 	public function afterInsert()
 	{
+		/** @var Dialogs $obDialog */
 		$obDialog = Dialogs::findOne($this->owner->dialog_id);
 		if(!$obDialog)
 			return FALSE;

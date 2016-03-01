@@ -442,8 +442,8 @@ class TaskController extends AbstractBaseBackendController
             $arAccDiff = array_diff($arAccObOld,$arAccNew);
             if(!empty($arAccDiff))
                 RedisNotification::removeNewTaskFromList($arAccDiff,$model->id);
-
-            $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
+            $modelUpd = $this->findModel($model->id);
+            $modelUpd->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
 
