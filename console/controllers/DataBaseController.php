@@ -360,6 +360,15 @@ class DataBaseController extends AbstractConsoleController{
 			}
 		}
 
+		if(isset($arContact['no_company']))
+		{
+			$arResult[] = ['----------------WITHOUT COMPANY------------------'];
+			foreach($arContact['no_company'] as $cont)
+			{
+				$arResult = $cont;
+			}
+		}
+
 		$arrHead = [];
 		if(isset($obUser[0]))
 			$arrHead = array_keys($obUser[0]);
