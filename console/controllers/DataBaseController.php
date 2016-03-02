@@ -330,8 +330,10 @@ class DataBaseController extends AbstractConsoleController{
 
 		$obUser = (new Query())
 			->from(CrmCmpContacts::tableName().' co')
+			->leftJoin(CUser::tableName().' as cu','cu.id = co.cmp_id')
+			->leftJoin(CUserRequisites::tableName().' as re','cu.requisites_id = re.id')
 			->leftJoin(BUser::tableName().'as bu','co.assigned_at = bu.id')
-			->select('co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
+			->select('re.corp_name,re.j_fname,re.j_mname,j_lname,co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
 
 		//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
 			->all();
