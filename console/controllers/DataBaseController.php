@@ -365,7 +365,7 @@ class DataBaseController extends AbstractConsoleController{
 			$arResult[] = ['----------------WITHOUT COMPANY------------------'];
 			foreach($arContact['no_company'] as $cont)
 			{
-				$arResult = $cont;
+				$arResult []= $cont;
 			}
 		}
 
