@@ -36,7 +36,9 @@ class MultiSelectWidget extends InputWidget{
     {
         if(!array_key_exists('multiple',$this->options)) //так как плагин для мультиселекта, то добавляем
             $this->options['multiple'] = 'multiple';
-
+        echo Html::a(\Yii::t('app/common','Select all'),'#',['id'=>'select-all-'.$this->options['id']]);
+        echo ' / ';
+        echo Html::a(\Yii::t('app/common','Deselect all'),'#',['id' => 'deselect-all-'.$this->options['id']]);
         if ($this->hasModel()) {
             echo Html::activeDropDownList($this->model, $this->attribute, $this->data, $this->options);
         } else {
@@ -67,6 +69,15 @@ class MultiSelectWidget extends InputWidget{
             ? Json::encode($this->clientOptions)
             : '';
         $js = "jQuery('#$id').multiSelect($options);";
+        $js.= "$('#select-all-".$id."').click(function(){
+                $('#$id').multiSelect('select_all');
+              return false;
+            });";
+        $js.= "$('#deselect-all-".$id."').click(function(){
+                $('#$id').multiSelect('deselect_all');
+              return false;
+            });";
+
         $view->registerJs($js);
     }
 

@@ -32,8 +32,8 @@ $this->title = Yii::t('app/reports','Payments reports');
                             <?=$form->field($model,'services')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
                                 'data' => \common\models\Services::getServicesMap(),
                                 'clientOptions' => [
-                                    'selectableHeader' => Yii::t('app/reports','Services'),
-                                    'selectionHeader' => Yii::t('app/reports','Selected services')
+                                    //'selectableHeader' => Yii::t('app/reports','Services'),
+                                    //'selectionHeader' => Yii::t('app/reports','Selected services')
                                 ]
                             ])?>
                         </div>
@@ -41,8 +41,8 @@ $this->title = Yii::t('app/reports','Payments reports');
                              <?=$form->field($model,'contractor')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
                                  'data' => \common\models\CUser::getContractorMap(),
                                  'clientOptions' => [
-                                     'selectableHeader' => Yii::t('app/reports','Contractors'),
-                                     'selectionHeader' => Yii::t('app/reports','Selected Contractors')
+                                     //'selectableHeader' => Yii::t('app/reports','Contractors'),
+                                     //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
                                  ]
                              ])?>
                         </div>
