@@ -81,8 +81,8 @@ class PartnerSearch extends Partner
 					;
 
         if(!empty($this->fio))
-            $query->andWhere(' ( lname LIKE "'.$this->fio.'%" OR
-                fname LIKE "'.$this->fio.'%" OR mname LIKE "'.$this->fio.'%" ) ');
+            $query->andWhere(' ( lname LIKE :fio OR
+                fname LIKE :fio OR mname LIKE :fio ) ',[':fio' =>'%'.$this->fio.'%' ]);
 
         return $dataProvider;
     }

@@ -130,18 +130,21 @@ class CUserSearch extends CUser
             ->andFilterWhere(['like', 'email', $this->email]);
 
         if(!empty($this->fio))
-            $query->andWhere(' ( '.CUserRequisites::tableName().'.j_lname LIKE "'.$this->fio.'%" OR '.
-                CUserRequisites::tableName().'.j_fname LIKE "'.$this->fio.'%" OR '.
-                CUserRequisites::tableName().'.j_mname LIKE "'.$this->fio.'%" ) ');
+        {
+            $query->andWhere(' ( '.CUserRequisites::tableName().'.j_lname LIKE :fio OR '.
+                CUserRequisites::tableName().'.j_fname LIKE :fio OR '.
+                CUserRequisites::tableName().'.j_mname LIKE :fio ) ',[':fio' => '%'.$this->fio.'%' ]);
+        }
 
         if(!empty($this->corp_name))
+        {
             $query->andWhere('( '.
-                CUserRequisites::tableName().'.site LIKE "%'.$this->corp_name.'%" OR '.
-                CUserRequisites::tableName().'.corp_name LIKE "%'.$this->corp_name.'%" OR '.
-                CUserRequisites::tableName().'.j_lname LIKE "%'.$this->corp_name.'%" OR '.
-                CUserRequisites::tableName().'.j_fname LIKE "%'.$this->corp_name.'%" OR '.
-                CUserRequisites::tableName().'.j_mname LIKE "%'.$this->corp_name.'%")');
-
+                CUserRequisites::tableName().'.site LIKE :corp_name OR '.
+                CUserRequisites::tableName().'.corp_name LIKE :corp_name OR '.
+                CUserRequisites::tableName().'.j_lname LIKE :corp_name OR '.
+                CUserRequisites::tableName().'.j_fname LIKE :corp_name OR '.
+                CUserRequisites::tableName().'.j_mname LIKE :corp_name)',[':corp_name' => '%'.$this->corp_name.'%' ]);
+        }
 
         $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_phone',$this->phone]);
         $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_email',$this->c_email]);

@@ -65,7 +65,7 @@ class BuserInviteCodeSearch extends BuserInviteCode
         ]);
 
         if(!empty($this->created_at))
-            $query->andWhere(" FROM_UNIXTIME(created_at,'%d-%m-%Y') = '".$this->created_at."' ");
+            $query->andWhere(" FROM_UNIXTIME(created_at,'%d-%m-%Y') = :createdAt ",[':createdAt' => $this->created_at]);
 
         $query->andFilterWhere(['like', 'code', $this->code])
             ->andFilterWhere(['like', 'email', $this->email]);
