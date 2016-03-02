@@ -15,6 +15,7 @@
             <th><?=Yii::t('app/reports','iProfitTotal')?></th>
             <th><?=Yii::t('app/reports','iTaxTotal')?></th>
             <th><?=Yii::t('app/reports','iProdTotal')?></th>
+            <th><?=Yii::t('app/reports','controllSumm')?></th>
         </tr>
     </thead>
     <tbody>
@@ -30,6 +31,9 @@
             </td>
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iProdTotal']);?>
+            </td>
+            <td>
+                <?=Yii::$app->formatter->asDecimal($model['summControll']);?>
             </td>
         </tr>
     </tbody>

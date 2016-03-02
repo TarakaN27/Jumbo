@@ -97,7 +97,8 @@ class PaymentsReportForm extends Model{
             'iSumTotal' => 0,
             'iProfitTotal' => 0,
             'iTaxTotal' => 0,
-            'iProdTotal' => 0
+            'iProdTotal' => 0,
+            'summControll' => 0
         ];
         $arCurr = [];
         /** @var Payments $dt */
@@ -129,6 +130,8 @@ class PaymentsReportForm extends Model{
 
         if($this->generateDocx)
             $arResult['docxLink'] = $this->generateDocxDocument($arResult);
+
+        $arResult['summControll'] = ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal'])-$arResult['iSumTotal'];
 
         return $arResult;
     }

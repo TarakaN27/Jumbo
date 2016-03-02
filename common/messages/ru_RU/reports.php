@@ -68,5 +68,6 @@ return [
     'Profit BYR' => 'Прибыль BYR',
     'Production BYR' => 'Произв. затраты BYR',
     'Tax BYR' => 'Налог BYR',
-    'Payment calc condition' => 'Условие'
+    'Payment calc condition' => 'Условие',
+    'controllSumm' => 'Контрольная сумма'
 ];
