@@ -165,7 +165,7 @@ $menuItems[] = [
 
                                             <?php if(Yii::$app->user->can('superRights')):?>
                                             <li>
-                                    JUMBO-203            <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
+                                                <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
                                             </li>
                                             <?php endif;?>
                                         </ul>
