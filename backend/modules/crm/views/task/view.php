@@ -197,8 +197,6 @@ $this->registerJs("
                                     ])?>
                                     <?php
                                         $title = $model->status == CrmTask::STATUS_NEED_ACCEPT ? 'Accept task' : 'Done task';
-                                        if($model->status == CrmTask::STATUS_NEED_ACCEPT)
-
                                         $addClass = '';
                                         if(!in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_NEED_ACCEPT]))
                                             $addClass = 'hide';
