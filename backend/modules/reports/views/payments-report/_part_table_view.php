@@ -44,9 +44,12 @@
             <th><?=Yii::t('app/reports','Legal person')?></th>
             <th><?=Yii::t('app/reports','Service')?></th>
             <th><?=Yii::t('app/reports','Payment sum')?></th>
-            <th><?=Yii::t('app/reports','Profit')?></th>
-            <th><?=Yii::t('app/reports','Production')?></th>
-            <th><?=Yii::t('app/reports','Tax')?></th>
+            <th><?=Yii::t('app/reports','Payment currency')?></th>
+            <th><?=Yii::t('app/reports','Exchange currency')?></th>
+            <th><?=Yii::t('app/reports','Profit BYR')?></th>
+            <th><?=Yii::t('app/reports','Production BYR')?></th>
+            <th><?=Yii::t('app/reports','Tax BYR')?></th>
+            <th><?=Yii::t('app/reports','Payment calc condition')?></th>
         </tr>
     </thead>
     <tbody>
@@ -71,6 +74,10 @@
             <td>
                     <?=$dt->pay_summ;?>
             </td>
+            <td>    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
+            <td>
+                    <?=isset($model['currency'][$dt->id]) ? $model['currency'][$dt->id] : 'N/A'?>
+            </td>
             <td>
                     <?=is_object($calc=$dt->calculate) ? $calc->profit : 'N/A';?>
             </td>
@@ -80,7 +87,9 @@
             <td>
                     <?=is_object($calc=$dt->calculate) ? $calc->tax : 'N/A';?>
             </td>
-
+            <td>
+                <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
+            </td>
         </tr>
         <?php endforeach;
     ?>

@@ -8,6 +8,7 @@
 
 namespace backend\modules\reports\forms;
 
+use common\models\ExchangeCurrencyHistory;
 use common\models\Payments;
 use yii\base\Model;
 use Yii;
@@ -68,15 +69,20 @@ class PaymentsReportForm extends Model{
      */
     public function getData()
     {
-        $data = Payments::find()->with('calculate','cuser','legal','service');
+        $data = Payments::find();//->with('calculate','cuser','legal','service','calculate.payCond');
+        $data->joinWith('calculate');
+        $data->joinWith('cuser');
+        $data->joinWith('legal');
+        $data->joinWith('service');
+        $data->joinWith('calculate.payCond');
         $data->where(
             ' pay_date > "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
             ' AND pay_date < "'.strtotime($this->dateTo.' 23:59:59').'"'
         );
 
         $data->andFilterWhere([
-            'service_id' => $this->services,
-            'cuser_id' => $this->contractor
+            Payments::tableName().'.service_id' => $this->services,
+            Payments::tableName().'.cuser_id' => $this->contractor
         ]);
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
@@ -86,17 +92,30 @@ class PaymentsReportForm extends Model{
         $arResult = [
             'data' => [],
             'excelLink' => '',
+            'currency' => [],
             'docxLink' => '',
             'iSumTotal' => 0,
             'iProfitTotal' => 0,
             'iTaxTotal' => 0,
             'iProdTotal' => 0
         ];
-
+        $arCurr = [];
+        /** @var Payments $dt */
         foreach($data as $dt)
         {
-            $arResult['data'][date('Y-m-d',$dt->pay_date)][] = $dt;
-            $arResult['iSumTotal']+= $dt->pay_summ;
+            $date = date('Y-m-d',$dt->pay_date);
+            $iCurr = 0;
+            if(isset($arCurr[$date]) && isset($arCurr[$date][$dt->currency_id]))
+            {
+                $iCurr = $arCurr[$date][$dt->currency_id];
+            }else{
+                $iCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$dt->currency_id);
+                $arCurr[$date][$dt->currency_id] = $iCurr;
+            }
+
+            $arResult['data'][$date][] = $dt;
+            $arResult['iSumTotal']+= ($dt->pay_summ*$iCurr);
+            $arResult['currency'][$dt->id] = $iCurr;
             if(is_object($tmp = $dt->calculate))
             {
                 $arResult['iProfitTotal']+=$tmp->profit;

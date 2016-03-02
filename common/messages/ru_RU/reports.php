@@ -62,5 +62,11 @@ return [
     'Total' => 'Всего',
     'Users' => 'Пользователи',
     'To list' => 'К списку',
-    'Timesheet' => 'Рабочие отчеты'
+    'Timesheet' => 'Рабочие отчеты',
+    'Payment currency' => 'Валюта платежа',
+    'Exchange currency' => 'Курс валюты',
+    'Profit BYR' => 'Прибыль BYR',
+    'Production BYR' => 'Произв. затраты BYR',
+    'Tax BYR' => 'Налог BYR',
+    'Payment calc condition' => 'Условие'
 ];
