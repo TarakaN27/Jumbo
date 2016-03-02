@@ -316,7 +316,7 @@ class DataBaseController extends AbstractConsoleController{
 
 	public function actionExportUser()
 	{
-		/**
+
 		$obUser = (new Query())
 			->from(CUser::tableName().' cu ')
 			->leftJoin(CUserRequisites::tableName().' as re','cu.requisites_id = re.id')
@@ -326,24 +326,47 @@ class DataBaseController extends AbstractConsoleController{
 			cu.id,cu.manager_id,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname,cu.status,
 			cu.created_at,cu.is_resident,cu.r_country,cu.is_opened,cu.contractor,cu.archive,cu.prospects_id,ty.name as type,
 			,re.*')
-		 */
+		->all();
 
-		$obUser = (new Query())
+		$obContact = (new Query())
 			->from(CrmCmpContacts::tableName().' co')
-			->leftJoin(CUser::tableName().' as cu','cu.id = co.cmp_id')
-			->leftJoin(CUserRequisites::tableName().' as re','cu.requisites_id = re.id')
 			->leftJoin(BUser::tableName().'as bu','co.assigned_at = bu.id')
-			->select('re.corp_name,re.j_fname,re.j_mname,j_lname,co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
+			->select('co.*,bu.fname as manager_fname,bu.mname as manager_mname,bu.lname as manager_lname')
 
 		//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
 			->all();
+
+		$arContact = [];    //соберем контакты
+		foreach($obContact as $cnt)
+		{
+			$pk = empty($cnt['cmp_id']) ? 'no_company' : $cnt['cmp_id'];
+			$arContact[$pk][]=$cnt;
+		}
+
+		$arResult = [];
+		foreach($obUser as $user)
+		{
+			$arResult [] = $user;
+			if(isset($arContact[$user['id']]))
+			{
+				$arResult [] = ['----------CONTACTS-'.$user['id']];
+				$arResult [] = array_keys($arContact[$user['id']][0]);
+				foreach($arContact[$user['id']] as $contact)
+				{
+					$arResult[] = $contact;
+				}
+				$arResult [] = ['-----------ENDCONTACTS-'.$user['id']];
+				$arResult[] = array_keys($user);
+			}
+		}
+
 		$arrHead = [];
 		if(isset($obUser[0]))
 			$arrHead = array_keys($obUser[0]);
 
-		$fp = fopen(Yii::getAlias('@app/runtime/contact.csv'), 'w');
+		$fp = fopen(Yii::getAlias('@app/runtime/cuser_with_contact.csv'), 'w');
 		fputcsv($fp,$arrHead,';');
-		foreach ($obUser as $fields) {
+		foreach ($arResult as $fields) {
 			fputcsv($fp, $fields,';');
 		}
 		fclose($fp);
