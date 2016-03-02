@@ -239,5 +239,6 @@ return [
 	'Prospects' => 'Перспективность',
 	'Go to task' => 'Перейти к задаче',
 	'Go to contact' => 'Перейти к контакту',
-	'Go to company' => 'перейти к компании'
+	'Go to company' => 'перейти к компании',
+	'Accept task' => 'Принять задачу'
 ];

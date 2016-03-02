@@ -195,12 +195,21 @@ $this->registerJs("
                                         'class' => 'btn btn-success begin-task '.($model->status == CrmTask::STATUS_OPENED ? '' : 'hide'),
                                         'data-task-id' => $model->id,
                                     ])?>
-                                    <?=Html::button(Yii::t('app/crm','Done task'),[
-                                        'class' => 'btn btn-danger done-task '.(
-                                            in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_NEED_ACCEPT]) ? '' : 'hide'
-                                            ),
-                                        'data-task-id' => $model->id,
-                                    ])?>
+                                    <?php
+                                        $title = $model->status == CrmTask::STATUS_NEED_ACCEPT ? 'Accept task' : 'Done task';
+                                        if($model->status == CrmTask::STATUS_NEED_ACCEPT)
+
+                                        $addClass = '';
+                                        if(!in_array($model->status,[CrmTask::STATUS_IN_PROGRESS,CrmTask::STATUS_NEED_ACCEPT]))
+                                            $addClass = 'hide';
+                                        elseif($model->status == CrmTask::STATUS_NEED_ACCEPT && $model->created_by != Yii::$app->user->id)
+                                            $addClass = 'hide';
+
+
+                                        echo Html::button(Yii::t('app/crm',$title),[
+                                            'class' => 'btn btn-danger done-task '.$addClass,
+                                            'data-task-id' => $model->id,
+                                        ])?>
                                     <?=Html::button(Yii::t('app/crm','Open task'),[
                                         'class' => 'btn btn-success open-task '.(
                                             in_array($model->status,[CrmTask::STATUS_CLOSE,CrmTask::STATUS_NEED_ACCEPT]) ? '' : 'hide'

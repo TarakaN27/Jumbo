@@ -35,7 +35,7 @@ class ContactController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['moder','bookkeeper','admin']
+                    'roles' => ['moder','e_marketer','bookkeeper','admin']
                 ]
             ]
         ];

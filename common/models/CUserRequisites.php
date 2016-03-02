@@ -251,7 +251,11 @@ class CUserRequisites extends AbstractActiveRecord
                     return $('#cuserrequisites-type_id input:checked').val() == '".CUserRequisites::TYPE_I_PERSON."';
                 }"
             ],
-            ['site','url','pattern' => '/^{schemes}:\/\/(([а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)(\.[а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)+)/i'],
+            [
+                'site',
+                'url',
+                'pattern' => '/^{schemes}:\/\/(([а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)(\.[а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)+)/i'
+            ],
             ['description','string']
         ];
     }

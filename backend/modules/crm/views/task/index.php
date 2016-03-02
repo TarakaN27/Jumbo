@@ -32,7 +32,7 @@ $('.editable').editable({
 	},
 });
 
-function getAvailableStatus(value)
+function getAvailableStatus(value,createdBy)
 {
     var
         value = parseInt(value),
@@ -48,7 +48,12 @@ function getAvailableStatus(value)
         arStatus = [".CrmTask::STATUS_OPENED.",value];
         break
       case ".CrmTask::STATUS_NEED_ACCEPT.":
-        arStatus = [".CrmTask::STATUS_OPENED.",".CrmTask::STATUS_CLOSE.",value];
+        if(parseInt(createdBy) == ".Yii::$app->user->id.")
+        {
+            arStatus = [".CrmTask::STATUS_OPENED.",".CrmTask::STATUS_CLOSE.",value];
+        }else{
+            arStatus = [".CrmTask::STATUS_OPENED.",value];
+        }
         break
       default:
         break;
@@ -58,9 +63,11 @@ function getAvailableStatus(value)
 }
 
 $('.editable').on('shown', function(e, editableObj) {
+
     var
         value = editableObj.input.\$input.val(),
-        arAvSts = getAvailableStatus(value),
+        createdBy = $(this).attr('data-created_by'),
+        arAvSts = getAvailableStatus(value,createdBy),
         id = $(this).attr('aria-describedby');
 
     $('#'+id).find('option').each(function(){
@@ -202,6 +209,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'data-value' => $model->status,
                     'data-type' => "select",
                     'data-pk' => $model->id,
+                    'data-created_by' => $model->created_by,
                     // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
                     'data-url' => \yii\helpers\Url::to(['update-status']),
                     'data-title' => Yii::t('app/common','change status')
@@ -373,6 +381,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'data-value' => $model->status,
                     'data-type' => "select",
                     'data-pk' => $model->id,
+                    'data-created_by' => $model->created_by,
                    // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
                     'data-url' => \yii\helpers\Url::to(['update-status']),
                     'data-title' => Yii::t('app/common','change status')

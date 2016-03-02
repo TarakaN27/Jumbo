@@ -165,7 +165,7 @@ $menuItems[] = [
 
                                             <?php if(Yii::$app->user->can('superRights')):?>
                                             <li>
-                                                <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
+                                    JUMBO-203            <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
                                             </li>
                                             <?php endif;?>
                                         </ul>
@@ -333,7 +333,8 @@ $menuItems[] = [
                                         <?php if(
                                         Yii::$app->user->can('adminRights') ||
                                         Yii::$app->user->can('only_bookkeeper') ||
-                                        Yii::$app->user->can('only_manager')
+                                        Yii::$app->user->can('only_manager') ||
+                                        Yii::$app->user->can('only_e_marketer')
                                         ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/contact/index']); ?>">
