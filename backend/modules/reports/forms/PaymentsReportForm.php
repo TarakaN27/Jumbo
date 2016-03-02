@@ -131,7 +131,7 @@ class PaymentsReportForm extends Model{
         if($this->generateDocx)
             $arResult['docxLink'] = $this->generateDocxDocument($arResult);
 
-        $arResult['summControll'] = ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal'])-$arResult['iSumTotal'];
+        $arResult['summControll'] = $arResult['iSumTotal'] - ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal']);
 
         return $arResult;
     }
