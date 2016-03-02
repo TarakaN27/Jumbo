@@ -20,16 +20,16 @@
     <tbody>
         <tr>
             <td>
-                <?=$model['iSumTotal'];?>
+                <?=Yii::$app->formatter->asDecimal($model['iSumTotal']);?>
             </td>
             <td>
-                <?=$model['iProfitTotal'];?>
+                <?=Yii::$app->formatter->asDecimal($model['iProfitTotal']);?>
             </td>
             <td>
-                <?=$model['iTaxTotal'];?>
+                <?=Yii::$app->formatter->asDecimal($model['iTaxTotal']);?>
             </td>
             <td>
-                <?=$model['iProdTotal'];?>
+                <?=Yii::$app->formatter->asDecimal($model['iProdTotal']);?>
             </td>
         </tr>
     </tbody>
@@ -72,20 +72,20 @@
                      <?=is_object($serv=$dt->service) ? $serv->name : 'N/A';?>
             </td>
             <td>
-                    <?=$dt->pay_summ;?>
+                    <?=Yii::$app->formatter->asDecimal($dt->pay_summ);?>
             </td>
             <td>    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
             <td>
-                    <?=isset($model['currency'][$dt->id]) ? $model['currency'][$dt->id] : 'N/A'?>
+                    <?=isset($model['currency'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt->id]) : 'N/A'?>
             </td>
             <td>
-                    <?=is_object($calc=$dt->calculate) ? $calc->profit : 'N/A';?>
+                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->profit) : 'N/A';?>
             </td>
             <td>
-                    <?=is_object($calc=$dt->calculate) ? $calc->production : 'N/A';?>
+                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->production) : 'N/A';?>
             </td>
             <td>
-                    <?=is_object($calc=$dt->calculate) ? $calc->tax : 'N/A';?>
+                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A';?>
             </td>
             <td>
                 <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
