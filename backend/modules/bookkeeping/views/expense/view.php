@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'pay_date',
                 'value' => $model->getFormatedPayDate()
             ],
-            'pay_summ',
+            'pay_summ:decimal',
             [
                 'attribute' => 'currency_id',
                 'value' => is_object($curr = $model->currency) ? '('.$curr->code.') '.$curr->name : 'N/A'
@@ -58,14 +58,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => is_object($cat = $model->cat) ? $cat->name : 'N/A'
             ],
             'description:ntext',
-            [
-                'attribute' => 'created_at',
-                'value' => is_null($model->created_at) ? NULL : $model->getFormatedCreatedAt()
-            ],
-            [
-                'attribute' => 'updated_at',
-                'value' => is_null($model->updated_at) ? NULL : $model->getFormatedUpdatedAt()
-            ],
+            'created_at:datetime',
+            'updated_at:datetime'
         ],
     ]) ?>
 

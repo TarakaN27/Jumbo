@@ -39,8 +39,12 @@ class Expense extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['pay_date', 'pay_summ', 'currency_id', 'legal_id', 'cuser_id', 'cat_id'], 'required'],
-            [['pay_date', 'currency_id', 'legal_id', 'cuser_id', 'cat_id', 'created_at', 'updated_at'], 'integer'],
+            [[
+                'pay_date', 'pay_summ', 'currency_id',
+                'legal_id', 'cuser_id', 'cat_id'
+            ], 'required'],
+            [[
+                'pay_date', 'currency_id', 'legal_id', 'cuser_id', 'cat_id', 'created_at', 'updated_at'], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string']
         ];

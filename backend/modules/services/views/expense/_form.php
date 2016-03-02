@@ -24,11 +24,14 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'parent_id')->dropDownList(\common\models\ExpenseCategories::getParentCat($model->isNewRecord ? NULL : $model->id),[
+    <?= $form->field($model, 'parent_id')->dropDownList(
+        \common\models\ExpenseCategories::getParentCat($model->isNewRecord ? NULL : $model->id),[
         'prompt' => Yii::t('app/services','EXPANSE_choose_parent_cat')
     ]) ?>
 
-    <?= $form->field($model, 'status')->dropDownList(\common\models\ExpenseCategories::getStatusArr()) ?>
+    <?= $form->field($model, 'status')->dropDownList(
+        \common\models\ExpenseCategories::getStatusArr()
+    ) ?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class = "x_title">
                 <h2><?php echo $this->title?></h2>
                 <section class="pull-right">
-                <?php if(Yii::$app->user->can('only_bookkeeper') || Yii::$app->user->can('superRights')):?>
+                <?php if(Yii::$app->user->can('superRights')):?>
                     <?= Html::a(Yii::t('app/services', 'Create Legal Person'), ['create'], ['class' => 'btn btn-success']) ?>
                 <?php endif;?>
                 </section>
@@ -28,12 +28,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     $tpl = '';
                     $viewTpl = '';
-                    if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper'))
+                    if(Yii::$app->user->can('superRights'))
                     {
                         $tpl = '{delete}';
                         $viewTpl = '{view}';
                     }
-                    elseif(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
+                    elseif(Yii::$app->user->can('adminRights'))
                         $viewTpl = '{view}';
 
                     echo GridView::widget([
@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'html',
                                 'value' => function($model)
                                     {
-                                        if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
+                                        if(Yii::$app->user->can('adminRights'))
                                             return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
                                         else
                                             return $model->name;
@@ -61,12 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     },
                                 'filter' => \common\models\LegalPerson::getStatusArr()
                             ],
-                            [
-                                'attribute' => 'created_at',
-                                'value' => function($model){
-                                        return $model->getFormatedCreatedAt();
-                                    }
-                            ],
+                            'created_at:datetime',
                             [
                                 'class' => 'yii\grid\ActionColumn',
                                 'template' => $viewTpl

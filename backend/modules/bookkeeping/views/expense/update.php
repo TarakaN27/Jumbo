@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = Yii::t('app/book', 'Update');
                                 </div>
     <?= $this->render('_form', [
         'model' => $model,
+        'cuserDesc' => $cuserDesc
     ]) ?>
 
 </div></div></div>

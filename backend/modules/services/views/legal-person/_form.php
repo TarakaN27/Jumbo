@@ -37,6 +37,11 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'act_tpl_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap())?>
 
     <?= $form->field($model, 'status')->dropDownList(\common\models\LegalPerson::getStatusArr()) ?>
+    <div class="form-group">
+        <div class = "col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+            <?= $form->field($model, 'admin_expense')->checkbox()?>
+        </div>
+    </div>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

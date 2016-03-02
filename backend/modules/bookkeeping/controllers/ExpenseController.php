@@ -3,6 +3,7 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\LegalPerson;
 use Yii;
 use common\models\Expense;
 use common\models\search\ExpenseSearch;
@@ -26,8 +27,13 @@ class ExpenseController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
+                    'actions' => ['index'],
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper']
+                    'roles' => ['bookkeeper']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin','superadmin']
                 ]
             ]
         ];
@@ -41,12 +47,24 @@ class ExpenseController extends AbstractBaseBackendController
     public function actionIndex()
     {
         $searchModel = new ExpenseSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $addWhere = NULL;
+        if(!Yii::$app->user->can('adminRights'))
+        {
+            $addWhere = LegalPerson::tableName().'.admin_expense is NULL OR '.LegalPerson::tableName().'.admin_expense = 0';
+        }
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addWhere);
+
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
+
+        // Get the initial city description
+        $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cuserDesc' => $cuserDesc
         ]);
     }
 
@@ -74,8 +92,11 @@ class ExpenseController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            // Get the initial city description
+            $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();
             return $this->render('create', [
                 'model' => $model,
+                'cuserDesc' => $cuserDesc
             ]);
         }
     }
@@ -93,8 +114,11 @@ class ExpenseController extends AbstractBaseBackendController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            // Get the initial city description
+            $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();
             return $this->render('update', [
                 'model' => $model,
+                'cuserDesc' => $cuserDesc
             ]);
         }
     }

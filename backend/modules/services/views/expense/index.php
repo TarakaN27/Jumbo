@@ -17,7 +17,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
-                                     <?= Html::a(Yii::t('app/services', 'Create Expense Categories'), ['create'], ['class' => 'btn btn-success']) ?>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                            <?= Html::a(Yii::t('app/services', 'Create Expense Categories'), ['create'], ['class' => 'btn btn-success']) ?>
+                                        <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>
@@ -59,7 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}'
+                'template' => '{delete}',
+                'visible' => Yii::$app->user->can('superRights')
             ],
         ],
     ]); ?>

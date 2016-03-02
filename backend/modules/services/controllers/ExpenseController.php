@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 
 /**
+ * Категории затрат
  * ExpenseController implements the CRUD actions for ExpenseCategories model.
  */
 class ExpenseController extends AbstractBaseBackendController
@@ -25,8 +26,13 @@ class ExpenseController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
+                    'actions' => ['index','view','update'],
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper']
+                    'roles' => ['admin']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['superadmin']
                 ]
             ]
         ];

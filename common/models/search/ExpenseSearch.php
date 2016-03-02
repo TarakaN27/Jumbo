@@ -40,9 +40,13 @@ class ExpenseSearch extends Expense
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$additionQuery = NULL)
     {
         $query = Expense::find()->with('currency','legal','cat','cuser');
+
+        $query->joinWith('legal');
+        if($additionQuery)
+            $query->where($additionQuery);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

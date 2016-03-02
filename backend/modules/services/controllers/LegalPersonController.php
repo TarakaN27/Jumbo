@@ -26,13 +26,13 @@ class LegalPersonController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
-                    'actions' => ['index','view'],
+                    'actions' => ['index','view','update'],
                     'allow' => true,
-                    'roles' => ['admin','moder']
+                    'roles' => ['admin']
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['superadmin','bookkeeper']
+                    'roles' => ['superadmin']
                 ]
             ]
         ];

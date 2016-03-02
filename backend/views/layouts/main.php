@@ -185,14 +185,16 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_services'); ?></a>
                                             </li>
                                         <?php endif; ?>
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/services/expense/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_expense_categories'); ?></a>
                                             </li>
                                         <?php endif; ?>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
                                         <li>
                                             <a href = "<?= Url::to(['/services/legal-person/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_legal_person'); ?></a>
                                         </li>
+                                        <?php endif; ?>
                                         <?php if(Yii::$app->user->can('forAll')):?>
                                              <li>
                                                 <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>

@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ExpenseSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -16,7 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
-                                     <?= Html::a(Yii::t('app/book', 'Create Expense'), ['create'], ['class' => 'btn btn-success']) ?>
+                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                            <?= Html::a(Yii::t('app/book', 'Create Expense'), ['create'], ['class' => 'btn btn-success']) ?>
+                                        <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>
@@ -32,10 +34,32 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'cuser_id',
                 'format' => 'html',
                 'value' => function($model){
-                        $name =  is_object($cuser = $model->cuser) ? $cuser->username : 'N/A';
-                        return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
+                        $name =  is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
+                        if(Yii::$app->user->can('adminRights'))
+                            return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
+                        else
+                            return $name;
                     },
-                'filter' => \common\models\CUser::getContractorMap()
+                'filter' => \kartik\select2\Select2::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'cuser_id',
+                    'initValueText' => $cuserDesc, // set the initial display text
+                    'options' => [
+                        'placeholder' => Yii::t('app/crm','Search for a company ...')
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                    ],
+                ])
             ],
             [
                 'attribute' => 'cat_id',
@@ -45,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\ExpenseCategories::getExpenseCatMap()
             ],
 
-            'pay_summ',
+            'pay_summ:decimal',
             [
                 'attribute' => 'currency_id',
                 'value' => function($model){
@@ -58,33 +82,32 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model){
                         return is_object($legal = $model->legal) ? $legal->name : 'N/A';
                     },
-                'filter' => \common\models\LegalPerson::getLegalPersonMap()
+                'filter' => \common\models\LegalPerson::getLegalPersonMapWithRoleControl()
             ],
             [
                 'attribute' => 'pay_date',
-                'value' => function($model){
-                        return $model->getFormatedPayDate();
-                    },
+                'format' => 'date',
                 'filter' => \yii\jui\DatePicker::widget([
 
                         'model'=>$searchModel,
                         'attribute'=>'pay_date',
                         'language' => 'ru',
-                        'dateFormat' => 'dd-MM-yyyy',
+                        'dateFormat' => 'dd.MM.yyyy',
                         'options' =>['class' => 'form-control'],
                         'clientOptions' => [
-                            'defaultDate' => date('d-m-Y',time())
+                            'defaultDate' => date('d.m.Y',time())
                         ],
                     ]),
-                'format' => 'raw',
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view}'
+                'template' => '{view}',
+                'visible' => Yii::$app->user->can('adminRights')
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}'
+                'template' => '{delete}',
+                'visible' => Yii::$app->user->can('adminRights')
             ],
         ],
     ]); ?>

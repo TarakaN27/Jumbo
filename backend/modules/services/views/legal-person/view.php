@@ -53,14 +53,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'status',
                             'value' => $model->getStatusStr()
                         ],
-                        [
-                            'attribute' => 'created_at',
-                            'value' => $model->getFormatedCreatedAt()
-                        ],
-                        [
-                            'attribute' => 'updated_at',
-                            'value' => $model->getFormatedUpdatedAt()
-                        ]
+                        'admin_expense:boolean',
+                        'created_at:datetime',
+                        'updated_at:datetime',
                     ],
                 ]) ?>
             </div>

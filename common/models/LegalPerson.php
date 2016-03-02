@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $use_vat
  * @property integer $docx_id
  * @property integer $act_tpl_id
+ * @property integer $admin_expense
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -41,7 +42,7 @@ class LegalPerson extends AbstractActiveRecord
     {
         return [
             [['description','doc_requisites'], 'string'],
-            [['status', 'created_at', 'updated_at','use_vat','docx_id','act_tpl_id'], 'integer'],
+            [['status', 'created_at', 'updated_at','use_vat','docx_id','act_tpl_id','admin_expense'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
@@ -65,7 +66,8 @@ class LegalPerson extends AbstractActiveRecord
             'doc_requisites' => Yii::t('app/services','Requisites for documents'),
             'use_vat' => Yii::t('app/services', 'Use vat'),
             'docx_id' => Yii::t('app/services', 'Docx ID'),
-            'act_tpl_id' => Yii::t('app/services', 'Act template')
+            'act_tpl_id' => Yii::t('app/services', 'Act template'),
+            'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin')
         ];
     }
 
@@ -120,5 +122,23 @@ class LegalPerson extends AbstractActiveRecord
     public function getActTemplate()
     {
         return $this->hasOne(ActsTemplate::className(),['id' => 'act_tpl_id']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public static function getLegalPersonMapWithRoleControl()
+    {
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
+        if(Yii::$app->user->can('adminRights'))
+            $models = self::getDb()->cache(function ($db) {
+                return LegalPerson::find()->orderBy(['id' => SORT_ASC])->all($db);
+            },86400,$dep);
+        else
+            $models = self::getDb()->cache(function ($db) {
+                return LegalPerson::find()->where('admin_expense is NULL or admin_expense = 0')->orderBy(['id' => SORT_ASC])->all($db);
+            },86400,$dep);
+
+        return ArrayHelper::map($models,'id','name');
     }
 }
