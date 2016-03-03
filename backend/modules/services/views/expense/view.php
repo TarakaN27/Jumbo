@@ -39,31 +39,26 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'description',
-            [
-                'attribute' => 'parent_id',
-                'value' => is_object($obParent = $model->parent) ? $obParent->name : NULL
+                                    <?= DetailView::widget([
+                                        'model' => $model,
+                                        'attributes' => [
+                                            'id',
+                                            'name',
+                                            'description',
+                                            [
+                                                'attribute' => 'parent_id',
+                                                'value' => is_object($obParent = $model->parent) ? $obParent->name : NULL
 
-            ],
-            [
-                'attribute' => 'status',
-                'value' => $model->getStatusStr()
-            ],
-            [
-                'attribute' => 'create_at',
-                'value' => $model->getFormatedCreatedAt()
-            ],
-            [
-                'attribute' => 'update_at',
-                'value' => $model->getFormatedUpdatedAt()
-            ],
-        ],
-    ]) ?>
+                                            ],
+                                            [
+                                                'attribute' => 'status',
+                                                'value' => $model->getStatusStr()
+                                            ],
+                                            'without_cuser:boolean',
+                                            'created_at:datetime',
+                                            'updated_at:datetime',
+                                        ],
+                                    ]) ?>
                                </div>
                             </div>
                         </div>

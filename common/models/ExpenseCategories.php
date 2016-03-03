@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $without_cuser
  */
 class ExpenseCategories extends AbstractActiveRecord
 {
@@ -43,7 +44,7 @@ class ExpenseCategories extends AbstractActiveRecord
             [['name'], 'required'],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
-            [['parent_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['parent_id', 'status', 'created_at', 'updated_at','without_cuser'], 'integer'],
             ['parent_id', 'default', 'value' => 0],
             [['name'], 'string', 'max' => 255],
             [['description'], 'string', 'max' => 32]
@@ -63,6 +64,7 @@ class ExpenseCategories extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
+            'without_cuser' => Yii::t('app/services','Without cuser for expense')
         ];
     }
 

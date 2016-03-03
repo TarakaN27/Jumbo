@@ -19,7 +19,7 @@ class m150707_113625_create_table_expense extends Migration
             'pay_summ' => Schema::TYPE_MONEY.' NOT NULL',
             'currency_id' => Schema::TYPE_INTEGER.' NOT NULL',
             'legal_id' => Schema::TYPE_INTEGER.' NOT NULL',
-            'cuser_id' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'cuser_id' => Schema::TYPE_INTEGER,
             'cat_id' => Schema::TYPE_INTEGER.' NOT NULL',
             'description' => Schema::TYPE_TEXT,
             'created_at' => Schema::TYPE_INTEGER ,

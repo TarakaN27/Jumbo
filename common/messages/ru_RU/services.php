@@ -72,8 +72,6 @@ return [
     'Unit enrollment' => 'Единица зачисления',
     'Not use sale with counting unit enrollment' => 'Не учитывать скидку при расчете единиц',
     'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при расчете единиц',
-    'Show expense only for admin and superadmin' => 'Показывать затраты по юрлицу только суперадминам и админам'
-
-
-
+    'Show expense only for admin and superadmin' => 'Показывать затраты по юрлицу только суперадминам и админам',
+    'Without cuser for expense' => 'Без указанаия контрагента для затрат'
 ];

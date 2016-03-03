@@ -41,12 +41,22 @@ class Expense extends AbstractActiveRecord
         return [
             [[
                 'pay_date', 'pay_summ', 'currency_id',
-                'legal_id', 'cuser_id', 'cat_id'
+                'legal_id',  'cat_id'
             ], 'required'],
             [[
                 'pay_date', 'currency_id', 'legal_id', 'cuser_id', 'cat_id', 'created_at', 'updated_at'], 'integer'],
             [['pay_summ'], 'number'],
-            [['description'], 'string']
+            [['description'], 'string'],
+            [['cuser_id'],'required','when' => function(){
+                $obCat = $this->cat;
+                if(is_object($obCat))
+                {
+                    if($obCat->without_cuser)
+                        return FALSE;
+                }
+                return TRUE;
+            }]
+
         ];
     }
 

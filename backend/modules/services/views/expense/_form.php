@@ -6,6 +6,20 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\ExpenseCategories */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerJs("
+$('#expensecategories-parent_id').on('change',function(){
+    var
+        check = $('#expensecategories-without_cuser');
+
+    if($(this).val() == undefined || $(this).val() == '')
+        {
+            check.prop('checked', false );
+            check.attr('disabled','disabled');
+        }else{
+            check.removeAttr('disabled');
+        }
+});
+",\yii\web\View::POS_READY);
 ?>
 
 <div class="expense-categories-form">
@@ -32,7 +46,16 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'status')->dropDownList(
         \common\models\ExpenseCategories::getStatusArr()
     ) ?>
+    <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+        <?php
+            $options['disabled'] = 'disabled';
+            if(!empty($model->parent_id))
+                $options = [];
 
+            echo $form->field($model,'without_cuser')->checkbox($options)?>
+        </div>
+    </div>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/services', 'Create') : Yii::t('app/services', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

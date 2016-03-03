@@ -24,48 +24,53 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
-   <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();?>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'filterSelector' => 'select[name="per-page"]',
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            [
-                'attribute' => 'name',
-                'format' => 'html',
-                'value' => function($model)
-                    {
-                            return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
-                    }
-            ],
-            'description',
-            [
-                'attribute' => 'parent_id',
-                'value' => function($model){
-                       $obParent = $model->parent;
-                       return is_object($obParent) ? $obParent->name : NULL;
-                    },
-                'filter' => \common\models\ExpenseCategories::getParentCat()
-            ],
-            [
-                'attribute' => 'status',
-                'value' => function($model){
-                        return $model->getStatusStr();
-                    },
-                'filter' => \common\models\ExpenseCategories::getStatusArr()
-            ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{view}'
-            ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}',
-                'visible' => Yii::$app->user->can('superRights')
-            ],
-        ],
-    ]); ?>
+                                   <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();?>
+                                    <?= GridView::widget([
+                                        'dataProvider' => $dataProvider,
+                                        'filterModel' => $searchModel,
+                                        'filterSelector' => 'select[name="per-page"]',
+                                        'columns' => [
+                                            ['class' => 'yii\grid\SerialColumn'],
+                                            [
+                                                'attribute' => 'name',
+                                                'format' => 'html',
+                                                'value' => function($model)
+                                                    {
+                                                            return Html::a($model->name,['update','id'=>$model->id],['class'=>'link-upd']);
+                                                    }
+                                            ],
+                                            'description',
+                                            [
+                                                'attribute' => 'parent_id',
+                                                'value' => function($model){
+                                                       $obParent = $model->parent;
+                                                       return is_object($obParent) ? $obParent->name : NULL;
+                                                    },
+                                                'filter' => \common\models\ExpenseCategories::getParentCat()
+                                            ],
+                                            [
+                                                'attribute' => 'status',
+                                                'value' => function($model){
+                                                        return $model->getStatusStr();
+                                                    },
+                                                'filter' => \common\models\ExpenseCategories::getStatusArr()
+                                            ],
+                                            [
+                                                'attribute' => 'without_cuser',
+                                                'format' => 'boolean',
+                                                'filter' => \common\models\ExpenseCategories::getYesNo()
+                                            ],
+                                            [
+                                                'class' => 'yii\grid\ActionColumn',
+                                                'template' => '{view}'
+                                            ],
+                                            [
+                                                'class' => 'yii\grid\ActionColumn',
+                                                'template' => '{delete}',
+                                                'visible' => Yii::$app->user->can('superRights')
+                                            ],
+                                        ],
+                                    ]); ?>
                                 </div>
                             </div>
                         </div>
