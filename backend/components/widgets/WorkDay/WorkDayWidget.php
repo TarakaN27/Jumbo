@@ -19,18 +19,17 @@ class WorkDayWidget extends Widget
 	public function run()
 	{
 		$begined = WorkDay::getBeginedDay(\Yii::$app->user->id);
-		//var_dump($begined);
 		if(!$begined) {
 			$model = new WorkDay();
 
-			$model->begin_time = date('Y-m-d H:i', time());
+			$model->begin_time = date('d.m.Y H:i', time());
 			$model->log_date = date('Y-m-d', time());
 		}else{
 			$model = clone $begined;
-			$model->end_time = date('Y-m-d H:i', time());
+			$model->end_time = date('d.m.Y H:i', time());
 
 			if(!empty($begined->end_time))
-				$model->begin_time = date('Y-m-d H:i', time());
+				$model->begin_time = date('d.m.Y H:i', time());
 		}
 
 		$this->registerAssets();

@@ -148,7 +148,7 @@ class PartnerController extends AbstractBaseBackendController
      */
     public function actionCreateCuserServ($id)
     {
-        $model = new PartnerCuserServ(['partner_id' => $id,'connect' => date('Y-m-d')]);
+        $model = new PartnerCuserServ(['partner_id' => $id,'connect' => date('d.m.Y')]);
 
         if($model->load(Yii::$app->request->post()) && $model->save())
         {

@@ -31,7 +31,7 @@ class UnitsReportForm extends Model{
     {
         return [
             [['dateFrom','dateTo'],'required'],
-            [['dateFrom','dateTo'],'date','format' => 'yyyy-M-d'],
+            [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
             [['managers'],'safe'],
             [['generateExcel','generateDocx'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],

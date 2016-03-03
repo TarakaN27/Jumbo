@@ -41,7 +41,7 @@ class PartnerCuserServ extends AbstractActiveRecord
         return [
             [['partner_id', 'cuser_id','service_id'], 'required'],
             [['partner_id', 'cuser_id','service_id', 'created_at', 'updated_at'], 'integer'],
-            ['connect','date', 'format' => 'yyyy-m-dd'],
+            ['connect','date', 'format' => 'php:d.m.Y'],
             [['connect'], 'safe'],
             [['service_id','cuser_id'],'uniqueValid']
         ];
@@ -126,5 +126,17 @@ class PartnerCuserServ extends AbstractActiveRecord
                'class' => PartnerLinkCuserServBehavior::className() //поведение для начисления прибыли партнерам
            ]
         ]);
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(!empty($this->connect))
+            $this->connect = date('Y-m-d',strtotime($this->connect));
+
+        return parent::beforeSave($insert);
     }
 }

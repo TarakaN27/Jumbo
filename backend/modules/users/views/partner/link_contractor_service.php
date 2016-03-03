@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 							},
 							'filter' => \common\models\Services::getServicesMap()
 						],
-						'connect',
+						'connect:date',
 						[
 							'class' => 'yii\grid\ActionColumn',
 							'template' => '{delete}',

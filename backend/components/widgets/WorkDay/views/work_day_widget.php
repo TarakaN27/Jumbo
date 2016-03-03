@@ -45,7 +45,7 @@ var
 
 		?>
 		<div>
-			<p><?=Yii::t('app/crm','Log date');?> <small><?php echo $model->log_date;?></small></p>
+			<p><?=Yii::t('app/crm','Log date');?> <small><?php echo  Yii::$app->formatter->asDate($model->log_date);?></small></p>
 		</div>
 		<div>
 			<p>Продолжительность дня
@@ -67,7 +67,7 @@ var
 
 		<?=$form->field($model,'end_time')->widget(\kartik\datetime\DateTimePicker::className(),[
 			'pluginOptions' => [
-				'format' => 'yyyy-mm-dd hh:ii',
+				'format' => 'dd.mm.yyyy hh:ii',
 				'todayHighlight' => true,
 				'autoclose' => true,
 			]
@@ -103,7 +103,7 @@ var
 
 			?>
 			<div>
-				<p><?=Yii::t('app/crm','Log date');?> <small><?php echo $model->log_date;?></small></p>
+				<p><?=Yii::t('app/crm','Log date');?> <small><?php echo Yii::$app->formatter->asDate($model->log_date);?></small></p>
 
 			</div>
 			<div>
@@ -149,7 +149,7 @@ var
 
 		?>
 		<div>
-			<p><?=Yii::t('app/crm','Log date');?> <small><?php echo $model->log_date;?></small></p>
+			<p><?=Yii::t('app/crm','Log date');?> <small><?php echo Yii::$app->formatter->asDate($model->log_date);?></small></p>
 		</div>
 			<?php
 				$form = ActiveForm::begin([
@@ -161,7 +161,7 @@ var
 
 			<?=$form->field($model,'begin_time')->widget(\kartik\datetime\DateTimePicker::className(),[
 				'pluginOptions' => [
-					'format' => 'yyyy-mm-dd hh:ii',
+					'format' => 'dd.mm.yyyy hh:ii',
 					'todayHighlight' => true,
 					'autoclose' => true,
 				]

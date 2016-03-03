@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
 						'pluginOptions' => [
 							'autoclose'=>true,
-							'format' => 'yyyy-m-dd'
+							'format' => 'dd.m.yyyy'
 						]
 					])?>
 

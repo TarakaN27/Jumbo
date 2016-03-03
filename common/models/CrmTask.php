@@ -388,6 +388,12 @@ class CrmTask extends AbstractActiveRecord
     {
         if(!empty($this->hourEstimate) || !empty($this->minutesEstimate))
             $this->time_estimate = (int)$this->minutesEstimate*60 + (int)$this->hourEstimate*3600;
+
+        if(!empty($this->deadline))
+        {
+            $this->deadline = date('Y-m-d H:i',strtotime($this->deadline));
+        }
+
         return parent::beforeSave($insert);
     }
 
