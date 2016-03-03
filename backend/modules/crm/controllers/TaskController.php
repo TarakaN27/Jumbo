@@ -135,7 +135,7 @@ class TaskController extends AbstractBaseBackendController
         $obWatcher = new CrmTaskWatcher(); //наблюдатели
         $obWatcher->task_id = (int)$id;
 
-        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time()),'task_id' => $model->id]); //модель для добавления времени
+        $obLogWork = new CrmTaskLogTime(['log_date' => date('d.m.Y',time()),'task_id' => $model->id]); //модель для добавления времени
         $obLogWork->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
 
         $obFile = new CrmCmpFile(); //модель для добавления файлов

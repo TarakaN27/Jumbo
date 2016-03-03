@@ -87,8 +87,8 @@ $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResiden
     ],
     'pluginOptions' => [
         'autoclose' => TRUE,
-        'format' => 'yyyy-mm-dd',
-        'defaultDate' => date('Y-m-d', time())
+        'format' =>'dd.mm.yyyy', //'yyyy-mm-dd',
+        'defaultDate' => date('d.m.Y', time())
     ]
 ]) ?>
 

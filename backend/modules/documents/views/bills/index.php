@@ -76,10 +76,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                                 'pluginOptions' => [
                                     'autoclose' => TRUE,
-                                    'format' => 'yyyy-mm-dd',
-                                    'defaultDate' => date('Y-m-d', time())
+                                    'format' => 'dd.mm.yyyy',
+                                    'defaultDate' => date('d.m.Y', time())
                                 ]
-                            ])
+                            ]),
+                        'format' => 'date'
                     ],
                     [
                         'attribute' => 'docx_tmpl_id',

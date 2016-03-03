@@ -398,7 +398,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = new PaymentRequest();
         $model->owner_id = Yii::$app->user->id;
         $model->status = PaymentRequest::STATUS_NEW;
-        $model->pay_date = date('Y-m-d',time());
+        $model->pay_date = date('d.m.Y',time());
 
         if($model->load(Yii::$app->request->post()) && $model->save())
         {

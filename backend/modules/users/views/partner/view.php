@@ -184,14 +184,8 @@ $('.btn-psk').on('click',function(){
                                     'attribute' => 'status',
                                     'value' => $model->getStatusStr()
                                 ],
-                                [
-                                    'attribute' => 'created_at',
-                                    'value' => Yii::$app->formatter->asDatetime($model->created_at)
-                                ],
-                                [
-                                    'attribute' => 'updated_at',
-                                    'value' => Yii::$app->formatter->asDatetime($model->updated_at)
-                                ],
+                                'created_at:datetime',
+                                'updated_at:datetime',
                             ],
                         ]) ?>
 

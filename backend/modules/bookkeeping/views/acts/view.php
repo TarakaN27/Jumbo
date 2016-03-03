@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => is_object($obTmpl = $model->template) ? $obTmpl->name : $model->template_id
                                 ],
                                 'amount',
-                                'act_date',
+                                'act_date:date',
                                 [
                                     'attribute' => 'sent',
                                     'value' => $model->getYesNoStr($model->sent)

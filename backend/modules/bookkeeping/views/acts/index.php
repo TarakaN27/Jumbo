@@ -107,7 +107,7 @@ $('#sendActID').on('click',sendActs);
                             },
                             'filter' => \common\models\Services::getServicesMap()
                         ],
-                        'act_date',
+                        'act_date:date',
                         [
                             'attribute' => 'sent',
                             'value' => function($model){

@@ -84,10 +84,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'model'=>$searchModel,
                                             'attribute'=>'created_at',
                                             'language' => 'ru',
-                                            'dateFormat' => 'dd-MM-yyyy',
+                                            'dateFormat' => 'dd.MM.yyyy',
                                             'options' =>['class' => 'form-control'],
                                             'clientOptions' => [
-                                                'defaultDate' => date('d-m-Y',time())
+                                                'defaultDate' => date('d.m.Y',time())
                                             ],
                                         ]),
                                     ],

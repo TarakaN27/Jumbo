@@ -100,7 +100,7 @@ class BillsManager extends Bills{
      */
     protected function billNameForDownload()
     {
-        return 'СЧЕТ №'.$this->bill_number.' от '.$this->bill_date;
+        return 'СЧЕТ №'.$this->bill_number.' от '.Yii::$app->formatter->asDate($this->bill_date);
     }
 
     protected function generateDocument($name,$tryPath)
@@ -185,7 +185,7 @@ class BillsManager extends Bills{
             $doc->setValue('jPersonSite',$jPersonSite);
             $doc->setValue('jPersonEmail',$jPersonEmail);
             $doc->setValue('billNumber',$this->bill_number);
-            $doc->setValue('billDate',$this->bill_date);
+            $doc->setValue('billDate',Yii::$app->formatter->asDate($this->bill_date));
             $doc->setValue('contractor',$contractor);
             $doc->setValue('payer',$payer);
             $doc->setValue('bankDetail',$bankDetail);

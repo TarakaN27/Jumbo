@@ -39,11 +39,13 @@ $this->title = Yii::t('app/services', 'Services contract');
 										<td style="width: 30%;"><?=\kartik\date\DatePicker::widget([
 												'name' => 'date['.$key.']',
 												'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
-												'value' => isset($arCSC[$key]) ?
-													$arCSC[$key]->cont_date : NULL,
+												'value' => isset($arCSC[$key])?
+
+													(empty($arCSC[$key]->cont_date) ? NULL : Yii::$app->formatter->asDate($arCSC[$key]->cont_date)) : NULL,
 												'pluginOptions' => [
 													'autoclose'=>true,
-													'format' => 'yyyy-m-dd'
+													'format' => 'dd.mm.yyyy',
+													 'defaultDate' => date('d-m-Y', time())
 												]
 											]);?></td>
 									</tr>

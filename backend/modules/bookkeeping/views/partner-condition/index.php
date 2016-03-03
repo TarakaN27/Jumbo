@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'percent',
-                        'start_date',
+                        'start_date:date',
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{update}{view}'

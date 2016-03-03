@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 CustomHelper::ciRub($model->amount).' )'
                         ],
                         'bill_number',
-                        'bill_date',
+                        'bill_date:date',
                         [
                             'attribute' => 'bill_template',
                             'value' => is_object($obTmpl = $model->bTemplate) ? $obTmpl->name : 'N/A'

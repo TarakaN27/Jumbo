@@ -72,7 +72,7 @@ class BillsSearch extends Bills
             'docx_tmpl_id' => $this->docx_tmpl_id,
             'amount' => $this->amount,
             'bill_number' => $this->bill_number,
-            'bill_date' => $this->bill_date,
+            'bill_date' => date('Y-m-d',strtotime($this->bill_date)),
             'bill_template' => $this->bill_template,
             'use_vat' => $this->use_vat,
             'vat_rate' => $this->vat_rate,

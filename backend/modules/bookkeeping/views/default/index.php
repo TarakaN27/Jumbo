@@ -106,21 +106,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'pay_date',
-                                'value' => function($model){
-                                        return $model->getFormatedPayDate();
-                                    },
                                 'filter' => \yii\jui\DatePicker::widget([
 
                                         'model'=>$searchModel,
                                         'attribute'=>'pay_date',
                                         'language' => 'ru',
-                                        'dateFormat' => 'dd-MM-yyyy',
+                                        'dateFormat' => 'dd.MM.yyyy',
                                         'options' =>['class' => 'form-control'],
                                         'clientOptions' => [
-                                            'defaultDate' => date('d-m-Y',time())
+                                            'defaultDate' => date('d.m.Y',time())
                                         ],
                                     ]),
-                                'format' => 'raw',
+                                'format' => 'date',
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',
