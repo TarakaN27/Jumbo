@@ -54,12 +54,13 @@
             <th><?=Yii::t('app/reports','Production BYR')?></th>
             <th><?=Yii::t('app/reports','Tax BYR')?></th>
             <th><?=Yii::t('app/reports','Payment calc condition')?></th>
+            <th><?=Yii::t('app/reports','Condition currency')?></th>
         </tr>
     </thead>
     <tbody>
 <?php foreach($model['data'] as $key => $data):?>
         <tr style="background-color:#f9f9f9">
-            <td colspan="10">
+            <td colspan="11">
                 <?=$key;?>
             </td>
         </tr>
@@ -95,7 +96,10 @@
                     <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A';?>
             </td>
             <td>
-                <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
+                    <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
+            </td>
+            <td>
+                    <?=isset($model['condCurr'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt->id]) : 'N/A';?>
             </td>
         </tr>
         <?php endforeach;
