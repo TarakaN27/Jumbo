@@ -93,6 +93,7 @@ class PaymentsReportForm extends Model{
             'data' => [],
             'excelLink' => '',
             'currency' => [],
+            'condCurr' => [],
             'docxLink' => '',
             'iSumTotal' => 0,
             'iProfitTotal' => 0,
@@ -101,6 +102,7 @@ class PaymentsReportForm extends Model{
             'summControll' => 0
         ];
         $arCurr = [];
+        $arCondCurr = [];
         /** @var Payments $dt */
         foreach($data as $dt)
         {
@@ -113,10 +115,22 @@ class PaymentsReportForm extends Model{
                 $iCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$dt->currency_id);
                 $arCurr[$date][$dt->currency_id] = $iCurr;
             }
+            $iCondCurr = 0;
+            if(is_object($calc=$dt->calculate) && is_object($cond = $calc->payCond))
+            {
+                if(isset($arCurr[$date]) && isset($arCurr[$date][$cond->cond_currency]))
+                {
+                    $iCondCurr = $arCurr[$date][$cond->cond_currency];
+                }else{
+                    $iCondCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$cond->cond_currency);
+                    $arCurr[$date][$cond->cond_currency] = $iCondCurr;
+                }
+            }
 
             $arResult['data'][$date][] = $dt;
             $arResult['iSumTotal']+= ($dt->pay_summ*$iCurr);
             $arResult['currency'][$dt->id] = $iCurr;
+            $arResult['condCurr'][$dt->id] = $iCondCurr;
             if(is_object($tmp = $dt->calculate))
             {
                 $arResult['iProfitTotal']+=$tmp->profit;
