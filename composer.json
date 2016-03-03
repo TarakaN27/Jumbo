@@ -32,7 +32,8 @@
         "gears/pdf": "*",
         "linslin/yii2-curl": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "yiisoft/yii2-redis": "~2.0"
+        "yiisoft/yii2-redis": "~2.0",
+        "kartik-v/yii2-field-range": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

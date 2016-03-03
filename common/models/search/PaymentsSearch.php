@@ -13,6 +13,10 @@ use common\models\Payments;
  */
 class PaymentsSearch extends Payments
 {
+    public
+        $from_date,
+        $to_date;
+
     /**
      * @inheritdoc
      */
@@ -21,7 +25,13 @@ class PaymentsSearch extends Payments
         return [
             [['id', 'cuser_id','currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
             [['pay_summ'], 'number'],
-            [['pay_date','description','payment_order'], 'safe'],
+            [[
+                'pay_date',
+                'description',
+                'payment_order',
+                'from_date',
+                'to_date',
+            ], 'safe'],
             [['pay_date'], 'default', 'value' => null],
         ];
     }
@@ -75,6 +85,12 @@ class PaymentsSearch extends Payments
 
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
+
+        if(!empty($this->from_date))
+            $query->andWhere(" pay_date >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:01')]);
+
+        if(!empty($this->to_date))
+            $query->andWhere(" pay_date <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
 
         $query->andFilterWhere([
             'id' => $this->id,

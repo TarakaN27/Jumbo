@@ -109,17 +109,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => function($model){
                                         return $model->getFormatedPayDate();
                                     },
-                                'filter' => \yii\jui\DatePicker::widget([
-
-                                        'model'=>$searchModel,
-                                        'attribute'=>'pay_date',
-                                        'language' => 'ru',
-                                        'dateFormat' => 'dd-MM-yyyy',
-                                        'options' =>['class' => 'form-control'],
-                                        'clientOptions' => [
-                                            'defaultDate' => date('d-m-Y',time())
-                                        ],
-                                    ]),
+                                'filter' => \kartik\date\DatePicker::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'from_date',
+                                    'attribute2' => 'to_date',
+                                    'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
+                                    'options2' => ['placeholder' => Yii::t('app/crm','End date')],
+                                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                    'separator' => '-',
+                                    'pluginOptions' => [
+                                        //'autoclose' => true,
+                                        'format' => 'dd.mm.yyyy',
+                                        'defaultDate' => date('d.m.Y',time())
+                                    ],
+                                ]),
                                 'format' => 'raw',
                             ],
                             [

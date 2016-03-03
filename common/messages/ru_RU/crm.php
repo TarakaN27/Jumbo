@@ -240,5 +240,7 @@ return [
 	'Go to task' => 'Перейти к задаче',
 	'Go to contact' => 'Перейти к контакту',
 	'Go to company' => 'перейти к компании',
-	'Accept task' => 'Принять задачу'
+	'Accept task' => 'Принять задачу',
+	'Begin date' => 'От',
+	'End date' => 'До'
 ];
