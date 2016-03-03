@@ -72,7 +72,7 @@ class BillsSearch extends Bills
             'docx_tmpl_id' => $this->docx_tmpl_id,
             'amount' => $this->amount,
             'bill_number' => $this->bill_number,
-            'bill_date' => date('Y-m-d',strtotime($this->bill_date)),
+            //'bill_date' => $this->bill_date,
             'bill_template' => $this->bill_template,
             'use_vat' => $this->use_vat,
             'vat_rate' => $this->vat_rate,
@@ -80,6 +80,11 @@ class BillsSearch extends Bills
             'updated_at' => $this->updated_at,
         ]);
 
+        if(!empty($this->bill_date))
+            $query->andFilterWhere([
+                'bill_date' => date('Y-m-d',strtotime($this->bill_date))
+            ]);
+        
         $query->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'object_text', $this->object_text])
             ->andFilterWhere(['like', 'buy_target', $this->buy_target]);
