@@ -76,7 +76,10 @@
                      <?=is_object($serv=$dt->service) ? $serv->name : 'N/A';?>
             </td>
             <td>
-                    <?=Yii::$app->formatter->asDecimal($dt->pay_summ);?>
+                    <?=\yii\helpers\Html::a(Yii::$app->formatter->asDecimal($dt->pay_summ),
+                        ['/bookkeeping/default/view','id' => $dt->id],
+                        ['target' =>'_blank']
+                        );?>
             </td>
             <td>    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
             <td>
