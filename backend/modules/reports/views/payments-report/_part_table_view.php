@@ -59,7 +59,7 @@
     <tbody>
 <?php foreach($model['data'] as $key => $data):?>
         <tr style="background-color:#f9f9f9">
-            <td colspan="7">
+            <td colspan="10">
                 <?=$key;?>
             </td>
         </tr>
