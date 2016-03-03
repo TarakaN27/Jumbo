@@ -359,6 +359,7 @@ class TaskController extends AbstractBaseBackendController
         $model->created_by = $iUserID;  //кто создал задачу
         $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $model->status = CrmTask::STATUS_OPENED; //статус
+        $model->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
         $data = [];
         $obFile = new CrmCmpFile();
 

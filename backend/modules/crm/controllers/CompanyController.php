@@ -197,6 +197,7 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
 		$modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
 		$modelTask->cmp_id = $id;   //вешаем компанию
+		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
 		$data = [];
 
 		/**
