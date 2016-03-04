@@ -71,13 +71,21 @@ class DefaultController extends AbstractBaseBackendController
     {
         $searchModel = new PaymentsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
         $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
+
+        foreach($arTotal as &$total)
+        {
+            $total = Yii::$app->formatter->asDecimal($total);
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'cuserDesc' => $cuserDesc
+            'cuserDesc' => $cuserDesc,
+            'arTotal' => $arTotal
         ]);
     }
 

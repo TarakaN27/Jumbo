@@ -67,19 +67,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'attribute' => 'bill_date',
+                        'format' => 'date',
                         'filter' => \kartik\date\DatePicker::widget([
-                                'model' => $searchModel,
-                                'attribute' => 'bill_date',
-                                'type' =>\kartik\date\DatePicker::TYPE_INPUT,
-                                'options' => [
-                                    'class' => 'form-control'
-                                ],
-                                'pluginOptions' => [
-                                    'autoclose' => TRUE,
-                                    'format' => 'yyyy-mm-dd',
-                                    'defaultDate' => date('Y-m-d', time())
-                                ]
-                            ])
+                            'model' => $searchModel,
+                            'attribute' => 'from_date',
+                            'attribute2' => 'to_date',
+                            'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
+                            'options2' => ['placeholder' => Yii::t('app/crm','End date')],
+                            'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                            'separator' => '-',
+                            'pluginOptions' => [
+                                //'autoclose' => true,
+                                'format' => 'dd.mm.yyyy',
+                                'defaultDate' => date('d.m.Y',time())
+                            ],
+                        ]),
                     ],
                     [
                         'attribute' => 'docx_tmpl_id',
@@ -138,6 +140,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
             ]); ?>
+                <div class="col-md-4 ">
+                    <?php if(!empty($iTotal)):?>
+                        <?=Html::tag('h3',Yii::t('app/crm','Total').' <small>'.$iTotal.'</small>')?>
+                    <?php endif;?>
+                </div>
             </div>
         </div>
     </div>

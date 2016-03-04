@@ -118,7 +118,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         */
                         'parent_id',
-                        'created_at:date',
+                        //'created_at:date',
+                        [
+                            'attribute' => 'created_at',
+                            'format' => 'date',
+                            'filter' => \kartik\date\DatePicker::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'from_date',
+                                'attribute2' => 'to_date',
+                                'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
+                                'options2' => ['placeholder' => Yii::t('app/crm','End date')],
+                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                'separator' => '-',
+                                'pluginOptions' => [
+                                    //'autoclose' => true,
+                                    'format' => 'dd.mm.yyyy',
+                                    'defaultDate' => date('d.m.Y',time())
+                                ],
+                            ]),
+                        ],
 
 
                         //'payment_id',
@@ -143,7 +161,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         */
                     ],
                 ]); ?>
-                        </div>
+                <div class="col-md-4 col-md-offset-8">
+                    <?php if(!empty($arTotal)):?>
+                        <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
+                        <table class="table table-striped table-bordered">
+                            <?php foreach($arTotal as $key => $value):?>
+                                <tr>
+                                    <th><?=$key;?></th>
+                                    <td><?=Yii::$app->formatter->asDecimal($value);?></td>
+                                </tr>
+                            <?php endforeach;?>
+                        </table>
+                    <?php endif;?>
+                </div>
+            </div>
         </div>
     </div>
 </div>

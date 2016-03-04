@@ -107,7 +107,24 @@ $('#sendActID').on('click',sendActs);
                             },
                             'filter' => \common\models\Services::getServicesMap()
                         ],
-                        'act_date',
+                        [
+                            'attribute' => 'act_date',
+                            'format' => 'date',
+                            'filter' => \kartik\date\DatePicker::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'from_date',
+                                'attribute2' => 'to_date',
+                                'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
+                                'options2' => ['placeholder' => Yii::t('app/crm','End date')],
+                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                'separator' => '-',
+                                'pluginOptions' => [
+                                    //'autoclose' => true,
+                                    'format' => 'dd.mm.yyyy',
+                                    'defaultDate' => date('d.m.Y',time())
+                                ],
+                            ]),
+                        ],
                         [
                             'attribute' => 'sent',
                             'value' => function($model){
@@ -148,6 +165,11 @@ $('#sendActID').on('click',sendActs);
                         ],
                     ],
                 ]); ?>
+                <div class="col-md-4 ">
+                    <?php if(!empty($iTotal)):?>
+                        <?=Html::tag('h3',Yii::t('app/crm','Total').' <small>'.$iTotal.'</small>')?>
+                    <?php endif;?>
+                </div>
                         </div>
         </div>
     </div>

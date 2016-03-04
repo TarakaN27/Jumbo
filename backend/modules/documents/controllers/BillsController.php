@@ -59,10 +59,11 @@ class BillsController extends AbstractBaseBackendController
     {
         $searchModel = new BillsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $iTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'iTotal' => $iTotal
         ]);
     }
 

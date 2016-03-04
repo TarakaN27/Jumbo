@@ -29,7 +29,6 @@ $gridView = [
             }
         }
     ],
-    'amount',
     [
         'attribute' => 'service_id',
         'value' => function($model){
@@ -59,10 +58,21 @@ $gridView = [
     ],
     [
         'attribute' => 'created_at',
-        'format' => 'html',
-        'value' => function($model){
-            return Yii::$app->formatter->asDatetime($model->created_at);
-        }
+        'format' => 'datetime',
+        'filter' => \kartik\date\DatePicker::widget([
+            'model' => $searchModel,
+            'attribute' => 'from_date',
+            'attribute2' => 'to_date',
+            'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
+            'options2' => ['placeholder' => Yii::t('app/crm','End date')],
+            'type' => \kartik\date\DatePicker::TYPE_RANGE,
+            'separator' => '-',
+            'pluginOptions' => [
+                //'autoclose' => true,
+                'format' => 'dd.mm.yyyy',
+                'defaultDate' => date('d.m.Y',time())
+            ],
+        ]),
     ],
 ];
 
@@ -85,35 +95,6 @@ if(!Yii::$app->user->isManager())
         'template' => '{view}'
     ];
 }
-/*
-$this->registerJs("
-    $('table').on('click','.paid-control',function(){
-        var
-            id = $(this).attr('data-id'),
-            paidControl = $('.paid-control[data-id = \"'+id+'\"]');
-        console.log(id);
-        $.ajax({
-       type: \"POST\",
-       url: '".\yii\helpers\Url::to(['change-paid'])."',
-       data: { pk: id},
-       dataType: 'json',
-       success: function(msg){
-            if(msg == 1)
-            {
-                paidControl.removeClass('paid-red');
-                paidControl.addClass('paid-green');
-            }else{
-                paidControl.removeClass('paid-green');
-                paidControl.addClass('paid-red');
-            }
-       },
-       error: function(err){
-        alert('Error');
-       }
-     });
-    });
-",\yii\web\View::POS_READY);
-*/
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -131,6 +112,19 @@ $this->registerJs("
                 'filterModel' => $searchModel,
                 'columns' => $gridView,
             ]); ?>
+                <div class="col-md-4 col-md-offset-8">
+                    <?php if(!empty($arTotal)):?>
+                        <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
+                        <table class="table table-striped table-bordered">
+                            <?php foreach($arTotal as $key => $value):?>
+                                <tr>
+                                    <th><?=$key;?></th>
+                                    <td><?=Yii::$app->formatter->asDecimal($value);?></td>
+                                </tr>
+                            <?php endforeach;?>
+                        </table>
+                    <?php endif;?>
+                </div>
             </div>
         </div>
     </div>

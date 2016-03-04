@@ -58,9 +58,12 @@ class PromisedPaymentController extends AbstractBaseBackendController
         $searchModel = new PromisedPaymentSearch($arSearchParam);
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $arTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'arTotal' => $arTotal
         ]);
     }
 

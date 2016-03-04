@@ -144,4 +144,12 @@ class Services extends AbstractActiveRecord
     {
         return $this->hasOne(BUser::className(),['id' => 'b_user_enroll']);
     }
+
+    /**
+     * @return string
+     */
+    public function getNameWithEnrollUnit()
+    {
+        return $this->name.' ['.$this->enroll_unit.']';
+    }
 }

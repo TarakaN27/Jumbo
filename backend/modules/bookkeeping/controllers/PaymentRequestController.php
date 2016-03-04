@@ -71,16 +71,25 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
 
+        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,['status' => PaymentRequest::STATUS_NEW]);
+
         $arRedisPaymentRequest = RedisNotification::getPaymentRequestListForUser(Yii::$app->user->id);
 
         $cuserDesc = empty($searchModel->cntr_id) ? '' : \common\models\CUser::findOne($searchModel->cntr_id)->getInfoWithSite();
         $buserDesc = empty($searchModel->owner_id) ? '' : BUser::findOne($searchModel->owner_id)->getFio();
+
+        foreach($arTotal as &$total)
+        {
+            $total = Yii::$app->formatter->asDecimal($total);
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'arRedisPaymentRequest' => $arRedisPaymentRequest,
             'cuserDesc' => $cuserDesc,
-            'buserDesc' => $buserDesc
+            'buserDesc' => $buserDesc,
+            'arTotal' => $arTotal
         ]);
     }
 

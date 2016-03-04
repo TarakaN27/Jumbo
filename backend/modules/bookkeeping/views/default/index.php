@@ -106,9 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'pay_date',
-                                'value' => function($model){
-                                        return $model->getFormatedPayDate();
-                                    },
+                                'format' => 'date',
                                 'filter' => \kartik\date\DatePicker::widget([
                                     'model' => $searchModel,
                                     'attribute' => 'from_date',
@@ -123,7 +121,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'defaultDate' => date('d.m.Y',time())
                                     ],
                                 ]),
-                                'format' => 'raw',
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',
@@ -135,6 +132,19 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ],
                     ]); ?>
+                <div class="col-md-4 col-md-offset-8">
+                    <?php if(!empty($arTotal)):?>
+                    <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
+                        <table class="table table-striped table-bordered">
+                            <?php foreach($arTotal as $key => $value):?>
+                                <tr>
+                                    <th><?=$key;?></th>
+                                    <td><?=$value;?></td>
+                                </tr>
+                            <?php endforeach;?>
+                        </table>
+                    <?php endif;?>
+                </div>
             </div>
         </div>
     </div>

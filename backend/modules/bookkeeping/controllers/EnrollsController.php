@@ -66,7 +66,8 @@ class EnrollsController extends Controller
             ];
         }
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addQuery,$addParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addQuery,$addParams); //table render data
+        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,$addQuery,$addParams); //total table render data
         $cuserDesc = '';
         if(!empty($searchModel->cuser_id))
         {
@@ -74,25 +75,6 @@ class EnrollsController extends Controller
             if($obUser)
                 $cuserDesc = $obUser->getInfo();
         }
-
-        $arTotal = [];
-
-        foreach($dataProvider->getModels() as $item)
-        {
-            /** @var Services $obServ */
-            $obServ = $item->service;
-            if(is_object($obServ))
-            {
-                $idKey = !empty($obServ->enroll_unit) ? $obServ->enroll_unit : 'na';
-                if(isset($arTotal[$idKey]))
-                {
-                    $arTotal[$idKey]+=$item->amount;
-                }else{
-                    $arTotal[$idKey]=$item->amount;
-                }
-            }
-        }
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
