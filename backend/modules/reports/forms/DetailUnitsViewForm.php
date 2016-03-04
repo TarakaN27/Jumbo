@@ -27,7 +27,7 @@ class DetailUnitsViewForm extends Model{
     {
         return [
             [['dateFrom','dateTo'],'required'],
-            [['dateFrom','dateTo'],'date','format' => 'yyyy-M-d'],
+            [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
             [['manID'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];

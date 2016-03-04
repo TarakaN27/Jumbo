@@ -142,7 +142,7 @@ class CrmTaskSearch extends CrmTask
         ]);
 
         if(!empty($this->deadline))
-            $query->andWhere("DATE_FORMAT(deadline, '%Y-%m-%d') = :deadline",['deadline' => $this->deadline]);
+            $query->andWhere("DATE_FORMAT(deadline, '%d.%m.%Y') = :deadline",['deadline' => $this->deadline]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'description', $this->description]);

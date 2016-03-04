@@ -25,6 +25,7 @@ class PartnerProfitCounterShare
 	 */
 	public function countingProfitForPartner($pID,$cID,$servID,$date)
 	{
+		$date = date('Y-m-d',strtotime($date));
 		$arActs = $this->getActs($cID,$servID,$date);
 		if(empty($arActs))
 			return TRUE; //нечего добавлять

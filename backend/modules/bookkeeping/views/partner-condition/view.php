@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'min_amount',
                                 'max_amount',
                                 'percent',
-                                'start_date',
+                                'start_date:date',
                                 [
                                     'attribute' => 'created_at',
                                     'format' => 'html',

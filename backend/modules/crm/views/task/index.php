@@ -161,10 +161,10 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 'model'=>$searchModel,
                 'attribute'=>'deadline',
                 'language' => 'ru',
-                'dateFormat' => 'yyyy-MM-dd',
+                'dateFormat' => 'dd-MM-yyyy',
                 'options' =>['class' => 'form-control'],
                 'clientOptions' => [
-                    'defaultDate' => date('y-m-d',time())
+                    'defaultDate' => date('d-m-Y',time())
                 ],
             ]),
             'value' => function($model){
@@ -187,7 +187,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 }else{
                     return NULL;
                 }
-                return Html::tag('span',$model->deadline,$options);
+                return Html::tag('span',Yii::$app->formatter->asDatetime($model->deadline),$options);
             }
         ],
         [
@@ -333,10 +333,10 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 'model'=>$searchModel,
                 'attribute'=>'deadline',
                 'language' => 'ru',
-                'dateFormat' => 'yyyy-MM-dd',
+                'dateFormat' => 'dd.MM.yyyy',
                 'options' =>['class' => 'form-control'],
                 'clientOptions' => [
-                    'defaultDate' => date('y-m-d',time())
+                    'defaultDate' => date('d.m.Y',time())
                 ],
             ]),
             'value' => function($model){
@@ -359,7 +359,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 }else{
                     return NULL;
                 }
-                return Html::tag('span',$model->deadline,$options);
+                return Html::tag('span',Yii::$app->formatter->asDatetime($model->deadline),$options);
             }
         ],
         [

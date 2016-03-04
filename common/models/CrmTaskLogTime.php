@@ -50,7 +50,7 @@ class CrmTaskLogTime extends AbstractActiveRecord
             [['task_id','buser_id'],'required'],
             [['task_id', 'buser_id', 'spend_time', 'created_at', 'updated_at','hour','minutes'], 'integer'],
             [['description','log_date'], 'string'],
-            ['log_date', 'date', 'format' => 'php:Y-m-d'],
+            //['log_date', 'date', 'format' => 'php:Y-m-d'],
             [['hour','minutes'],'integer','min' => 0],
             ['hour','integer','max' => 24],
             ['minutes','integer','max' => 60],
@@ -116,6 +116,9 @@ class CrmTaskLogTime extends AbstractActiveRecord
         {
             $this->spend_time = (int)($this->hour*3600) + (int)($this->minutes*60);
         }
+
+        if(!empty($this->log_date))
+            $this->log_date = date('Y-m-d',strtotime($this->log_date));
 
         return parent::beforeSave($insert);
     }

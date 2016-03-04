@@ -200,7 +200,9 @@ return [
     'Condition info' => 'Информация по условиям',
     'Not enough amount for create partition request' => 'Не достаточно единиц для создания подзапроса на зачисление',
     'Parent request' => 'ID родительского запроса',
-    'Partial enrollment' => 'Частичное зачисление'
+    'Partial enrollment' => 'Частичное зачисление',
+    'Contract number' => 'Номер контракта',
+    'Contract date' => 'Дата контракта'
 
 
 

@@ -74,7 +74,7 @@ class Acts extends AbstractActiveRecord
                 'updated_at','genFile'], 'integer'],
             [['act_date','entityFields'], 'safe'],
             [['ask'],'unique'],
-            [['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
+            //[['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
             [['amount','ask','contract_num'], 'string', 'max' => 255],
             ['file_name','file','on' => ['insert', 'update'],'when' => function($model) {
                 return !$model->genFile;
@@ -194,6 +194,10 @@ class Acts extends AbstractActiveRecord
                     throw new ServerErrorHttpException('Can not create document.');
                 $this->file_name = $fileName;
             }
+
+            $this->act_date = date('Y-m-d',strtotime($this->act_date));
+            $this->contract_date = date('Y-m-d',strtotime($this->contract_date));
+
             return TRUE;
         }
 

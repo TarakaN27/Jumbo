@@ -157,7 +157,7 @@ $this->registerJs("
                                     </tr>
                                     <tr>
                                         <th><?= Yii::t('app/crm','Deadline');?></th>
-                                        <td><?=$model->deadline;?></td>
+                                        <td><?=Yii::$app->formatter->asDatetime($model->deadline);?></td>
                                     </tr>
                                     <tr>
                                         <th><?= Yii::t('app/crm','Status');?></th>

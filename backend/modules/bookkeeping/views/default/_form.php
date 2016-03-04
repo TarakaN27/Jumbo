@@ -212,9 +212,9 @@ $this->registerJs('
         ]); ?>
 
     <?= $form->field($model, 'pay_date')->widget(DatePicker::className(),[
-        'dateFormat' => 'dd-MM-yyyy',
+        'dateFormat' => 'dd.MM.yyyy',
         'clientOptions' => [
-            'defaultDate' => date('d-m-Y',time())
+            'defaultDate' => date('d.m.Y',time())
         ],
         'options' => [
             'class' => 'form-control'

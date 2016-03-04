@@ -40,10 +40,10 @@ $this->title = Yii::t('app/services', 'Services default contacts');
 												'name' => 'date['.$key.']',
 												'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
 												'value' => isset($arDC[$key]) ?
-													$arDC[$key]->cont_date : NULL,
+													(empty($arDC[$key]->cont_date) ? NULL : Yii::$app->formatter->asDate($arDC[$key]->cont_date)) : NULL,
 												'pluginOptions' => [
 													'autoclose'=>true,
-													'format' => 'yyyy-m-dd'
+													'format' => 'dd.m.yyyy'
 												]
 											]);?></td>
 									</tr>

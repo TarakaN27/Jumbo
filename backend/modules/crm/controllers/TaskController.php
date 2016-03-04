@@ -135,7 +135,7 @@ class TaskController extends AbstractBaseBackendController
         $obWatcher = new CrmTaskWatcher(); //наблюдатели
         $obWatcher->task_id = (int)$id;
 
-        $obLogWork = new CrmTaskLogTime(['log_date' => date('Y-m-d',time()),'task_id' => $model->id]); //модель для добавления времени
+        $obLogWork = new CrmTaskLogTime(['log_date' => date('d.m.Y',time()),'task_id' => $model->id]); //модель для добавления времени
         $obLogWork->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
 
         $obFile = new CrmCmpFile(); //модель для добавления файлов
@@ -406,6 +406,8 @@ class TaskController extends AbstractBaseBackendController
         if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //редактировать задачу может только автор
             throw new ForbiddenHttpException();
 
+        if(!empty($model->deadline))
+            $model->deadline = Yii::$app->formatter->asDatetime($model->deadline);
         $arAccOb = $model->busersAccomplices;
         $arAccObOld = [];
         $data = [];
@@ -558,6 +560,8 @@ class TaskController extends AbstractBaseBackendController
             throw new NotFoundHttpException();
 
         $model->setScenario(CrmTaskLogTime::SCENARIO_UPDATE);
+        if(!empty($model->log_date))
+            $model->log_date = Yii::$app->formatter->asDate($model->log_date);
 
         if($model->load(Yii::$app->request->post()) && $model->save())
         {

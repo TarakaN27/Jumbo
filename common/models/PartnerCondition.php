@@ -69,4 +69,16 @@ class PartnerCondition extends AbstractActiveRecord
             ],
         ]);
     }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(!empty($this->start_date))
+            $this->start_date = date('Y-m-d',strtotime($this->start_date));
+
+        return parent::beforeSave($insert);
+    }
 }

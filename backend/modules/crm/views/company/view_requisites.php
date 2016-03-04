@@ -478,7 +478,7 @@ use yii\widgets\DetailView;
 							<td><?=$serv;?></td>
 							<td><?=isset($arCSC[$key]) ? $arCSC[$key]->cont_number : NULL;?>
 							</td>
-							<td style="width: 30%;"><?=isset($arCSC[$key]) ? $arCSC[$key]->cont_date : NULL;?></td>
+							<td style="width: 30%;"><?=isset($arCSC[$key]) ? Yii::$app->formatter->asDate($arCSC[$key]->cont_date) : NULL;?></td>
 						</tr>
 					<?php endforeach;?>
 				</table>

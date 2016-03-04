@@ -31,7 +31,7 @@ margin-top:25px;
 			'type' => DatePicker::TYPE_COMPONENT_APPEND,
 			'pluginOptions' => [
 				'autoclose'=>true,
-				'format' => 'yyyy-mm-dd'
+				'format' => 'dd.mm.yyyy'
 			],
 		])?>
 	</div>

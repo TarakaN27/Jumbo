@@ -101,7 +101,7 @@ $('#enrollprocessform-repay').on('change',function(){
                                 ],
                                 [
                                     'attribute' => 'pay_date',
-                                    'value' => empty($model->pay_date) ? NULL : Yii::$app->formatter->asDatetime($model->pay_date)
+                                    'value' => empty($model->pay_date) ? NULL : Yii::$app->formatter->asDate($model->pay_date)
                                 ],
                                 [
                                     'attribute' => 'pay_amount',

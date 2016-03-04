@@ -68,4 +68,12 @@ class ServiceDefaultContract extends AbstractActiveRecordWTB
     {
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
     }
+
+    public function beforeSave($insert)
+    {
+        if(!empty($this->cont_date))
+            $this->cont_date = date('Y-m-d',strtotime($this->cont_date));
+
+        return parent::beforeSave($insert);
+    }
 }

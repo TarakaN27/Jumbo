@@ -58,8 +58,8 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         //'convertFormat' => true,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'yyyy-m-d h:i:s',
-            'startDate' => date('d-m-yyyy h:i',time()),
+            'format' => 'd.m.yyyy h:i:s',
+            'startDate' => date('d.m.yyyy h:i',time()),
             'todayHighlight' => true
         ]
     ]) ?>
