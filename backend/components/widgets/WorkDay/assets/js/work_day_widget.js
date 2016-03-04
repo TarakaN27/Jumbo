@@ -111,14 +111,20 @@ $(document).ready(function() {
         {
             return false;
         }
+        //костыль. moment js не принимал дату в формате d.m.Y H:i
+        var
+            end_time_tmp = end_time.val().split(" "),
+            date_tmp = end_time_tmp[0].split('.');
+        date_tmp = date_tmp.reverse();
+        end_time = date_tmp.join("-")+' '+end_time_tmp[1];
 
-        if(begin_time.val() > moment(end_time.val()).unix())
+        if(begin_time.val() > moment(end_time).unix())
         {
             addErrorNotify(WORK_DAY,WORK_DAY_ERROR_END_TIME);
             return false;
         }
 
-        if(moment().endOf('day').unix() < moment(end_time.val()).unix())
+        if(moment().endOf('day').unix() < moment(end_time).unix())
         {
             addErrorNotify(WORK_DAY,WORK_DAY_ERROR_END_TIME);
             return false;

@@ -52,14 +52,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \common\models\LegalPerson::getLegalPersonMap()
                         ],
-                        'summ_from',
-                        'summ_to',
+                        'summ_from:decimal',
+                        'summ_to:decimal',
                         [
                             'attribute' => 'currency_id',
                             'value' => function($model){
                                     return is_object($obCurr = $model->currency) ? $obCurr->code : 'N/A';
                                 },
                             'filter' => \common\models\ExchangeRates::getRatesCodes()
+                        ],
+                        [
+                            'attribute' => 'cond_currency',
+                            'value' => function($model){
+                                return is_object($obCC = $model->condCurrency) ? $obCC->code : 'N/A';
+                            }
                         ],
                         [
                             'attribute' => 'type',
