@@ -65,7 +65,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'cond_currency',
                             'value' => function($model){
                                 return is_object($obCC = $model->condCurrency) ? $obCC->code : 'N/A';
-                            }
+                            },
+                            'filter' => \common\models\ExchangeRates::getRatesCodes()
                         ],
                         [
                             'attribute' => 'type',

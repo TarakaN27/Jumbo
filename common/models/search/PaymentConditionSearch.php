@@ -18,7 +18,11 @@ class PaymentConditionSearch extends PaymentCondition
     public function rules()
     {
         return [
-            [['id', 'service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','type'], 'integer'],
+            [[
+                'id', 'service_id', 'l_person_id',
+                'is_resident', 'created_at',
+                'updated_at','type','currency_id','cond_currency'
+            ], 'integer'],
             [['name', 'description'], 'safe'],
             [['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],
         ];
