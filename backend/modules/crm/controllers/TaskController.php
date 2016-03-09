@@ -349,7 +349,10 @@ class TaskController extends AbstractBaseBackendController
             ->all();
 
         if(empty($arTaskID))
-            return NULL;
+            return $this->renderPartial('part/_woked_time_area',[
+                'obLog' => [],
+                'showTaskID' => TRUE
+            ]);
 
         $arIds = [];
         foreach($arTaskID as $task)

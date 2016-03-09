@@ -395,7 +395,7 @@ $this->registerJs("
                                     'obLog' => $obLog,
                                     ]);
                                 ?>
-                                <?php if(empty($model->parent_id)):?>
+                                <?php if(empty($model->parent_id) && $dataProviderChildtask->getTotalCount() > 0):?>
                                     <?=Html::tag('h4',Yii::t('app/crm','Sub task log work'))?>
                                     <?=Html::button(Yii::t('app/crm','Show child task log time'),[
                                         'id' => 'show_subtask_time',
