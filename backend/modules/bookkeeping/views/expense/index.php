@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
-                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <?= Html::a(Yii::t('app/book', 'Create Expense'), ['create'], ['class' => 'btn btn-success']) ?>
                                         <?php endif;?>
                                     </section>
@@ -105,7 +105,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         [
                                             'class' => 'yii\grid\ActionColumn',
                                             'template' => '{view}',
-                                            'visible' => Yii::$app->user->can('adminRights')
+                                            'visible' => Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')
                                         ],
                                         [
                                             'class' => 'yii\grid\ActionColumn',

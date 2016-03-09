@@ -18,7 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2><?= Html::encode($this->title) ?></h2>
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-                                    <?= Html::a(Yii::t('app/book','Create expense'),['create'],['class'=>'btn btn-primary']);?>
+                                    <?= Html::a(Yii::t('app/book','Create expense'),['create'],['class'=>'btn btn-success']);?>
+                                    <?php if(Yii::$app->user->can('adminRights')):?>
                                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                                     <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
                                         'class' => 'btn btn-danger',
@@ -27,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'method' => 'post',
                                         ],
                                     ]) ?>
-
+                                    <?php endif;?>
                                     </section>
                                     <div class = "clearfix"></div>
                                 </div>
