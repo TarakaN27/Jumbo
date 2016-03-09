@@ -127,7 +127,7 @@ return [
 	'Meeting' => 'Встреча',
 	'Call' => 'Звонок',
 	'Search for a contact ...' => 'Поиск контакта',
-	'Assign successfully changed' => 'Отвесттвенный успешно изменен',
+	'Assign successfully changed' => 'Ответственный успешно изменен',
 	'Can not change assign' => 'Не удалось сменить ответственного',
 	'Comments' => 'Комментарии',
 	'Spend time' => 'Затраченное время',
