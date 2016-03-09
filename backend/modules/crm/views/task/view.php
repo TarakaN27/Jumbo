@@ -94,7 +94,7 @@ $('.x_content').on('beforeSubmit', 'form#task_assigned_form', function () {
           return false;
      }
      var
-        showRole = ".Yii::$app->user->can('superRights').";
+        showRole = ".(Yii::$app->user->can('superRights') ? 'true':'false').";
 
      // submit form
      $.ajax({
