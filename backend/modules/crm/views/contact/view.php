@@ -205,7 +205,8 @@ $this->registerJs("
                                     'model' => $modelTask,
                                     'sAssName' => $sAssName,
                                     'data' => $data,
-                                    'hideContact' => TRUE
+                                    'hideContact' => TRUE,
+                                    'pTaskName' => '',
                                 ])?>
                             </div>
                         </div>

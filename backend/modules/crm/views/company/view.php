@@ -296,7 +296,8 @@ $this->registerJs("
 									'dataContact' => $dataContact,
 									'sAssName' => $sAssName,
 									'data' => $data,
-									'hideCuser' => TRUE
+									'hideCuser' => TRUE,
+									'pTaskName' => '',
 								])?>
 							</div>
 						</div>
