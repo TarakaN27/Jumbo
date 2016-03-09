@@ -206,6 +206,7 @@ class CrmTask extends AbstractActiveRecord
             ['status','default','value'=>self::STATUS_OPENED],
             [['arrAcc'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
+            ['parent_id','validateParent']
         ];
     }
 
@@ -241,6 +242,28 @@ class CrmTask extends AbstractActiveRecord
             'arrFiles' => Yii::t('app/crm', 'arrFiles'),
             'payment_request' => Yii::t('app/crm', 'Payment request')
         ];
+    }
+
+    /**
+     * @param $attribute
+     * @param $params
+     */
+    public function validateParent($attribute,$params)
+    {
+        if(!empty($this->parent_id))
+        {
+            if(CrmTask::find()->where(['id' => $this->parent_id])->andWhere('parent_id is not null or parent_id != 0')->exists())
+            {
+                $this->addErrors($attribute,Yii::t('app/crm','This task can not be parent'));
+            }
+        }
+        if(!$this->isNewRecord && !empty($this->parent_id))
+        {
+            if(CrmTask::find()->where(['parent_id' => $this->id])->exists())
+            {
+                $this->addErrors($attribute,Yii::t('app/crm','For this task can not set parent'));
+            }
+        }
     }
 
     /**
@@ -366,6 +389,14 @@ class CrmTask extends AbstractActiveRecord
     public function getPayRequest()
     {
         return $this->hasOne(PaymentRequest::className(),['id' => 'payment_request']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildTask()
+    {
+        return $this->hasMany(self::className(),['parent_id' => 'id']);
     }
 
     /**

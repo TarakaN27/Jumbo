@@ -219,5 +219,5 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .pdd-top-10{padding-top: 10px;}
 .message_wrapper .message img,
 .message_wrapper .message video,
-.msgBoxList .block_content .inner_dialog_section_msg img
-{max-width: 100%;}
+.msgBoxList .block_content .inner_dialog_section_msg img {max-width: 100%;}
+.wm-x-title{border-top: 2px solid #E6E9ED;  border-bottom: none;  padding-top: 10px;  margin-bottom: 0px;}

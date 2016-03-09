@@ -243,5 +243,13 @@ return [
 	'Accept task' => 'Принять задачу',
 	'Begin date' => 'От',
 	'End date' => 'До',
-	'Total' => 'Всего'
+	'Total' => 'Всего',
+	'Search for a task ...' => 'Поиск задачи id или название',
+	'This task can not be parent' => 'Задача не может быть родительской',
+	'For this task can not set parent' => 'Для задачи не может быть задана родительская задача',
+	'Child task' => 'Подзадачи',
+	'Parent task' => 'Родительская задача',
+	'Sub task successfully added' => 'Подзадача добавлена',
+	'Add sub task' => 'Добавить подзадачу',
+	'Sub tasks' => 'Подзадачи'
 ];

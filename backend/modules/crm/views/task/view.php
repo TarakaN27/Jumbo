@@ -248,6 +248,13 @@ $this->registerJs("
                                     <?=Yii::t('app/crm','Comments');?>
                                 </a>
                             </li>
+                            <?php if(empty($model->parent_id)):?>
+                                <li role="presentation" class="">
+                                    <a href="#tab_content5" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
+                                        <?=Yii::t('app/crm','Sub tasks');?>
+                                    </a>
+                                </li>
+                            <?php endif;?>
                             <li role="presentation" class="">
                                 <a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">
                                     <?=Yii::t('app/crm','Spend time');?>
@@ -258,6 +265,13 @@ $this->registerJs("
                                     <?=Yii::t('app/crm','History');?>
                                 </a>
                             </li>
+                            <?php if(empty($model->parent_id)):?>
+                                <li role="presentation" class="wm_right_tab">
+                                        <a href="#tab_content4" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
+                                            <h3 class="label label-primary"><?=Yii::t('app/crm','Add sub task');?></h3>
+                                        </a>
+                                </li>
+                            <?php endif;?>
                         </ul>
                         <div id="myTabContent" class="tab-content">
                             <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
@@ -266,6 +280,72 @@ $this->registerJs("
                                     'iTaskID' => $model->id
                                 ]);?>
                             </div>
+                            <?php if(empty($model->parent_id)):?>
+                                <div role="tabpanel" class="tab-pane fade" id="tab_content5" aria-labelledby="profile-tab">
+                                    <?=\yii\grid\GridView::widget([
+                                        'dataProvider' =>$dataProviderChildtask,
+                                        'columns' => [
+                                            'id',
+                                            [
+                                                'attribute' => 'title',
+                                                'format' => 'raw',
+                                                'value' => function($model){
+                                                    $options = ['class' => 'link-upd','target' => '_blank'];
+                                                    if($model->status == CrmTask::STATUS_CLOSE)
+                                                    {
+                                                        $options = ['class' => 'link-upd line-through','target' => '_blank'];
+                                                    }
+                                                    return Html::a($model->title,['view','id' => $model->id],$options);
+                                                }
+                                            ],
+                                            [
+                                                'attribute' => 'assigned_id',
+                                                'value' => function($model){
+                                                    return ($obUser = $model->assigned) ? $obUser->getFio() : 'N/A';
+                                                }
+                                            ],
+                                            [
+                                                'attribute' => 'deadline',
+                                                'format' => 'raw',
+                                                'value' => function($model){
+                                                    $options = [];
+                                                    if(!empty($model->deadline))
+                                                    {
+                                                        if(!in_array($model->status,[CrmTask::STATUS_NEED_ACCEPT,CrmTask::STATUS_CLOSE]))
+                                                        {
+                                                            $time = strtotime($model->deadline);
+                                                            $timeNow = time();
+                                                            if($time < $timeNow)
+                                                                $options = [
+                                                                    'class' => 'red'
+                                                                ];
+                                                            elseif($time < time()+4*3600)
+                                                                $options = [
+                                                                    'class' => 'yellow'
+                                                                ];
+                                                        }
+                                                    }else{
+                                                        return NULL;
+                                                    }
+                                                    return Html::tag('span',Yii::$app->formatter->asDatetime($model->deadline),$options);
+                                                }
+                                            ],
+                                            [
+                                                'attribute' => 'priority',
+                                                'value' => function($model){
+                                                    return $model->getPriorityStr();
+                                                }
+                                            ],
+                                            [
+                                                'attribute' => 'status',
+                                                'value' => function($model){
+                                                    return $model->getStatusStr();
+                                                }
+                                            ],
+                                        ]
+                                    ]);?>
+                                </div>
+                            <?php endif;?>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
                                 <!-- Затраченное время -->
                                 <?php echo $this->render('part/_woked_time_area',[
@@ -277,10 +357,21 @@ $this->registerJs("
                                 <!-- история -->
                                 <p>no history</p>
                             </div>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="profile-tab">
+                                <!-- подзадача -->
+                                <?php echo $this->render('../task/_form',[
+                                    'model' => $modelTask,
+                                    'contactDesc' => '',
+                                    'dataContact' => [],
+                                    'sAssName' => $sAssName,
+                                    'data' => [],
+                                    'hideCuser' => TRUE,
+                                    'hideParent' => TRUE,
+                                    'hideContact' => TRUE
+                                ])?>
+                            </div>
                         </div>
                     </div>
-
-
                 </div>
                 <!-- start project-detail sidebar -->
                 <div class="col-md-3 col-sm-3 col-xs-12">
@@ -330,6 +421,22 @@ $this->registerJs("
                                             echo  YII::t('app/crm','Quantity hours').' '.Html::tag('span',$item,$spanOpt);
                                         }
                                         ?>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                        </section>
+                    <?php endif;?>
+                    <?php if(is_object($obParent)):?>
+                        <section class="wm-side-bar-right">
+                            <div class="wm-x-title">
+                                <h2><?php echo Yii::t('app/crm','Parent task')?></h2>
+                                <ul class="right-bar-cmp">
+                                    <li>
+                                        <?=Html::a($obParent->title,['/crm/task/view','id' => $obParent->id],[
+                                            'target' => '_blank'
+                                        ]);?>
+
                                     </li>
                                 </ul>
                                 <div class="clearfix"></div>

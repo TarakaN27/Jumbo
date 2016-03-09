@@ -3,6 +3,7 @@
 namespace app\modules\crm\controllers;
 
 use backend\models\BUser;
+use common\components\helpers\CustomHelper;
 use common\components\notification\RedisNotification;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
@@ -17,6 +18,7 @@ use common\models\CrmTask;
 use common\models\search\CrmTaskSearch;
 use backend\components\AbstractBaseBackendController;
 use yii\base\InvalidParamException;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -110,9 +112,10 @@ class TaskController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        /** @var CrmTask $model */
         $model = CrmTask::find()
                  ->with(
-				  'cmp','contact',
+				  'cmp','contact','parent',
 				  'busersAccomplices','busersWatchers',
 				  'taskFiles','cmp.quantityHour'
 			  )
@@ -142,6 +145,16 @@ class TaskController extends AbstractBaseBackendController
         $obFile->setScenario('insert');
         $obFile->task_id = $id;
 
+        //Модель для задач
+        $modelTask = new CrmTask();
+        //дефолтные состояния
+        $modelTask->created_by = Yii::$app->user->id;  //кто создал задачу
+        $modelTask->assigned_id = Yii::$app->user->id; //по умолчанию вешаем сами на себя
+        $modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
+        $modelTask->cmp_id = $model->cmp_id;   //вешаем компанию
+        $modelTask->contact_id = $model->contact_id; //вешаем конаткт
+        $modelTask->parent_id = $model->id;
+        $modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
 
         $obTime = CrmTaskLogTime::find()->where([ //занесенное время
             'task_id' => $model->id,
@@ -211,6 +224,7 @@ class TaskController extends AbstractBaseBackendController
         /**
          * Смена ответсвенного.
          */
+        /*
         if($model->load(Yii::$app->request->post()))
         {
             if($model->save())
@@ -224,6 +238,7 @@ class TaskController extends AbstractBaseBackendController
                 return $this->redirect(['view','id' => $id]);
             }
         }
+        */
 
         /**
          * Добавление файла
@@ -241,6 +256,49 @@ class TaskController extends AbstractBaseBackendController
             }
         }
 
+        /**
+         * Добавление задачи
+         */
+        if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
+        {
+            if($modelTask->createTask(Yii::$app->user->id))
+            {
+                Yii::$app->session->addFlash('success',Yii::t('app/crm','Sub task successfully added'));
+                return $this->redirect(['view', 'id' => $id,'#' => 'tab_content5']);
+            }else{
+                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+                return $this->redirect(['view','id' => $id]);
+            }
+        }
+
+        $obParent = $model->parent;
+        $arChild = $model->childTask;
+        $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+
+        $queryChild = CrmTask::find()
+            ->alias('t')
+            ->select([
+                't.id',
+                't.title',
+                't.status',
+                't.deadline',
+                't.priority',
+                'assigned_id',
+                'as.fname',
+                'as.mname',
+                'as.lname'
+            ])
+            ->where(['parent_id' => $id])
+            ->joinWith('assigned as');
+
+
+        $dataProviderChildtask = new ActiveDataProvider([
+            'query' => $queryChild,
+            'sort'=> [
+                'defaultOrder' => ['status'=>SORT_ASC]
+            ],
+        ]);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
             'obAccmpl' => $obAccmpl,
@@ -255,9 +313,39 @@ class TaskController extends AbstractBaseBackendController
             'obFile' => $obFile,
             'arFile' => $arFile,
             'obCmp' => $obCmp,
-            'obCnt' => $obCnt
+            'obCnt' => $obCnt,
+            'obParent' => $obParent,
+            'arChild' => $arChild,
+            'sAssName' =>$sAssName,
+            'modelTask' => $modelTask,
+            'dataProviderChildtask' => $dataProviderChildtask
         ]);
     }
+
+    /**
+     * @param $id
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\base\ExitException
+     */
+    public function actionChangeAssigned($id)
+    {
+        $model = $this->findModel($id);
+
+        if($model->load(Yii::$app->request->post()))
+        {
+            if($model->save())
+            {
+                $model->updateUpdatedAt();
+                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
+                return Yii::$app->end(200);
+            }else{
+                throw new ServerErrorHttpException();
+            }
+        }
+        throw new ServerErrorHttpException();
+    }
+
 
     /**
      * @return mixed
@@ -378,10 +466,19 @@ class TaskController extends AbstractBaseBackendController
                 $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
             else
                 $cuserDesc = '';
+
             if(!empty($model->contact_id))
                 $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
             else
                 $contactDesc = '';
+
+            $pTaskName = '';
+            if(!empty($model->parent_id))
+            {
+                $obTask = CrmTask::findOne($model->parent_id);
+                if(!$obTask)
+                $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
+            }
 
             return $this->render('create', [
                 'model' => $model,
@@ -389,7 +486,8 @@ class TaskController extends AbstractBaseBackendController
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
                 'data' => $data,
-                'obFile' => $obFile
+                'obFile' => $obFile,
+                'pTaskName' => $pTaskName
             ]);
         }
     }
@@ -459,12 +557,22 @@ class TaskController extends AbstractBaseBackendController
                 $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
             else
                 $contactDesc = '';
+
+            $pTaskName = '';
+            if(!empty($model->parent_id))
+            {
+                $obTask = CrmTask::findOne($model->parent_id);
+                if($obTask)
+                    $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
+            }
+
             return $this->render('update', [
                 'model' => $model,
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
                 'sAssName' => $sAssName,
-                'data' => $data
+                'data' => $data,
+                'pTaskName' => $pTaskName
             ]);
         }
     }

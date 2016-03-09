@@ -8,10 +8,18 @@
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\web\JsExpression;
+
+$this->registerJs("
+
+
+
+",\yii\web\View::POS_READY);
 $form = ActiveForm::begin([
+	'id' => 'task_assigned_form',
 	'options' => [
 		'class' => 'text-left',
-		'enctype' => 'multipart/form-data'
+		'enctype' => 'multipart/form-data',
+		'onsubmit' => 'return false;'
 	],
 ]);
 ?>

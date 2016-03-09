@@ -41,6 +41,30 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
         ]
     ) ?>
 
+    <?php
+        if(!isset($hideParent))
+        echo $form->field($model,'parent_id')->widget(\kartik\select2\Select2::className(),[
+                'initValueText' => $pTaskName, // set the initial display text
+                'options' => [
+                    'placeholder' => Yii::t('app/crm','Search for a task ...')
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'minimumInputLength' => 2,
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-parent-crm-task']),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                ],
+            ]
+        )
+
+    ?>
+
     <div class = "form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="crmtask-time_estimate">
             <?=$model->getAttributeLabel('time_estimate')?>

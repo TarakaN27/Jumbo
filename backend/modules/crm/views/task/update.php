@@ -28,7 +28,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/crm', 'Update');
                     'cuserDesc' => $cuserDesc,
                     'contactDesc' => $contactDesc,
                     'sAssName' => $sAssName,
-                    'data' => $data
+                    'data' => $data,
+                    'pTaskName' => $pTaskName
                 ]) ?>
             </div>
         </div>

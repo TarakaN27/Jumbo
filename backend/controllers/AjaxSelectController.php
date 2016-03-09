@@ -11,7 +11,9 @@ namespace backend\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use common\components\helpers\CustomHelper;
 use common\models\CrmCmpContacts;
+use common\models\CrmTask;
 use common\models\CUser;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -42,6 +44,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 						'get-contractor' => ['post'],
 						'get-b-user' => ['post'],
 						'get-crm-contact' => ['post'],
+						'get-parent-crm-task' => ['post']
 					],
 				],
 			]
@@ -181,6 +184,45 @@ class AjaxSelectController extends AbstractBaseBackendController
 		elseif ($id > 0) {
 			$out['results'] = ['id' => $id, 'text' => CrmCmpContacts::findOne($id)->fio];
 		}
+		return $out;
+	}
+
+	public function actionGetParentCrmTask($q = null, $id = null)
+	{
+		$out = ['results' => ['id' => '', 'text' => '']];
+		if(!is_null($q))
+		{
+			$query = CrmTask::find()    //находим родительские задачи
+				->select(['id','title'])
+				->where('parent_id is null OR parent_id = 0');
+
+			if(!Yii::$app->user->can('adminRights'))    //если поьзователь не админ, то выдаем только свои таски
+				$query->andWhere(['created_by' => Yii::$app->user->id]);
+
+			$query->andWhere(' title LIKE :q OR id = :id');
+			$query->params([
+				':q' => '%'.$q.'%',
+				':id' => $q
+			]);
+
+			$query->limit(10);
+
+			$arTask = $query->all();
+
+			foreach($arTask as $task)
+			{
+				$out['results'] [] = [
+					'id' => $task->id,
+					'text' => $task->id.' - '.CustomHelper::cuttingString($task->title,100)
+				];
+			}
+
+			$out['results'] = array_values($out['results']);
+		}elseif($id > 0)
+		{
+			$out['results'] = ['id' => $id, 'text' => $id.' - '.CustomHelper::cuttingString(CrmTask::findOne($id)->title,100)];
+		}
+
 		return $out;
 	}
 }
