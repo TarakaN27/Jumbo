@@ -41,9 +41,24 @@ function() {
     );
 });
 $('.activity-update-link').removeClass('hidden');
+
+$('#show_subtask_time').on('click',function(){
+    $.ajax({
+          url: '".\yii\helpers\Url::to(['/crm/task/load-subtask-time','id' => $model->id])."',
+          type: 'post',
+          data: {},
+          success: function (res) {
+            $('#tab_content2').append(res);
+            $('#show_subtask_time').remove();
+          },
+          error: function(errorMsg){
+
+          }
+     });
+});
+
 ",\yii\web\View::POS_READY);
 $this->registerJs("
-
 $('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
      var form = $(this);
      // return false if form still have some validation errors
@@ -71,6 +86,35 @@ $('#activity-modal').on('beforeSubmit', 'form#EditLogWorkID', function () {
      });
      return false;
 });
+
+$('.x_content').on('beforeSubmit', 'form#task_assigned_form', function () {
+     var form = $(this);
+     // return false if form still have some validation errors
+     if (form.find('.has-error').length) {
+          return false;
+     }
+     var
+        showRole = ".Yii::$app->user->can('superRights').";
+
+     // submit form
+     $.ajax({
+          url: form.attr('action'),
+          type: 'post',
+          data: form.serialize(),
+          success: function (res) {
+            $('#task-ass-user').html(res.fio);
+            if(showRole)
+                $('#task-ass-role').html(res.role);
+            $('.assigned_block .close').trigger('click');
+		    addSuccessNotify(TASK,'".Yii::t('app/crm','Assign successfully changed')."');
+          },
+          error: function(errorMsg){
+          	addErrorNotify(TASK,'".Yii::t('app/crm','Can not change assign')."');
+          }
+     });
+     return false;
+});
+
 ");
 $this->registerJs("
 	$('.project_files').on('click','.delete-link',function(){
@@ -100,7 +144,6 @@ $this->registerJs("
 	    });
 	});
 ");
-
 ?>
 
 <?php Modal::begin([
@@ -352,24 +395,35 @@ $this->registerJs("
                                     'obLog' => $obLog,
                                     ]);
                                 ?>
+                                <?php if(empty($model->parent_id)):?>
+                                    <?=Html::tag('h4',Yii::t('app/crm','Sub task log work'))?>
+                                    <?=Html::button(Yii::t('app/crm','Show child task log time'),[
+                                        'id' => 'show_subtask_time',
+                                        'btn btn-default'
+                                    ])?>
+                                <?php endif;?>
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
                                 <!-- история -->
                                 <p>no history</p>
                             </div>
+                            <?php if(empty($model->parent_id)):?>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="profile-tab">
                                 <!-- подзадача -->
-                                <?php echo $this->render('../task/_form',[
-                                    'model' => $modelTask,
-                                    'contactDesc' => '',
-                                    'dataContact' => [],
-                                    'sAssName' => $sAssName,
-                                    'data' => [],
-                                    'hideCuser' => TRUE,
-                                    'hideParent' => TRUE,
-                                    'hideContact' => TRUE
-                                ])?>
+                                <?php
+                                    echo $this->render('../task/_form',[
+                                        'model' => $modelTask,
+                                        'contactDesc' => '',
+                                        'dataContact' => [],
+                                        'sAssName' => $sAssName,
+                                        'data' => [],
+                                        'hideCuser' => TRUE,
+                                        'hideParent' => TRUE,
+                                        'hideContact' => TRUE
+                                    ])
+                                ?>
                             </div>
+                            <?php endif;?>
                         </div>
                     </div>
                 </div>
@@ -480,7 +534,7 @@ $this->registerJs("
                     <section class="wm-side-bar-right">
                         <div class="x_title">
                             <h2><?php echo Yii::t('app/crm','Assigned At')?></h2>
-                            <ul class="nav navbar-right panel_toolbox">
+                            <ul class="nav navbar-right panel_toolbox assigned_block">
                                 <li>
                                     <?php
                                         \common\components\customComponents\Modal\CustomModal::begin([
@@ -509,10 +563,10 @@ $this->registerJs("
                                 <i class="fa fa-user aero"></i>
                             </a>
                             <div class="media-body" style="height: 50px;vertical-align: middle;">
-                                <p class="title"><?php echo is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned;?></p>
+                                <p class="title" id="task-ass-user"><?php echo is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned;?></p>
                                 <?php if(Yii::$app->user->can('superRights')):?>
                                 <p>
-                                    <small><?php echo is_object($obMan = $model->assigned) ? $obMan->getRoleStr() : 'N/A';?></small>
+                                    <small id="task-ass-role"><?php echo is_object($obMan = $model->assigned) ? $obMan->getRoleStr() : 'N/A';?></small>
                                 </p>
                                 <?php endif;?>
                             </div>

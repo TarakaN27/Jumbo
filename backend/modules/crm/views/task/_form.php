@@ -107,7 +107,8 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
             'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
             'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
         ],
-    ]) ?>
+    ])
+    ?>
 
     <?php
         echo

@@ -7,42 +7,35 @@
  */
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
-use yii\web\JsExpression;
+$this->registerCssFile('@web/css/select/select2.min.css');
+$this->registerJsFile('@web/js/select/select2.full.js',['depends' => [\yii\web\JqueryAsset::className()]]);
 
 $this->registerJs("
-
+$('#assigned_right_sidebar').select2({
+	data : ".\yii\helpers\Json::encode(\backend\models\BUser::getAllMembersMap()).",
+	theme : 'krajee'
+});
 
 
 ",\yii\web\View::POS_READY);
+
 $form = ActiveForm::begin([
 	'id' => 'task_assigned_form',
+	'action' => \yii\helpers\Url::to(['/crm/task/change-assigned','id' => $model->id]),
 	'options' => [
 		'class' => 'text-left',
 		'enctype' => 'multipart/form-data',
 		'onsubmit' => 'return false;'
-	],
+	]
 ]);
 ?>
 	<div class="row">
 		<div class="col-md-6">
-			<?php echo $form->field($model,'assigned_id')->widget(\kartik\select2\Select2::className(),[
-				'initValueText' => $sAssName, // set the initial display text
-				'options' => [
-					'placeholder' => Yii::t('app/crm','Search for a users ...')
-				],
-				'pluginOptions' => [
-					'allowClear' => true,
-					'minimumInputLength' => 2,
-					'ajax' => [
-						'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
-						'dataType' => 'json',
-						'data' => new JsExpression('function(params) { return {q:params.term}; }')
-					],
-					'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-					'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-					'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-				],
-			]); ?>
+			<?php echo $form->field($model,'assigned_id')->dropDownList(\backend\models\BUser::getAllMembersMap(),[
+				'id' => 'assigned_right_sidebar',
+				'class' => 'controll'
+			])
+			?>
 		</div>
 		<div class="col-md-6">
 			<div class="form-group text-right">

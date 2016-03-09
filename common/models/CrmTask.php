@@ -254,14 +254,14 @@ class CrmTask extends AbstractActiveRecord
         {
             if(CrmTask::find()->where(['id' => $this->parent_id])->andWhere('parent_id is not null or parent_id != 0')->exists())
             {
-                $this->addErrors($attribute,Yii::t('app/crm','This task can not be parent'));
+                $this->addError($attribute,Yii::t('app/crm','This task can not be parent'));
             }
         }
         if(!$this->isNewRecord && !empty($this->parent_id))
         {
             if(CrmTask::find()->where(['parent_id' => $this->id])->exists())
             {
-                $this->addErrors($attribute,Yii::t('app/crm','For this task can not set parent'));
+                $this->addError($attribute,Yii::t('app/crm','For this task can not set parent'));
             }
         }
     }

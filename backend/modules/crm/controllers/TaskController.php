@@ -19,6 +19,7 @@ use common\models\search\CrmTaskSearch;
 use backend\components\AbstractBaseBackendController;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -222,25 +223,6 @@ class TaskController extends AbstractBaseBackendController
         }
 
         /**
-         * Смена ответсвенного.
-         */
-        /*
-        if($model->load(Yii::$app->request->post()))
-        {
-            if($model->save())
-            {
-                $model->updateUpdatedAt();
-                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                Yii::$app->session->setFlash('success',Yii::t('app/crm','Assign successfully changed'));
-                return $this->redirect(['view','id' => $id]);
-            }else{
-                Yii::$app->session->setFlash('success',Yii::t('app/crm','Can not change assign'));
-                return $this->redirect(['view','id' => $id]);
-            }
-        }
-        */
-
-        /**
          * Добавление файла
          */
         if($obFile->load(Yii::$app->request->post()))
@@ -324,9 +306,9 @@ class TaskController extends AbstractBaseBackendController
 
     /**
      * @param $id
+     * @return int|string
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
-     * @throws \yii\base\ExitException
      */
     public function actionChangeAssigned($id)
     {
@@ -336,14 +318,49 @@ class TaskController extends AbstractBaseBackendController
         {
             if($model->save())
             {
+                Yii::$app->response->format = Response::FORMAT_JSON;
                 $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                return Yii::$app->end(200);
+                $obMan = $model->assigned;
+                if(!$obMan)
+                    return ['fio' => NULL,'role' => NULL];
+                else
+                    return ['fio' => $obMan->getFio(),'role' => $obMan->getRoleStr()];
+                return is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_id;
+
             }else{
                 throw new ServerErrorHttpException();
             }
         }
         throw new ServerErrorHttpException();
+    }
+
+    /**
+     * @param $id
+     * @return null|string
+     */
+    public function actionLoadSubtaskTime($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $arTaskID = (new Query())
+            ->select('id')
+            ->from(CrmTask::tableName())
+            ->where(['parent_id' => $id])
+            ->all();
+
+        if(empty($arTaskID))
+            return NULL;
+
+        $arIds = [];
+        foreach($arTaskID as $task)
+            $arIds[] = $task['id'];
+
+        $arLogs = CrmTaskLogTime::find()->where(['task_id' => $arIds])->all();
+
+        return $this->renderPartial('part/_woked_time_area',[
+            'obLog' => $arLogs,
+            'showTaskID' => TRUE
+        ]);
     }
 
 

@@ -251,5 +251,8 @@ return [
 	'Parent task' => 'Родительская задача',
 	'Sub task successfully added' => 'Подзадача добавлена',
 	'Add sub task' => 'Добавить подзадачу',
-	'Sub tasks' => 'Подзадачи'
+	'Sub tasks' => 'Подзадачи',
+	'Show child task log time' => 'Показать затраты подзадач',
+	'Sub task log work' => 'Затраты подзадач',
+	'Task ID' => 'ID задачи'
 ];
