@@ -120,6 +120,7 @@ class CompanyController extends AbstractBaseBackendController
 				$modelR->isResident = FALSE;
 
 			$modelR->contructor = $model->contractor;
+			$modelR->allow_expense = $model->allow_expense;
 			if($model->validate() && $modelR->validate())
 			{
 				$transaction = Yii::$app->db->beginTransaction(); //транзакция для того чтобы при ошибках сохранения не создавалось лишних записей

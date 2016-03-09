@@ -43,6 +43,7 @@ use yii\widgets\DetailView;
 							'attribute' => 'contractor',
 							'value' => $model->getContractorStr()
 						],
+						'allow_expense:boolean',
 						[
 							'attribute' => 'archive',
 							'value' => $model->getArchiveStr()

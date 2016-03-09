@@ -193,6 +193,15 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 					'class' => 'control-label'
 				]])->dropDownList(\common\models\CUser::getContractorArr())?>
 		</div>
+		<?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?=$form->field($model,'allow_expense', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])->dropDownList(\common\models\AbstractActiveRecord::getYesNo())?>
+		</div>
+		<?php endif;?>
 
 	</div>
 

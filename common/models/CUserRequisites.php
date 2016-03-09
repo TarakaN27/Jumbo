@@ -55,8 +55,9 @@ class CUserRequisites extends AbstractActiveRecord
         TYPE_I_PERSON = 15; // ИП
 
     public
-        $contructor = CUser::CONTRACTOR_NO,
-        $isResident = true;
+        $allow_expense = AbstractActiveRecord::NO,  //разрешить затраты по пользователю
+        $contructor = CUser::CONTRACTOR_NO,         //пользователь является контрагентом
+        $isResident = true;                         //пользователь резидент
 
     /**
      * @inheritdoc
@@ -256,7 +257,104 @@ class CUserRequisites extends AbstractActiveRecord
                 'url',
                 'pattern' => '/^{schemes}:\/\/(([а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)(\.[а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)+)/i'
             ],
-            ['description','string']
+            ['description','string'],
+
+
+            ///////////////////////для пользоватлей для которых разершены затраты
+            [
+                ['j_fname', 'j_lname', 'j_mname','type_id'],
+                'required',
+                'when' => function($model) {
+                    if(
+                        $this->allow_expense == AbstractActiveRecord::YES &&
+                        $this->contructor != CUser::CONTRACTOR_YES &&
+                        ($model->type_id == CUserRequisites::TYPE_I_PERSON || $model->type_id == CUserRequisites::TYPE_F_PERSON)
+                    )
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            typeID = $('#cuserrequisites-type_id input:checked').val(),
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."' && (typeID == '".CUserRequisites::TYPE_I_PERSON."' || typeID == '".CUserRequisites::TYPE_F_PERSON."' ) )
+                        {
+                            return true;
+                        }
+                        return false;
+                    }"
+            ],
+            ['p_address',
+                'required',
+                'when' => function($model) {
+                    if(
+                        $this->allow_expense == AbstractActiveRecord::YES &&
+                        $this->contructor != CUser::CONTRACTOR_YES &&
+                        ($model->type_id == CUserRequisites::TYPE_I_PERSON || $model->type_id == CUserRequisites::TYPE_F_PERSON)
+                    )
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            typeID = $('#cuserrequisites-type_id input:checked').val(),
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."' && (typeID == '".CUserRequisites::TYPE_I_PERSON."' || typeID == '".CUserRequisites::TYPE_F_PERSON."' ) )
+                        {
+                            return true;
+                        }
+                        return false;
+                    }"],
+            [['corp_name','j_address'],
+                'required',
+                'when' => function($model) {
+                    if(
+                        $this->allow_expense == AbstractActiveRecord::YES &&
+                        $this->contructor != CUser::CONTRACTOR_YES &&
+                        $model->type_id == CUserRequisites::TYPE_J_PERSON
+                    )
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            typeID = $('#cuserrequisites-type_id input:checked').val(),
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."' && typeID == '".CUserRequisites::TYPE_J_PERSON."')
+                        {
+                            return true;
+                        }
+                        return false;
+                    }"
+
+            ],
+            [
+                ['ch_account', 'b_name','b_code', 'p_address','ynp','bank_address'],
+                'required',
+                'when' => function($model) {
+                    if(
+                        $this->allow_expense == AbstractActiveRecord::YES &&
+                        $this->contructor != CUser::CONTRACTOR_YES &&
+                        ($model->type_id == CUserRequisites::TYPE_J_PERSON || $model->type_id == CUserRequisites::TYPE_I_PERSON )
+                    )
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            typeID = $('#cuserrequisites-type_id input:checked').val(),
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."' && (typeID == '".CUserRequisites::TYPE_I_PERSON."' || typeID == '".CUserRequisites::TYPE_J_PERSON."' ))
+                        {
+                            return true;
+                        }
+                        return false;
+                    }"
+            ]
         ];
     }
 

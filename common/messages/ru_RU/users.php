@@ -209,5 +209,7 @@ return [
     'Cuser Prospects' => 'Типы перспективности компаний',
     'Choose_user_prospects_type' => 'Выбрать перспективность компании',
     'Prospects' => 'Перспективность компании',
-    'Bank address' => 'Адрес банка'
+    'Bank address' => 'Адрес банка',
+    'Allow expense' => 'Разрешить затраты',
+    'Archive' => 'Архивная'
 ];

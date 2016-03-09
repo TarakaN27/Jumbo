@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'allowClear' => true,
                                                     'minimumInputLength' => 2,
                                                     'ajax' => [
-                                                        'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                                                        'url' => \yii\helpers\Url::to(['/ajax-select/get-expense-user']),
                                                         'dataType' => 'json',
                                                         'data' => new JsExpression('function(params) { return {q:params.term}; }')
                                                     ],
