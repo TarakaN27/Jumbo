@@ -58,13 +58,15 @@ class EnrollsController extends Controller
 
         $addQuery = [];
         $addParams = [];
+
         if(!Yii::$app->user->can('adminRights') && Yii::$app->user->can('only_bookkeeper'))
         {
-            $addQuery = '( buser_id = :user OR '.CUser::tableName().'.manager_id = :user OR '.Services::tableName().'.b_user_enroll = :user )';
+            $addQuery = '( buser_id = :user OR '.CUser::tableName().'.manager_id = :user OR serv.b_user_enroll = :user )';
             $addParams = [
                 ':user' => Yii::$app->user->id
             ];
         }
+
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addQuery,$addParams); //table render data
         $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,$addQuery,$addParams); //total table render data

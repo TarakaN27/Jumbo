@@ -92,7 +92,7 @@ class EnrollsSearch extends Enrolls
     {
 
         if(!empty($additionQuery))
-            $query->where($addParams);
+            $query->where($additionQuery);
 
         if(!empty($addParams))
             $query->params($addParams);
@@ -154,6 +154,8 @@ class EnrollsSearch extends Enrolls
     public function totalCount($params,$additionQuery = [],$addParams = [])
     {
         $query = Enrolls::find()->select(['amount','service_id']);
+        $query->joinWith('cuser');
+        $query->joinWith('service serv');
         $query = $this->queryHelper($query,$params,$additionQuery,$addParams);
         if(!$this->countTotal)
             return [];

@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'format' => 'html',
                                             'value' => function($model){
                                                     $name =  is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
-                                                    if(Yii::$app->user->can('adminRights'))
+                                                    if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'))
                                                         return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
                                                     else
                                                         return $name;
