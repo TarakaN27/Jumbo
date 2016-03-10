@@ -19,9 +19,9 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
         $date,
         $codeID;
 
-    public function __construct($codeID = NULL)
+    public function __construct($codeID = NULL,$time = NULL)
     {
-        $time = time(); //текущая дата
+        $time = is_null($time) ? time() : $time;
         $this->codeID = $codeID;
         $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $time) . '/' . date('m', $time) . '/' . date('Y', $time);
     }
