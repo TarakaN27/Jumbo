@@ -38,6 +38,7 @@ use common\components\entityFields\EntityFieldsTrait;
  * @property integer $contractor
  * @property integer $archive
  * @property integer $prospects_id
+ * @property integer $allow_expense
  */
 class CUser extends AbstractUser
 {
@@ -169,7 +170,11 @@ class CUser extends AbstractUser
     public function rules()
     {
         return [
-            [['role','status','created_at','updated_at','manager_id','is_opened','created_by','contractor'],'integer'],
+            [[
+                'role','status','created_at',
+                'updated_at','manager_id','is_opened',
+                'created_by','contractor','allow_expense'
+            ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
@@ -198,8 +203,24 @@ class CUser extends AbstractUser
             ['role', 'default', 'value' => self::ROLE_USER],
             ['role', 'in', 'range' => array_keys(self::getRoleArr())],
 
-            [['type'],'required'],
             [['type'],'integer'],
+            [['type'],'required',
+                'when' => function($model) {
+                    if($this->allow_expense == AbstractActiveRecord::YES && $this->contractor != self::CONTRACTOR_YES)
+                        return FALSE;
+                    return TRUE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."')
+                        {
+                            return false;
+                        }
+                        return true;
+                    }"],
+
 
             [['requisites_id','is_resident'],'integer'],
             ['is_resident', 'in', 'range' => array_keys(self::getResidentArr())],
@@ -215,7 +236,24 @@ class CUser extends AbstractUser
             ['archive','in','range' => array_keys(self::getArchiveArr())],
 
             [['entityFields'], 'safe'],
-            ['prospects_id','required']
+            ['prospects_id','required',
+                'when' => function($model) {
+                    if($this->allow_expense == AbstractActiveRecord::YES && $this->contractor != self::CONTRACTOR_YES)
+                        return FALSE;
+                    return TRUE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."')
+                        {
+                            return false;
+                        }
+                        return true;
+                    }"],
+
+            ['allow_expense','default','value' => AbstractActiveRecord::NO]
         ];
     }
 
@@ -246,7 +284,8 @@ class CUser extends AbstractUser
             'created_by' => Yii::t('app/users','Created by'),
             'contractor' => Yii::t('app/users','Contractor'),
             'archive' => Yii::t('app/users','Archive'),
-            'prospects_id' => Yii::t('app/users','Prospects')
+            'prospects_id' => Yii::t('app/users','Prospects'),
+            'allow_expense' => Yii::t('app/users','Allow expense')
         ];
     }
 
@@ -530,6 +569,25 @@ class CUser extends AbstractUser
             ->asArray()
             ->all();
         return ArrayHelper::map($tmp,'id','c_email');
+    }
+
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public static function getExpenseUserMap()
+    {
+        $dep =  new TagDependency([
+            'tags' => [
+                NamingHelper::getCommonTag(self::className()),
+            ]
+        ]);
+        $models = self::getDb()->cache(function ($db) {
+            return CUser::find()->with('requisites')->where(['allow_expense' => self::CONTRACTOR_YES])->all($db);
+        },86400,$dep);
+
+        return ArrayHelper::map($models,'id','infoWithSite');
     }
 
 }

@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'format' => 'html',
                                             'value' => function($model){
                                                     $name =  is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
-                                                    if(Yii::$app->user->can('adminRights'))
+                                                    if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'))
                                                         return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
                                                     else
                                                         return $name;
@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'allowClear' => true,
                                                     'minimumInputLength' => 2,
                                                     'ajax' => [
-                                                        'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                                                        'url' => \yii\helpers\Url::to(['/ajax-select/get-expense-user']),
                                                         'dataType' => 'json',
                                                         'data' => new JsExpression('function(params) { return {q:params.term}; }')
                                                     ],

@@ -38,7 +38,7 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
             'allowClear' => true,
             'minimumInputLength' => 2,
             'ajax' => [
-                'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                'url' => \yii\helpers\Url::to(['/ajax-select/get-expense-user']),
                 'dataType' => 'json',
                 'data' => new JsExpression('function(params) { return {q:params.term}; }')
             ],

@@ -27,7 +27,7 @@ class ExpenseController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
-                    'actions' => ['index','create','view'],
+                    'actions' => ['index','create','view','update'],
                     'allow' => true,
                     'roles' => ['bookkeeper']
                 ],

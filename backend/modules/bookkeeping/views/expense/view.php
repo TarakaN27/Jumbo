@@ -19,8 +19,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <section class="pull-right">
                                     <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                                     <?= Html::a(Yii::t('app/book','Create expense'),['create'],['class'=>'btn btn-success']);?>
-                                    <?php if(Yii::$app->user->can('adminRights')):?>
                                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                                    <?php if(Yii::$app->user->can('adminRights')):?>
                                     <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
                                         'class' => 'btn btn-danger',
                                         'data' => [
