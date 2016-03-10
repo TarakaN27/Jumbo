@@ -11,6 +11,7 @@ namespace console\controllers;
 use common\components\ExchangeRates\ExchangeRatesCBRF;
 use common\components\ExchangeRates\ExchangeRatesNBRB;
 use common\components\ExchangeRates\ExchangeRatesObmennikBY;
+use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use console\components\AbstractConsoleController;
 use yii\web\NotFoundHttpException;
@@ -138,5 +139,45 @@ class ExchangeRatesController extends AbstractConsoleController{
         }
 
         return $this->log(!$bHasError);
+    }
+
+    /**
+     * @return int
+     */
+    public function actionRecalculate()
+    {
+        $curIDs = [4,5,6,9];
+        $fromDate = '2015-12-25';
+        $toDate = '2016-02-22';
+
+        $exHist = ExchangeCurrencyHistory::find()
+            ->where(['currency_id' => $curIDs])
+            ->andWhere('date > :fromDate AND date < :toDate')
+            ->params([':fromDate' => $fromDate,':toDate' => $toDate])
+            ->all();
+
+        $arByDate = [];
+        foreach($exHist as $hist)
+            $arByDate[$hist->date][] = $hist;
+
+        foreach($arByDate as $date => $arHist)
+        {
+            $obCBRF = new ExchangeRatesCBRF(NULL,strtotime($date));
+            $curr = $obCBRF->getRURcurrencyInBur();
+            echo $date.'-'.$curr.PHP_EOL;
+            /** @var ExchangeCurrencyHistory $ex */
+            foreach($arHist as $ex)
+            {
+                $new = round($curr*$ex->rate_cbr,4);
+                $old = round($curr*$ex->old_rate_cbr,4);
+                $ex->rate_nbrb = $new;
+                $ex->old_rate_nbrb = $old;
+                $ex->save();
+            }
+        }
+
+
+
+        return self::EXIT_CODE_NORMAL;
     }
 }
