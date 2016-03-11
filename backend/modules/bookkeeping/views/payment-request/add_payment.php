@@ -114,11 +114,13 @@ $this->registerJs('
             data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount,prID:"'.$modelP->id.'"},
             success: function(msg){
                 showOptions(msg.visable,"#"+condID);
+                /*
                 if(msg.default != "" && msg.default  != null)
                 {
                     $("#"+condID).val(msg.default);
                     boundsCheckingConditions("#"+condID);
                 }
+                */
                 var
                     lineIDCT = lineID.replace(/-service/gi,"-condtype"),
                     lineIDCP = lineID.replace(/-service/gi,"-customproduction");
@@ -414,13 +416,13 @@ $this->registerJs('
                                         ]) ?>
                                         <div class="row">
                                             <div class="col-md-offset-2 pdd-left-15">
+                                                <?php if(Yii::$app->user->can('adminRights')):?>
                                                 <div class="col-md-6">
-                                                <?= $form->field($m,"[{$i}]showAll",[
-
-                                                ])->checkbox([
+                                                <?= $form->field($m,"[{$i}]showAll",[])->checkbox([
                                                     'class' => 'showAllBtn'
                                                 ])?>
                                                 </div>
+                                                <?php endif;?>
                                                 <div class="col-md-6 pdd-top-10">
                                                     <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
                                                         'target' => 'blank'

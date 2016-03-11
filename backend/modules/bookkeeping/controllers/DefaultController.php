@@ -41,7 +41,7 @@ class DefaultController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
-                    'actions' => ['index','view','create','update'],
+                    'actions' => ['index','view','create'],
                     'allow' => true,
                     'roles' => ['moder']
                 ],
@@ -105,71 +105,7 @@ class DefaultController extends AbstractBaseBackendController
         ]);
     }
 
-    /**
-     * Creates a new Payments model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    /*
-    public function actionCreate()
-    {
-        $model = new Payments();
-        if(empty($model->pay_date))
-            $model->pay_date = time();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $trans = Yii::$app->db->beginTransaction();
-            try{
-                if($model->save())
-                {
-                    /** @var PaymentCondition $obCond */
- /*                   $obCond = PaymentCondition::findOne($model->condition_id);
-                    if(empty($obCond))
-                        throw new NotFoundHttpException("Condition not found");
-
-                    $obPOp = new PaymentOperations(
-                        $model->pay_summ,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale
-                    );
-
-                    $arCount = $obPOp->getFullCalculate();
-
-                    $obClc = new PaymentsCalculations([
-                        'payment_id' => $model->id,
-                        'pay_cond_id' => $obCond->id,
-                        'tax' => $arCount['tax'],
-                        'profit' => $arCount['profit'],
-                        'production' => $arCount['production'],
-                        'cnd_corr_factor' => $obCond->corr_factor,
-                        'cnd_commission' => $obCond->commission,
-                        'cnd_sale' => $obCond->sale,
-                        'cnd_tax' => $obCond->tax,
-                    ]);
-
-                    if($obClc->save())
-                    {
-                        $trans->commit();
-                        Yii::$app->session->setFlash('success',Yii::t('app/book',"Payment successfully added"));
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    }else{
-                        $trans->rollBack();
-                        Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
-                    }
-                }
-            }catch (\Exception $e)
-            {
-                $trans->rollBack();
-                Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
-            }
-            $trans->rollBack();
-            Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't add payment"));
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-                //'obCalc' => $obCalc
-            ]);
-        }
-    }
-*/
     /**
      * Updates an existing Payments model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -328,10 +264,23 @@ class DefaultController extends AbstractBaseBackendController
             $trans->rollBack();
             Yii::$app->session->setFlash('error',Yii::t('app/book',"Can't update payment"));
         } else {
+            /** @var  CUser $obCntrID */
+            $obCntrID = CUser::findOneByIDCached(is_object($cuser = $model->cuser) ? $cuser->id : 0);
+            $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',strtotime($model->pay_date)),$model->currency_id);
+            $paySumm = (float)$model->pay_summ*$nCurr;
+            $arCondVisible = PaymentCondition::getAppropriateConditions(
+                $model->service_id,
+                $model->legal_id,
+                $paySumm,
+                (is_object($obCntrID) ? $obCntrID->is_resident : NULL),
+                strtotime($model->pay_date));
 
+            $arCondVisible [] = $model->condition_id;
+            $arCondVisible = array_unique($arCondVisible);
 
             return $this->render('update', [
-                'model' => $model
+                'model' => $model,
+                'arCondVisible' => $arCondVisible
             ]);
         }
     }
@@ -363,13 +312,15 @@ class DefaultController extends AbstractBaseBackendController
             $obCntrID->is_resident,
             strtotime($payDate));
 
-        $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
-            'cuser_id' => $obCntrID->id,
-            'service_id' => $iServID
-        ])->one();
+        /**
+            $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
+                'cuser_id' => $obCntrID->id,
+                'service_id' => $iServID
+            ])->one();
 
-        if(!empty($obPPC) && !in_array($obPPC->cond_id,$arCondVisible))
-            $arCondVisible [] = $obPPC->cond_id;
+            if(!empty($obPPC) && !in_array($obPPC->cond_id,$arCondVisible))
+                $arCondVisible [] = $obPPC->cond_id;
+        **/
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 

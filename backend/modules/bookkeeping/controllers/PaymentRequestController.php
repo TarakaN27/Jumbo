@@ -27,7 +27,6 @@ use common\models\PaymentRequest;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
 use common\models\search\PaymentRequestSearch;
-use Faker\Provider\el_GR\Payment;
 use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
@@ -138,6 +137,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     $obCntrID->is_resident,
                     $modelP->pay_date);
 
+                /*
                 $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
                     'cuser_id' => $obCntrID->id,
                     'service_id' => $modelP->service_id
@@ -153,6 +153,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     if(!in_array($obPPC->cond_id,$arCondVisible))
                         $arCondVisible[] = $obPPC->cond_id;
                 }
+                */
             }
              $model = [$formModel];
         }
@@ -370,7 +371,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
             $paySumm,
             $obCntrID->is_resident,
             $modelP->pay_date);
-
+        /*
+         * //дефолтное условие
         $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
             'cuser_id' => $obCntrID->id,
             'service_id' => $iServID
@@ -378,7 +380,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
         if(!empty($obPPC) && !in_array($obPPC->cond_id,$arCondVisible))
             $arCondVisible [] = $obPPC->cond_id;
-
+        */
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return ['visable' => $arCondVisible,'default' => empty($obPPC) ? NULL : $obPPC->cond_id];
@@ -392,6 +394,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     protected function getCondition($iServID,$lPID,$obCntrID,$amount = 0)
     {
+        /*
         $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
             'cuser_id' => $obCntrID->id,
             'service_id' => $iServID
@@ -401,6 +404,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
             return ['cID' => $obPPC->cond_id];
 
         unset($obPPC);
+        */
 
         $obCond = PaymentCondition::find()  //находим все условия
             ->select(['id','summ_from','summ_to'])

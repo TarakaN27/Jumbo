@@ -22,7 +22,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/book', 'Update');
                                     <div class="clearfix"></div>
                                 </div>
     <?= $this->render('_form', [
-        'model' => $model
+        'model' => $model,
+        'arCondVisible' => $arCondVisible
     ]) ?>
 
 </div></div></div>

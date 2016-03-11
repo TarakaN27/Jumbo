@@ -140,9 +140,11 @@ class Payments extends AbstractActiveRecord
                 [
                     'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
                 ],
+                /* отключили 11/02/2016
                 [
                     'class' => PaymentPredefinedConditionBehavior::className()  //устанавливаем предопределныеусловия для CUSER
                 ],
+                */
                 [
                     'class' => PaymentQuantityHoursBehavior::className()    //начисление норма часов
                 ],

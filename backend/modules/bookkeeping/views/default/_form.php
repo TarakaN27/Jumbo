@@ -60,12 +60,14 @@ function findCondition()
         data: {iServID:iServ,iContrID:iCuser,lPID:iLP,amount:amount,iCurr:iCurr,payDate:payDate},
         success: function(msg){
                 showOptions(msg.visable,"#payments-condition_id");
+                /*
                 if(msg.default != "" && msg.default  != null)
                 {
                     $("#payments-condition_id").val(msg.default);
                     boundsCheckingConditions("#"+condID);
                     condTypeAction();
                 }
+                */
         },
         error: function(msg){
             addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
@@ -143,7 +145,7 @@ function findCondition()
     function initDefaultCondition()
     {
         var
-            condID = '.\yii\helpers\Json::encode([$model->condition_id]).';
+            condID = '.\yii\helpers\Json::encode($arCondVisible).';
         showOptions(condID,"#payments-condition_id");
         $("#payments-condition_id").val('.$model->condition_id.');
         condTypeAction();
@@ -151,16 +153,16 @@ function findCondition()
 ',\yii\web\View::POS_END);
 
 $this->registerJs('
-    $("#payments-cuser_id").on("change",findCondition);
+     $("#payments-cuser_id").on("change",findCondition);
      // по дефолту инициализирцем
-        initDefaultCondition();
-        $("#show_all_id").on("change",showAllBtnActions);
-        $("#payments-condition_id").on("change",function(){
+     initDefaultCondition();
+     $("#show_all_id").on("change",showAllBtnActions);
+     $("#payments-condition_id").on("change",function(){
             condTypeAction();
-        });
-        $("#payments-pay_summ").on("change",function(){
+     });
+     $("#payments-pay_summ").on("change",function(){
             findCondition();
-        });
+     });
 
      $("#payments-pay_date").on("change",function(){
         $.ajax({
@@ -258,12 +260,14 @@ $this->registerJs('
     ]) ?>
     <div class="row">
         <div class="col-md-offset-3 pdd-left-15">
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <div class="col-md-6">
-            <?= $form->field($model,"showAll")->checkbox([
-                'class' => 'showAllBtn',
-                'id' => 'show_all_id'
-            ])?>
+                <?= $form->field($model,"showAll")->checkbox([
+                    'class' => 'showAllBtn',
+                    'id' => 'show_all_id'
+                ])?>
             </div>
+            <?php endif;?>
             <div class="col-md-6">
                 <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
                     'target' => 'blank'
@@ -271,8 +275,6 @@ $this->registerJs('
             </div>
         </div>
     </div>
-
-
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
