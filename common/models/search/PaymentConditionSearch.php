@@ -77,7 +77,8 @@ class PaymentConditionSearch extends PaymentCondition
             'tax' => $this->tax,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'type' => $this->type
+            'type' => $this->type,
+            'cond_currency' => $this->cond_currency
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
