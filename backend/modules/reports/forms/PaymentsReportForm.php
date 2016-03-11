@@ -8,6 +8,7 @@
 
 namespace backend\modules\reports\forms;
 
+use common\models\CUser;
 use common\models\ExchangeCurrencyHistory;
 use common\models\Payments;
 use yii\base\Model;
@@ -15,10 +16,17 @@ use Yii;
 
 class PaymentsReportForm extends Model{
 
+    CONST   //типы группировки
+        GROUP_BY_DATE = 1,
+        GROUP_BY_MANAGER = 2,
+        GROUP_BY_SERVICE = 3,
+        GROUP_BY_CONTRACTOR = 4;
+
     public
+        $groupType = self::GROUP_BY_DATE,
         $services,
         $contractor,
-       // $managers,
+        $managers,
         $dateFrom,
         $generateExcel,
         $generateDocx,
@@ -32,8 +40,8 @@ class PaymentsReportForm extends Model{
         return [
             [['dateFrom','dateTo'],'required'],
             [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
-            [['services','contractor'],'safe'],
-            [['generateExcel','generateDocx'],'integer'],
+            [['services','contractor','managers'],'safe'],
+            [['generateExcel','generateDocx','groupType'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];
     }
@@ -56,12 +64,35 @@ class PaymentsReportForm extends Model{
         return [
             'services' => Yii::t('app/reports','Services'),
             'contractor' => Yii::t('app/reports','Contractor'),
-         //   'managers' => Yii::t('app/reports','Managers'),
+            'managers' => Yii::t('app/reports','Managers'),
             'dateFrom' => Yii::t('app/reports','Date from'),
             'dateTo' => Yii::t('app/reports','Date to'),
             'generateExcel' => Yii::t('app/reports','Generate excel'),
             'generateDocx' => Yii::t('app/reports','Generate docx'),
+            'groupType' => Yii::t('app/reports','Group type'),
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getGroupByMap()
+    {
+        return [
+            self::GROUP_BY_DATE => Yii::t('app/reports','Group by date'),
+            self::GROUP_BY_MANAGER => Yii::t('app/reports','Group by manager'),
+            self::GROUP_BY_SERVICE => Yii::t('app/reports','Group by service'),
+            self::GROUP_BY_CONTRACTOR => Yii::t('app/reports','Group by contractor')
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupByStr()
+    {
+        $tmp = self::getGroupByMap();
+        return isset($tmp[$this->groupType]) ? $tmp[$this->groupType] : 'N/A';
     }
 
     /**
@@ -72,6 +103,8 @@ class PaymentsReportForm extends Model{
         $data = Payments::find();//->with('calculate','cuser','legal','service','calculate.payCond');
         $data->joinWith('calculate');
         $data->joinWith('cuser');
+        $data->joinWith('cuser.manager');
+        $data->joinWith('cuser.requisites');
         $data->joinWith('legal');
         $data->joinWith('service');
         $data->joinWith('calculate.payCond');
@@ -82,7 +115,8 @@ class PaymentsReportForm extends Model{
 
         $data->andFilterWhere([
             Payments::tableName().'.service_id' => $this->services,
-            Payments::tableName().'.cuser_id' => $this->contractor
+            Payments::tableName().'.cuser_id' => $this->contractor,
+            CUser::tableName().'.manager_id' => $this->managers
         ]);
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
@@ -99,10 +133,20 @@ class PaymentsReportForm extends Model{
             'iProfitTotal' => 0,
             'iTaxTotal' => 0,
             'iProdTotal' => 0,
-            'summControll' => 0
+            'summControll' => 0,
+            'totalGroupSum' => [],
+            'totalGroupProfit' => [],
+            'totalGroupTax' => [],
+            'totalGroupProd' => []
+
         ];
         $arCurr = [];
         $arCondCurr = [];
+        $totalGroupSum = [];
+        $totalGroupProfit = [];
+        $totalGroupTax = [];
+        $totalGroupProd = [];
+
         /** @var Payments $dt */
         foreach($data as $dt)
         {
@@ -127,17 +171,78 @@ class PaymentsReportForm extends Model{
                 }
             }
 
-            $arResult['data'][$date][] = $dt;
+            $tmpCalc = $dt->calculate;
+
+            //формируем массив с данными
+            switch ($this->groupType){
+                case self::GROUP_BY_DATE:
+                    $arResult['data'][$date][] = $dt;
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$date,$dt->pay_summ*$iCurr);
+                    if(is_object($tmpCalc))
+                    {
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$date,$tmpCalc->production);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$date,$tmpCalc->profit);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$date,$tmpCalc->tax);
+                    }
+                    break;
+                case self::GROUP_BY_MANAGER:
+                    $manID = is_object($obUser = $dt->cuser) ? is_object($obMan = $obUser->manager) ? $obMan->getFio() : 'n_a' : 'n_a';
+                    $arResult['data'][$manID][] = $dt;
+
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$manID,$dt->pay_summ*$iCurr);
+                    if(is_object($tmpCalc))
+                    {
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$manID,$tmpCalc->production);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$manID,$tmpCalc->profit);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$manID,$tmpCalc->tax);
+                    }
+                    break;
+                case self::GROUP_BY_SERVICE:
+                    $obServ = $dt->service;
+                    $servName = is_object($obServ) ? $obServ->name : 'n_a';
+                    $arResult['data'][$servName][] = $dt;
+
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$servName,$dt->pay_summ*$iCurr);
+                    if(is_object($tmpCalc))
+                    {
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$servName,$tmpCalc->production);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$servName,$tmpCalc->profit);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$servName,$tmpCalc->tax);
+                    }
+                    break;
+                case self::GROUP_BY_CONTRACTOR:
+                    $obCuser = $dt->cuser;
+                    $corpName = is_object($obCuser) ? $obCuser->getInfoWithSite() : 'n_a';
+                    $arResult['data'][$corpName][] = $dt;
+
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$corpName,$dt->pay_summ*$iCurr);
+                    if(is_object($tmpCalc))
+                    {
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$corpName,$tmpCalc->production);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$corpName,$tmpCalc->profit);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$corpName,$tmpCalc->tax);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
             $arResult['iSumTotal']+= ($dt->pay_summ*$iCurr);
             $arResult['currency'][$dt->id] = $iCurr;
             $arResult['condCurr'][$dt->id] = $iCondCurr;
-            if(is_object($tmp = $dt->calculate))
+            if(is_object($tmpCalc))
             {
-                $arResult['iProfitTotal']+=$tmp->profit;
-                $arResult['iTaxTotal']+=$tmp->tax;
-                $arResult['iProdTotal']+=$tmp->production;
+                $arResult['iProfitTotal']+= $tmpCalc->profit;
+                $arResult['iTaxTotal']+= $tmpCalc->tax;
+                $arResult['iProdTotal']+= $tmpCalc->production;
             }
+
         }
+
+        $arResult['totalGroupSum'] = $totalGroupSum;
+        $arResult['totalGroupProfit'] = $totalGroupProfit;
+        $arResult['totalGroupTax'] = $totalGroupTax;
+        $arResult['totalGroupProd'] = $totalGroupProd;
 
         if($this->generateExcel)
             $arResult['excelLink'] = $this->generateExcelDocument($arResult);
@@ -148,6 +253,22 @@ class PaymentsReportForm extends Model{
         $arResult['summControll'] = $arResult['iSumTotal'] - ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal']);
 
         return $arResult;
+    }
+
+    /**
+     * @param $arArray
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    protected function totalHelper($arArray,$key,$value)
+    {
+        if(isset($arArray[$key]))
+            $arArray[$key]+=$value;
+        else
+            $arArray[$key]=$value;
+
+        return $arArray;
     }
 
     /**
@@ -190,28 +311,43 @@ class PaymentsReportForm extends Model{
 
         $objPHPExcel->getActiveSheet()->setCellValue('A9',Yii::t('app/reports','Payments date'));
         $objPHPExcel->getActiveSheet()->setCellValue('B9',Yii::t('app/reports','Contractor'));
-        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Legal person'));
-        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Service'));
-        $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Payment sum'));
-        $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Profit'));
-        $objPHPExcel->getActiveSheet()->setCellValue('G9',Yii::t('app/reports','Production'));
-        $objPHPExcel->getActiveSheet()->setCellValue('H9',Yii::t('app/reports','Tax'));
+        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Responsibility'));
+        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Legal person'));
+        $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Service'));
+        $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Payment sum'));
+        $objPHPExcel->getActiveSheet()->setCellValue('G9',Yii::t('app/reports','Payment currency'));
+        $objPHPExcel->getActiveSheet()->setCellValue('H9',Yii::t('app/reports','Exchange currency'));
+        $objPHPExcel->getActiveSheet()->setCellValue('I9',Yii::t('app/reports','Profit'));
+        $objPHPExcel->getActiveSheet()->setCellValue('J9',Yii::t('app/reports','Production'));
+        $objPHPExcel->getActiveSheet()->setCellValue('K9',Yii::t('app/reports','Tax'));
+        $objPHPExcel->getActiveSheet()->setCellValue('L9',Yii::t('app/reports','Payment calc condition'));
+        $objPHPExcel->getActiveSheet()->setCellValue('M9',Yii::t('app/reports','Condition currency'));
         $i=10;
-        foreach($data['data'] as $key=>$dt)
-        {
-            foreach($dt as $d)
+        if($this->groupType == self::GROUP_BY_DATE)
+            foreach($data['data'] as $key=>$dt)
             {
-                $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$key);
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,is_object($cuser=$d->cuser) ? $cuser->getInfo() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,$d->pay_summ);
-                $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,is_object($calc=$d->calculate) ? $calc->profit : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,is_object($calc=$d->calculate) ? $calc->production : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,is_object($calc=$d->calculate) ? $calc->tax : 'N/A');
-                $i++;
+                foreach($dt as $d)
+                {
+                    $cuser=$d->cuser;
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,Yii::$app->formatter->asDate($d->pay_date));
+                    $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d->pay_summ);
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$d->id]) : '');
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,is_object($calc=$d->calculate) ? $calc->profit : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc=$d->calculate) ? $calc->production : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc=$d->calculate) ? $calc->tax : 'N/A');
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($calc=$d->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['condCurr'][$d->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$d->id]) : 'N/A');
+                    $i++;
+                }
             }
-        }
 
         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save(Yii::getAlias('@backend/web/reports/').$sFileName);
@@ -253,21 +389,28 @@ class PaymentsReportForm extends Model{
             //таблица Рекламная сеть Яндекса
             $doc->cloneRow('cDate',$iCount);
 
-            $iter = 1;
-            foreach($data['data'] as $key=>$dt)
-                foreach($dt as $item)
-                {
-                    $doc->setValue('cDate#'.$iter, $key);
-                    $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
-                    $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
-                    $doc->setValue('service#'.$iter,is_object($serv=$item->service) ? $serv->name : 'N/A');
-                    $doc->setValue('iSum#'.$iter,$item->pay_summ);
-                    $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
-                    $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? $calc->production : 'N/A');
-                    $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
+            if($this->groupType == self::GROUP_BY_DATE)
+            {
+                $iter = 1;
+                foreach($data['data'] as $key=>$dt)
+                    foreach($dt as $item)
+                    {
+                        $doc->setValue('cDate#'.$iter, $key);
+                        $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
+                        $doc->setValue('manager#'.$iter,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                        $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
+                        $doc->setValue('service#'.$iter,is_object($serv=$item->service) ? $serv->name : 'N/A');
+                        $doc->setValue('iSum#'.$iter,$item->pay_summ);
+                        $doc->setValue('currCode#'.$iter,is_object($curr = $item->currency) ? $curr->code : 'N/A');
+                        $doc->setValue('exRate#'.$iter,isset($data['currency'][$item->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$item->id]) : '');
+                        $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
+                        $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? $calc->production : 'N/A');
+                        $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
+                        $doc->setValue('exCondRate#'.$iter,isset($data['condCurr'][$item->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$item->id]) : 'N/A');
+                        $iter++;
+                    }
+            }
 
-                    $iter++;
-                }
 
             $doc->saveAs(Yii::getAlias('@backend/web/reports/').$sFileName);
             if(file_exists(Yii::getAlias('@backend/web/reports/').$sFileName))

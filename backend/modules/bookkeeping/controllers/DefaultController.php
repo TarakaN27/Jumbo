@@ -72,9 +72,12 @@ class DefaultController extends AbstractBaseBackendController
         $searchModel = new PaymentsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams);
+
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
+
         $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
+        $buserDesc = empty($searchModel->manager) ? '' : BUser::findOne($searchModel->manager)->getFio();
 
         foreach($arTotal as &$total)
         {
@@ -85,6 +88,7 @@ class DefaultController extends AbstractBaseBackendController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'cuserDesc' => $cuserDesc,
+            'buserDesc' => $buserDesc,
             'arTotal' => $arTotal
         ]);
     }

@@ -176,8 +176,6 @@ class ExchangeRatesController extends AbstractConsoleController{
             }
         }
 
-
-
         return self::EXIT_CODE_NORMAL;
     }
 }

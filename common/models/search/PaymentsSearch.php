@@ -2,8 +2,11 @@
 
 namespace common\models\search;
 
+use backend\models\BUser;
 use common\models\CUser;
 use common\models\ExchangeRates;
+use common\models\LegalPerson;
+use common\models\Services;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -16,6 +19,7 @@ use yii\helpers\ArrayHelper;
 class PaymentsSearch extends Payments
 {
     public
+        $manager,
         $from_date,
         $to_date;
 
@@ -28,7 +32,7 @@ class PaymentsSearch extends Payments
     public function rules()
     {
         return [
-            [['id', 'cuser_id','currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'cuser_id','currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','manager'], 'integer'],
             [['pay_summ'], 'number'],
             [[
                 'pay_date',
@@ -36,6 +40,7 @@ class PaymentsSearch extends Payments
                 'payment_order',
                 'from_date',
                 'to_date',
+                'manager'
             ], 'safe'],
             [['pay_date'], 'default', 'value' => null],
             [['from_date','to_date'],'date','format' => 'php:m.d.Y']
@@ -60,7 +65,29 @@ class PaymentsSearch extends Payments
      */
     public function search($params)
     {
-        $query = Payments::find()->with('legal','service','cuser','currency');
+        $query = Payments::find()
+            ->select([
+                Payments::tableName().'.id',
+                'cuser_id',
+                'service_id',
+                'legal_id',
+                'currency_id',
+                'pay_date',
+                'payment_order',
+                'pay_summ',
+                CUser::tableName().'.requisites_id',
+                CUser::tableName().'.manager_id',
+                Services::tableName().'.name',
+                LegalPerson::tableName().'.name',
+                ExchangeRates::tableName().'.name',
+                BUser::tableName().'.fname',
+                BUser::tableName().'.mname',
+                BUser::tableName().'.lname',
+            ])
+            ->joinWith('legal')
+            ->joinWith('service')
+            ->joinWith('cuser.manager')
+            ->joinWith('currency');
 
         $query = $this->queryHelper($query,$params);
 
@@ -97,6 +124,8 @@ class PaymentsSearch extends Payments
             $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
         }
 
+        $query->joinWith('cuser');
+
         $this->load($params);
 
         if(!empty($this->pay_date))
@@ -116,11 +145,14 @@ class PaymentsSearch extends Payments
             'service_id' => $this->service_id,
             'legal_id' => $this->legal_id,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
+            CUser::tableName().'.manager_id' => $this->manager
         ]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
         $query->andFilterWhere(['like','payment_order',$this->payment_order]);
+
+
 
         //для работы тотала
         if(
@@ -132,7 +164,8 @@ class PaymentsSearch extends Payments
             !empty($this->service_id)||
             !empty($this->legal_id) ||
             !empty($this->currency_id) ||
-            !empty($this->payment_order)
+            !empty($this->payment_order) ||
+            !empty($this->manager)
         )
             $this->countTotal = TRUE;
 
@@ -177,5 +210,13 @@ class PaymentsSearch extends Payments
         }
 
         return $arResult;
+    }
+
+    public function attributeLabels()
+    {
+        $arParent = parent::attributeLabels();
+        return ArrayHelper::merge($arParent,[
+            'manager' => Yii::t('app/book','Responsibility')
+        ]);
     }
 }

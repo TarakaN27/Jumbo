@@ -18,6 +18,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
+                    <p><span class="label label-info">Info</span> <?=Yii::t('app/reports','Payment reports help info')?></p>
                 <?php $form = \yii\bootstrap\ActiveForm::begin([
                     'options' => [
                        // 'class' => 'form-inline'
@@ -46,43 +47,57 @@ $this->title = Yii::t('app/reports','Payments reports');
                                  ]
                              ])?>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                <?=$form->field($model,'dateFrom')->widget(\kartik\date\DatePicker::className(),[
-                                    'options' => [
-                                        'class' => 'form-control'
-                                    ],
-                                    'pluginOptions' => [
-                                        'autoclose' => TRUE,
-                                        'format' => 'dd.mm.yyyy',
-                                        'defaultDate' => date('d.m.Y', time())
-                                    ]
-                                ])?>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <?=$form->field($model,'dateTo')->widget(\kartik\date\DatePicker::className(),[
-                                'options' => [
-                                    'class' => 'form-control'
-                                ],
-                                'pluginOptions' => [
-                                    'autoclose' => TRUE,
-                                    'format' => 'dd.mm.yyyy',
-                                    'defaultDate' => date('d.m.Y', time())
+                            <?=$form->field($model,'managers')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                                'data' => \backend\models\BUser::getAllMembersMap(),
+                                'clientOptions' => [
+                                    //'selectableHeader' => Yii::t('app/reports','Contractors'),
+                                    //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
                                 ]
                             ])?>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                               <?=$form->field($model,'generateExcel')->checkbox();?>
-                               <?=$form->field($model,'generateDocx')->checkbox();?>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <?=$form->field($model,'dateFrom')->widget(\kartik\date\DatePicker::className(),[
+                                        'options' => [
+                                            'class' => 'form-control'
+                                        ],
+                                        'pluginOptions' => [
+                                            'autoclose' => TRUE,
+                                            'format' => 'dd.mm.yyyy',
+                                            'defaultDate' => date('d.m.Y', time())
+                                        ]
+                                    ])?>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <?=$form->field($model,'dateTo')->widget(\kartik\date\DatePicker::className(),[
+                                        'options' => [
+                                            'class' => 'form-control'
+                                        ],
+                                        'pluginOptions' => [
+                                            'autoclose' => TRUE,
+                                            'format' => 'dd.mm.yyyy',
+                                            'defaultDate' => date('d.m.Y', time())
+                                        ]
+                                    ])?>
+                                </div>
                             </div>
-                            <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="row">
 
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <?=$form->field($model,'groupType')->radioList(\backend\modules\reports\forms\PaymentsReportForm::getGroupByMap())?>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <?=$form->field($model,'generateExcel')->checkbox();?>
+                                    <?=$form->field($model,'generateDocx')->checkbox();?>
+                                </div>
                             </div>
+                        </div>
                     </div>
-                    <div class="form-group">
+
+
+                    <div class="form-group text-center">
                             <?= Html::submitButton(Yii::t('app/reports', 'Get report'), ['class' => 'btn btn-success']) ?>
                     </div>
                 <?php \yii\bootstrap\ActiveForm::end();?>
@@ -92,6 +107,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                     <?php if(!empty($arData)):?>
                         <?= $this->render('_part_table_view', [
                             'model' => $arData,
+                            'modelForm' => $model
                         ]) ?>
                     <?php else:?>
                         <p><?=Yii::t('app/reports','No data');?></p>

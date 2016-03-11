@@ -4,7 +4,7 @@ return [
     'language' => 'ru_RU',
     'sourceLanguage' => 'en_US',
     'version' => '1.0',
-    'name' => 'Webmart Group corp',
+    'name' => 'Jumbo webmart',
     'timeZone'=> 'Europe/Minsk',
     'components' => [
         'config' => [

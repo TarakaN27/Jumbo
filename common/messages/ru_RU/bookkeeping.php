@@ -202,7 +202,8 @@ return [
     'Parent request' => 'ID родительского запроса',
     'Partial enrollment' => 'Частичное зачисление',
     'Contract number' => 'Номер контракта',
-    'Contract date' => 'Дата контракта'
+    'Contract date' => 'Дата контракта',
+    'Responsibility' => 'Ответственный'
 
 
 

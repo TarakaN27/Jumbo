@@ -70,5 +70,13 @@ return [
     'Tax BYR' => 'Налог BYR',
     'Payment calc condition' => 'Условие',
     'controllSumm' => 'Контрольная сумма',
-    'Condition currency' => 'Курс условия'
+    'Condition currency' => 'Курс условия',
+    'Group by date' => 'Группировка по дате',
+    'Group by manager' => 'Группировка по ответсвенному',
+    'Group type' => 'Тип группировки',
+    'Responsibility' => 'Ответственный',
+    'Group by service' => 'Группировка по услугам',
+    'Group by contractor' => 'Группировка по контрагентам',
+    'Payment reports help info' => 'Если не выбрать параметр, то этот параметр не будет учитываться при запросе.
+    Например если не выбрать услуги -- это будет равносильно выбору всех услуг.'
 ];
