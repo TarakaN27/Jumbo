@@ -293,9 +293,9 @@ class PaymentsReportForm extends Model{
         $objPHPExcel->getActiveSheet()
             ->setCellValue('A1', 'Отчет по платежам')
             ->setCellValue('A2', 'Начальная дата:')
-            ->setCellValue('B2', $this->dateFrom)
+            ->setCellValue('B2', Yii::$app->formatter->asDate($this->dateFrom))
             ->setCellValue('A3', 'Конечная дата:')
-            ->setCellValue('B3', $this->dateTo)
+            ->setCellValue('B3', Yii::$app->formatter->asDate($this->dateTo))
             ->setCellValue('A4', 'Общая сумма платежей:')
             ->setCellValue('B4', $data['iSumTotal'])
             ->setCellValue('A5', 'Общая прибыль:')
@@ -373,8 +373,8 @@ class PaymentsReportForm extends Model{
             $doc->setValue('Year',date('Y'));
 
             //страница с общей статистикой
-            $doc->setValue('startDay',$this->dateFrom);
-            $doc->setValue('endDay',$this->dateTo);
+            $doc->setValue('startDay',Yii::$app->formatter->asDate($this->dateFrom));
+            $doc->setValue('endDay',Yii::$app->formatter->asDate($this->dateTo));
             $doc->setValue('currentDay',date('Y-m-d'));
             $doc->setValue('iSumTotal',$data['iSumTotal']);
             $doc->setValue('iTaxTotal',$data['iTaxTotal']);
