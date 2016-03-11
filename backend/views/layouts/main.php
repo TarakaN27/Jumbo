@@ -185,7 +185,7 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_services'); ?></a>
                                             </li>
                                         <?php endif; ?>
-                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/services/expense/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_expense_categories'); ?></a>
                                             </li>
@@ -256,7 +256,7 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
                                         <!---Затраты ---------------------->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/expense/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_expense'); ?></a>
                                             </li>

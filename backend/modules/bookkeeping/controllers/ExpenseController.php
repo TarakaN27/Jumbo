@@ -33,7 +33,7 @@ class ExpenseController extends AbstractBaseBackendController
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','superadmin']
+                    'roles' => ['superadmin']
                 ]
             ]
         ];
@@ -49,7 +49,7 @@ class ExpenseController extends AbstractBaseBackendController
         $searchModel = new ExpenseSearch();
 
         $addWhere = NULL;
-        if(!Yii::$app->user->can('adminRights'))
+        if(!Yii::$app->user->can('superRights'))
         {
             $addWhere = LegalPerson::tableName().'.admin_expense is NULL OR '.LegalPerson::tableName().'.admin_expense = 0';
         }

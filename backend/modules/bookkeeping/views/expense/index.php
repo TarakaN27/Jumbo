@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class = "x_title">
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <?= Html::a(Yii::t('app/book', 'Create Expense'), ['create'], ['class' => 'btn btn-success']) ?>
                                         <?php endif;?>
                                     </section>
@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'format' => 'html',
                                             'value' => function($model){
                                                     $name =  is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
-                                                    if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'))
+                                                    if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper'))
                                                         return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
                                                     else
                                                         return $name;
@@ -105,12 +105,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                         [
                                             'class' => 'yii\grid\ActionColumn',
                                             'template' => '{view}',
-                                            'visible' => Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')
+                                            'visible' => Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')
                                         ],
                                         [
                                             'class' => 'yii\grid\ActionColumn',
                                             'template' => '{delete}',
-                                            'visible' => Yii::$app->user->can('adminRights')
+                                            'visible' => Yii::$app->user->can('superRights')
                                         ],
                                     ],
                                 ]); ?>

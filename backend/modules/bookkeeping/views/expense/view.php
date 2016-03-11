@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                                     <?= Html::a(Yii::t('app/book','Create expense'),['create'],['class'=>'btn btn-success']);?>
                                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                                    <?php if(Yii::$app->user->can('adminRights')):?>
+                                    <?php if(Yii::$app->user->can('superRights')):?>
                                     <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
                                         'class' => 'btn btn-danger',
                                         'data' => [
