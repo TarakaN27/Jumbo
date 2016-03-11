@@ -323,7 +323,7 @@ class PaymentsReportForm extends Model{
         $objPHPExcel->getActiveSheet()->setCellValue('L9',Yii::t('app/reports','Payment calc condition'));
         $objPHPExcel->getActiveSheet()->setCellValue('M9',Yii::t('app/reports','Condition currency'));
         $i=10;
-        if($this->groupType == self::GROUP_BY_DATE)
+
             foreach($data['data'] as $key=>$dt)
             {
                 foreach($dt as $d)
@@ -389,13 +389,12 @@ class PaymentsReportForm extends Model{
             //таблица Рекламная сеть Яндекса
             $doc->cloneRow('cDate',$iCount);
 
-            if($this->groupType == self::GROUP_BY_DATE)
-            {
+
                 $iter = 1;
                 foreach($data['data'] as $key=>$dt)
                     foreach($dt as $item)
                     {
-                        $doc->setValue('cDate#'.$iter, $key);
+                        $doc->setValue('cDate#'.$iter, Yii::$app->formatter->asDate($item->pay_date));
                         $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
                         $doc->setValue('manager#'.$iter,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
                         $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
@@ -409,7 +408,7 @@ class PaymentsReportForm extends Model{
                         $doc->setValue('exCondRate#'.$iter,isset($data['condCurr'][$item->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$item->id]) : 'N/A');
                         $iter++;
                     }
-            }
+
 
 
             $doc->saveAs(Yii::getAlias('@backend/web/reports/').$sFileName);
