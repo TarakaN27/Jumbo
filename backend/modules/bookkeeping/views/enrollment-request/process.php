@@ -83,7 +83,8 @@ $('#enrollprocessform-repay').on('change',function(){
                                 [
                                     'attribute' => 'created_at',
                                     'value' => Yii::$app->formatter->asDatetime($obPrPay->created_at)
-                                ]
+                                ],
+                                'description:text'
                             ]
                         ])?>
                     <?else:?>
