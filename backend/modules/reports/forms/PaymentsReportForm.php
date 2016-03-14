@@ -344,7 +344,7 @@ class PaymentsReportForm extends Model{
                     $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc=$d->calculate) ? $calc->tax : 'N/A');
 
                     $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($calc=$d->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['condCurr'][$d->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$d->id]) : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['condCurr'][$d->id]) ? $data['condCurr'][$d->id] : 'N/A');
                     $i++;
                 }
             }
