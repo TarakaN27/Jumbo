@@ -96,5 +96,6 @@ return [
     'Tax rate' => 'Ставка НДС',
     'Get extended excel report' => 'Скачать расширенный Excel',
     'Generate extend excel' => 'Сгенерировать расширенный Excel',
-    'Print' => 'Печать'
+    'Print' => 'Печать',
+    'Group total' => 'Всего по группе'
 ];

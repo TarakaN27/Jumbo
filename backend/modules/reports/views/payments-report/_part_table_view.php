@@ -262,7 +262,7 @@ $('#sort-type').on('change',function(){
         <?php endforeach;?>
         <tr class="wm-tr-total">
             <td colspan="4">
-                <?=Yii::t('app/reports','Total')?>
+                <?=Yii::t('app/reports','Group total')?>
             </td>
             <td>
                 <?=isset($model['totalGroupSum'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupSum'][$key]) : '-';?>
