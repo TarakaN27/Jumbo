@@ -34,8 +34,8 @@ return [
     'Total cost' => 'Общая сумма',
     'Get report' => 'Получить отчет',
     'Detail units table' => 'Детализированная статистика',
-    'Get docx report' => 'Получить docx',
-    'Get excel report' => 'Получить excel',
+    'Get docx report' => 'Скачать docx',
+    'Get excel report' => 'Скачать excel',
     'Selected managers' => 'Выбранные менеджеры',
     'Generate excel' => 'Сгенерировать Excel',
     'Generate docx' => 'Сгенерировать Docx',
@@ -87,5 +87,14 @@ return [
     'Prod total A-Z' => 'Произв. затраты А-Я',
     'Prod total Z-A' => 'Произв. затраты Я-А',
     'Tax total A-Z' => 'Налог А-Я',
-    'Tax total Z-A' => 'Налог Я-А'
+    'Tax total Z-A' => 'Налог Я-А',
+    'Currency code' => 'Код валюты условия',
+    'Currency name' => 'Название валюты условия',
+    'Corr factor' => 'Коэфициент',
+    'Commission' => 'Ставка комиссии',
+    'Sale rate' => 'Ставка скидки',
+    'Tax rate' => 'Ставка НДС',
+    'Get extended excel report' => 'Скачать расширенный Excel',
+    'Generate extend excel' => 'Сгенерировать расширенный Excel',
+    'Print' => 'Печать'
 ];

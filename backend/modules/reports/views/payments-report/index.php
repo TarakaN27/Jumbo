@@ -90,6 +90,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                                 </div>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <?=$form->field($model,'generateExcel')->checkbox();?>
+                                    <?=$form->field($model,'generateExtendExcel')->checkbox();?>
                                     <?=$form->field($model,'generateDocx')->checkbox();?>
                                 </div>
                             </div>
@@ -102,6 +103,42 @@ $this->title = Yii::t('app/reports','Payments reports');
                     </div>
                 <?php \yii\bootstrap\ActiveForm::end();?>
                     <hr/>
+
+                    <div class = "row no-print">
+                        <div class = "col-xs-12 text-center">
+                            <button class = "btn btn-default" onclick = "window.print();">
+                                <i class = "fa fa-print"></i> <?=Yii::t('app/reports','Print')?>
+                            </button>
+                            <?php if(!empty($arData['excelLink'])):?>
+                                <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get excel report'),[
+                                    '/site/get-document','name' => $arData['excelLink'],'hidfold' => 'reports'],
+                                    [
+                                        'target' => '_blank',
+                                        'class' => "btn btn-default"
+                                    ]
+                                )?>
+                            <?php endif;?>
+                            <?php if(!empty($arData['excelExtendLink'])):?>
+                                <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get extended excel report'),[
+                                    '/site/get-document','name' => $arData['excelExtendLink'],'hidfold' => 'reports'],
+                                    [
+                                        'target' => '_blank',
+                                        'class' => "btn btn-default"
+                                    ]
+                                )?>
+                            <?php endif;?>
+                            <?php if(!empty($arData['docxLink'])):?>
+                                <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get docx report'),[
+                                    '/site/get-document','name' => $arData['docxLink'],'hidfold' => 'reports'],
+                                    [
+                                        'target' => '_blank',
+                                        'class' => "btn btn-default"
+                                    ]
+                                )?>
+                            <?php endif;?>
+                        </div>
+                    </div>
+                    <hr/>
                 </div>
                 <div class="x_content">
                     <?php if(!empty($arData)):?>
@@ -112,32 +149,6 @@ $this->title = Yii::t('app/reports','Payments reports');
                     <?php else:?>
                         <p><?=Yii::t('app/reports','No data');?></p>
                     <?php endif;?>
-                    <hr/>
-                    <div class = "row no-print">
-                        <div class = "col-xs-12">
-                            <button class = "btn btn-default" onclick = "window.print();">
-                                <i class = "fa fa-print"></i> Print
-                            </button>
-                            <?php if(!empty($arData['excelLink'])):?>
-                                <?=Html::a(Yii::t('app/reports','Get excel report'),[
-                                    '/site/get-document','name' => $arData['excelLink'],'hidfold' => 'reports'],
-                                    [
-                                        'target' => '_blank',
-                                        'class' => "btn btn-default"
-                                    ]
-                                )?>
-                            <?php endif;?>
-                            <?php if(!empty($arData['docxLink'])):?>
-                                <?=Html::a(Yii::t('app/reports','Get docx report'),[
-                                        '/site/get-document','name' => $arData['docxLink'],'hidfold' => 'reports'],
-                                    [
-                                        'target' => '_blank',
-                                        'class' => "btn btn-default"
-                                    ]
-                                )?>
-                            <?php endif;?>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
