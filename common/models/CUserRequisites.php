@@ -332,7 +332,7 @@ class CUserRequisites extends AbstractActiveRecord
 
             ],
             [
-                ['ch_account', 'b_name','b_code', 'p_address','ynp','bank_address'],
+                ['ch_account', 'b_name','b_code', 'p_address','bank_address'],
                 'required',
                 'when' => function($model) {
                     if(
@@ -354,7 +354,34 @@ class CUserRequisites extends AbstractActiveRecord
                         }
                         return false;
                     }"
+            ],
+            [
+                ['ynp'],
+                'required',
+                'when' => function($model) {
+                    if(
+                        $this->isResident &&
+                        $this->allow_expense == AbstractActiveRecord::YES &&
+                        $this->contructor != CUser::CONTRACTOR_YES &&
+                        ($model->type_id == CUserRequisites::TYPE_J_PERSON || $model->type_id == CUserRequisites::TYPE_I_PERSON )
+                    )
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => "function (attribute, value) {
+                        var
+                            typeID = $('#cuserrequisites-type_id input:checked').val(),
+                            allowExpense = $('#cuser-allow_expense').val(),
+                            cntr = $('#cuser-contractor').val();
+                        if($('#cuserrequisites-isresident').val() == 'true' && cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' && allowExpense != undefined && allowExpense == '".AbstractActiveRecord::YES."' && (typeID == '".CUserRequisites::TYPE_I_PERSON."' || typeID == '".CUserRequisites::TYPE_J_PERSON."' ))
+                        {
+                            return true;
+                        }
+                        return false;
+                    }"
             ]
+
+
         ];
     }
 
