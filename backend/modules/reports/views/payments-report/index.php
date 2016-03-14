@@ -103,7 +103,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                     </div>
                 <?php \yii\bootstrap\ActiveForm::end();?>
                     <hr/>
-
+                    <?php if(!empty($arData)):?>
                     <div class = "row no-print">
                         <div class = "col-xs-12 text-center">
                             <button class = "btn btn-default" onclick = "window.print();">
@@ -139,6 +139,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                         </div>
                     </div>
                     <hr/>
+                    <?php endif;?>
                 </div>
                 <div class="x_content">
                     <?php if(!empty($arData)):?>
