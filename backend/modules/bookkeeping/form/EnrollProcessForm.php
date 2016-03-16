@@ -24,6 +24,7 @@ use yii\web\ServerErrorHttpException;
 class EnrollProcessForm extends Model{
 
     public
+        $cuserOP,
         $part_enroll,
         $availableAmount,
         $description,
@@ -38,7 +39,7 @@ class EnrollProcessForm extends Model{
     {
         return [
             [['description'],'string','max' => 255],
-            [['isPayment','part_enroll'],'integer'],
+            [['isPayment','part_enroll','cuserOP'],'integer'],
             [['enroll','repay','availableAmount'],'number'],
     //        ['enroll','validateAmount']
         ];
@@ -50,7 +51,8 @@ class EnrollProcessForm extends Model{
             'enroll' => \Yii::t('app/book','Unit enroll amount'),
             'repay' => \Yii::t('app/book','Unit repay amount'),
             'description' => \Yii::t('app/book','Description'),
-            'part_enroll' => \Yii::t('app/book','Partial enrollment')
+            'part_enroll' => \Yii::t('app/book','Partial enrollment'),
+            'cuserOP' => \Yii::t('app/book','Cuser for OP')
         ];
     }
 
@@ -108,16 +110,47 @@ class EnrollProcessForm extends Model{
             if ($this->repay > 0 && $this->isPayment)    //гасим обещанные платежи платежи
             {
                 $rAmount = $this->repay;
+                $arUserID  = [$this->request->cuser_id];
+                if(!empty($this->cuserOP))
+                    $arUserID [] = $this->cuserOP;
+
+                $arPromised = PromisedPayment::find()
+                    ->where([
+                        'cuser_id' => $arUserID,
+                        'service_id' => $this->request->service_id
+                    ])
+                    ->andWhere('(paid is NULL OR paid = 0)')
+                    //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
+                    ->all();
+
+                $arPIds = [];
+                foreach($arPromised as $pr)
+                    $arPIds [] = $pr->id;
+
+                $arRepayTmp = PromisedPayRepay::find()
+                    ->select(['amount','pr_pay_id'])
+                    ->where(['pr_pay_id' => $arPIds])
+                    ->all();
+
+                $arRepay = [];
+                foreach($arRepayTmp as $tmp)
+                    if(isset($arRepay[$tmp->pr_pay_id]))
+                        $arRepay[$tmp->pr_pay_id]+=$tmp->amount;
+                    else
+                        $arRepay[$tmp->pr_pay_id]=$tmp->amount;
+
                 /** @var PromisedPayment $pro */
-                foreach ($this->arPromised as $pro) {
+                foreach ($arPromised as $pro) {
                     if ($pro->paid == PromisedPayment::YES)
                         throw new InvalidParamException();
 
                     if ($rAmount <= 0)
                         break;
 
-                    if ($rAmount >= $pro->amount) {
-                        $rAmount -= $pro->amount;
+                    $repay = isset($arRepay[$pro->id]) ? $arRepay[$pro->id] : 0;
+
+                    if ($rAmount >= ($pro->amount - $repay)) {
+                        $rAmount -= ($pro->amount - $repay);
                         $pro->paid = PromisedPayment::YES;
                         $pro->buser_id_p = \Yii::$app->user->id;
                         $pro->paid_date = time();
@@ -126,7 +159,7 @@ class EnrollProcessForm extends Model{
                         $obRep = new PromisedPayRepay();
                         $obRep->enroll_id = $obEnroll->id;
                         $obRep->pr_pay_id = $pro->id;
-                        $obRep->amount = $pro->amount;
+                        $obRep->amount = ($pro->amount - $repay);
                         $obRep->payment_id = $this->request->payment_id;
                         if(!$obRep->save())
                             throw new ServerErrorHttpException();

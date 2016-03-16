@@ -97,5 +97,11 @@ return [
     'Get extended excel report' => 'Скачать расширенный Excel',
     'Generate extend excel' => 'Сгенерировать расширенный Excel',
     'Print' => 'Печать',
-    'Group total' => 'Всего по группе'
+    'Group total' => 'Всего по группе',
+    'Payments ID' => 'ID платежа',
+    'Pay date' => 'Дата платежа',
+    'Payment owner' => 'Владелец платежа',
+    'Can not load promised payments' => 'Не удалось загрузить обещанные платежи',
+    'Promised payment' => 'Обещанный платеж',
+    'Cuser for OP' => 'Контрагент для погашения ОП'
 ];

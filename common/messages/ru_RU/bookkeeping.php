@@ -203,7 +203,8 @@ return [
     'Partial enrollment' => 'Частичное зачисление',
     'Contract number' => 'Номер контракта',
     'Contract date' => 'Дата контракта',
-    'Responsibility' => 'Ответственный'
+    'Responsibility' => 'Ответственный',
+    'Cuser for OP' => 'Контрагент для погашения ОП'
 
 
 
