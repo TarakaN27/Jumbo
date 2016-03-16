@@ -10,14 +10,19 @@ use common\models\CUser;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\PaymentCondition;
+use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
 use common\models\PromisedPayment;
+use common\models\PromisedPayRepay;
+use common\models\Services;
 use Yii;
 use common\models\EnrollmentRequest;
 use common\models\search\EnrollmentRequestSearch;
+use yii\base\InvalidParamException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use yii\web\Response;
 
 /**
  * EnrollmentRequestController implements the CRUD actions for EnrollmentRequest model.
@@ -209,10 +214,26 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
             /** @var PaymentCondition $obCond */
             $obCond = is_object($obCalc) ? $obCalc->payCond : NULL;
-            $arPromised = PromisedPayment::find()->where([
-                'cuser_id' => $model->cuser_id,
-                'service_id' => $model->service_id
-            ])->andWhere('(paid is NULL OR paid = 0)')->all();
+            $arPromised = PromisedPayment::find()
+                ->select([
+                    PromisedPayment::tableName().'.id',
+                    PromisedPayment::tableName().'.amount',
+                    PromisedPayment::tableName().'.description',
+                    'owner',
+                    'service_id',
+                    BUser::tableName().'.fname',
+                    Buser::tableName().'.mname',
+                    BUser::tableName().'.lname',
+                    Services::tableName().'.name'
+                ])
+                ->joinWith('addedBy')
+                ->joinWith('service')
+                ->where([
+                    'cuser_id' => $model->cuser_id,
+                    'service_id' => $model->service_id
+                ])
+                ->andWhere('(paid is NULL OR paid = 0)')
+                ->all();
             $obPayment = $model->payment;
             $obForm->arPromised = $arPromised;
 
@@ -252,6 +273,15 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             }
         }
 
+        $cuserDesc = '';
+        if(!empty($obForm->cuserOP))
+        {
+            /** @var CUser $obCuser */
+            $obCuser = CUser::find()->where(['id' => $obForm->cuserOP])->joinWith('requisites')->one();
+            $cuserDesc = $obCuser->getInfoWithSite();
+        }
+
+
         return $this->render('process',[
             'model' => $model,
             'obPrPay' => $obPrPay,
@@ -261,8 +291,70 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             'obForm' => $obForm,
             'arPromised' => $arPromised,
             'obPayment' => $obPayment,
-            'exchRate' => $exchRate
+            'exchRate' => $exchRate,
+            'cuserDesc' => $cuserDesc
         ]);
 
     }
+
+    public function actionGetPromisedPayment()
+    {
+        $cID = Yii::$app->request->post('cuserID');
+        $cIPOP = Yii::$app->request->post('cuserOP');
+        $servID = Yii::$app->request->post('servID');
+
+        if(empty($servID))
+            throw new InvalidParamException();
+
+        $arUserID = [];
+        if(!empty($cID))
+            $arUserID [] = (int)$cID;
+        if(!empty($cIPOP))
+            $arUserID [] = (int)$cIPOP;
+
+        if(empty($arUserID))
+            throw new InvalidParamException();
+
+        $arPromised = PromisedPayment::find()
+            ->select([
+                PromisedPayment::tableName().'.id',
+                PromisedPayment::tableName().'.amount',
+                PromisedPayment::tableName().'.description',
+                'owner',
+                'service_id',
+                BUser::tableName().'.fname',
+                Buser::tableName().'.mname',
+                BUser::tableName().'.lname',
+                Services::tableName().'.name'
+            ])
+            ->joinWith('addedBy')
+            ->joinWith('service')
+            ->where([
+                'cuser_id' => $arUserID,
+                'service_id' => $servID
+            ])
+            ->andWhere('(paid is NULL OR paid = 0)')
+            //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
+            ->all();
+
+        $amount = 0;
+        foreach($arPromised as $pr)
+        {
+            $repay = $pr->repay;
+            $repAmount = 0;
+            foreach($repay as $rep)
+                $repAmount+=$rep->amount;
+
+            $amount+=($pr->amount-$repAmount);
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return [
+            'grid' => $this->renderPartial('_promised_grid',[
+                'arPromised' => $arPromised
+                ]),
+            'amount' => $amount
+        ];
+    }
+
 }

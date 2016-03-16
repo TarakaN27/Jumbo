@@ -7,24 +7,69 @@
  * Time: 4:15 PM
  */
 use yii\helpers\Html;
+use yii\web\JsExpression;
 $this->title = Yii::t('app/book','Process enrollment request');
 
 $this->registerJs("
-$('#enrollprocessform-repay').on('change',function(){
-    var
-        delta = 0,
-        amount =  $('#enrollprocessform-availableamount').val(),
-        repay = $(this).val(),
-        enroll = $('#enrollprocessform-enroll');
 
-    delta = amount-repay;
-    if(delta < 0)
-        {
-            enroll.val(0);
-        }else{
-            enroll.val(delta);
-        }
-})
+function countDelta()
+{
+    var
+            delta = 0,
+            amount =  $('#enrollprocessform-availableamount').val(),
+            repay = $('#enrollprocessform-repay').val(),
+            enroll = $('#enrollprocessform-enroll');
+
+        delta = amount-repay;
+        if(delta < 0)
+            {
+                enroll.val(0);
+            }else{
+                enroll.val(delta);
+            }
+}
+
+$('#enrollprocessform-repay').on('change',countDelta);
+$('#enrollprocessform-cuserop').on('change',function(){
+        var
+            this1 = $(this),
+            value = this1.val();
+
+        $.ajax({
+            type: 'POST',
+            url: '".\yii\helpers\Url::to(['get-promised-payment'])."',
+            data: { cuserID: ".$model->service_id.", cuserOP: value,servID: ".$model->service_id." },
+            success: function(data){
+                $('#promised-payment-table').html(data.grid);
+                var ppAmount = parseFloat(data.amount);
+                if(ppAmount > 0)
+                {
+                    var
+                        amount =  parseFloat($('#enrollprocessform-availableamount').val()),
+                        repay = $('#enrollprocessform-repay');
+                    repay.removeAttr('disabled');
+
+                    if(amount > ppAmount)
+                    {
+                        repay.val(ppAmount);
+                    }else{
+                        repay.val(amount);
+                    }
+                    countDelta();
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                addErrorNotify('".Yii::t('app/reports','Promised payment')."','".Yii::t('app/reports','Can not load promised payments')."');
+                this1.val('');
+                var
+                    repay = $('#enrollprocessform-repay');
+
+                repay.val(0);
+                repay.attr('disabled','disabled');
+                countDelta();
+            }
+        });
+});
 ",\yii\web\View::POS_READY);
 
 ?>
@@ -126,50 +171,21 @@ $('#enrollprocessform-repay').on('change',function(){
                                 ]
                             ]
                         ]);?>
-
-
-
                     <?php endif;?>
-
                 </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <?php if($model->payment_id):?>
-
                             <?=Html::tag('h3',Yii::t('app/book','Promised payments'))?>
-                            <?=\yii\grid\GridView::widget([
-                                'dataProvider' => new \yii\data\ArrayDataProvider([
-                                    'allModels' => $arPromised,
-                                ]),
-                                'columns' => [
-                                    [
-                                        'attribute' => 'amount',
-                                        'label' => Yii::t('app/book','Unit amount'),
-
-                                    ],
-                                    [
-                                        'attribute' => 'description',
-                                        'label' => Yii::t('app/book','Description')
-                                    ],
-                                    [
-                                        'attribute' => 'owner',
-                                        'label' => Yii::t('app/book','Owner'),
-                                        'value' => function($model){
-                                            return is_object($obBuser = $model->addedBy) ? $obBuser->getFio() : NULL;
-                                        }
-                                    ],
-                                ]
-
-                            ])?>
-
+                            <div id="promised-payment-table">
+                                <?=$this->render('_promised_grid',['arPromised' => $arPromised]);?>
+                            </div>
                         <?php endif;?>
                     </div>
                 </div>
 
-
                 <div class="row">
-
                         <?=Html::tag('h3',Yii::t('app/book','Enroll request proccess'))?>
                         <?php
                         $form = \yii\bootstrap\ActiveForm::begin([
@@ -193,6 +209,25 @@ $('#enrollprocessform-repay').on('change',function(){
                                     $arOptions['disabled'] = 'disabled';
 
                                 echo $form->field($obForm,'repay')->textInput($arOptions);
+
+                                echo $form->field($obForm,'cuserOP')->widget(\kartik\select2\Select2::className(),[
+                                    'initValueText' => $cuserDesc, // set the initial display text
+                                    'options' => [
+                                        'placeholder' => Yii::t('app/crm','Search for a company ...')
+                                    ],
+                                    'pluginOptions' => [
+                                        'allowClear' => true,
+                                        'minimumInputLength' => 2,
+                                        'ajax' => [
+                                            'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
+                                            'dataType' => 'json',
+                                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                                        ],
+                                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                                    ],
+                                ]);
                             }
                         ?>
                         <div class="form-group">
@@ -209,10 +244,7 @@ $('#enrollprocessform-repay').on('change',function(){
                             </div>
                         </div>
                         <?php \yii\bootstrap\ActiveForm::end();?>
-
                 </div>
-
-
             </div>
         </div>
     </div>

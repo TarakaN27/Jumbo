@@ -100,5 +100,8 @@ return [
     'Group total' => 'Всего по группе',
     'Payments ID' => 'ID платежа',
     'Pay date' => 'Дата платежа',
-    'Payment owner' => 'Владелец платежа'
+    'Payment owner' => 'Владелец платежа',
+    'Can not load promised payments' => 'Не удалось загрузить обещанные платежи',
+    'Promised payment' => 'Обещанный платеж',
+    'Cuser for OP' => 'Контрагент для погашения ОП'
 ];
