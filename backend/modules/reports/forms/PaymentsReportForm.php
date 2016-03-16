@@ -369,8 +369,9 @@ class PaymentsReportForm extends Model{
     }
 
     /**
-     * @param $arResult
-     * @return null|string
+     * @param $data
+     * @param array $arCondIDs
+     * @return string
      * @throws \PHPExcel_Exception
      * @throws \PHPExcel_Reader_Exception
      */
@@ -420,28 +421,29 @@ class PaymentsReportForm extends Model{
         $objPHPExcel->getActiveSheet()
             ->setCellValue('A9', 'Детализация платежей:');
 
-        $objPHPExcel->getActiveSheet()->setCellValue('A9',Yii::t('app/reports','Payments date'));
-        $objPHPExcel->getActiveSheet()->setCellValue('B9',Yii::t('app/reports','Contractor'));
-        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Responsibility'));
-        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Legal person'));
-        $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Service'));
-        $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Payment sum'));
-        $objPHPExcel->getActiveSheet()->setCellValue('G9',Yii::t('app/reports','Payment currency'));
-        $objPHPExcel->getActiveSheet()->setCellValue('H9',Yii::t('app/reports','Exchange currency'));
-        $objPHPExcel->getActiveSheet()->setCellValue('I9',Yii::t('app/reports','Profit'));
-        $objPHPExcel->getActiveSheet()->setCellValue('J9',Yii::t('app/reports','Production'));
-        $objPHPExcel->getActiveSheet()->setCellValue('K9',Yii::t('app/reports','Tax'));
+        $objPHPExcel->getActiveSheet()->setCellValue('A9',Yii::t('app/reports','Payments ID'));
+        $objPHPExcel->getActiveSheet()->setCellValue('B9',Yii::t('app/reports','Payments date'));
+        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Contractor'));
+        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Responsibility'));
+        $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Legal person'));
+        $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Service'));
+        $objPHPExcel->getActiveSheet()->setCellValue('G9',Yii::t('app/reports','Payment sum'));
+        $objPHPExcel->getActiveSheet()->setCellValue('H9',Yii::t('app/reports','Payment currency'));
+        $objPHPExcel->getActiveSheet()->setCellValue('I9',Yii::t('app/reports','Exchange currency'));
+        $objPHPExcel->getActiveSheet()->setCellValue('J9',Yii::t('app/reports','Profit'));
+        $objPHPExcel->getActiveSheet()->setCellValue('K9',Yii::t('app/reports','Production'));
+        $objPHPExcel->getActiveSheet()->setCellValue('L9',Yii::t('app/reports','Tax'));
 
-        $objPHPExcel->getActiveSheet()->setCellValue('L9',Yii::t('app/reports','Corr factor'));
-        $objPHPExcel->getActiveSheet()->setCellValue('M9',Yii::t('app/reports','Commission'));
-        $objPHPExcel->getActiveSheet()->setCellValue('N9',Yii::t('app/reports','Sale rate'));
-        $objPHPExcel->getActiveSheet()->setCellValue('O9',Yii::t('app/reports','Tax rate'));
+        $objPHPExcel->getActiveSheet()->setCellValue('M9',Yii::t('app/reports','Corr factor'));
+        $objPHPExcel->getActiveSheet()->setCellValue('N9',Yii::t('app/reports','Commission'));
+        $objPHPExcel->getActiveSheet()->setCellValue('O9',Yii::t('app/reports','Sale rate'));
+        $objPHPExcel->getActiveSheet()->setCellValue('P9',Yii::t('app/reports','Tax rate'));
 
-        $objPHPExcel->getActiveSheet()->setCellValue('P9',Yii::t('app/reports','Payment calc condition'));
-        $objPHPExcel->getActiveSheet()->setCellValue('Q9',Yii::t('app/reports','Condition currency'));
+        $objPHPExcel->getActiveSheet()->setCellValue('Q9',Yii::t('app/reports','Payment calc condition'));
+        $objPHPExcel->getActiveSheet()->setCellValue('R9',Yii::t('app/reports','Condition currency'));
 
-        $objPHPExcel->getActiveSheet()->setCellValue('R9',Yii::t('app/reports','Currency code'));
-        $objPHPExcel->getActiveSheet()->setCellValue('S9',Yii::t('app/reports','Currency name'));
+        $objPHPExcel->getActiveSheet()->setCellValue('S9',Yii::t('app/reports','Currency code'));
+        $objPHPExcel->getActiveSheet()->setCellValue('T9',Yii::t('app/reports','Currency name'));
         $i=10;
 
         foreach($data['data'] as $key=>$dt)
@@ -452,34 +454,31 @@ class PaymentsReportForm extends Model{
                 /** @var PaymentsCalculations $calc */
                 $calc=$d->calculate;
 
+                $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
+                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,Yii::$app->formatter->asDate($d->pay_date));
+                $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,$d->pay_summ);
 
+                $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,isset($data['currency'][$d->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$d->id]) : '');
 
+                $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc) ? $calc->profit : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc) ? $calc->production : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($calc) ? $calc->tax : 'N/A');
 
+                $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,is_object($calc) ? $calc->cnd_corr_factor : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('N'.$i,is_object($calc) ? $calc->cnd_commission : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$i,is_object($calc) ? $calc->cnd_sale : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$i,is_object($calc) ? $calc->cnd_tax : 'N/A');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,Yii::$app->formatter->asDate($d->pay_date));
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d->pay_summ);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$i,is_object($calc) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$i,isset($data['condCurr'][$d->id]) ? $data['condCurr'][$d->id] : 'N/A');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$d->id]) : '');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,is_object($calc) ? $calc->profit : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc) ? $calc->production : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc) ? $calc->tax : 'N/A');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($calc) ? $calc->cnd_corr_factor : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,is_object($calc) ? $calc->cnd_commission : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$i,is_object($calc) ? $calc->cnd_sale : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$i,is_object($calc) ? $calc->cnd_tax : 'N/A');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$i,is_object($calc) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$i,isset($data['condCurr'][$d->id]) ? $data['condCurr'][$d->id] : 'N/A');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['code'] : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['name'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['code'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['name'] : 'N/A');
 
                 $i++;
             }
