@@ -32,6 +32,7 @@ use yii\helpers\ArrayHelper;
  * @property string $lname
  * @property string $mname
  * @property integer $log_work_type
+ * @property integer $allow_unit
  */
 class BUser extends AbstractUser
 {
@@ -146,7 +147,10 @@ class BUser extends AbstractUser
             [['fname','lname','mname'], 'string', 'min' => 2, 'max' => 255],
 
             ['log_work_type','default','value' => self::LOG_WORK_TYPE_DEFAULT],
-            ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())]
+            ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())],
+
+            ['allow_unit','integer'],
+            ['allow_unit','default','value' => 0]
         ];
     }
 
@@ -171,7 +175,8 @@ class BUser extends AbstractUser
             'lname' => Yii::t('app/users', 'Last name'),
             'mname' => Yii::t('app/users', 'Midle name'),
             'crm_group_id' => Yii::t('app/users', 'Crm Group Id'),
-            'log_work_type' => Yii::t('app/crm','Log work type')
+            'log_work_type' => Yii::t('app/crm','Log work type'),
+            'allow_unit' => Yii::t('app/users','Allow unit')
         ];
     }
 
