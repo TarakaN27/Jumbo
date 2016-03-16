@@ -177,7 +177,7 @@ $('#sort-type').on('change',function(){
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_SERVICE ||
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_CONTRACTOR
             ):?>
-                <th class="width-8-percent"><?=Yii::t('app/reports','Responsibility')?></th>
+                <th class="width-8-percent"><?=Yii::t('app/reports','Payment owner')?></th>
             <?php endif;?>
             <?php if(
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_MANAGER ||
@@ -219,7 +219,7 @@ $('#sort-type').on('change',function(){
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_CONTRACTOR
             ):?>
             <td class="width-8-percent">
-                    <?=is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A';?>
+                    <?=is_object($req = $dt->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A';?>
             </td>
             <?php endif;?>
             <?php if(

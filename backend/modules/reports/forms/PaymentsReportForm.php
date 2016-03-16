@@ -12,6 +12,7 @@ use common\models\CUser;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\PaymentCondition;
+use common\models\PaymentRequest;
 use common\models\Payments;
 use yii\base\Model;
 use Yii;
@@ -107,22 +108,23 @@ class PaymentsReportForm extends Model{
     public function getData()
     {
         $data = Payments::find();//->with('calculate','cuser','legal','service','calculate.payCond');
-        $data->joinWith('calculate');
+        //$data->joinWith('calculate');
         $data->joinWith('cuser');
-        $data->joinWith('cuser.manager');
+        //$data->joinWith('cuser.manager');
         $data->joinWith('cuser.requisites');
         $data->joinWith('legal');
         $data->joinWith('service');
         $data->joinWith('calculate.payCond');
+        $data->joinWith('payRequest.manager');
         $data->where(
-            ' pay_date > "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
-            ' AND pay_date < "'.strtotime($this->dateTo.' 23:59:59').'"'
+            Payments::tableName().'.pay_date > "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
+            ' AND '.Payments::tableName().'.pay_date < "'.strtotime($this->dateTo.' 23:59:59').'"'
         );
 
         $data->andFilterWhere([
             Payments::tableName().'.service_id' => $this->services,
             Payments::tableName().'.cuser_id' => $this->contractor,
-            CUser::tableName().'.manager_id' => $this->managers
+            PaymentRequest::tableName().'.manager_id' => $this->managers
         ]);
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
@@ -194,7 +196,7 @@ class PaymentsReportForm extends Model{
                     }
                     break;
                 case self::GROUP_BY_MANAGER:
-                    $manID = is_object($obUser = $dt->cuser) ? is_object($obMan = $obUser->manager) ? $obMan->getFio() : 'n_a' : 'n_a';
+                    $manID = is_object($obUser = $dt->payRequest) ? is_object($obMan = $obUser->manager) ? $obMan->getFio() : 'n_a' : 'n_a';
                     $arResult['data'][$manID][] = $dt;
 
                     $totalGroupSum = $this->totalHelper($totalGroupSum,$manID,$dt->pay_summ*$iCurr);
@@ -322,7 +324,7 @@ class PaymentsReportForm extends Model{
 
         $objPHPExcel->getActiveSheet()->setCellValue('A9',Yii::t('app/reports','Payments date'));
         $objPHPExcel->getActiveSheet()->setCellValue('B9',Yii::t('app/reports','Contractor'));
-        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Responsibility'));
+        $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Payment owner'));
         $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Legal person'));
         $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Service'));
         $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Payment sum'));
@@ -344,7 +346,7 @@ class PaymentsReportForm extends Model{
                     $calc=$d->calculate;
                     $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,Yii::$app->formatter->asDate($d->pay_date));
                     $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($req = $d->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
                     $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
                     $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
                     $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d->pay_summ);
@@ -424,7 +426,7 @@ class PaymentsReportForm extends Model{
         $objPHPExcel->getActiveSheet()->setCellValue('A9',Yii::t('app/reports','Payments ID'));
         $objPHPExcel->getActiveSheet()->setCellValue('B9',Yii::t('app/reports','Payments date'));
         $objPHPExcel->getActiveSheet()->setCellValue('C9',Yii::t('app/reports','Contractor'));
-        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Responsibility'));
+        $objPHPExcel->getActiveSheet()->setCellValue('D9',Yii::t('app/reports','Payment owner'));
         $objPHPExcel->getActiveSheet()->setCellValue('E9',Yii::t('app/reports','Legal person'));
         $objPHPExcel->getActiveSheet()->setCellValue('F9',Yii::t('app/reports','Service'));
         $objPHPExcel->getActiveSheet()->setCellValue('G9',Yii::t('app/reports','Payment sum'));
@@ -457,7 +459,7 @@ class PaymentsReportForm extends Model{
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,Yii::$app->formatter->asDate($d->pay_date));
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($req = $d->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,$d->pay_summ);
@@ -531,7 +533,7 @@ class PaymentsReportForm extends Model{
                     {
                         $doc->setValue('cDate#'.$iter, Yii::$app->formatter->asDate($item->pay_date));
                         $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
-                        $doc->setValue('manager#'.$iter,is_object($cuser)&&is_object($obMan = $cuser->manager) ? $obMan->getFio() : 'N/A');
+                        $doc->setValue('manager#'.$iter,is_object($req = $item->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
                         $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
                         $doc->setValue('service#'.$iter,is_object($serv=$item->service) ? $serv->name : 'N/A');
                         $doc->setValue('iSum#'.$iter,$item->pay_summ);

@@ -98,5 +98,7 @@ return [
     'Generate extend excel' => 'Сгенерировать расширенный Excel',
     'Print' => 'Печать',
     'Group total' => 'Всего по группе',
-    'Payments ID' => 'ID платежа'
+    'Payments ID' => 'ID платежа',
+    'Pay date' => 'Дата платежа',
+    'Payment owner' => 'Владелец платежа'
 ];
