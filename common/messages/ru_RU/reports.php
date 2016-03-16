@@ -103,5 +103,5 @@ return [
     'Payment owner' => 'Владелец платежа',
     'Can not load promised payments' => 'Не удалось загрузить обещанные платежи',
     'Promised payment' => 'Обещанный платеж',
-    'Cuser for OP' => 'Контрагент для погашения ОП'
+    'Cuser for OP' => 'Погасить ОП другого контрагента'
 ];

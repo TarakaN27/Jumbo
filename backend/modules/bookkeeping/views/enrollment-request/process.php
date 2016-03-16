@@ -38,7 +38,7 @@ $('#enrollprocessform-cuserop').on('change',function(){
         $.ajax({
             type: 'POST',
             url: '".\yii\helpers\Url::to(['get-promised-payment'])."',
-            data: { cuserID: ".$model->service_id.", cuserOP: value,servID: ".$model->service_id." },
+            data: { cuserID: ".$model->cuser_id.", cuserOP: value,servID: ".$model->service_id." },
             success: function(data){
                 $('#promised-payment-table').html(data.grid);
                 var ppAmount = parseFloat(data.amount);
@@ -200,7 +200,7 @@ $('#enrollprocessform-cuserop').on('change',function(){
                         echo Html::activeHiddenInput($obForm,'availableAmount');
 
                         ?>
-                        <?= $form->field($obForm,'enroll')->textInput();?>
+
                         <?php
                             if($obForm->isPayment)
                             {
@@ -230,6 +230,7 @@ $('#enrollprocessform-cuserop').on('change',function(){
                                 ]);
                             }
                         ?>
+                        <?= $form->field($obForm,'enroll')->textInput();?>
                         <div class="form-group">
                             <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                                 <?= $form->field($obForm,'part_enroll')->checkbox()?>

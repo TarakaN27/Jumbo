@@ -184,7 +184,7 @@ return [
     'Prepay history' => 'История погашений',
     'Enr Req ID' => 'Запрос на зачисление',
     'Payment request already processed' => 'Запрос на платеж уже обработан.',
-    'Unit enroll amount' => 'Кол-во единиц к зачислению',
+    'Unit enroll amount' => 'Кол-во единиц к зачислению из платежа',
     'Unit repay amount' => 'Кол-во единиц для погашения ОП',
     'Owner' => 'Кто добавил',
     'PaymentID' => 'ID платежа ',
@@ -200,11 +200,11 @@ return [
     'Condition info' => 'Информация по условиям',
     'Not enough amount for create partition request' => 'Не достаточно единиц для создания подзапроса на зачисление',
     'Parent request' => 'ID родительского запроса',
-    'Partial enrollment' => 'Частичное зачисление',
+    'Partial enrollment' => 'Частичное зачисление "Зачислить указанную часть расчетного кол-ва единиц и создать запрос на дозачисление остатка"',
     'Contract number' => 'Номер контракта',
     'Contract date' => 'Дата контракта',
     'Responsibility' => 'Ответственный',
-    'Cuser for OP' => 'Контрагент для погашения ОП'
+    'Cuser for OP' => 'Погасить ОП другого контрагента'
 
 
 
