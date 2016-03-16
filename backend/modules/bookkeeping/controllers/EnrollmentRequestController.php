@@ -217,6 +217,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             $arPromised = PromisedPayment::find()
                 ->select([
                     PromisedPayment::tableName().'.id',
+                    PromisedPayment::tableName().'.cuser_id',
                     PromisedPayment::tableName().'.amount',
                     PromisedPayment::tableName().'.description',
                     'owner',
@@ -318,6 +319,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $arPromised = PromisedPayment::find()
             ->select([
                 PromisedPayment::tableName().'.id',
+                PromisedPayment::tableName().'.cuser_id',
                 PromisedPayment::tableName().'.amount',
                 PromisedPayment::tableName().'.description',
                 'owner',

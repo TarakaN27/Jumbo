@@ -39,6 +39,13 @@
 			'value' => function($model){
 				return is_object($obServ = $model->service) ? $obServ->name : NULL;
 			}
+		],
+		[
+			'attribute' => 'cuser_id',
+			'label' => Yii::t('app/book','Cuser ID'),
+			'value' => function($model){
+				return is_object($obCuser = $model->cuser) ? $obCuser->getInfoWithSite() : NULL;
+			}
 		]
 	]
 
