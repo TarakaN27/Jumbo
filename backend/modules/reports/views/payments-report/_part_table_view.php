@@ -147,7 +147,7 @@ $('#sort-type').on('change',function(){
                  data-prod = "<?=isset($model['totalGroupProd'][$key]) ? $model['totalGroupProd'][$key] : 0;?>"
             >
         <tr style="background-color:#f9f9f9">
-            <td colspan="12">
+            <td colspan="13">
                 <?php
                     switch($modelForm->groupType)
                     {
@@ -168,6 +168,7 @@ $('#sort-type').on('change',function(){
             </td>
         </tr>
         <tr>
+            <th class="width-4-percent"><?=Yii::t('app/reports','Payments ID')?></th>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_CONTRACTOR):?>
                 <th class="width-16-percent"><?=Yii::t('app/reports','Contractor')?></th>
             <?php endif;?>
@@ -201,6 +202,11 @@ $('#sort-type').on('change',function(){
         <?php
         foreach($data as $dt): $cuser=$dt->cuser;?>
         <tr>
+            <td class="width-4-percent">    <?=\yii\helpers\Html::a(
+                    $dt->id,
+                    ['/bookkeeping/default/view','id' => $dt->id],
+                    ['target' => '_blank']
+                );?></td>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_CONTRACTOR):?>
             <td class="width-16-percent">
                     <?=is_object($cuser) ? $cuser->getInfo() : 'N/A';?>
@@ -261,7 +267,7 @@ $('#sort-type').on('change',function(){
         </tr>
         <?php endforeach;?>
         <tr class="wm-tr-total">
-            <td colspan="4">
+            <td colspan="5">
                 <?=Yii::t('app/reports','Group total')?>
             </td>
             <td>
