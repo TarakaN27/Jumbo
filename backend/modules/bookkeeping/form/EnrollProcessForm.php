@@ -111,8 +111,14 @@ class EnrollProcessForm extends Model{
             {
                 $rAmount = $this->repay;
                 $arUserID  = [$this->request->cuser_id];
-                if(!empty($this->cuserOP))
+                $orderType = SORT_ASC;
+                if(!empty($this->cuserOP)) {
                     $arUserID [] = $this->cuserOP;
+                    if($this->cuserOP < $this->request->cuser_id)
+                        $orderType = SORT_DESC;
+                }
+
+                $arUserID = array_unique($arUserID);
 
                 $arPromised = PromisedPayment::find()
                     ->where([
@@ -120,6 +126,7 @@ class EnrollProcessForm extends Model{
                         'service_id' => $this->request->service_id
                     ])
                     ->andWhere('(paid is NULL OR paid = 0)')
+                    ->orderBy(['cuser_id' => $orderType])
                     //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
                     ->all();
 
