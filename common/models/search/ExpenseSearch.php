@@ -106,10 +106,10 @@ class ExpenseSearch extends Expense
         $query->andFilterWhere(['like', 'description', $this->description]);
 
         if(!empty($this->from_date))
-            $query->andWhere(self::tableName().".created_at >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
+            $query->andWhere(self::tableName().".pay_date >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
 
         if(!empty($this->to_date))
-            $query->andWhere(self::tableName().".created_at <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
+            $query->andWhere(self::tableName().".pay_date <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
 
         if(
             !empty($this->pay_date)||
