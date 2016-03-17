@@ -369,6 +369,7 @@ $this->registerJs('
                                              'attribute' => 'pay_date',
                                              'value' => Yii::$app->formatter->asDate($modelP->pay_date)
                                          ],
+                                         'description:text'
 
                                      ]
                                 ])?>
