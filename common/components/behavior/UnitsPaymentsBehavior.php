@@ -11,8 +11,11 @@ namespace common\components\behavior;
 
 use app\models\Units;
 use app\models\UnitsToManager;
+use backend\models\BUser;
 use common\components\helpers\CustomHelper;
+use common\models\AbstractActiveRecord;
 use common\models\CUser;
+use common\models\Payments;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
 
@@ -53,9 +56,22 @@ class UnitsPaymentsBehavior extends Behavior{
         if(empty($obUnit))
             return TRUE;
 
+        /** @var BUser $obManager */
+        $obManager = BUser::find()      //находим менеджера, для которого зачисляется unit
+            ->select(['b.id','b.allow_unit'])
+            ->alias('b')
+            ->leftJoin(CUser::tableName().' as c','c.manager_id = b.id')
+            ->where(['c.id' => $iCUserID])
+            ->one();
+
+        if(!$obManager || $obManager->allow_unit != AbstractActiveRecord::YES)  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units
+            return TRUE;
+
+        /*
         $iManager = CUser::find()->select('manager_id')->where(['id' => $iCUserID])->scalar();      //ID менеджера
         if(empty($iManager))
             return TRUE;
+        */
 
         $cost = $obUnit->getCostForDate($sDate);    // получаем стоимость юнита на дату платежа
 
@@ -64,10 +80,10 @@ class UnitsPaymentsBehavior extends Behavior{
 
         if($obUnit->multiple == Units::YES)     // зачислять за каждый платеж ?
         {
-            return $this->saveManUnit($cost,$iManager,$iPayID,$obUnit->id,$sDate); // начисляем юнит
+            return $this->saveManUnit($cost,$obManager->id,$iPayID,$obUnit->id,$sDate); // начисляем юнит
         }else{  //начислять только один раз в месяц за платеж
             $bManUnit = UnitsToManager::find()->where([   //проверяем не зачисляли ли в месяце на дату платежа.
-                    'manager_id' => $iManager,
+                    'manager_id' => $obManager->id,
                     'unit_id' => $obUnit->id
                 ])
                 ->andWhere(' (( updated_at >= '.CustomHelper::getBeginMonthTime($sDate).' AND '.
@@ -79,7 +95,7 @@ class UnitsPaymentsBehavior extends Behavior{
             if(!empty($bManUnit)) //если было зачисление
                 return TRUE;
 
-            return $this->saveManUnit($cost,$iManager,$iPayID,$obUnit->id,$sDate); //начисляем юнит
+            return $this->saveManUnit($cost,$obManager->id,$iPayID,$obUnit->id,$sDate); //начисляем юнит
         }
         return FALSE;
     }
@@ -111,7 +127,35 @@ class UnitsPaymentsBehavior extends Behavior{
      */
     public function afterDelete()
     {
-        $iPayID = $this->owner->id;
+        $iPayID = $this->owner->id;             // ID платежа
+        $iCUserID = $this->owner->cuser_id;     // ID контрагента
+        $sDate = $this->owner->pay_date;        // Дата платежа
+        $iService = $this->owner->service_id;   // ID услуги
+
+        /** @var Units $obUnit */
+        $obUnit = Units::find()->where(['service_id' => $iService,'type' => Units::TYPE_PAYMENT])->one(); //ищем юнит
+        if(empty($obUnit) || $obUnit->multiple == Units::YES)  //если не нашли, удалим юниты по платежу или если юниты зачисляются несколбко раз
+        {
+            UnitsToManager::deleteAll(['payment_id' => $iPayID]);
+            return TRUE;
+        }
+
+        UnitsToManager::deleteAll(['payment_id' => $iPayID]);
+
+        $obPayment = Payments::find()
+            ->where('pay_date >= :beginDate && pay_date <= :endDate')
+            ->andWhere(['!=','cuser_id',$iCUserID])
+            ->params([
+                ':beginDate' => CustomHelper::getBeginMonthTime($sDate),
+                ':endDate' => CustomHelper::getEndMonthTime($sDate)
+            ])
+            ->orderBy(['pay_date' => SORT_ASC])
+            ->one();
+        if(!$obPayment)
+            return TRUE;
+
+
+
         UnitsToManager::deleteAll(['payment_id' => $iPayID]);
         return TRUE;
     }
