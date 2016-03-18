@@ -117,8 +117,8 @@ class PaymentsReportForm extends Model{
         $data->joinWith('calculate.payCond');
         $data->joinWith('payRequest.manager');
         $data->where(
-            Payments::tableName().'.pay_date > "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
-            ' AND '.Payments::tableName().'.pay_date < "'.strtotime($this->dateTo.' 23:59:59').'"'
+            Payments::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
+            ' AND '.Payments::tableName().'.pay_date <= "'.strtotime($this->dateTo.' 23:59:59').'"'
         );
 
         $data->andFilterWhere([
