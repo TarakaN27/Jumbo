@@ -215,5 +215,6 @@ return [
     'Allow unit' => 'Разрешить зачисление юнитов',
     'Cuser Groups' => 'Группы компаний',
     'Create Cuser Groups' => 'Добавить группу компаний',
-    'Corp name' => 'Название компании'
+    'Corp name' => 'Название компании',
+    'USER_cuser_groups' => 'Группы компаний'
 ];

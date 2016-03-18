@@ -324,6 +324,11 @@ $menuItems[] = [
                                             </a>
                                         </li>
                                         <?php endif;?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/user-groups/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_groups'); ?></a>
+                                            </li>
+                                        <?php endif;?>
                                         <?php if(Yii::$app->user->can('adminRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
