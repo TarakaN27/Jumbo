@@ -135,9 +135,9 @@ class PromisedPaymentSearch extends PromisedPayment
         {
             $name = is_object($tmp->service) ? $tmp->service->getNameWithEnrollUnit() : $tmp->service_id;
             if(isset($arResult[$name]))
-                $arResult[$name]+=$tmp->amount;
+                $arResult[$name]+=(float)$tmp->amount;
             else
-                $arResult[$name]=$tmp->amount;
+                $arResult[$name]=(float)$tmp->amount;
         }
         return $arResult;
     }
