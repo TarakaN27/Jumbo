@@ -352,7 +352,7 @@ class PaymentsReportForm extends Model{
                     $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d->pay_summ);
 
                     $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$d->id]) : '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d->id]) ? $data['currency'][$d->id] : '');
 
                     $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,is_object($calc) ? $calc->profit : 'N/A');
                     $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc) ? $calc->production : 'N/A');
@@ -465,7 +465,7 @@ class PaymentsReportForm extends Model{
                 $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,$d->pay_summ);
 
                 $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,isset($data['currency'][$d->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$d->id]) : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,isset($data['currency'][$d->id]) ? $data['currency'][$d->id] : '');
 
                 $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc) ? $calc->profit : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc) ? $calc->production : 'N/A');
