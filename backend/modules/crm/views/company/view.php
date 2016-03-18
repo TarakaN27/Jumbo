@@ -302,11 +302,34 @@ $this->registerJs("
 							</div>
 						</div>
 					</div>
-
-
 				</div>
 				<!-- start project-detail sidebar -->
 				<div class="col-md-3 col-sm-3 col-xs-12">
+					<?php if(!empty($arGroups)):?>
+					<section>
+						<div class="x_title">
+							<h2><?php echo Yii::t('app/crm','Group company')?></h2>
+							<div class="clearfix"></div>
+						</div>
+						<div class="media event">
+							<?php
+							$arItem = [];
+							foreach($arGroups as $group)
+							{
+								$arItem [] = [
+									'label' => $group->name,
+									'content'=>$this->render('_part_collapse_groups',['data' => $group->cuserObjects])
+								];
+							}
+							?>
+							<?php echo CollapseWidget::widget([
+								'items' => $arItem
+							]);
+							?>
+
+						</div>
+					</section>
+					<?php endif;?>
 					<section class="wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Assigned At')?></h2>

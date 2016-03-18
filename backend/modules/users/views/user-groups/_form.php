@@ -34,7 +34,7 @@ use yii\web\JsExpression;
             'allowClear' => true,
             'minimumInputLength' => 2,
             'ajax' => [
-                'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
+                'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp-for-user']),
                 'dataType' => 'json',
                 'data' => new JsExpression('function(params) { return {q:params.term}; }')
             ],

@@ -93,7 +93,6 @@ class CUserGroups extends AbstractActiveRecord
             }else
                 return FALSE;
         }catch (Exception $e){
-            var_dump($e);
             $tr->rollBack();
             return FALSE;
         }

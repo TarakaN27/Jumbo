@@ -24,7 +24,12 @@ class UserGroupsController extends Controller
     public function actionIndex()
     {
         $searchModel = new CUserGroupsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $addQuery = [];
+        if(!Yii::$app->user->can('adminRights'))
+            $addQuery = ['cu.manager_id' => Yii::$app->user->id];
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addQuery);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -79,7 +84,6 @@ class UserGroupsController extends Controller
                     ->all();
                 $data = ArrayHelper::map($arCuser,'id','infoWithSite');
             }
-            var_dump($model->getErrors());
             return $this->render('create', [
                 'model' => $model,
                 'data' => $data

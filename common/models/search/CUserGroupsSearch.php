@@ -39,9 +39,17 @@ class CUserGroupsSearch extends CUserGroups
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$addQuery = NULL,$addParams = [])
     {
-        $query = CUserGroups::find();
+        $query = CUserGroups::find()
+            ->alias('gr')
+            ->joinWith('cuserObjects cu');
+
+        if(!empty($addQuery))
+            $query->where($addQuery);
+
+        if(!empty($addParams))
+            $query->params($addParams);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -56,12 +64,12 @@ class CUserGroupsSearch extends CUserGroups
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'gr.id' => $this->id,
+            'gr.created_at' => $this->created_at,
+            'gr.updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'gr.name', $this->name]);
 
         return $dataProvider;
     }

@@ -96,6 +96,51 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
+	public function actionGetCmpForUser($q = null, $id = null)
+	{
+		$out = ['results' => ['id' => '', 'text' => '']];
+		if (!is_null($q)) {
+
+			$obCUser = CUser::find()
+				->select([CUser::tableName().'.id','requisites_id'])
+				->joinWith('requisites')
+				->where(['like',CUserRequisites::tableName().'.corp_name',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.site',$q]);
+
+			if(!Yii::$app->user->can('adminRights'))
+				$obCUser = $obCUser->andWhere([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
+
+			$obCUser = $obCUser->limit(10)
+
+			//	->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
+
+			//echo $obCUser;die;
+
+				->all()
+			;
+
+			foreach($obCUser as $user)
+				$out['results'] []= [
+					'id' => $user->id,
+					'text' => $user->getInfoWithSite()
+				];
+			$out['results'] = array_values($out['results']);
+
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => CUser::findOne($id)->getInfoWithSite()];
+		}
+		return $out;
+	}
+
 	public function actionGetContractor($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];

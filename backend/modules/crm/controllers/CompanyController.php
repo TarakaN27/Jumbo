@@ -202,15 +202,13 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
 		$data = [];
 
-
+		//получаем группы к которой принадлежит компания
 		$arGroups = CUserGroups::find()
-			->select([
-
-			])
 			->alias('gr')
 			->joinWith('cuserObjects cu')
+			->joinWith('cuserObjects.requisites')
 			->where([
-				
+				'cu.id' => $id
 			])
 			->all();
 
@@ -303,7 +301,8 @@ class CompanyController extends AbstractBaseBackendController
 			'dataContact' => $dataContact,
 			'sAssName' => $sAssName,
 			'data' => $data,
-			'obQHour' => $obQHour
+			'obQHour' => $obQHour,
+			'arGroups' => $arGroups
 		]);
 	}
 
