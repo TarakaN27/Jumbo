@@ -203,6 +203,20 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
+                                <li>
+                                    <a>
+                                        <i class="fa fa-gift"></i><?php echo Yii::t('app/common', 'Remuneration'); ?>
+                                        <span class = "fa fa-chevron-down"></span>
+                                    </a>
+                                    <ul class = "nav child_menu" style = "display: none">
+
+                                            <li>
+                                                <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/common', 'Remuneration'); ?></a>
+                                            </li>
+
+                                    </ul>
+                                </li>
+
                                 <?php if(
                                 Yii::$app->user->can('adminRights') ||
                                 Yii::$app->user->can('only_bookkeeper') ||

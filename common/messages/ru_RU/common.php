@@ -91,5 +91,6 @@ return [
     'Enrollment request' => 'Запрос на зачисление',
     'Enrollments' => 'Зачисления',
     'Select all' => 'Выбрать все',
-    'Deselect all' => 'Очистить'
+    'Deselect all' => 'Очистить',
+    'Remuneration' => 'Вознаграждения'
 ];

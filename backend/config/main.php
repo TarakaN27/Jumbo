@@ -42,6 +42,9 @@ return [
         'crm' => [
             'class' => 'app\modules\crm\Module',
         ],
+        'bonus' => [
+            'class' => 'backend\modules\bonus\Module',
+        ],
     ],
     'components' => [
 
