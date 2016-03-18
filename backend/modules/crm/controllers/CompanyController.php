@@ -18,6 +18,7 @@ use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use common\models\CUser;
+use common\models\CUserGroups;
 use common\models\CuserServiceContract;
 use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
@@ -200,6 +201,18 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask->cmp_id = $id;   //вешаем компанию
 		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
 		$data = [];
+
+
+		$arGroups = CUserGroups::find()
+			->select([
+
+			])
+			->alias('gr')
+			->joinWith('cuserObjects cu')
+			->where([
+				
+			])
+			->all();
 
 		/**
 		 * Добавление задачи

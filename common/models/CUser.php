@@ -378,9 +378,20 @@ class CUser extends AbstractUser
         return $this->hasOne(CuserQuantityHour::className(),['cuser_id' => 'id']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getProspects()
     {
         return $this->hasOne(CuserProspects::className(),['id' => 'prospects_id']);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getCmpGroup()
+    {
+        return $this->hasMany(CUserGroups::className(), ['id' => 'group_id'])->viaTable(CuserToGroup::tableName(), ['cuser_id' => 'id']);
     }
 
     /**

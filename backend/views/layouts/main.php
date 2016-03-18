@@ -329,6 +329,9 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
                                             </li>
                                             <li>
+                                                <a href = "<?= Url::to(['/users/user-groups/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_groups'); ?></a>
+                                            </li>
+                                            <li>
                                                 <a href = "<?= Url::to(['/users/cuser-prospects/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_prospects'); ?></a>
                                             </li>
                                         <?php endif;?>
