@@ -62,7 +62,7 @@ class RecalcPayment
 			$corrfactor = is_numeric($newCond['corr_factor']) ? $newCond['corr_factor'] : $calc->cnd_corr_factor;
 			$tax = is_numeric($newCond['tax']) ? $newCond['tax'] : $calc->cnd_tax;
 
-			$commision = is_null($newCond['kommision']) ? $newCond['kommision'] : $calc->cnd_commission;
+			$commision = is_numeric($newCond['kommision']) ? $newCond['kommision'] : $calc->cnd_commission;
 			$sale = $calc->cnd_sale;
 
 			$obPO = new PaymentOperations($amount,$tax,$commision,$corrfactor,$sale,PaymentCondition::TYPE_USUAL,NULL);
@@ -99,7 +99,7 @@ class RecalcPayment
 				->joinWith('payment pay')
 				->where('pay.pay_date >= :begindate')
 				->andwhere(['pay_cond_id' => $begin])
-				->params([':begindate' => strtotime($begin['bigin'].' 00:00:00')])
+				->params([':begindate' => strtotime($newCond['bigin'].' 00:00:00')])
 				->all();
 
 			if(empty($arPayCalc))
@@ -113,7 +113,7 @@ class RecalcPayment
 				$corrfactor = is_numeric($newCond['corr_factor']) ? $newCond['corr_factor'] : $calc->cnd_corr_factor;
 				$tax = is_numeric($newCond['tax']) ? $newCond['tax'] : $calc->cnd_tax;
 
-				$commision = is_null($newCond['kommision']) ? $newCond['kommision'] : $calc->cnd_commission;
+				$commision = is_numeric($newCond['kommision']) ? $newCond['kommision'] : $calc->cnd_commission;
 				$sale = $calc->cnd_sale;
 
 				$obPO = new PaymentOperations($amount,$tax,$commision,$corrfactor,$sale,PaymentCondition::TYPE_USUAL,NULL);
