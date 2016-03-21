@@ -2,6 +2,8 @@
 namespace backend\controllers;
 
 use backend\models\forms\BUserSignupForm;
+use common\components\anubis\Anubis;
+use common\components\crunchs\Payment\RecalcPayment;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\models\BuserInviteCode;
@@ -37,7 +39,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index','get-document','test-notification'],
+                        'actions' => ['logout', 'index','get-document','test-notification','special'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -69,6 +71,15 @@ class SiteController extends Controller
         $this->layout = 'main';
         return $this->render('index');
     }
+
+
+    public function actionSpecial()
+    {
+        $recalc = new RecalcPayment();
+        $recalc->recalculateWithSetConditions();
+        die;
+    }
+
 
     public function actionLogin()
     {
