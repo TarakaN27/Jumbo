@@ -92,5 +92,6 @@ return [
     'Enrollments' => 'Зачисления',
     'Select all' => 'Выбрать все',
     'Deselect all' => 'Очистить',
-    'Remuneration' => 'Вознаграждения'
+    'Remuneration' => 'Вознаграждения',
+    'Bonus scehemes' => 'Бонусные схемы'
 ];

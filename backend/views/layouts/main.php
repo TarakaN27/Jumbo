@@ -211,7 +211,7 @@ $menuItems[] = [
                                     <ul class = "nav child_menu" style = "display: none">
 
                                             <li>
-                                                <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/common', 'Remuneration'); ?></a>
+                                                <a href = "<?= Url::to(['/bonus/default/index']); ?>"><?php echo Yii::t('app/common', 'Bonus scehemes'); ?></a>
                                             </li>
 
                                     </ul>

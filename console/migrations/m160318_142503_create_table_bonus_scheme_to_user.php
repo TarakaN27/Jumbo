@@ -18,12 +18,12 @@ class m160318_142503_create_table_bonus_scheme_to_user extends Migration
             'PRIMARY KEY (buser_id,scheme_id)'
         ], $tableOptions);
 
-        $this->addForeignKey("FK_bstb_buser_id", "{{%bonus_scheme_to_buser}}", "cuser_id", "{{%c_user}}", "id", 'CASCADE','RESTRICT');
-        $this->addForeignKey("FK_ctg_group_id", "{{%cuser_to_group}}", "group_id", "{{%c_user_groups}}", "id", 'CASCADE','RESTRICT');
+        $this->addForeignKey("FK_bstb_buser_id", "{{%bonus_scheme_to_buser}}", 'buser_id', "{{%b_user}}", "id", 'CASCADE','RESTRICT');
+        $this->addForeignKey("FK_bstb_scheme_id", "{{%bonus_scheme_to_buser}}", "scheme_id", "{{%bonus_scheme}}", "id", 'CASCADE','RESTRICT');
     }
 
     public function down()
     {
-        $this->dropTable('table_bonus_scheme_to_user');
+        $this->dropTable('{{%bonus_scheme_to_buser}}');
     }
 }
