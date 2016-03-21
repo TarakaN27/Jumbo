@@ -75,13 +75,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\PaymentCondition::getTypeArr()
                         ],
-                        // 'corr_factor',
-                        // 'commission',
-                        // 'sale',
-                        // 'tax',
-                        // 'created_at',
-                        // 'updated_at',
-
+                        'corr_factor',
+                        'commission',
+                        'sale',
+                        'tax',
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'
