@@ -81,4 +81,12 @@ class BonusScheme extends AbstractActiveRecord
             'updated_at' => Yii::t('app/users', 'Updated At'),
         ];
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getServices()
+    {
+        return $this->hasMany(BonusSchemeService::className(),['scheme_id' => 'id']);
+    }
 }
