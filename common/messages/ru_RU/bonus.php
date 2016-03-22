@@ -18,7 +18,8 @@ return [
 	'Group by company' => 'Группировка по компании',
 	'Group by company group' => 'Группировка по группе компаний',
 	'Choose grouping type' => 'Выбрать тип группировки',
-	'Create Bonus Scheme' => 'Добавить бонусныую схему'
+	'Create Bonus Scheme' => 'Добавить бонусныую схему',
+	'Multiple' => 'Учитывать несколько раз'
 
 
 ];

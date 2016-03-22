@@ -7,7 +7,7 @@ use common\models\BonusScheme;
 use common\models\search\BonusSchemeSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-
+use common\models\Services;
 
 /**
  * DefaultController implements the CRUD actions for BonusScheme model.
@@ -50,8 +50,27 @@ class DefaultController extends Controller
     {
         $model = new BonusScheme();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+
+        echo '<pre>';
+        print_r($_POST);
+        echo '</pre>';
+
+        //die;
+        if ($model->load(Yii::$app->request->post())) {
+            $tr = Yii::$app->db->beginTransaction();
+            $arServices = Services::getAllServices();
+            if($model->save())
+            {
+                $cost = Yii::$app->request->post('cost');
+                $multiple = Yii::$app->request->post('multiple');
+                $monthPersent = Yii::$app->request->post('services',[]);
+
+
+
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+            $tr->rollBack();
         } else {
             return $this->render('create', [
                 'model' => $model,

@@ -32,8 +32,8 @@ class BonusScheme extends AbstractActiveRecord
     public static function getGroupByMap()
     {
         return [
-            self::GROUP_BY_COMPANY => Yii::t('app/users','Group by company'),
-            self::GROUP_BY_CMP_GROUP => Yii::t('app/users','Group by company group')
+            self::GROUP_BY_COMPANY => Yii::t('app/bonus','Group by company'),
+            self::GROUP_BY_CMP_GROUP => Yii::t('app/bonus','Group by company group')
         ];
     }
 
