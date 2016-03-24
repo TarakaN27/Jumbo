@@ -81,7 +81,7 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
         $obDate = self::find()
             ->where(' date <= :date AND currency_id = :iCurID ')
             ->params([':date' => $date,':iCurID' => $iCurID])
-            ->orderBy(['id' => SORT_DESC])
+            ->orderBy(['date' => SORT_DESC])
             ->one();
         return $obDate;
     }
