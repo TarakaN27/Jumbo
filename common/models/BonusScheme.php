@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use backend\models\BUser;
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%bonus_scheme}}".
@@ -120,5 +122,19 @@ class BonusScheme extends AbstractActiveRecord
         return $this->hasMany(BonusSchemeService::className(),['scheme_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsersID()
+    {
+        return $this->hasMany(BonusSchemeToBuser::className(),['scheme_id' => 'id']);
+    }
 
+    /**
+     * @return $this
+     */
+    public function getUsers()
+    {
+        return $this->hasMany(BUser::className(),['id' => 'buser_id'])->viaTable(BonusSchemeToBuser::tableName(),['scheme_id' => 'id']);
+    }
 }

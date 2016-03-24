@@ -2,12 +2,20 @@
 
 namespace backend\modules\bonus\controllers;
 
+use backend\models\BUser;
+use backend\modules\bonus\form\ConnectBonusToUserForm;
+use common\models\BonusSchemeService;
+use common\models\BonusSchemeServiceHistory;
+use common\models\LegalPerson;
 use Yii;
 use common\models\BonusScheme;
 use common\models\search\BonusSchemeSearch;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use common\models\Services;
+use yii\web\ServerErrorHttpException;
 
 /**
  * DefaultController implements the CRUD actions for BonusScheme model.
@@ -36,65 +44,149 @@ class DefaultController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $arServices = Services::getServicesMap();
+        $arLegal = [];
+        if(in_array($model->type,[$model::TYPE_SIMPLE_BONUS,$model::TYPE_COMPLEX_TYPE]))
+            $arLegal = LegalPerson::getLegalPersonMap();
+
+        $arBServices = $model->services;
+
+        $arUsers = $model->users;
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'arServices' => $arServices,
+            'arLegal' => $arLegal,
+            'arBServices' => $arBServices,
+            'arUsers' => $arUsers
         ]);
     }
 
     /**
-     * Creates a new BonusScheme model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|\yii\web\Response
+     * @throws ServerErrorHttpException
+     * @throws \yii\db\Exception
      */
     public function actionCreate()
     {
         $model = new BonusScheme();
-
-
-        echo '<pre>';
-        print_r($_POST);
-        echo '</pre>';
-
-        //die;
         if ($model->load(Yii::$app->request->post())) {
             $tr = Yii::$app->db->beginTransaction();
             $arServices = Services::getAllServices();
-            if($model->save())
+            if($model->save())  //сохраняем схему
             {
-                $cost = Yii::$app->request->post('cost');
-                $multiple = Yii::$app->request->post('multiple');
-                $monthPersent = Yii::$app->request->post('services',[]);
+                $cost = Yii::$app->request->post('costs',[]);
+                $multiple = Yii::$app->request->post('multiple',[]);
+                $legal = Yii::$app->request->post('legal',[]);
+                $monthPersent = Yii::$app->request->post('months',[]);
+                foreach($arServices as $obServ)     //сохраняем услуги по схеме
+                {
+                    $obBSev = new BonusSchemeService([
+                        'scheme_id' => $model->id,
+                        'service_id' => $obServ->id,
+                        'month_percent' => isset($monthPersent[$obServ->id]) ? $monthPersent[$obServ->id] : [],
+                        'legal_person' => isset($legal[$obServ->id]) ? $legal[$obServ->id] : [],
+                        'cost' => isset($cost[$obServ->id]) ? $cost[$obServ->id] : NULL,
+                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL
+                    ]);
 
-
-
-
+                    if(!$obBSev->save())
+                    {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                }
+                $tr->commit();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             $tr->rollBack();
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
         }
+        return $this->render('create', [
+            'model' => $model,
+            'arBServices' => []
+        ]);
     }
 
     /**
-     * Updates an existing BonusScheme model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\db\Exception
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $arBServicesTmp = $model->services;
+        $arBServices = [];
+        foreach($arBServicesTmp as $value)
+            $arBServices[$value->service_id] = $value;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $tr = Yii::$app->db->beginTransaction();
+            $arServices = Services::getAllServices();
+            if($model->save())  //сохраняем схему
+            {
+                $cost = Yii::$app->request->post('costs',[]);
+                $multiple = Yii::$app->request->post('multiple',[]);
+                $legal = Yii::$app->request->post('legal',[]);
+                $monthPersent = Yii::$app->request->post('months',[]);
+                $model->unlinkAll('services',TRUE); //удаляем старые услуги
+
+                $rows = [];
+                foreach($arBServicesTmp as $item)
+                {
+                    $rows []= [
+                        '',
+                        $model->id,
+                        $item->service_id,
+                        Json::encode($item->month_percent),
+                        $item->cost,
+                        $item->unit_multiple,
+                        time(),
+                        time(),
+                        Json::encode($item->legal_person)
+                    ];
+                }
+                $historyModel = new BonusSchemeServiceHistory();    //пишем историю
+                if(!Yii::$app->db->createCommand()
+                    ->batchInsert(BonusSchemeServiceHistory::tableName(), $historyModel->attributes(), $rows)
+                    ->execute())
+                {
+                    $tr->rollBack();
+                    throw new ServerErrorHttpException();
+                }
+
+                foreach($arServices as $obServ)     //сохраняем услуги по схеме
+                {
+                    $obBSev = new BonusSchemeService([
+                        'scheme_id' => $model->id,
+                        'service_id' => $obServ->id,
+                        'month_percent' => isset($monthPersent[$obServ->id]) ? $monthPersent[$obServ->id] : [],
+                        'legal_person' => isset($legal[$obServ->id]) ? $legal[$obServ->id] : [],
+                        'cost' => isset($cost[$obServ->id]) ? $cost[$obServ->id] : NULL,
+                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL
+                    ]);
+
+                    if(!$obBSev->save())
+                    {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                }
+                $tr->commit();
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+            $tr->rollBack();
             return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('update', [
+            'model' => $model,
+            'arBServices' => $arBServices
+
+        ]);
     }
 
     /**
@@ -124,5 +216,34 @@ class DefaultController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionConnectUser($id)
+    {
+        $model = $this->findModel($id);
+        $obForm = new ConnectBonusToUserForm(['obScheme' => $model]);
+        if($obForm->load(Yii::$app->request->post()))
+        {
+            if($obForm->makeRequest())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/bonus','User successfully connected'));
+                return $this->redirect('index');
+            }
+        }
+        $data = [];
+        if(!empty($obForm->users))
+            $data = ArrayHelper::map(
+                BUser::find()->select(['id','fname','lname','mname'])->where(['id' => $obForm->users])->all(),
+                'id','fio');
+        return $this->render('connect_user',[
+            'model' => $model,
+            'obForm' => $obForm,
+            'data' => $data
+        ]);
     }
 }

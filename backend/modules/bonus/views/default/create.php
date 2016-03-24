@@ -22,9 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="clearfix"></div>
             </div>
             <div class="x_content bonus-scheme-create">
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+            <?= $this->render('_form', [
+                'model' => $model,
+                'arBServices' => $arBServices
+            ]) ?>
             </div>
         </div>
     </div>

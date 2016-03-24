@@ -53,7 +53,7 @@ class TabledNotification
 				'type' => $type,
 				'ntf_type' => $ntfType,
 				'message' => $body,
-				'wmu' => $wmu
+				'wmu' => $wmu   //пользователи для которых предназначено сообщение
 			])
 		]);
 	}

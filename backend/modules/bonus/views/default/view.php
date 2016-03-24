@@ -2,7 +2,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use common\models\BonusScheme;
+use yii\data\ArrayDataProvider;
+use common\components\customComponents\collapse\CollapseWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\BonusScheme */
 
@@ -34,15 +36,123 @@ $this->params['breadcrumbs'][] = $this->title;
                             'model' => $model,
                             'attributes' => [
                                 'id',
-            'name',
-            'type',
-            'num_month',
-            'inactivity',
-            'grouping_type',
-            'created_at',
-            'updated_at',
+                                'name',
+                                [
+                                    'attribute' => 'type',
+                                    'value' => $model->getTypeStr()
+                                ],
+                                'num_month',
+                                'inactivity',
+                                [
+                                    'attribute' => 'grouping_type',
+                                    'value' => $model->getGroupingTypeStr()
+                                ],
+                                'created_at:datetime',
+                                'updated_at:datetime',
                             ],
                         ]) ?>
+
+                    <?
+                        $arItem [] = [
+                            'label' => Yii::t('app/bonus','Users'),
+                            'content'=>\yii\grid\GridView::widget([
+                                'dataProvider' => new ArrayDataProvider([
+                                    'allModels' => $arUsers
+                                ]),
+                                'columns' => [
+                                    'fio',
+                                    'roleStr'
+                                ]
+                            ])
+                        ];
+
+                        $arItem [] = [
+                            'label' => Yii::t('app/bonus','Detail'),
+                            'content'=>\yii\grid\GridView::widget([
+                                'dataProvider' => new ArrayDataProvider([
+                                    'allModels' => $arBServices
+                                ]),
+                                'columns' => [
+                                    [
+                                        'attribute' => 'service_id',
+                                        'value' => function($model) use ($arServices){
+                                            return isset($arServices[$model->service_id]) ? $arServices[$model->service_id] : $model->service_id;
+                                        }
+                                    ],
+                                    [
+                                        'attribute' => 'cost',
+                                        'format' => 'decimal',
+                                        'visible' => $model->type == BonusScheme::TYPE_UNITS
+                                    ],
+                                    [
+                                        'attribute' => 'unit_multiple',
+                                        'format' => 'boolean',
+                                        'visible' => $model->type == BonusScheme::TYPE_UNITS
+                                    ],
+                                    [
+                                        'attribute' => 'month_percent',
+                                        'format' => 'raw',
+                                        'visible' => in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS]),
+                                        'value' => function($model){
+                                            if(!is_array($model->month_percent))
+                                                return $model->month_percent;
+                                            $head = Html::tag('th',Yii::t('app/bonus','Month number'));
+                                            $head.= Html::tag('th',Yii::t('app/bonus','Percent'));
+                                            $str = Html::tag('thead',Html::tag('tr',$head));
+                                            unset($head);
+                                            foreach($model->month_percent as $key=>$value)
+                                            {
+                                                $tmp = Html::tag('th',$key);
+                                                $tmp.= Html::tag('td',Yii::$app->formatter->asDecimal($value));
+                                                $str.=Html::tag('tr',$tmp);
+                                            }
+                                            return Html::tag('table',Html::tag('tbody',$str),['class' => 'table table-bordered']);
+                                        }
+                                    ],
+                                    [
+                                        'attribute' => 'month_percent',
+                                        'format' => 'raw',
+                                        'visible' => in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS]),
+                                        'value' => function($model) use ($arLegal){
+                                            if(!is_array($model->legal_person))
+                                                return $model->legal_person;
+
+                                            $head = Html::tag('th',Yii::t('app/bonus','Legal person'));
+                                            $head.= Html::tag('th',Yii::t('app/bonus','Deduct VAT'));
+                                            $str = Html::tag('thead',Html::tag('tr',$head));
+                                            unset($head);
+
+                                            $arLG = $model->legal_person;
+                                            foreach($arLegal as $key=>$value)
+                                            {
+                                                $bVal = isset($arLG[$key]) ? $arLG[$key] : 0;
+                                                $tmp = Html::tag('th',$value);
+                                                $tmp.= Html::tag('td',Yii::$app->formatter->asBoolean($bVal));
+                                                $str.=Html::tag('tr',$tmp);
+                                            }
+                                            /*
+											foreach($model->month_percent as $key=>$value)
+											{
+
+												$tmp = Html::tag('th',$key);
+												$tmp.= Html::tag('td',Yii::$app->formatter->asDecimal($value));
+												$str.=Html::tag('tr',$tmp);
+											}
+											*/
+                                            return Html::tag('table',Html::tag('tbody',$str),['class' => 'table table-bordered']);
+                                        }
+                                    ],
+
+                                ]
+                            ])
+                        ];
+
+
+                    ?>
+                    <?php echo CollapseWidget::widget([
+                        'items' => $arItem
+                    ]);
+                    ?>
                 </div>
             </div>
         </div>

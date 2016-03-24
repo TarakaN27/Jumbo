@@ -177,7 +177,8 @@ class BUser extends AbstractUser
             'crm_group_id' => Yii::t('app/users', 'Crm Group Id'),
             'log_work_type' => Yii::t('app/crm','Log work type'),
             'allow_unit' => Yii::t('app/users','Allow unit'),
-            'fio' => 'ФИО сотрудника'
+            'fio' => Yii::t('app/users','fio'),
+            'roleStr' => Yii::t('app/users','Role Str')
         ];
     }
 

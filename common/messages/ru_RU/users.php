@@ -216,5 +216,7 @@ return [
     'Cuser Groups' => 'Группы компаний',
     'Create Cuser Groups' => 'Добавить группу компаний',
     'Corp name' => 'Название компании',
-    'USER_cuser_groups' => 'Группы компаний'
+    'USER_cuser_groups' => 'Группы компаний',
+    'fio' =>'ФИО сотрудника',
+    'Role Str' => 'Роль'
 ];

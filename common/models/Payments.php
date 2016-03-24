@@ -36,6 +36,8 @@ class Payments extends AbstractActiveRecord
 {
 
     public
+        $isSale = false,
+        $saleUser,
         $customProd,
         $showAll,
         $updateWithNewCondition,
@@ -228,5 +230,8 @@ class Payments extends AbstractActiveRecord
             ->andWhere(['cuser_id' => $userID])
             ->all();
     }
+
+
+
 
 }

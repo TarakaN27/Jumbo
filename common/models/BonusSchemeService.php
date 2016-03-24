@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%bonus_scheme_service}}".
@@ -15,6 +16,7 @@ use Yii;
  * @property integer $unit_multiple
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $legal_person
  *
  * @property Services $service
  * @property BonusScheme $scheme
@@ -35,8 +37,11 @@ class BonusSchemeService extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['scheme_id', 'service_id', 'unit_multiple', 'created_at', 'updated_at'], 'integer'],
-            [['month_percent'], 'string'],
+            [[
+                'scheme_id', 'service_id', 'unit_multiple',
+                'created_at', 'updated_at'
+            ], 'integer'],
+            [['month_percent','legal_person'], 'string'],
             [['cost'], 'number']
         ];
     }
@@ -50,7 +55,8 @@ class BonusSchemeService extends AbstractActiveRecord
             'id' => Yii::t('app/users', 'ID'),
             'scheme_id' => Yii::t('app/users', 'Scheme ID'),
             'service_id' => Yii::t('app/users', 'Service ID'),
-            'month_percent' => Yii::t('app/users', 'Month Percent'),
+            'month_percent' => Yii::t('app/bonus', 'Month Percent'),
+            'legal_person' => Yii::t('app/users', 'Legal person'),
             'cost' => Yii::t('app/users', 'Cost'),
             'unit_multiple' => Yii::t('app/users', 'Unit Multiple'),
             'created_at' => Yii::t('app/users', 'Created At'),
@@ -73,4 +79,50 @@ class BonusSchemeService extends AbstractActiveRecord
     {
         return $this->hasOne(BonusScheme::className(), ['id' => 'scheme_id']);
     }
+
+    /**
+     * @return bool
+     */
+    public function beforeValidate()
+    {
+        if(is_array($this->month_percent))
+            $this->month_percent = Json::encode($this->month_percent);
+
+        if(is_array($this->legal_person))
+            $this->legal_person = Json::encode($this->legal_person);
+
+        return parent::beforeValidate();
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(is_array($this->month_percent))
+            $this->month_percent = Json::encode($this->month_percent);
+
+        if(is_array($this->legal_person))
+            $this->legal_person = Json::encode($this->legal_person);
+
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     *
+     */
+
+    public function afterFind()
+    {
+        if(!is_array($this->month_percent) && !empty($this->month_percent))
+            $this->month_percent = Json::decode($this->month_percent);
+
+        if(!is_array($this->legal_person) && !empty($this->legal_person))
+            $this->legal_person = Json::decode($this->legal_person);
+
+        return parent::afterFind();
+    }
+
+
 }

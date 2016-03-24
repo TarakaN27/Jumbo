@@ -8,6 +8,7 @@
 namespace common\components\helpers;
 
 use Yii;
+use yii\base\InvalidParamException;
 use \yii\web\NotFoundHttpException;
 use \yii\web\ForbiddenHttpException;
 
@@ -245,6 +246,7 @@ class CustomHelper {
     }
 
     /**
+     * Расширение файла
      * @param $filename
      * @return string
      */
@@ -283,6 +285,7 @@ class CustomHelper {
     }
 
     /**
+     * Округление до 50 000 тысяч.
      * @param $amount
      * @return float
      */
@@ -293,6 +296,7 @@ class CustomHelper {
     }
 
     /**
+     * Проверка что папка существет, если нет, то создает папку
      * @param $path
      * @param int $rights
      * @return bool
@@ -402,7 +406,7 @@ class CustomHelper {
     }
 
     /**
-     * первый символ заглавный
+     * Первый символ заглавный
      * @param $string
      * @param string $e
      * @return bool|mixed|string
@@ -421,6 +425,7 @@ class CustomHelper {
     }
 
     /**
+     * Конвертируем csv в массив
      * @param string $filename
      * @param string $delimiter
      * @param bool|FALSE $convert
@@ -452,5 +457,33 @@ class CustomHelper {
             fclose($handle);
         }
         return $data;
+    }
+
+    /**
+     * Проверяем строка -- это валидный json ?
+     * @param $string
+     * @return bool
+     */
+    public static function isValidJSON($string)
+    {
+        if (is_int($string) || is_float($string)) {
+            return true;
+        }
+
+        json_decode($string);
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    /**
+     * Определяем является ли время time текущим днем
+     * @param $time
+     * @return bool
+     */
+    public static function isCurrentDay($time)
+    {
+        if(!is_numeric($time))
+            throw new InvalidParamException('time must be an integer');
+        return date('d.m.Y',time()) == date('d.m.Y',time());
     }
 }

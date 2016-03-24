@@ -37,7 +37,6 @@ class UnitsPaymentsBehavior extends Behavior{
         ];
     }
 
-
     /**
      * @return bool
      */

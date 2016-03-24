@@ -19,7 +19,23 @@ return [
 	'Group by company group' => 'Группировка по группе компаний',
 	'Choose grouping type' => 'Выбрать тип группировки',
 	'Create Bonus Scheme' => 'Добавить бонусныую схему',
-	'Multiple' => 'Учитывать несколько раз'
-
+	'Multiple' => 'Учитывать несколько раз',
+	'Month Percent' => 'Проценты по месяцам',
+	'Month number' => 'Номер месяца',
+	'Percent' => 'Процент',
+	'Deduct VAT' => 'Вычитать НДС из платежа',
+	'To list' => 'К списку',
+	'Update' => 'Редактировать',
+	'Delete' => 'Удалить',
+	'Legal person' => 'Юр. лицо',
+	'Detail' => 'Детали',
+	'Cost' => 'Стоимость',
+	'Unit Multiple' => 'Учитывать несколько раз',
+	'User successfully connected' => 'Пользователи успешно добавлены',
+	'Users' => 'Пользователи',
+	'Bonus Schemes' => 'Бонусные схемы',
+	'Connect users' => 'Добавить пользователей',
+	'Connect user to bonus scheme' => 'Добавление пользователй к бонусной схеме',
+	'Save' => 'Сохранить'
 
 ];

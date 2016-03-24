@@ -1,0 +1,123 @@
+<?php
+
+namespace common\models;
+
+use common\components\helpers\CustomHelper;
+use Yii;
+
+/**
+ * This is the model class for table "{{%bonus_scheme_service_history}}".
+ *
+ * @property integer $id
+ * @property integer $scheme_id
+ * @property integer $service_id
+ * @property string $month_percent
+ * @property string $cost
+ * @property integer $unit_multiple
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property string $legal_person
+ *
+ * @property Services $service
+ * @property BonusScheme $scheme
+ */
+class BonusSchemeServiceHistory extends AbstractActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%bonus_scheme_service_history}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['scheme_id', 'service_id', 'unit_multiple', 'created_at', 'updated_at'], 'integer'],
+            [['month_percent','legal_person'], 'string'],
+            [['cost'], 'number']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Yii::t('app/bonus', 'ID'),
+            'scheme_id' => Yii::t('app/bonus', 'Scheme ID'),
+            'service_id' => Yii::t('app/bonus', 'Service ID'),
+            'month_percent' => Yii::t('app/bonus', 'Month Percent'),
+            'cost' => Yii::t('app/bonus', 'Cost'),
+            'unit_multiple' => Yii::t('app/bonus', 'Unit Multiple'),
+            'created_at' => Yii::t('app/bonus', 'Created At'),
+            'updated_at' => Yii::t('app/bonus', 'Updated At'),
+            'legal_person' => Yii::t('app/users', 'Legal person'),
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getService()
+    {
+        return $this->hasOne(Services::className(), ['id' => 'service_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getScheme()
+    {
+        return $this->hasOne(BonusScheme::className(), ['id' => 'scheme_id']);
+    }
+
+    /**
+     * @param $time
+     * @param $iServID
+     * @param $iUserID
+     * @return null
+     */
+    public static function getCurrentBonusService($time,$iServID,$iUserID,$iType)
+    {
+        $obScheme = NULL;
+        if(CustomHelper::isCurrentDay($time))   //это текущий день
+        {
+            $obScheme = BonusSchemeService::find()
+                //->select(['s.*','sc.id','u.scheme_id'])
+                ->alias('s')
+                ->joinWith('scheme sc')
+                ->joinWith('scheme.users u')
+                ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
+                ->orderBy(['s.updated_at' => SORT_DESC])
+                ->one();
+        }else{
+            $obScheme = BonusSchemeServiceHistory::find()
+                ->alias('s')
+                ->joinWith('scheme sc')
+                ->joinWith('scheme.users u')
+                ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
+                ->orderBy(['s.updated_at' => SORT_DESC])
+                ->one();
+
+            if(empty($obScheme))
+                $obScheme = BonusSchemeService::find()
+                    ->alias('s')
+                    ->joinWith('scheme sc')
+                    ->joinWith('scheme.users u')
+                    ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
+                    ->orderBy(['s.updated_at' => SORT_DESC])
+                    ->one();
+        }
+
+
+        return $obScheme;
+    }
+
+
+}

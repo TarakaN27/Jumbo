@@ -22,63 +22,9 @@ $this->registerJs('
         B_TYPE_SIMPLE = '.BonusScheme::TYPE_SIMPLE_BONUS.',
         B_TYPE_COMPLEX = '.BonusScheme::TYPE_COMPLEX_TYPE.';
 ',\yii\web\View::POS_HEAD);
-/*
-$this->registerJs("
-$('#bonusscheme-num_month').on('change',function(){
-    var
-        num = $(this).val();
-
-    if(num == undefined || num < 0 || num =='')
-    {
-       $('.monthList').html('');
-       $('.monthList').each(function( index ) {
-            $(this).attr('data-num',0);
-       });
-       return false;
-    }
-    num = parseInt(num);
-    var
-        monthList = $('.monthList');    //get all month container
-
-    monthList.each(function( index ) {
-        var
-            this1 = this,
-            servID = $(this).attr('data-col'),
-            currentNum = parseInt($(this).attr('data-num'));
-        if(currentNum > num)        //if need remove element
-            {
-                for(var j = currentNum; j >= num+1;j--)
-                {
-                    $('#div_mid_'+servID +'_'+j).remove();
-                }
-            }else{                  //if need add new element
-                for(var i = currentNum+1;i <= num;i++)
-                {
-                    var
-                        input = $(document.createElement('input')), //input
-                        label = $(document.createElement('label')), //label
-                        div = $(document.createElement('div'));     //div container
-                    label.html(i);
-                    input.attr('name','months['+servID +']['+i+']');
-                    input.attr('id','mid_'+servID +'_'+i);
-                    div.addClass('form-group');
-                    div.attr('id','div_mid_'+servID +'_'+i)
-                    div.append(label);
-                    div.append(input);
-                    div.appendTo(this1);    //add to dom
-                }
-            }
-        $(this).attr('data-num',num);       //set current number of month
-    });
-});
-$('#preloader').remove();
-$('.bonus-scheme-form').removeClass('hide');
-",\yii\web\View::POS_READY);
-*/
 ?>
 <div id="preloader">
     <div class="loader mrg-auto"></div>
-
 </div>
 <div class="bonus-scheme-form hide">
 
@@ -100,9 +46,17 @@ $('.bonus-scheme-form').removeClass('hide');
         'prompt' => Yii::t('app/bonus','Choose type')
     ]) ?>
 
-    <?= $form->field($model, 'num_month')->textInput() ?>
+    <?php
+        $options = [];
+        if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE]))
+            $options['disabled'] = 'disabled';
+        echo $form->field($model, 'num_month')->textInput($options) ?>
 
-    <?= $form->field($model, 'inactivity')->textInput() ?>
+    <?php
+        $options = [];
+        if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE]))
+            $options['disabled'] = 'disabled';
+        echo $form->field($model, 'inactivity')->textInput($options) ?>
 
     <?= $form->field($model, 'grouping_type')->dropDownList($model::getGroupByMap(),[
         'prompt' => Yii::t('app/bonus','Choose grouping type')
@@ -117,11 +71,21 @@ $('.bonus-scheme-form').removeClass('hide');
                         'class' => 'pdd-top-8 col-md-4 col-sm-4 col-xs-12'
                     ]);?>
                     <div class="col-md-6 col-sm-6 col-xs-12">
-                        <?=Html::textInput('costs['.$serv->id.']',null,['class' => 'form-control'])?>
+                        <?php
+                            $value = NULL;
+                            if(isset($arBServices[$serv->id]))
+                                $value = $arBServices[$serv->id]->cost;
+                            echo Html::textInput('costs['.$serv->id.']',$value,['class' => 'form-control']);
+                        ?>
                     </div>
                 </div>
                 <div class="form-group">
-                        <?=Html::checkbox('multiple['.$serv->id.']',false)?>
+                        <?php
+                            $checked = FALSE;
+                            if(isset($arBServices[$serv->id]) && $arBServices[$serv->id]->unit_multiple)
+                                $checked = TRUE;
+                            echo Html::checkbox('multiple['.$serv->id.']',$checked);
+                        ?>
                         <?=Html::label(Yii::t('app/bonus','Multiple'),null,[
                             'class' => 'pdd-top-8'
                         ]);?>
@@ -138,14 +102,34 @@ $('.bonus-scheme-form').removeClass('hide');
                     <div class="col-md-6 col-sm-6 col-xs-12">
                     <?php foreach($arLP as $key => $lp):?>
                         <div class="form-group">
-                            <?=Html::checkbox('services['.$serv->id.']['.$key.']');?>
+                            <?php
+                               $checked = FALSE;
+                                if(isset($arBServices[$serv->id])) {
+                                    $tmpLp = $arBServices[$serv->id]->legal_person;
+                                    if(isset($tmpLp[$key]) && isset($tmpLp[$key]) == 1)
+                                        $checked = TRUE;
+                                }
+                                echo Html::checkbox('legal['.$serv->id.']['.$key.']',$checked);
+                            ?>
                             <?=Html::label($lp);?>
                         </div>
                     <?php endforeach;?>
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 monthList" data-col="<?=$serv->id?>" data-num="0">
-
-
+                    <div class="col-md-6 col-sm-6 col-xs-12 monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">
+                        <?php if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
+                            foreach($arBServices[$serv->id]->month_percent as $key => $item):
+                        ?>
+                        <?php
+                                $inputEl = Html::textInput('months['.$serv->id.']['.$key.']',$item,[
+                                    'id' => 'mid_'.$serv->id.'_'.$key
+                                ]);
+                                $labelEl = Html::label($key);
+                                echo Html::tag('div',$labelEl.$inputEl,[
+                                    'class' => 'form-group',
+                                    'id' => 'div_mid_'.$serv->id.'_'.$key
+                                ]);
+                                ?>
+                        <?php endforeach;?>
                     </div>
                 </div>
             </div>

@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'name',
                                             'description',
                                             'rate',
+                                            'c_inactivity',
                                             [
                                                 'attribute' => 'status',
                                                 'value' => $model->getStatusStr()
