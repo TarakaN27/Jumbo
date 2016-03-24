@@ -20,11 +20,11 @@ class RecalcPayment
 {
 	public function recalculateWithSetConditions()
 	{
-		$ar_begin = [43,45,47];
-		$ar_except = [112];
-		$special = 112;
+		$ar_begin = [];
+		$ar_except = [];
+		$special = NULL;
 
-		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/Sverka_feb.csv'));
+		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_2.csv'));
 		if(empty($arData))
 			return FALSE;
 
@@ -86,6 +86,7 @@ class RecalcPayment
 		}
 
 		unset($arPayCalc);
+		/*
 		foreach($ar_begin as $begin)
 		{
 			if(!isset($arNewCond[$begin]))
@@ -105,7 +106,6 @@ class RecalcPayment
 			if(empty($arPayCalc))
 				continue;
 
-			/** @var PaymentsCalculations $calc */
 			foreach($arPayCalc as $calc)
 			{
 				$amount = floatval($calc->production) + floatval($calc->profit) + floatval($calc->tax);
@@ -149,7 +149,6 @@ class RecalcPayment
 			->params([':begindate' => strtotime('17.02.2016 00:00:00')])
 			->all();
 
-		/** @var PaymentsCalculations $calc */
 		foreach($arPayCalc as $calc)
 		{
 			$amount = floatval($calc->production) + floatval($calc->profit) + floatval($calc->tax);
@@ -189,7 +188,6 @@ class RecalcPayment
 			->params([':begindate' => strtotime('17.02.2016 00:00:00')])
 			->all();
 
-		/** @var PaymentsCalculations $calc */
 		foreach($arPayCalc as $calc)
 		{
 			$amount = floatval($calc->production) + floatval($calc->profit) + floatval($calc->tax);
@@ -224,7 +222,6 @@ class RecalcPayment
 		if(isset($newCond))
 			unset($newCond);
 		$arConds = PaymentCondition::find()->where(['id' => array_keys($arNewCond)])->all();
-		/** @var PaymentCondition $conds */
 		foreach($arConds as $conds)
 		{
 			if(!isset($arNewCond[$conds->id]))
@@ -250,7 +247,7 @@ class RecalcPayment
 			}
 
 		}
-
+*/
 
 		$tr->commit();
 
