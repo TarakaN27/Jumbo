@@ -80,6 +80,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         'sale',
                         'tax',
                         [
+                            'attribute' => 'not_use_sale',
+                            'format' => 'boolean',
+                            'filter' => \common\models\PaymentCondition::getYesNo()
+                        ],
+                        [
+                            'attribute' => 'not_use_corr_factor',
+                            'format' => 'boolean',
+                            'filter' => \common\models\PaymentCondition::getYesNo()
+                        ],
+                        [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'
                         ],
