@@ -204,7 +204,11 @@ return [
     'Contract number' => 'Номер контракта',
     'Contract date' => 'Дата контракта',
     'Responsibility' => 'Ответственный',
-    'Cuser for OP' => 'Контрагент для погашения ОП'
+    'Cuser for OP' => 'Контрагент для погашения ОП',
+    'Sale user' => 'Кто продал',
+    'Is sale' => 'Это продажа',
+    'Maybe payment is sale' => 'Возможно платеж является продажей!',
+    'Choose user' => 'Выбрать пользователя'
 
 
 

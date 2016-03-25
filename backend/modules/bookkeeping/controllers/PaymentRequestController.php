@@ -22,6 +22,7 @@ use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
+use common\models\managers\PaymentsManager;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
@@ -29,6 +30,7 @@ use common\models\PaymentsCalculations;
 use common\models\search\PaymentRequestSearch;
 use Yii;
 use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
@@ -137,6 +139,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     $obCntrID->is_resident,
                     $modelP->pay_date);
 
+                if(PaymentsManager::isSale($modelP->service_id,$modelP->cntr_id,$modelP->pay_date))
+                    $formModel->isSale = TRUE;
+
                 /*
                 $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
                     'cuser_id' => $obCntrID->id,
@@ -155,6 +160,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 }
                 */
             }
+
              $model = [$formModel];
         }
         else
@@ -515,5 +521,22 @@ class PaymentRequestController extends AbstractBaseBackendController{
             return TRUE;
         else
             return FALSE;
+    }
+
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     */
+    public function actionIsSale()
+    {
+        $iServID = Yii::$app->request->post('iServID');     //Услуга
+        $iContrID = Yii::$app->request->post('iContrID');   //контрагент
+        $payDate = Yii::$app->request->post('payDate');     //дата платежа
+
+        if(empty($iServID) || empty($iContrID) || empty($payDate))
+            throw new InvalidParamException();
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return PaymentsManager::isSale($iServID,$iContrID,$payDate);
     }
 } 

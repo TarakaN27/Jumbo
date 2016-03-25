@@ -48,8 +48,10 @@ class PaymentsManager extends Payments
 		)
 			return FALSE;
 
+		//@todo проверить нет ли запросов на платеж до даты $payDate
+		//@todo dateTime - 4 месяца.(период бездействия)
 		$beginDate = $beginDate - (int)$obServ->c_inactivity*86400*30;  //период бездействия = дата платежа минус время бездействия
-		return  !Payments::find()   //проверяем , если не было платежей за период бехдействия, то счтаем платеж продажей
+		return  !Payments::find()   //проверяем , если не было платежей за период бездействия, то считаем платеж продажей
 			->where(['cuser_id' => $arCuser,'serice_id' => $iServID])
 			->andWhere('pay_date >= :beginDate')
 			->params([':beginDate' => $beginDate])
@@ -57,22 +59,46 @@ class PaymentsManager extends Payments
 			->exists();
 	}
 
+	/**
+	 * @param $iServID
+	 * @param $iCUserID
+	 * @param $payDate
+	 * @param bool|FALSE $useGroup
+	 * @return null
+	 */
 	public function getPaymentMonth($iServID,$iCUserID,$payDate,$useGroup = FALSE)
 	{
-
-		$arCuser = self::getUserByGroup($iCUserID);
-		$obPaymentSale = PaymentsSale::find()
+		$arCuser = self::getUserByGroup($iCUserID); //получаем пользователей группы компаний
+		$obPaymentSale = PaymentsSale::find()   //находим первую продажу услуги компании или группе компаний
 			->where(['cuser_id' => $arCuser,'service_id' => $iServID])
-			->orderBy(['sale_date'])
+			->orderBy(['sale_date' =>SORT_DESC])
+			->one();
 		;
 
+		if(!$obPaymentSale)     //нет продажи, не сможем определить кол-во месяцев со дня продажи
+			return NULL;
 
+		//$obService = Services::find()->select(['id','c_inactivity'])->where()
+		/**
+		$obPayment = Payments::find()   //находим продажу
+			->select(['id','pay_date'])
+			->where('pay_date >= :beginDate')
+			->params([':beginDate' => $obPaymentSale->sale_date])
+			->orderBy(['pay_date' =>SORT_ASC])
+			->one();
 
+		if(!$obPayment)
+			return NULL;
 
+		*/
 
+		if($payDate < $obPaymentSale->sale_date)
+			return NULL;
 
-
-
+		$date1 = new \DateTime($payDate);
+		$date2 = new \DateTime($obPaymentSale->sale_date);
+		$interval = $date1->diff($date2);
+		return $interval->m;    //вренем разницу в месяцах между двумя датами
 	}
 
 	/**

@@ -59,6 +59,8 @@ class PaymentBonusBehavior extends Behavior
 
 
 
+
+
 	}
 
 	/***
@@ -135,6 +137,15 @@ class PaymentBonusBehavior extends Behavior
 		}
 
 		return TRUE;
+	}
+
+
+
+	protected function countingSimpleBonus()
+	{
+
+
+
 	}
 
 	/**
