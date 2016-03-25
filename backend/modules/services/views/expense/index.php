@@ -61,6 +61,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'filter' => \common\models\ExpenseCategories::getYesNo()
                                             ],
                                             [
+                                                'attribute' => 'ignore_at_report',
+                                                'format' => 'boolean',
+                                                'filter' => \common\models\ExpenseCategories::getYesNo()
+                                            ],
+                                            [
                                                 'class' => 'yii\grid\ActionColumn',
                                                 'template' => '{view}'
                                             ],

@@ -57,6 +57,10 @@ class ExpenseController extends AbstractBaseBackendController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addWhere);
         $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,$addWhere);
 
+
+
+        //$arTotalIgnore =
+
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
 

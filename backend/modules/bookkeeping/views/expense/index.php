@@ -115,10 +115,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                 ]); ?>
                                     <div class="col-md-4 col-md-offset-8">
-                                        <?php if(!empty($arTotal)):?>
+                                        <?php if(!empty($arTotal) && !empty($arTotal['total'])):?>
                                             <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
                                             <table class="table table-striped table-bordered">
-                                                <?php foreach($arTotal as $key => $value):?>
+                                                <?php foreach($arTotal['total'] as $key => $value):?>
+                                                    <tr>
+                                                        <th><?=$key;?></th>
+                                                        <td><?=Yii::$app->formatter->asDecimal($value);?></td>
+                                                    </tr>
+                                                <?php endforeach;?>
+                                            </table>
+                                        <?php endif;?>
+                                        <?php if(!empty($arTotal) && !empty($arTotal['withoutIgnore'])):?>
+                                            <?=Html::tag('h3',Yii::t('app/crm','Total without ignore'))?>
+                                            <table class="table table-striped table-bordered">
+                                                <?php foreach($arTotal['withoutIgnore'] as $key => $value):?>
                                                     <tr>
                                                         <th><?=$key;?></th>
                                                         <td><?=Yii::$app->formatter->asDecimal($value);?></td>
