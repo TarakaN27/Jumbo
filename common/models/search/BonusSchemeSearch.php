@@ -18,7 +18,7 @@ class BonusSchemeSearch extends BonusScheme
     public function rules()
     {
         return [
-            [['id', 'type', 'num_month', 'inactivity', 'grouping_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'type', 'num_month', 'grouping_type', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'safe'],
         ];
     }
@@ -59,7 +59,6 @@ class BonusSchemeSearch extends BonusScheme
             'id' => $this->id,
             'type' => $this->type,
             'num_month' => $this->num_month,
-            'inactivity' => $this->inactivity,
             'grouping_type' => $this->grouping_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

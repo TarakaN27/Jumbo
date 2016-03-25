@@ -43,7 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'filter' => \common\models\BonusScheme::getTypeMap()
                         ],
                         'num_month',
-                        'inactivity',
                         [
                             'attribute' => 'grouping_type',
                             'value' => function($model){

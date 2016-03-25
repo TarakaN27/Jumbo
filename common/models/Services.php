@@ -22,7 +22,6 @@ use common\components\behavior\Service\ServiceRateBehavior;
  * @property integer $allow_enrollment
  * @property integer $b_user_enroll
  * @property string $enroll_unit
- * @property integer $c_inactivity
  */
 class Services extends AbstractActiveRecord
 {
@@ -44,7 +43,7 @@ class Services extends AbstractActiveRecord
             [[
                 'status', 'created_at',
                 'updated_at','b_user_enroll',
-                'allow_enrollment','c_inactivity'
+                'allow_enrollment'
             ], 'integer'],
             [['name','enroll_unit'], 'string', 'max' => 255],
             ['rate','number','min' => 100],
@@ -82,8 +81,7 @@ class Services extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'allow_enrollment' => Yii::t('app/services', 'Allow enrollment'),
             'b_user_enroll' => Yii::t('app/services', 'Responsibility for enrollment'),
-            'enroll_unit' => Yii::t('app/services', 'Unit enrollment'),
-            'c_inactivity' => Yii::t('app/services', 'Cuser inactivity'),
+            'enroll_unit' => Yii::t('app/services', 'Unit enrollment')
         ];
     }
 

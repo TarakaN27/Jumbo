@@ -143,6 +143,9 @@ class PaymentBonusBehavior extends Behavior
 
 	protected function countingSimpleBonus()
 	{
+		//if()
+
+
 
 
 

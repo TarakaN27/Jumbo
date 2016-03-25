@@ -10,11 +10,6 @@ jQuery(document).ready(function(){
         {
             $('.monthList').html('');
             $('.monthList').attr('data-num',0);
-            /*
-            $('.monthList').each(function( index ) {
-                $(this).attr('data-num',0);
-            });
-            */
             return false;
         }
         num = parseInt(num);
@@ -56,7 +51,6 @@ jQuery(document).ready(function(){
     $('#bonusscheme-type').on('change',function(){
         var
             numMonth = $('#bonusscheme-num_month'),
-            inactive = $('#bonusscheme-inactivity'),
             type = $(this).val();
 
         if(type == B_TYPE_UNIT)
@@ -64,17 +58,30 @@ jQuery(document).ready(function(){
             $('.type2,.type3').addClass('hide');
             $('.type1').removeClass('hide');
             numMonth.attr('disabled','disabled');
-            inactive.attr('disabled','disabled');
+            numMonth.val('');
+            numMonth.trigger('change');
         }else if(type == B_TYPE_SIMPLE || type == B_TYPE_COMPLEX)
         {
             $('.type1').addClass('hide');
             $('.type2,.type3').removeClass('hide');
-            numMonth.removeAttr('disabled','disabled');
-            inactive.removeAttr('disabled','disabled');
+
+            if(type == B_TYPE_SIMPLE)
+            {
+                $('.ch_type2').removeClass('hide');
+                $('.ch_type3').addClass('hide');
+                numMonth.attr('disabled','disabled');
+                numMonth.val('');
+                numMonth.trigger('change');
+            }else{
+                $('.ch_type2').addClass('hide');
+                $('.ch_type3').removeClass('hide');
+                numMonth.removeAttr('disabled','disabled');
+            }
         }else{
             $('.type1,.type2,.type3').addClass('hide');
             numMonth.removeAttr('disabled','disabled');
-            inactive.removeAttr('disabled','disabled');
+            numMonth.val('');
+            numMonth.trigger('change');
         }
     });
 

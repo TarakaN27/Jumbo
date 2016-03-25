@@ -486,4 +486,18 @@ class CustomHelper {
             throw new InvalidParamException('time must be an integer');
         return date('d.m.Y',time()) == date('d.m.Y',time());
     }
+
+    /**
+     * Функция получает $time -- unixTimeStamp и кол-во месяцев на которое нужно увеличить или уменьшить текущую
+     * @param $time
+     * @param $numMonth
+     * @return int
+     */
+    public static function getDateMinusNumMonth($time,$numMonth,$sign = '-')
+    {
+        $obDate = new \DateTime();
+        $obDate->setTimestamp($time);
+        $obDate->modify($sign.$numMonth.' month');
+        return $obDate->getTimestamp();
+    }
 }

@@ -80,6 +80,7 @@ class DefaultController extends Controller
                 $multiple = Yii::$app->request->post('multiple',[]);
                 $legal = Yii::$app->request->post('legal',[]);
                 $monthPersent = Yii::$app->request->post('months',[]);
+                $simplePercent = Yii::$app->request->post('simple_percent',[]);
                 foreach($arServices as $obServ)     //сохраняем услуги по схеме
                 {
                     $obBSev = new BonusSchemeService([
@@ -88,7 +89,8 @@ class DefaultController extends Controller
                         'month_percent' => isset($monthPersent[$obServ->id]) ? $monthPersent[$obServ->id] : [],
                         'legal_person' => isset($legal[$obServ->id]) ? $legal[$obServ->id] : [],
                         'cost' => isset($cost[$obServ->id]) ? $cost[$obServ->id] : NULL,
-                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL
+                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL,
+                        'simple_percent' => isset($simplePercent[$obServ->id]) ? $simplePercent[$obServ->id] : NULL
                     ]);
 
                     if(!$obBSev->save())
@@ -132,6 +134,7 @@ class DefaultController extends Controller
                 $multiple = Yii::$app->request->post('multiple',[]);
                 $legal = Yii::$app->request->post('legal',[]);
                 $monthPersent = Yii::$app->request->post('months',[]);
+                $simplePercent = Yii::$app->request->post('simple_percent',[]);
                 $model->unlinkAll('services',TRUE); //удаляем старые услуги
 
                 $rows = [];
@@ -146,7 +149,8 @@ class DefaultController extends Controller
                         $item->unit_multiple,
                         time(),
                         time(),
-                        Json::encode($item->legal_person)
+                        Json::encode($item->legal_person),
+                        $item->simple_percent
                     ];
                 }
                 $historyModel = new BonusSchemeServiceHistory();    //пишем историю
@@ -166,7 +170,8 @@ class DefaultController extends Controller
                         'month_percent' => isset($monthPersent[$obServ->id]) ? $monthPersent[$obServ->id] : [],
                         'legal_person' => isset($legal[$obServ->id]) ? $legal[$obServ->id] : [],
                         'cost' => isset($cost[$obServ->id]) ? $cost[$obServ->id] : NULL,
-                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL
+                        'unit_multiple' => isset($multiple[$obServ->id]) ? 1 : NULL,
+                        'simple_percent' => isset($simplePercent[$obServ->id]) ? $simplePercent[$obServ->id] : NULL
                     ]);
 
                     if(!$obBSev->save())

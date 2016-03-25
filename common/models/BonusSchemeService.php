@@ -17,6 +17,7 @@ use yii\helpers\Json;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $legal_person
+ * @property number $simple_percent
  *
  * @property Services $service
  * @property BonusScheme $scheme
@@ -42,7 +43,7 @@ class BonusSchemeService extends AbstractActiveRecord
                 'created_at', 'updated_at'
             ], 'integer'],
             [['month_percent','legal_person'], 'string'],
-            [['cost'], 'number']
+            [['cost','simple_percent'], 'number']
         ];
     }
 
@@ -61,6 +62,7 @@ class BonusSchemeService extends AbstractActiveRecord
             'unit_multiple' => Yii::t('app/users', 'Unit Multiple'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'simple_percent' => Yii::t('app/bonus','Simple percent')
         ];
     }
 

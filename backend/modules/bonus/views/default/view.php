@@ -42,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => $model->getTypeStr()
                                 ],
                                 'num_month',
-                                'inactivity',
                                 [
                                     'attribute' => 'grouping_type',
                                     'value' => $model->getGroupingTypeStr()
@@ -90,9 +89,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'visible' => $model->type == BonusScheme::TYPE_UNITS
                                     ],
                                     [
+                                        'attribute' => 'simple_percent',
+                                        'format' => 'decimal',
+                                        'visible' => $model->type == BonusScheme::TYPE_SIMPLE_BONUS,
+                                    ],
+                                    [
                                         'attribute' => 'month_percent',
                                         'format' => 'raw',
-                                        'visible' => in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS]),
+                                        'visible' => $model->type == BonusScheme::TYPE_COMPLEX_TYPE,
                                         'value' => function($model){
                                             if(!is_array($model->month_percent))
                                                 return $model->month_percent;
@@ -110,7 +114,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         }
                                     ],
                                     [
-                                        'attribute' => 'month_percent',
+                                        'attribute' => 'legal_person',
                                         'format' => 'raw',
                                         'visible' => in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS]),
                                         'value' => function($model) use ($arLegal){
@@ -130,15 +134,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 $tmp.= Html::tag('td',Yii::$app->formatter->asBoolean($bVal));
                                                 $str.=Html::tag('tr',$tmp);
                                             }
-                                            /*
-											foreach($model->month_percent as $key=>$value)
-											{
-
-												$tmp = Html::tag('th',$key);
-												$tmp.= Html::tag('td',Yii::$app->formatter->asDecimal($value));
-												$str.=Html::tag('tr',$tmp);
-											}
-											*/
                                             return Html::tag('table',Html::tag('tbody',$str),['class' => 'table table-bordered']);
                                         }
                                     ],
@@ -146,8 +141,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]
                             ])
                         ];
-
-
                     ?>
                     <?php echo CollapseWidget::widget([
                         'items' => $arItem

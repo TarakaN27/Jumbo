@@ -14,7 +14,9 @@ use backend\modules\reports\forms\DetailUnitsViewForm;
 use backend\modules\reports\forms\UnitsReportForm;
 
 class UnitsReportsController extends AbstractBaseBackendController{
-
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $model = new UnitsReportForm();
@@ -23,7 +25,6 @@ class UnitsReportsController extends AbstractBaseBackendController{
         {
             $arData = $model->getData();
         }
-
 
         return $this->render('index',[
            'arData' => $arData,

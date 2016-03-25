@@ -17,7 +17,6 @@ use yii\helpers\Json;
  * @property integer $grouping_type
  * @property integer $created_at
  * @property integer $updated_at
- * @property integer $infinite
  */
 class BonusScheme extends AbstractActiveRecord
 {
@@ -86,7 +85,7 @@ class BonusScheme extends AbstractActiveRecord
         return [
             [['name','type'],'required'],
             [[
-                'type', 'num_month', 'inactivity',
+                'type', 'num_month',
                 'grouping_type', 'created_at', 'updated_at',
                 'infinite'
             ], 'integer'],
@@ -106,7 +105,6 @@ class BonusScheme extends AbstractActiveRecord
             'name' => Yii::t('app/bonus', 'Name'),
             'type' => Yii::t('app/bonus', 'Type'),
             'num_month' => Yii::t('app/bonus', 'Num Month'),
-            'inactivity' => Yii::t('app/bonus', 'Inactivity'),
             'infinite' => Yii::t('app/bonus','Infinite'),
             'grouping_type' => Yii::t('app/bonus', 'Grouping Type'),
             'created_at' => Yii::t('app/bonus', 'Created At'),

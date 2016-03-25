@@ -36,6 +36,9 @@ return [
 	'Bonus Schemes' => 'Бонусные схемы',
 	'Connect users' => 'Добавить пользователей',
 	'Connect user to bonus scheme' => 'Добавление пользователй к бонусной схеме',
-	'Save' => 'Сохранить'
+	'Save' => 'Сохранить',
+	'Deduct tax for legal person' => 'Вычитать налог для Юр.лица',
+	'Month percent' => 'Проценты по месяцам',
+	'Simple month percent' => 'Процент'
 
 ];

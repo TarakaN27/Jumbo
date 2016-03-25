@@ -17,6 +17,7 @@ use Yii;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $legal_person
+ * @property number $simple_percent
  *
  * @property Services $service
  * @property BonusScheme $scheme
@@ -39,7 +40,7 @@ class BonusSchemeServiceHistory extends AbstractActiveRecord
         return [
             [['scheme_id', 'service_id', 'unit_multiple', 'created_at', 'updated_at'], 'integer'],
             [['month_percent','legal_person'], 'string'],
-            [['cost'], 'number']
+            [['cost','simple_percent'], 'number']
         ];
     }
 
@@ -58,6 +59,7 @@ class BonusSchemeServiceHistory extends AbstractActiveRecord
             'created_at' => Yii::t('app/bonus', 'Created At'),
             'updated_at' => Yii::t('app/bonus', 'Updated At'),
             'legal_person' => Yii::t('app/users', 'Legal person'),
+            'simple_percent' => Yii::t('app/bonus','Simple percent')
         ];
     }
 

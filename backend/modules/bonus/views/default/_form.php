@@ -52,12 +52,6 @@ $this->registerJs('
             $options['disabled'] = 'disabled';
         echo $form->field($model, 'num_month')->textInput($options) ?>
 
-    <?php
-        $options = [];
-        if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE]))
-            $options['disabled'] = 'disabled';
-        echo $form->field($model, 'inactivity')->textInput($options) ?>
-
     <?= $form->field($model, 'grouping_type')->dropDownList($model::getGroupByMap(),[
         'prompt' => Yii::t('app/bonus','Choose grouping type')
     ]) ?>
@@ -100,6 +94,8 @@ $this->registerJs('
                 <hr>
                 <div class="row">
                     <div class="col-md-6 col-sm-6 col-xs-12">
+                    <?=Html::tag('h4',Yii::t('app/bonus','Deduct tax for legal person'))?>
+                    <hr/>
                     <?php foreach($arLP as $key => $lp):?>
                         <div class="form-group">
                             <?php
@@ -115,21 +111,35 @@ $this->registerJs('
                         </div>
                     <?php endforeach;?>
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">
-                        <?php if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
-                            foreach($arBServices[$serv->id]->month_percent as $key => $item):
-                        ?>
+                    <div class="col-md-6 col-sm-6 col-xs-12 ch_type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE])? '' : 'hide'?>" >
+                        <?=Html::tag('h4',Yii::t('app/bonus','Month percent'))?>
+                        <hr/>
+                        <div class="monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">
+                            <?php if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
+                                foreach($arBServices[$serv->id]->month_percent as $key => $item):
+                            ?>
+                            <?php
+                                    $inputEl = Html::textInput('months['.$serv->id.']['.$key.']',$item,[
+                                        'id' => 'mid_'.$serv->id.'_'.$key
+                                    ]);
+                                    $labelEl = Html::label($key);
+                                    echo Html::tag('div',$labelEl.$inputEl,[
+                                        'class' => 'form-group',
+                                        'id' => 'div_mid_'.$serv->id.'_'.$key
+                                    ]);
+                                    ?>
+                            <?php endforeach;?>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 simple_percent ch_type2 <?= in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
+                        <?=Html::tag('h4',Yii::t('app/bonus','Simple month percent'))?>
+                        <hr/>
                         <?php
-                                $inputEl = Html::textInput('months['.$serv->id.']['.$key.']',$item,[
-                                    'id' => 'mid_'.$serv->id.'_'.$key
-                                ]);
-                                $labelEl = Html::label($key);
-                                echo Html::tag('div',$labelEl.$inputEl,[
-                                    'class' => 'form-group',
-                                    'id' => 'div_mid_'.$serv->id.'_'.$key
-                                ]);
-                                ?>
-                        <?php endforeach;?>
+                            $valueSP = NULL;
+                            if(isset($arBServices[$serv->id]))
+                                $valueSP = $arBServices[$serv->id]->simple_percent;
+                            echo Html::textInput('simple_percent['.$serv->id.']',$valueSP,['class' => 'form-control']);
+                        ?>
                     </div>
                 </div>
             </div>

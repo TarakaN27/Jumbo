@@ -57,8 +57,6 @@ $('#services-allow_enrollment').on('change',function(){
 
     <?= $form->field($model, 'status')->dropDownList(\common\models\Services::getStatusArr()) ?>
 
-    <?= $form->field($model,'c_inactivity')->textInput();?>
-
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= $form->field($model,'allow_enrollment')->checkbox()?>
