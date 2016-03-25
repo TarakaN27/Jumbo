@@ -92,6 +92,15 @@ class ExpenseSearch extends Expense
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
 
         $table = self::tableName();
+        $cats = [$this->cat_id];
+        if(!empty($this->cat_id))
+        {
+            $exCat = ExpenseCategories::find()->select(['id'])->where(['parent_id' => $this->cat_id])->all();
+            foreach($exCat as $c)
+                $cats[] = $c->id;
+        }else{
+            $cats = $this->cat_id;
+        }
 
         $query->andFilterWhere([
             $table.'.id' => $this->id,
@@ -100,7 +109,7 @@ class ExpenseSearch extends Expense
             $table.'.currency_id' => $this->currency_id,
             $table.'.legal_id' => $this->legal_id,
             $table.'.cuser_id' => $this->cuser_id,
-            $table.'.cat_id' => $this->cat_id,
+            $table.'.cat_id' => $cats,
             $table.'.created_at' => $this->created_at,
             $table.'.updated_at' => $this->updated_at,
         ]);

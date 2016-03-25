@@ -25,7 +25,7 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
     ]); ?>
 
     <?= $form->field($model, 'cat_id')->dropDownList(
-        \common\models\ExpenseCategories::getExpenseCatMap(),[
+        \common\models\ExpenseCategories::getExpenseCatMapWithoutParent(),[
         'prompt' => Yii::t('app/book','BOOK_choose_expense_category')
     ]) ?>
 

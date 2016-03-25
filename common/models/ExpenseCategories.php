@@ -126,6 +126,28 @@ class ExpenseCategories extends AbstractActiveRecord
         return ArrayHelper::map($tmp,'id','name');
     }
 
+    /**
+     * Получаем категории родительские без дочерних + родительские
+     * @return array
+     */
+    public static function getExpenseCatMapWithoutParent()
+    {
+        $tmp = self::getAllExpenseCategories();
+        $parent = [];
+        foreach($tmp as $t)
+            if(!empty($t->parent_id))
+                $parent [] = $t->parent_id;
+
+        $arResult = [];
+        foreach($tmp as $cat)
+        {
+            if(!in_array($cat->id,$parent))
+                $arResult[$cat->id] = $cat->name;
+        }
+        return $arResult;
+
+    }
+
 
     /**
      * Опишем связь родителя
