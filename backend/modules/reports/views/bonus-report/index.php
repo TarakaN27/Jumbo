@@ -28,6 +28,18 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 					// ],
 				]);?>
 				<?php if(Yii::$app->user->can('adminRights')):?>
+				<div class="col-md-6 col-sm-6 col-xs-12">
+
+						<?=$form->field($model,'users')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+							'data' => \backend\models\BUser::getAllMembersMap(),
+							'clientOptions' => [
+
+							]
+						])?>
+
+				</div>
+				<?php endif;?>
+				<?php if(Yii::$app->user->can('adminRights')):?>
 					<div class="col-md-6 col-sm-6 col-xs-12">
 				<?else:?>
 					<div class="col-md-12 col-sm-12 col-xs-12">
@@ -59,16 +71,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 						</div>
 					</div>
 				</div>
-				<div class="col-md-6 col-sm-6 col-xs-12">
-				<?php if(Yii::$app->user->can('adminRights')):?>
-					<?=$form->field($model,'users')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
-						'data' => \backend\models\BUser::getAllMembersMap(),
-						'clientOptions' => [
 
-						]
-					])?>
-				<?php endif;?>
-				</div>
 
 				<div class="col-md-12 col-sm-12 col-xs-12">
 					<div class="form-group text-center">
@@ -82,15 +85,17 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 						<?=\yii\grid\GridView::widget([
 							'dataProvider' => $data['dataProvider'],
 							'columns' => [
-								'amount:decimal',
 								[
 									'attribute' => 'buser.fio',
 									'visible' => Yii::$app->user->can('adminRights')
 								],
 								[
-									'attribute' => 'scheme.name',
-									'label' => Yii::t('app/bonus','Scheme name')
+									'attribute' => 'service.name',
+									'label' => Yii::t('app/bonus','Service name')
 								],
+								'cuser.infoWithSite',
+								'payment_id',
+								'created_at:datetime',
 								[
 									'attribute' => 'scheme.type',
 									'value' => function($model){
@@ -98,36 +103,26 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 										return is_object($obScheme) ? $obScheme->getTypeStr() : NULL;
 									}
 								],
-								'payment_id',
-								'created_at:datetime',
-								'updated_at:datetime',
 								[
-									'attribute' => 'service.name',
-									'label' => Yii::t('app/bonus','Service name')
+									'attribute' => 'scheme.name',
+									'label' => Yii::t('app/bonus','Scheme name'),
+									'visible' => Yii::$app->user->can('adminRights')
 								],
-
-								'cuser.infoWithSite'
+								'amount:decimal',
 							]
 						])?>
-
 						<div class="col-md-4 col-md-offset-8">
 							<?php if(!empty($data['totalCount'])):?>
 								<table class="table table-striped table-bordered">
-
 										<tr>
 											<th><?=Yii::t('app/crm','Total');?></th>
 											<td><?=Yii::$app->formatter->asDecimal($data['totalCount']);?></td>
 										</tr>
-
 								</table>
 							<?php endif;?>
 						</div>
-
-
 					<?php endif;?>
-
 				</div>
-
 			</div>
 		</div>
 	</div>
