@@ -14,6 +14,7 @@ use backend\models\BUser;
  * @property integer $sale_date
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $sale_num
  *
  * @property BUser $buser
  * @property CUser $cuser
@@ -35,7 +36,11 @@ class PaymentsSale extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['cuser_id', 'service_id', 'buser_id', 'sale_date', 'created_at', 'updated_at'], 'integer']
+            [[
+                'cuser_id', 'service_id', 'buser_id',
+                'sale_date', 'created_at', 'updated_at',
+                'sale_num'
+            ], 'integer']
         ];
     }
 
@@ -52,6 +57,7 @@ class PaymentsSale extends AbstractActiveRecord
             'sale_date' => Yii::t('app/book', 'Sale Date'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'sale_num' => Yii::t('app/book','Sale number')
         ];
     }
 

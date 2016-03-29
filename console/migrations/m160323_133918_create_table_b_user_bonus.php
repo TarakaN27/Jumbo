@@ -15,7 +15,7 @@ class m160323_133918_create_table_b_user_bonus extends Migration
 
         $this->createTable('{{%b_user_bonus}}', [
             'id' => $this->primaryKey(),
-            'amount' => $this->money(4),
+            'amount' => $this->money(16,4),
             'buser_id' => $this->integer(),
             'scheme_id' => $this->integer(),
             'payment_id' => $this->integer(),

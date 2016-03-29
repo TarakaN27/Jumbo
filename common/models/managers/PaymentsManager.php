@@ -30,7 +30,7 @@ class PaymentsManager extends Payments
 	 */
 	public static function isSale($iServID,$iCUserID,$payDate,$iPRequest = NULL)
 	{
-		$inActivePeriod = (int)Yii::$app->config->get('main_param',0);  //период бездействия в месяцах
+		$inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
 
 		if($inActivePeriod <= 0)    //не задан период бездействия, вернем FALSE
 			return FALSE;
@@ -50,7 +50,7 @@ class PaymentsManager extends Payments
 		$beginDate = CustomHelper::getDateMinusNumMonth($beginDate,$inActivePeriod);  //отнимаем от даты платежа время бездействия по календарю
 
 		return !Payments::find()   //проверяем , если не было платежей за период бездействия, то считаем платеж продажей
-			->where(['cuser_id' => $arCuser,'serice_id' => $iServID])
+			->where(['cuser_id' => $arCuser,'service_id' => $iServID])
 			->andWhere('pay_date >= :beginDate')
 			->params([':beginDate' => $beginDate])
 			->limit(1)
@@ -65,7 +65,7 @@ class PaymentsManager extends Payments
 	 * @param bool|FALSE $useGroup
 	 * @return null
 	 */
-	public function getPaymentMonth($iServID,$iCUserID,$payDate,$useGroup = FALSE)
+	public static function getPaymentMonth($iServID,$iCUserID,$payDate,$useGroup = FALSE)
 	{
 		$arCuser = self::getUserByGroup($iCUserID); //получаем пользователей группы компаний
 		$obPaymentSale = PaymentsSale::find()   //находим первую продажу услуги компании или группе компаний
@@ -107,7 +107,7 @@ class PaymentsManager extends Payments
 	 * @param $iCUserID
 	 * @return array
 	 */
-	protected static function getUserByGroup($iCUserID)
+	public static function getUserByGroup($iCUserID)
 	{
 		$arCuser = [$iCUserID];     //находим всех клиентов группы, если клиент в группе, иначе указывем только клиента
 		$tmpGroup = CuserToGroup::find()

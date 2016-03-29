@@ -199,7 +199,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'description' => $p->comment,
                                 'prequest_id' => $modelP->id,
                                 'condition_id' => $p->condID,
-                                'payment_order' => $modelP->payment_order
+                                'payment_order' => $modelP->payment_order,
+                                'isSale' => $p->isSale,
+                                'saleUser' => $p->saleUser
                             ]);
 
                             if(!$obPay->save())

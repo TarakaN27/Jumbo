@@ -2,10 +2,13 @@
 
 namespace backend\modules\bonus\controllers;
 
+use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use backend\modules\bonus\form\ConnectBonusToCuserForm;
 use backend\modules\bonus\form\ConnectBonusToUserForm;
 use common\models\BonusSchemeService;
 use common\models\BonusSchemeServiceHistory;
+use common\models\CUser;
 use common\models\LegalPerson;
 use Yii;
 use common\models\BonusScheme;
@@ -20,7 +23,7 @@ use yii\web\ServerErrorHttpException;
 /**
  * DefaultController implements the CRUD actions for BonusScheme model.
  */
-class DefaultController extends Controller
+class DefaultController extends AbstractBaseBackendController
 {
     /**
      * Lists all BonusScheme models.
@@ -53,13 +56,15 @@ class DefaultController extends Controller
         $arBServices = $model->services;
 
         $arUsers = $model->users;
+        $arCusers = $model->cusers;
 
         return $this->render('view', [
             'model' => $model,
             'arServices' => $arServices,
             'arLegal' => $arLegal,
             'arBServices' => $arBServices,
-            'arUsers' => $arUsers
+            'arUsers' => $arUsers,
+            'arCusers' => $arCusers
         ]);
     }
 
@@ -250,5 +255,34 @@ class DefaultController extends Controller
             'obForm' => $obForm,
             'data' => $data
         ]);
+    }
+
+    public function actionConnectCuser($id)
+    {
+        $model = $this->findModel($id);
+        $obForm = new ConnectBonusToCuserForm(['obScheme' => $model]);
+        if($obForm->load(Yii::$app->request->post()))
+        {
+            if($obForm->makeRequest())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/bonus','Cuser successfully connected'));
+                return $this->redirect('index');
+            }
+        }
+        $data = [];
+        if(!empty($obForm->users))
+            $data = ArrayHelper::map(
+                CUser::find()
+                    ->alias('c')
+                    ->select(['c.id','c.requisites_id','r.j_lname','r.j_mname','r.j_fname','r.type_id'])
+                    ->joinWith('requisites r')
+                    ->where(['c.id' => $obForm->users])->all(),
+                'id','infoWithSite');
+        return $this->render('connect_cuser',[
+            'model' => $model,
+            'obForm' => $obForm,
+            'data' => $data
+        ]);
+
     }
 }

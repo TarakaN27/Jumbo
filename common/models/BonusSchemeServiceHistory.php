@@ -82,44 +82,30 @@ class BonusSchemeServiceHistory extends AbstractActiveRecord
     /**
      * @param $time
      * @param $iServID
-     * @param $iUserID
+     * @param $iScheme
      * @return null
      */
-    public static function getCurrentBonusService($time,$iServID,$iUserID,$iType)
+    public static function getCurrentBonusService($time,$iServID,$iScheme)
     {
         $obScheme = NULL;
         if(CustomHelper::isCurrentDay($time))   //это текущий день
         {
             $obScheme = BonusSchemeService::find()
-                //->select(['s.*','sc.id','u.scheme_id'])
-                ->alias('s')
-                ->joinWith('scheme sc')
-                ->joinWith('scheme.users u')
-                ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
-                ->orderBy(['s.updated_at' => SORT_DESC])
+                ->where(['service_id' => $iServID,'scheme_id' => $iScheme])
+                ->orderBy(['updated_at' => SORT_DESC])
                 ->one();
         }else{
             $obScheme = BonusSchemeServiceHistory::find()
-                ->alias('s')
-                ->joinWith('scheme sc')
-                ->joinWith('scheme.users u')
-                ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
-                ->orderBy(['s.updated_at' => SORT_DESC])
+                ->where(['service_id' => $iServID,'id' => $iScheme])
+                ->orderBy(['updated_at' => SORT_DESC])
                 ->one();
-
             if(empty($obScheme))
                 $obScheme = BonusSchemeService::find()
-                    ->alias('s')
-                    ->joinWith('scheme sc')
-                    ->joinWith('scheme.users u')
-                    ->where(['s.service_id' => $iServID,'u.id' => $iUserID,'sc.type' => $iType])
-                    ->orderBy(['s.updated_at' => SORT_DESC])
+                    ->where(['service_id' => $iServID,'id' => $iScheme])
+                    ->orderBy(['updated_at' => SORT_DESC])
                     ->one();
         }
 
-
         return $obScheme;
     }
-
-
 }

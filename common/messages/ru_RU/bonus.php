@@ -39,6 +39,18 @@ return [
 	'Save' => 'Сохранить',
 	'Deduct tax for legal person' => 'Вычитать налог для Юр.лица',
 	'Month percent' => 'Проценты по месяцам',
-	'Simple month percent' => 'Процент'
-
+	'Simple month percent' => 'Процент',
+	'Cuser successfully connected' => 'Контрагент успешно добавлен',
+	'Connect cusers' => 'Добавить компании',
+	'Cusers' => 'Компании',
+	'Begin date' => 'Начальная дата',
+	'End date' => 'Конечная дата',
+	'End date must be more than begin date' => 'Начальная дата должна быть меньше чем конечная',
+	'Updated At' => 'Обновлено',
+	'Created At' => 'Добавлено',
+	'Payment ID' => 'Платеж',
+	'Amount' => 'Сумма',
+	'Scheme name' => 'Название схемы',
+	'Service name' => 'Название услуги',
+	'Bonus reports' => 'Отчет по бонусам'
 ];

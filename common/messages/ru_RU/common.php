@@ -93,5 +93,7 @@ return [
     'Select all' => 'Выбрать все',
     'Deselect all' => 'Очистить',
     'Remuneration' => 'Вознаграждения',
-    'Bonus scehemes' => 'Бонусные схемы'
+    'Bonus scehemes' => 'Бонусные схемы',
+    'Bonus report' => 'Отчеты по бонусам',
+    'Reports' => 'Отчеты'
 ];

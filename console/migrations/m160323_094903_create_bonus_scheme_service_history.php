@@ -17,7 +17,7 @@ class m160323_094903_create_bonus_scheme_service_history extends Migration
             'scheme_id' => $this->integer(),
             'service_id' => $this->integer(),
             'month_percent' => $this->text(),
-            'cost' => $this->money(4),
+            'cost' => $this->money(16,4),
             'unit_multiple' => $this->boolean(),
             'created_at' => $this->integer(),
             'updated_at' => $this->integer()

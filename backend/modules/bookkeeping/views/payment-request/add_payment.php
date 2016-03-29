@@ -292,24 +292,42 @@ $this->registerJs('
     function isSaleCheck(this1)
     {
         var
-            block = $(this).offsetParent().offsetParent().find(".maybesale"),
-            line = $(this).attr("id"),
-            check = condID = line.replace(/-service/gi,"-issale"),
-            saleUser = condID = line.replace(/-service/gi,"-issale"),
+            block = $(this1).offsetParent().offsetParent().find(".maybesale"),
+            lines = $(this1).attr("id"),
+            check = $("#"+lines.replace(/-service/gi,"-issale")),
+            saleUser = $("#"+lines.replace(/-service/gi,"-saleuser")),
             value = $(this1).val();
 
         if(value == undefined || value == "")
             {
                 saleUser.val("");
                 check.prop("checked",false);
+                block.addClass("hide");
                 //saleUser.select2("val", "");
-
-
+                //addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
+                return false;
             }
 
-
-
-        console.log(block);
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['is-sale']).'",
+            dataType: "json",
+            data: {iServID:value,iContrID:"'.$modelP->cntr_id.'",payDate:"'.$modelP->pay_date.'"},
+            success: function(msg){
+                if(msg)
+                  {
+                        block.removeClass("hide");
+                  }else{
+                        block.addClass("hide");
+                  }
+            },
+            error: function(msg){
+                block.removeClass("hide");
+                addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
 
     }
 ',\yii\web\View::POS_END);

@@ -66,6 +66,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                          <li>
                                              '.Html::a(Yii::t('app/bonus','Connect users'),['connect-user','id' => $model->id]).'
                                          </li>
+                                         <li>
+                                             '.Html::a(Yii::t('app/bonus','Connect cusers'),['connect-cuser','id' => $model->id]).'
+                                         </li>
                                      </ul>
                                 </div>
                                                             ';

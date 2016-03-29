@@ -218,5 +218,6 @@ return [
     'Corp name' => 'Название компании',
     'USER_cuser_groups' => 'Группы компаний',
     'fio' =>'ФИО сотрудника',
-    'Role Str' => 'Роль'
+    'Role Str' => 'Роль',
+    'Company with site' => 'Компания и сайт'
 ];

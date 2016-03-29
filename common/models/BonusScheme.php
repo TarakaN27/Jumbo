@@ -44,7 +44,7 @@ class BonusScheme extends AbstractActiveRecord
     public function getGroupingTypeStr()
     {
         $tmp = self::getGroupByMap();
-        return isset($tmp[$this->grouping_type]) ? $tmp[$this->grouping_type] : 'N/A';
+        return isset($tmp[$this->grouping_type]) ? $tmp[$this->grouping_type] : NULL;
     }
 
     /**
@@ -134,5 +134,18 @@ class BonusScheme extends AbstractActiveRecord
     public function getUsers()
     {
         return $this->hasMany(BUser::className(),['id' => 'buser_id'])->viaTable(BonusSchemeToBuser::tableName(),['scheme_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCuserID()
+    {
+        return $this->hasMany(BonusSchemeToCuser::className(),['scheme_id' => 'id']);
+    }
+
+    public function getCusers()
+    {
+        return $this->hasMany(CUser::className(),['id' => 'cuser_id'])->viaTable(BonusSchemeToCuser::tableName(),['scheme_id' => 'id']);
     }
 }

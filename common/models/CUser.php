@@ -285,7 +285,8 @@ class CUser extends AbstractUser
             'contractor' => Yii::t('app/users','Contractor'),
             'archive' => Yii::t('app/users','Archive'),
             'prospects_id' => Yii::t('app/users','Prospects'),
-            'allow_expense' => Yii::t('app/users','Allow expense')
+            'allow_expense' => Yii::t('app/users','Allow expense'),
+            'infoWithSite' => Yii::t('app/users','Company with site'),
         ];
     }
 

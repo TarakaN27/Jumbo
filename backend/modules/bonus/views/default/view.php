@@ -52,6 +52,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]) ?>
 
                     <?
+                        $arItem[] = [
+                            'label' => Yii::t('app/bonus','Cusers'),
+                            'content' => \yii\grid\GridView::widget([
+                                'dataProvider' => new ArrayDataProvider([
+                                    'allModels' => $arCusers
+                                ]),
+                                'columns' => [
+                                    'id',
+                                    'infoWithSite'
+                                ]
+                            ])
+                        ];
+
+
+
                         $arItem [] = [
                             'label' => Yii::t('app/bonus','Users'),
                             'content'=>\yii\grid\GridView::widget([

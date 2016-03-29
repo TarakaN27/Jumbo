@@ -9,7 +9,6 @@ use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
-use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 
