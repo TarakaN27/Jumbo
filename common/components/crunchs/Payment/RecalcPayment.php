@@ -12,7 +12,9 @@ namespace common\components\crunchs\Payment;
 
 use common\components\helpers\CustomHelper;
 use common\components\payment\PaymentOperations;
+use common\models\ExchangeCurrencyHistory;
 use common\models\PaymentCondition;
+use common\models\Payments;
 use common\models\PaymentsCalculations;
 use yii\web\ServerErrorHttpException;
 
@@ -24,7 +26,7 @@ class RecalcPayment
 		$ar_except = [];
 		$special = NULL;
 
-		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_2.csv'));
+		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_3.csv'));
 		if(empty($arData))
 			return FALSE;
 
@@ -46,7 +48,38 @@ class RecalcPayment
 		}
 
 
-		$arPayCalc = PaymentsCalculations::find()->where(['pay_cond_id' => $arCondID])->all();
+		$arPayCalc = PaymentsCalculations::find()->with('payCond')->where(['pay_cond_id' => $arCondID])->all();
+		$arPaymentID = [];
+		foreach($arPayCalc as $clc)
+		{
+			$arPaymentID[] = $clc->payment_id;
+		}
+
+		$arPaymentTmp = Payments::find()->where(['id' => $arPaymentID])->all();
+
+		$arPayment = [];
+		$arExch = [];
+		foreach($arPaymentTmp as $tmp)
+		{
+			$date = date('Y-m-d',$tmp->pay_date);
+			if(isset($arExch[$date][$tmp->currency_id]))
+			{
+				$nCurr = $arExch[$date][$tmp->currency_id];
+			}else{
+				$nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$tmp->pay_date),$tmp->currency_id);
+				if(is_null($nCurr))
+				{
+					continue;
+				}
+				if(isset($arExch[$date]))
+					$arExch[$date][$tmp->currency_id] = $nCurr;
+				else
+					$arExch[$date] = [$tmp->currency_id => $nCurr];
+			}
+
+			$arPayment[$tmp->id] = $tmp->pay_summ*$nCurr;
+		}
+
 
 		$tr = \Yii::$app->db->beginTransaction();
 		/** @var PaymentsCalculations $calc */
@@ -55,9 +88,12 @@ class RecalcPayment
 			if(!isset($arNewCond[$calc->pay_cond_id]))
 				continue;
 
+			if(!isset($arPayment[$calc->payment_id]))
+				continue;
+
 			$newCond = $arNewCond[$calc->pay_cond_id];
 
-			$amount = floatval($calc->production) + floatval($calc->profit) + floatval($calc->tax);
+			$amount = $arPayment[$calc->payment_id];
 
 			$corrfactor = is_numeric($newCond['corr_factor']) ? $newCond['corr_factor'] : $calc->cnd_corr_factor;
 			$tax = is_numeric($newCond['tax']) ? $newCond['tax'] : $calc->cnd_tax;
@@ -65,7 +101,9 @@ class RecalcPayment
 			$commision = is_numeric($newCond['kommision']) ? $newCond['kommision'] : $calc->cnd_commission;
 			$sale = $calc->cnd_sale;
 
-			$obPO = new PaymentOperations($amount,$tax,$commision,$corrfactor,$sale,PaymentCondition::TYPE_USUAL,NULL);
+			$condType = is_object($obCond = $calc->payCond) ? (empty($obCond->type) ? PaymentCondition::TYPE_USUAL : $obCond->type ): PaymentCondition::TYPE_USUAL;
+
+			$obPO = new PaymentOperations($amount,$tax,$commision,$corrfactor,$sale,$condType,NULL);
 
 			$result = $obPO->getFullCalculate();
 
