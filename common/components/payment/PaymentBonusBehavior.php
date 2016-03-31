@@ -11,6 +11,7 @@ namespace common\components\payment;
 
 use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
+use common\models\BonusSchemeExceptCuser;
 use common\models\BonusSchemeService;
 use common\models\BonusSchemeServiceHistory;
 use common\models\BonusSchemeToBuser;
@@ -20,6 +21,8 @@ use common\models\CUserGroups;
 use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\PaymentsManager;
+use common\models\PaymentCondition;
+use common\models\PaymentsCalculations;
 use common\models\PaymentsSale;
 use common\models\Services;
 use yii\base\Behavior;
@@ -44,7 +47,7 @@ class PaymentBonusBehavior extends Behavior
 	{
 		return [
 			Payments::EVENT_AFTER_UPDATE => 'afterUpdate',
-			Payments::EVENT_AFTER_INSERT => 'afterInsert',
+			Payments::EVENT_SAVE_DONE => 'afterInsert',
 			Payments::EVENT_AFTER_DELETE => 'afterDelete',
 		];
 	}
@@ -101,9 +104,12 @@ class PaymentBonusBehavior extends Behavior
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 			->joinWith('usersID')
+			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_UNITS])
 			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $obManager->id])
+			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
 			->orderBy(BonusSchemeToCuser::tableName().'.cuser_id IS NULL ASC , '.BonusScheme::tableName().'.updated_at DESC')
+			->params([':idCUser' => $iCUserID])
 			->one();
 
 		if(empty($obScheme))
@@ -267,12 +273,15 @@ class PaymentBonusBehavior extends Behavior
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 			->joinWith('usersID')
+			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS])
 			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser])
+			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
 			->orderBy([
 				BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,
 				BonusScheme::tableName().'.updated_at' => SORT_DESC
 			])
+			->params([':idCUser' => $model->cuser_id])
 			->one();
 
 		if(empty($obScheme))
@@ -283,8 +292,10 @@ class PaymentBonusBehavior extends Behavior
 		if(empty($obBServ))
 			return FALSE;
 
-		$excRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($model->pay_date,$model->currency_id);  //получаем курс валюты в бел. рублях
-		$amount = $excRate*$model->pay_summ;    //получаем сумму платежа в бел. рублях
+
+		$amount = $this->getAmount();
+		if(empty($amount))
+			return FALSE;
 
 		if(is_array($obBServ->legal_person) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
 			isset($obBServ->legal_person[$model->legal_id]) &&
@@ -294,6 +305,31 @@ class PaymentBonusBehavior extends Behavior
 		}
 
 		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавим бонус
+	}
+
+	/**
+	 * @return float|null
+	 */
+	protected function getAmount()
+	{
+		/** @var Payments $model */
+		$model = $this->owner;
+		$amount = NULL;
+		//для кастомных условий, бонус считается от прибыли
+		if(PaymentCondition::find()->where(['id' => $model->condition_id,'type' => PaymentCondition::TYPE_CUSTOM])->exists())
+		{
+			/** @var PaymentsCalculations $obCalc */
+			$obCalc = $model->calculate;
+			if($obCalc)
+			{
+				$amount = $obCalc->profit;
+			}
+		}else{  //для обычных условий бонус считается из платежа
+			$excRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($model->pay_date,$model->currency_id);  //получаем курс валюты в бел. рублях
+			$amount = $excRate*$model->pay_summ;    //получаем сумму платежа в бел. рублях
+		}
+
+		return $amount;
 	}
 
 	/**
@@ -336,9 +372,12 @@ class PaymentBonusBehavior extends Behavior
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 			->joinWith('usersID')
+			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE])
 			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
+			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
 			->orderBy([BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,BonusScheme::tableName().'.updated_at' => SORT_DESC])
+			->params([':idCUser' => $model->cuser_id])
 			->one();
 
 		if(empty($obScheme))
@@ -383,8 +422,12 @@ class PaymentBonusBehavior extends Behavior
 		if(empty($percent))
 			return FALSE;
 
-		$excRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($model->pay_date,$model->currency_id);  //курс валюты в бел рублях
-		$amount = $excRate*$model->pay_summ*($percent/100); //сумма платежа
+		$amount = $this->getAmount();
+		if(empty($amount))
+			return FALSE;
+		else
+			$amount = $amount*($percent/100);
+
 		if(is_array($obBServ->legal_person) &&  //если ля юр. лица указан, что нужно отнять налог
 			isset($obBServ->legal_person[$model->legal_id]) &&
 			$obBServ->legal_person[$model->legal_id] == 1)

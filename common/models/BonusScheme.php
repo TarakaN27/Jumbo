@@ -144,8 +144,30 @@ class BonusScheme extends AbstractActiveRecord
         return $this->hasMany(BonusSchemeToCuser::className(),['scheme_id' => 'id']);
     }
 
+    /**
+     * @return $this
+     */
     public function getCusers()
     {
         return $this->hasMany(CUser::className(),['id' => 'cuser_id'])->viaTable(BonusSchemeToCuser::tableName(),['scheme_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExceptCuserID()
+    {
+        return $this->hasMany(BonusSchemeExceptCuser::className(),['scheme_id' => 'id']);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getExceptCusers()
+    {
+        return $this->hasMany(CUser::className(),['id' => 'cuser_id'])->viaTable(BonusSchemeExceptCuser::tableName(),['scheme_id' => 'id']);
+    }
+
+
+
 }

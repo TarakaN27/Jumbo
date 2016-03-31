@@ -52,5 +52,7 @@ return [
 	'Amount' => 'Сумма',
 	'Scheme name' => 'Название схемы',
 	'Service name' => 'Название услуги',
-	'Bonus reports' => 'Отчет по бонусам'
+	'Bonus reports' => 'Отчет по бонусам',
+	'Except cusers' => 'Исключенные компании',
+	'Add user to except' => 'Добавить компанию в исключения'
 ];

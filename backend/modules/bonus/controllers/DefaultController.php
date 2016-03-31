@@ -6,6 +6,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bonus\form\ConnectBonusToCuserForm;
 use backend\modules\bonus\form\ConnectBonusToUserForm;
+use backend\modules\bonus\form\ExceptBonusSchemeCUser;
 use common\models\BonusSchemeService;
 use common\models\BonusSchemeServiceHistory;
 use common\models\CUser;
@@ -279,6 +280,40 @@ class DefaultController extends AbstractBaseBackendController
                     ->where(['c.id' => $obForm->users])->all(),
                 'id','infoWithSite');
         return $this->render('connect_cuser',[
+            'model' => $model,
+            'obForm' => $obForm,
+            'data' => $data
+        ]);
+
+    }
+
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionExceptUser($id)
+    {
+        $model = $this->findModel($id);
+        $obForm = new ExceptBonusSchemeCUser(['obScheme' => $model]);
+        if($obForm->load(Yii::$app->request->post()))
+        {
+            if($obForm->makeRequest())
+            {
+                Yii::$app->session->setFlash('success',Yii::t('app/bonus','Cuser add to except'));
+                return $this->redirect('index');
+            }
+        }
+        $data = [];
+        if(!empty($obForm->users))
+            $data = ArrayHelper::map(
+                CUser::find()
+                    ->alias('c')
+                    ->select(['c.id','c.requisites_id','r.j_lname','r.j_mname','r.j_fname','r.type_id'])
+                    ->joinWith('requisites r')
+                    ->where(['c.id' => $obForm->users])->all(),
+                'id','infoWithSite');
+        return $this->render('except_cuser',[
             'model' => $model,
             'obForm' => $obForm,
             'data' => $data
