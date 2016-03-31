@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "{{%exchange_currency_history}}".
@@ -78,12 +80,16 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
      */
     public static function getCurrencyForDate($date,$iCurID)
     {
-        $obDate = self::find()
-            ->where(' date <= :date AND currency_id = :iCurID ')
-            ->params([':date' => $date,':iCurID' => $iCurID])
-            ->orderBy(['date' => SORT_DESC])
-            ->one();
-        return $obDate;
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
+        $models = self::getDb()->cache(function ($db) use ($date,$iCurID) {
+            return self::find()
+                ->where(' date <= :date AND currency_id = :iCurID ')
+                ->params([':date' => $date,':iCurID' => $iCurID])
+                ->orderBy(['date' => SORT_DESC])
+                ->one($db);
+        },86400,$dep);
+
+        return $models;
     }
 
     /**
@@ -98,7 +104,7 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
         if(date('Y-m-d',time()) == $date)           //если дата равна текущей, то вернем текущее значение курса валюты
         {
             /** @var ExchangeRates $obCurr */
-            $obCurr = ExchangeRates::findOne($iCurID);  //курсы валют текущие
+            $obCurr = ExchangeRates::findOneByIDCached($iCurID,FALSE);  //курсы валют текущие
             if(!empty($obCurr))
             {
                 $returnValue = (float)$obCurr->nbrb_rate;
@@ -111,7 +117,7 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
                 $returnValue = (float)$obECH->rate_nbrb;
             }else{
                 /** @var ExchangeRates $obCurr */
-                $obCurr = ExchangeRates::findOne($iCurID);  //курсы валют текущие
+                $obCurr = ExchangeRates::findOneByIDCached($iCurID,FALSE);  //курсы валют текущие
                 if(!empty($obCurr))
                 {
                     $returnValue = (float)$obCurr->nbrb_rate;

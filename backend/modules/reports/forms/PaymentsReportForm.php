@@ -8,13 +8,18 @@
 
 namespace backend\modules\reports\forms;
 
+use backend\models\BUser;
 use common\models\CUser;
+use common\models\CuserProspects;
 use common\models\CuserQuantityHour;
+use common\models\CUserRequisites;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
+use common\models\LegalPerson;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
+use common\models\Services;
 use yii\base\Model;
 use Yii;
 use common\models\PaymentsCalculations;
@@ -109,20 +114,69 @@ class PaymentsReportForm extends Model{
     public function getData()
     {
         $data = Payments::find();//->with('calculate','cuser','legal','service','calculate.payCond');
-        //$data->joinWith('calculate');
+        $arSelect = [
+            Payments::tableName().'.id',
+            Payments::tableName().'.cuser_id',
+            Payments::tableName().'.legal_id',
+            Payments::tableName().'.service_id',
+            Payments::tableName().'.pay_summ',
+            Payments::tableName().'.currency_id',
+            Payments::tableName().'.pay_date',
+            Payments::tableName().'.prequest_id',
+            PaymentsCalculations::tableName().'.pay_cond_id',
+            PaymentsCalculations::tableName().'.tax',
+            PaymentsCalculations::tableName().'.profit',
+            PaymentsCalculations::tableName().'.production',
+            PaymentsCalculations::tableName().'.cnd_corr_factor' ,
+            PaymentsCalculations::tableName().'.cnd_commission' ,
+            PaymentsCalculations::tableName().'.cnd_sale',
+            PaymentsCalculations::tableName().'.cnd_tax' ,
+            CUserRequisites::tableName().'.corp_name',
+            CUserRequisites::tableName().'.j_fname',
+            CUserRequisites::tableName().'.j_lname',
+            CUserRequisites::tableName().'.j_mname',
+            CUserRequisites::tableName().'.type_id',
+            CUser::tableName().'.requisites_id',
+            CUser::tableName().'.prospects_id',
+            CUser::tableName().'.manager_id',
+            ExchangeRates::tableName().'.code',
+            ExchangeRates::tableName().'.name as curr_name',
+            ExchangeRates::tableName().'.nbrb_rate',
+            LegalPerson::tableName().'.name as legal_name',
+            Services::tableName().'.name as service_name',
+            PaymentCondition::tableName().'.name as pay_cond_name',
+            PaymentCondition::tableName().'.corr_factor as pc_corr_factor' ,
+            PaymentCondition::tableName().'.commission  as pc_commission'  ,
+            PaymentCondition::tableName().'.sale  as pc_sale ' ,
+            PaymentCondition::tableName().'.tax  as pc_tax' ,
+            PaymentCondition::tableName().'.currency_id  as pc_currency_id',
+            PaymentCondition::tableName().'.cond_currency  as cond_currency',
+            PaymentRequest::tableName().'.manager_id as preq_man_id',
+            BUser::tableName().'.fname',
+            BUser::tableName().'.lname',
+            BUser::tableName().'.mname',
+        ];
+        $data->joinWith('calculate');
         $data->joinWith('cuser');
+        $data->joinWith('currency');
         //$data->joinWith('cuser.manager');
         $data->joinWith('cuser.requisites');
         if($this->generateExtendExcel)
         {
             $data->joinWith('cuser.quantityHour');
             $data->joinWith('cuser.prospects');
+
+            array_push($arSelect,CuserProspects::tableName().'.name as prospects_name');
+            array_push($arSelect,CuserQuantityHour::tableName().'.cuser_id as quant_user');
+            array_push($arSelect,CuserQuantityHour::tableName().'.hours');
+            array_push($arSelect,CuserQuantityHour::tableName().'.spent_time');
         }
 
         $data->joinWith('legal');
         $data->joinWith('service');
         $data->joinWith('calculate.payCond');
         $data->joinWith('payRequest.manager');
+        $data->select($arSelect);
         $data->where(
             Payments::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
             ' AND '.Payments::tableName().'.pay_date <= "'.strtotime($this->dateTo.' 23:59:59').'"'
