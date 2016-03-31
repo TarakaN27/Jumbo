@@ -46,6 +46,7 @@ class PromisedPayment extends AbstractActiveRecord
     public function rules()
     {
         return [
+            ['amount','trim'],
             [['cuser_id', 'amount','service_id'], 'required'],
             [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id','owner'], 'integer'],
             [['amount'], 'number', 'min' => 0],

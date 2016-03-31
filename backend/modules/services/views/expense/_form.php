@@ -58,6 +58,11 @@ $('#expensecategories-parent_id').on('change',function(){
     </div>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+            <?php echo $form->field($model,'ignore_at_report')->checkbox()?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/services', 'Create') : Yii::t('app/services', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
      </div>
         </div>

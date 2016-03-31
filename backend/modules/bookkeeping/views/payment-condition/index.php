@@ -75,13 +75,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\PaymentCondition::getTypeArr()
                         ],
-                        // 'corr_factor',
-                        // 'commission',
-                        // 'sale',
-                        // 'tax',
-                        // 'created_at',
-                        // 'updated_at',
-
+                        'corr_factor',
+                        'commission',
+                        'sale',
+                        'tax',
+                        [
+                            'attribute' => 'not_use_sale',
+                            'format' => 'boolean',
+                            'filter' => \common\models\PaymentCondition::getYesNo()
+                        ],
+                        [
+                            'attribute' => 'not_use_corr_factor',
+                            'format' => 'boolean',
+                            'filter' => \common\models\PaymentCondition::getYesNo()
+                        ],
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'

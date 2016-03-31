@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $without_cuser
+ * @property integer $ignore_at_report
  */
 class ExpenseCategories extends AbstractActiveRecord
 {
@@ -44,10 +45,11 @@ class ExpenseCategories extends AbstractActiveRecord
             [['name'], 'required'],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
-            [['parent_id', 'status', 'created_at', 'updated_at','without_cuser'], 'integer'],
+            [['parent_id', 'status', 'created_at', 'updated_at','without_cuser','ignore_at_report'], 'integer'],
             ['parent_id', 'default', 'value' => 0],
             [['name'], 'string', 'max' => 255],
-            [['description'], 'string', 'max' => 32]
+            [['description'], 'string', 'max' => 32],
+            ['ignore_at_report','default','value' => self::NO]
         ];
     }
 
@@ -64,7 +66,8 @@ class ExpenseCategories extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
-            'without_cuser' => Yii::t('app/services','Without cuser for expense')
+            'without_cuser' => Yii::t('app/services','Without cuser for expense'),
+            'ignore_at_report' => Yii::t('app/services','Ignore at reports'),
         ];
     }
 
@@ -121,6 +124,28 @@ class ExpenseCategories extends AbstractActiveRecord
     {
         $tmp = self::getAllExpenseCategories();
         return ArrayHelper::map($tmp,'id','name');
+    }
+
+    /**
+     * Получаем категории родительские без дочерних + родительские
+     * @return array
+     */
+    public static function getExpenseCatMapWithoutParent()
+    {
+        $tmp = self::getAllExpenseCategories();
+        $parent = [];
+        foreach($tmp as $t)
+            if(!empty($t->parent_id))
+                $parent [] = $t->parent_id;
+
+        $arResult = [];
+        foreach($tmp as $cat)
+        {
+            if(!in_array($cat->id,$parent))
+                $arResult[$cat->id] = $cat->name;
+        }
+        return $arResult;
+
     }
 
 

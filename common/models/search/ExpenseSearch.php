@@ -3,6 +3,7 @@
 namespace common\models\search;
 
 use common\models\ExchangeRates;
+use common\models\ExpenseCategories;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -55,7 +56,6 @@ class ExpenseSearch extends Expense
         $query = Expense::find()->with('currency','legal','cat','cuser');
 
         $query->joinWith('legal');
-
         $query = $this->queryHelper($query,$params,$additionQuery);
 
         $dataProvider = new ActiveDataProvider([
@@ -91,25 +91,36 @@ class ExpenseSearch extends Expense
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
 
+        $table = self::tableName();
+        $cats = [$this->cat_id];
+        if(!empty($this->cat_id))
+        {
+            $exCat = ExpenseCategories::find()->select(['id'])->where(['parent_id' => $this->cat_id])->all();
+            foreach($exCat as $c)
+                $cats[] = $c->id;
+        }else{
+            $cats = $this->cat_id;
+        }
+
         $query->andFilterWhere([
-            'id' => $this->id,
+            $table.'.id' => $this->id,
             //'pay_date' => $this->pay_date,
-            'pay_summ' => $this->pay_summ,
-            'currency_id' => $this->currency_id,
-            'legal_id' => $this->legal_id,
-            'cuser_id' => $this->cuser_id,
-            'cat_id' => $this->cat_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            $table.'.pay_summ' => $this->pay_summ,
+            $table.'.currency_id' => $this->currency_id,
+            $table.'.legal_id' => $this->legal_id,
+            $table.'.cuser_id' => $this->cuser_id,
+            $table.'.cat_id' => $cats,
+            $table.'.created_at' => $this->created_at,
+            $table.'.updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'description', $this->description]);
+        $query->andFilterWhere(['like', $table.'.description', $this->description]);
 
         if(!empty($this->from_date))
-            $query->andWhere(self::tableName().".created_at >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
+            $query->andWhere($table.".pay_date >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
 
         if(!empty($this->to_date))
-            $query->andWhere(self::tableName().".created_at <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
+            $query->andWhere($table.".pay_date <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
 
         if(
             !empty($this->pay_date)||
@@ -134,8 +145,59 @@ class ExpenseSearch extends Expense
      */
     public function totalCount($params,$additionQuery=NULL)
     {
+        $query = Expense::find()->select([
+            'pay_summ',
+            'currency_id',
+            ExchangeRates::tableName().'.code',
+            'cat_id',
+            ExpenseCategories::tableName().'.ignore_at_report',
+        ]);
+        $query->joinWith('currency');
+        $query->joinWith('cat');
+        $query = $this->queryHelper($query,$params,$additionQuery=NULL);
+
+        if(!$this->bCountTotal)
+            return [];
+
+        $arExp = $query->all();
+
+        if(empty($arExp))
+            return [];
+
+        $arResult = [
+            'total' => [],
+            'withoutIgnore' =>[]
+        ];
+        foreach($arExp as $exp)
+        {
+            $name = is_object($exp->currency) ? $exp->currency->code : $exp->currency_id;
+            if(isset($arResult['total'][$name]))
+                $arResult['total'][$name]+=$exp->pay_summ;
+            else
+                $arResult['total'][$name] = $exp->pay_summ;
+
+            if($exp->cat->ignore_at_report != self::YES)
+            {
+                if(isset($arResult['withoutIgnore'][$name]))
+                    $arResult['withoutIgnore'][$name]+=$exp->pay_summ;
+                else
+                    $arResult['withoutIgnore'][$name] = $exp->pay_summ;
+            }
+        }
+
+        return $arResult;
+    }
+
+    /**
+     * @param $params
+     * @param null $additionQuery
+     * @return array
+     */
+    public function totalCountWithoutIgnore($params,$additionQuery=NULL)
+    {
         $query = Expense::find()->select(['pay_summ','currency_id',ExchangeRates::tableName().'.code']);
         $query->joinWith('currency');
+        $query->joinWith('category');
         $query = $this->queryHelper($query,$params,$additionQuery=NULL);
 
         if(!$this->bCountTotal)

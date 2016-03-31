@@ -74,5 +74,6 @@ return [
     'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при расчете единиц',
     'Show expense only for admin and superadmin' => 'Показывать затраты по юрлицу только суперадминам и админам',
     'Without cuser for expense' => 'Без указания контрагента для затрат',
-    'Cuser inactivity' => 'Период бездействия компании'
+    'Cuser inactivity' => 'Период бездействия компании',
+    'Ignore at reports' => 'Не учитывать затраты в сводках'
 ];

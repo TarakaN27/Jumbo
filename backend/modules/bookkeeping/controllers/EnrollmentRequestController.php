@@ -23,6 +23,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * EnrollmentRequestController implements the CRUD actions for EnrollmentRequest model.
@@ -217,6 +218,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             $arPromised = PromisedPayment::find()
                 ->select([
                     PromisedPayment::tableName().'.id',
+                    PromisedPayment::tableName().'.cuser_id',
                     PromisedPayment::tableName().'.amount',
                     PromisedPayment::tableName().'.description',
                     'owner',
@@ -309,8 +311,15 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $arUserID = [];
         if(!empty($cID))
             $arUserID [] = (int)$cID;
+
+        $orderType = SORT_ASC;
         if(!empty($cIPOP))
+        {
             $arUserID [] = (int)$cIPOP;
+            if($cIPOP < $cID)
+                $orderType = SORT_DESC;
+        }
+
 
         if(empty($arUserID))
             throw new InvalidParamException();
@@ -318,6 +327,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $arPromised = PromisedPayment::find()
             ->select([
                 PromisedPayment::tableName().'.id',
+                PromisedPayment::tableName().'.cuser_id',
                 PromisedPayment::tableName().'.amount',
                 PromisedPayment::tableName().'.description',
                 'owner',
@@ -334,6 +344,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                 'service_id' => $servID
             ])
             ->andWhere('(paid is NULL OR paid = 0)')
+            ->orderBy(['cuser_id' => $orderType])
             //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
             ->all();
 

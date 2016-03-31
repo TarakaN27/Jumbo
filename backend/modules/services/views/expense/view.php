@@ -55,6 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'value' => $model->getStatusStr()
                                             ],
                                             'without_cuser:boolean',
+                                            'ignore_at_report:boolean',
                                             'created_at:datetime',
                                             'updated_at:datetime',
                                         ],
