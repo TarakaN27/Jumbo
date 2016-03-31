@@ -487,7 +487,8 @@ class CrmTask extends AbstractActiveRecord
                 if(
                     ($this->status == self::STATUS_IN_PROGRESS && $this->task_control != 1)
                     ||
-                    ($this->status == self::STATUS_IN_PROGRESS && $this->created_by == Yii::$app->user->id))
+                    ($this->status == self::STATUS_IN_PROGRESS && $this->created_by == Yii::$app->user->id)
+                )
                 {
                     $this->status = self::STATUS_CLOSE;
                     if($this->save())
@@ -501,6 +502,14 @@ class CrmTask extends AbstractActiveRecord
                     if($this->save())
                         $rtnStatus = $this->status;
                 }
+
+                if($this->status == self::STATUS_IN_PROGRESS && $this->task_control == 1 && $this->created_by != Yii::$app->user->id)
+                {
+                    $this->status = self::STATUS_NEED_ACCEPT;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+
                 break;
 
             case self::STATUS_NEED_ACCEPT:
