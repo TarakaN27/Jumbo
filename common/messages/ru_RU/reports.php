@@ -103,5 +103,10 @@ return [
     'Payment owner' => 'Владелец платежа',
     'Can not load promised payments' => 'Не удалось загрузить обещанные платежи',
     'Promised payment' => 'Обещанный платеж',
-    'Cuser for OP' => 'Погасить ОП другого контрагента'
+    'Cuser for OP' => 'Погасить ОП другого контрагента',
+    'Full amount BYR' => 'Сумма платежей в BYR',
+    'Prospects' => 'Перспективность',
+    'Paid hour' => 'Оплачено часов',
+    'Spend hour' => 'Затрачено часов',
+    'Balance hour' => 'Баланс трудозатрат'
 ];
