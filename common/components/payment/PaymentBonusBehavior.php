@@ -211,6 +211,7 @@ class PaymentBonusBehavior extends Behavior
 				'service_id' => $model->service_id,
 				'buser_id' => $model->saleUser,
 				'sale_date' => $model->pay_date,
+				'payment_id' => $model->id,
 				'sale_num' => 1
 			]);
 			if(!$obSale->save())
@@ -235,6 +236,7 @@ class PaymentBonusBehavior extends Behavior
 					'service_id' => $model->service_id,
 					'buser_id' => $model->saleUser,
 					'sale_date' => $model->pay_date,
+					'payment_id' => $model->id,
 					'sale_num' => 1
 				]);
 			}else
@@ -244,6 +246,7 @@ class PaymentBonusBehavior extends Behavior
 					'service_id' => $model->service_id,
 					'buser_id' => $model->saleUser,
 					'sale_date' => $model->pay_date,
+					'payment_id' => $model->id,
 					'sale_num' => $obLastSale->sale_num++
 				]);
 			}else{
@@ -252,6 +255,7 @@ class PaymentBonusBehavior extends Behavior
 					'service_id' => $model->service_id,
 					'buser_id' => $model->saleUser,
 					'sale_date' => $model->pay_date,
+					'payment_id' => $model->id,
 					'sale_num' => $obLastSale->sale_num
 				]);
 			}
@@ -277,7 +281,7 @@ class PaymentBonusBehavior extends Behavior
 			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS])
 			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser])
-			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
+			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
 			->orderBy([
 				BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,
 				BonusScheme::tableName().'.updated_at' => SORT_DESC
@@ -290,7 +294,7 @@ class PaymentBonusBehavior extends Behavior
 
 		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры схемы
 
-		if(empty($obBServ))
+		if(empty($obBServ) || empty($obBServ->simple_percent))
 			return FALSE;
 
 
@@ -304,6 +308,8 @@ class PaymentBonusBehavior extends Behavior
 		{
 			$amount = $amount - CustomHelper::getVatMountByAmount($amount); //отнимем от суммы платежа налог
 		}
+
+		$amount = round($amount*($obBServ->simple_percent/100),6);
 
 		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавим бонус
 	}
@@ -376,7 +382,7 @@ class PaymentBonusBehavior extends Behavior
 			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE])
 			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
-			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
+			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
 			->orderBy([BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,BonusScheme::tableName().'.updated_at' => SORT_DESC])
 			->params([':idCUser' => $model->cuser_id])
 			->one();

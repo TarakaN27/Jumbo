@@ -15,6 +15,7 @@ use backend\models\BUser;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $sale_num
+ * @property integer $payment_id
  *
  * @property BUser $buser
  * @property CUser $cuser
@@ -39,7 +40,7 @@ class PaymentsSale extends AbstractActiveRecord
             [[
                 'cuser_id', 'service_id', 'buser_id',
                 'sale_date', 'created_at', 'updated_at',
-                'sale_num'
+                'sale_num','payment_id'
             ], 'integer']
         ];
     }
@@ -57,7 +58,8 @@ class PaymentsSale extends AbstractActiveRecord
             'sale_date' => Yii::t('app/book', 'Sale Date'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
-            'sale_num' => Yii::t('app/book','Sale number')
+            'sale_num' => Yii::t('app/book','Sale number'),
+            'payment_id' => Yii::t('app/book','Payment ID')
         ];
     }
 
@@ -83,5 +85,13 @@ class PaymentsSale extends AbstractActiveRecord
     public function getService()
     {
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayment()
+    {
+        return $this->hasOne(Payments::className(),['id' => 'payment_id']);
     }
 }

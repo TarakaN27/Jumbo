@@ -3,7 +3,10 @@
 namespace common\models;
 
 use backend\models\BUser;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 /**
@@ -168,6 +171,27 @@ class BonusScheme extends AbstractActiveRecord
         return $this->hasMany(CUser::className(),['id' => 'cuser_id'])->viaTable(BonusSchemeExceptCuser::tableName(),['scheme_id' => 'id']);
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getAllBonusScheme()
+    {
+        $dep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
 
+        return self::getDb()->cache(function(){
+            return self::find()->all();
+        },86400,$dep);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getBonusSchemeMap()
+    {
+        return ArrayHelper::map(self::getAllBonusScheme(),'id','name');
+    }
 
 }

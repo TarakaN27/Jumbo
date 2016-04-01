@@ -65,6 +65,7 @@ class ImportSale
 					'sale_date' => $obPayment->pay_date,
 					'created_at' => $obPayment->created_at,
 					'updated_at' => $obPayment->updated_at,
+					'payment_id' => $data['paymentID'],
 					'sale_num' => 1
 				]);
 				$obSale->save();

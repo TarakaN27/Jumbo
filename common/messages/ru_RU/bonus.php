@@ -54,5 +54,8 @@ return [
 	'Service name' => 'Название услуги',
 	'Bonus reports' => 'Отчет по бонусам',
 	'Except cusers' => 'Исключенные компании',
-	'Add user to except' => 'Добавить компанию в исключения'
+	'Add user to except' => 'Добавить компанию в исключения',
+	'Scheme' => 'Бонусная схема',
+	'Bonus type' => 'Тип бонусной схемы',
+	'Service' => 'Услуга'
 ];

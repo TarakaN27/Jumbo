@@ -4,6 +4,7 @@ namespace backend\controllers;
 use backend\models\forms\BUserSignupForm;
 use common\components\anubis\Anubis;
 use common\components\crunchs\bonus\ImportSale;
+use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
 use common\components\crunchs\Payment\RecalcPayment;
 use common\components\helpers\CustomHelper;
@@ -90,8 +91,16 @@ class SiteController extends Controller
         */
 
         //перерасчет юнитов
+
         $obUnit = new RecalculateUnitBonus();
         $obUnit->run();
+
+
+        //перерассчет бонусов
+        /*
+        $obBonus = new RecalculateBonus();
+        $obBonus->run();
+        */
 
         die;
     }

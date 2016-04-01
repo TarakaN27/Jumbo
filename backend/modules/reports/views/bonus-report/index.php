@@ -6,7 +6,10 @@
  * Time: 11.05
  */
 Use yii\helpers\Html;
-$this->title = Yii::t('app/bonus','Bonus reports')
+$this->title = Yii::t('app/bonus','Bonus reports');
+$admin = Yii::$app->user->can('adminRights');
+$rowNum = $admin ? 6 : 4;
+$rowContNum = $admin ? 6 : 12;
 ?>
 <div class="row">
 	<div class="col-md-12 col-sm-12 col-xs-12">
@@ -27,7 +30,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 					//     'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
 					// ],
 				]);?>
-				<?php if(Yii::$app->user->can('adminRights')):?>
+				<?php if($admin):?>
 				<div class="col-md-6 col-sm-6 col-xs-12">
 
 						<?=$form->field($model,'users')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
@@ -39,13 +42,10 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 
 				</div>
 				<?php endif;?>
-				<?php if(Yii::$app->user->can('adminRights')):?>
-					<div class="col-md-6 col-sm-6 col-xs-12">
-				<?else:?>
-					<div class="col-md-12 col-sm-12 col-xs-12">
-				<?php endif;?>
+
+				<div class="col-md-<?=$rowContNum;?> col-sm-<?=$rowContNum;?> col-xs-12">
 					<div class="row">
-						<div class="col-md-6 col-sm-6 col-xs-12">
+						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
 							<?=$form->field($model,'beginDate')->widget(\kartik\date\DatePicker::className(),[
 								'options' => [
 									'class' => 'form-control'
@@ -57,7 +57,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 								]
 							])?>
 						</div>
-						<div class="col-md-6 col-sm-6 col-xs-12">
+						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
 							<?=$form->field($model,'endDate')->widget(\kartik\date\DatePicker::className(),[
 								'options' => [
 									'class' => 'form-control'
@@ -67,6 +67,21 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 									'format' => 'dd.mm.yyyy',
 									'defaultDate' => date('d.m.Y', time())
 								]
+							])?>
+						</div>
+						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
+							<?=$form->field($model,'bonusType')->dropDownList(\common\models\BonusScheme::getTypeMap(),[
+								'prompt' => Yii::t('app/bonus','Choose bonus type')
+							])?>
+						</div>
+						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
+							<?=$form->field($model,'scheme')->dropDownList(\common\models\BonusScheme::getBonusSchemeMap(),[
+								'prompt' => Yii::t('app/bonus','Choose bonus scheme')
+							])?>
+						</div>
+						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
+							<?=$form->field($model,'service')->dropDownList(\common\models\Services::getServicesMap(),[
+								'prompt' => Yii::t('app/bonus','Choose service')
 							])?>
 						</div>
 					</div>
@@ -87,7 +102,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 							'columns' => [
 								[
 									'attribute' => 'buser.fio',
-									'visible' => Yii::$app->user->can('adminRights')
+									'visible' => $admin
 								],
 								[
 									'attribute' => 'service.name',
@@ -106,7 +121,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 								[
 									'attribute' => 'scheme.name',
 									'label' => Yii::t('app/bonus','Scheme name'),
-									'visible' => Yii::$app->user->can('adminRights')
+									'visible' => $admin
 								],
 								'amount:decimal',
 							]
