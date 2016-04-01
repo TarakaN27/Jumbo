@@ -1,3 +1,4 @@
+php_value memory_limit 150M
 RewriteEngine on
 # if a directory or a file exists, use the request directly
 RewriteCond %{REQUEST_FILENAME} !-f
