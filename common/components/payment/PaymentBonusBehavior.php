@@ -22,6 +22,7 @@ use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\PaymentsManager;
 use common\models\PaymentCondition;
+use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
 use common\models\PaymentsSale;
 use common\models\Services;
@@ -94,8 +95,8 @@ class PaymentBonusBehavior extends Behavior
 		$obManager = BUser::find()      //находим менеджера, для которого зачисляется unit
 		->select(['b.id','b.allow_unit'])
 			->alias('b')
-			->leftJoin(CUser::tableName().' as c','c.manager_id = b.id')
-			->where(['c.id' => $iCUserID])
+			->leftJoin(PaymentRequest::tableName().' as r','r.manager_id = b.id')
+			->where(['r.id' => $model->prequest_id])
 			->one();
 
 		if(!$obManager || $obManager->allow_unit != AbstractActiveRecord::YES)  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units

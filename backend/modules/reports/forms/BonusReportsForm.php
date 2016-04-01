@@ -10,6 +10,7 @@ namespace backend\modules\reports\forms;
 
 
 use common\models\BUserBonus;
+use common\models\Payments;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -59,8 +60,9 @@ class BonusReportsForm extends Model
 	{
 		$query = BUserBonus::find()
 			->joinWith('service')
+			->joinWith('payment')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere(BUserBonus::tableName().'.updated_at >= :beginDate AND '.BUserBonus::tableName().'.updated_at <= :endDate')
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
 			->params([
 				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
 				':endDate' => strtotime($this->endDate.' 23:59:59')
@@ -68,7 +70,11 @@ class BonusReportsForm extends Model
 
 		return [
 			'dataProvider' => new ActiveDataProvider([
-					'query' => $query
+					'query' => $query,
+					'pagination' => [
+						'pageSize' => -1,
+					],
+					//'sort'=> ['defaultOrder' => ['pay_date'=>SORT_ASC]],
 				]),
 			'totalCount' => $query->sum('amount')
 		];

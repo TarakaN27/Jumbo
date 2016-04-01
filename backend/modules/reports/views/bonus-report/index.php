@@ -95,7 +95,7 @@ $this->title = Yii::t('app/bonus','Bonus reports')
 								],
 								'cuser.infoWithSite',
 								'payment_id',
-								'created_at:datetime',
+								'payment.pay_date:datetime',
 								[
 									'attribute' => 'scheme.type',
 									'value' => function($model){
