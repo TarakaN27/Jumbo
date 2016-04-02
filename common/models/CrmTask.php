@@ -380,7 +380,7 @@ class CrmTask extends AbstractActiveRecord
      */
     public function getTaskFiles()
     {
-        return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id']);
+        return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id'])->orderBy([CrmCmpFile::tableName().'.updated_at' => SORT_DESC]);
     }
 
     /**
@@ -667,18 +667,8 @@ class CrmTask extends AbstractActiveRecord
                             ]
                         ];
 
-                        $tmpName = explode('.',$file->name);
-                        if(is_array($tmpName))
-                        {
-                            $tmpName = $tmpName[0];
-                        }else
-                        {
-                            $tmpName = $file->name;
-                        }
-                        
                         //добавляем файлы. Файлы сохраняются через поведение Uploadbehavior
                         $obFile = new CrmCmpFile();
-                        $obFile->name = empty($item['title']) ? $tmpName : $item['title'];
                         $obFile->task_id = $this->id;
                         $obFile->setScenario('insert');
                         if(!$obFile->save())

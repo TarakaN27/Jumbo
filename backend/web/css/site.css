@@ -256,3 +256,4 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     -moz-animation: rotate 0.5s infinite linear;
     -webkit-animation: rotate 0.5s infinite linear;
 }
+.list-cell__title{display: none;}

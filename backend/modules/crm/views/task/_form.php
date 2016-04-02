@@ -209,7 +209,11 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
                     [
                         'name'  => 'title',
                         'title' => Yii::t('app/crm','File name'),
+                        'options' => [
+                            'class' => 'hide'
+                        ]
                     ],
+
                     [
                         'name'  => 'fileInput',
                         'enableError' => true,

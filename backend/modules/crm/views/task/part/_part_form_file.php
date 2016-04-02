@@ -17,7 +17,6 @@
 	?>
 	<div class="row ">
 		<div class="col-md-6">
-			<?php echo $form->field($model,'name')->textInput(); ?>
 			<?php echo $form->field($model,'src')->fileInput(); ?>
 		</div>
 	</div>

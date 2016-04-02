@@ -55,6 +55,13 @@ class UploadBehavior extends Behavior{
 	 * @var string the base URL or path alias for this file
 	 */
 	public $url;
+
+    public $attributeName = NULL;
+
+    public $checkBySingleAttribute = NULL;
+
+    public $checkIsExist = FALSE;
+
 	/**
 	 * @var boolean|callable generate a new unique name for the file
 	 * set true or anonymous function takes the old filename and returns a new name.
@@ -113,11 +120,58 @@ class UploadBehavior extends Behavior{
 		if (in_array($model->scenario, $this->scenarios)) {
 			$this->_file = UploadedFile::getInstance($model, $this->attribute);
 			if ($this->_file instanceof UploadedFile) {
+                $this->getRealName();
 				$this->_file->name = $this->getFileName($this->_file);
 				$model->setAttribute($this->attribute, $this->_file);
 			}
 		}
 	}
+
+    /**
+     *
+     */
+    protected function getRealName()
+    {
+        $model = $this->owner;
+        if(!is_null($this->attributeName))
+        {
+            $tmpName = explode('.',$this->_file->name);
+            if(is_array($tmpName))
+            {
+                $count = count($tmpName);
+                if($count > 2)
+                {
+                    unset($tmpName[$count-1]);
+                    $tmpName = implode('_',$tmpName);
+                }else{
+                    $tmpName = $tmpName[0];
+                }
+            }else
+            {
+                $tmpName = $this->_file->name;
+            }
+
+            if($this->checkIsExist)
+            {
+                $class = $model::className();
+                $query = $class::find()->where([$this->attributeName => $tmpName]);
+                if(!is_null($this->checkBySingleAttribute))
+                {
+                    $attr = $this->checkBySingleAttribute;
+                    $query->andWhere([$attr => $model->$attr]);
+                }
+
+                if($query->exists())
+                    $tmpName.= date('d_m_Y_H_i',time());
+            }
+            $model->setAttribute($this->attributeName,$tmpName);
+        }
+
+
+
+
+    }
+
 	/**
 	 * This method is called at the beginning of inserting or updating a record.
 	 */
@@ -230,6 +284,7 @@ class UploadBehavior extends Behavior{
 			unlink($path);
 		}
 	}
+
 	/**
 	 * @param UploadedFile $file
 	 * @return string
