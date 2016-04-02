@@ -251,6 +251,7 @@ class CompanyController extends AbstractBaseBackendController
 		 */
 		if($model->load(Yii::$app->request->post()))
 		{
+            $model->setScenario(CUser::SCENARIO_CHANGE_ASSIGNE);
 			if($model->save())
 			{
 				Yii::$app->session->setFlash('success',Yii::t('app/crm','Assigned successfully changed'));

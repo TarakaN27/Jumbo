@@ -126,7 +126,7 @@ class PaymentRequestNotificationBehavior extends Behavior
 	}
 
     /**
-     * 
+     *
      */
     public function afterDelete()
     {
