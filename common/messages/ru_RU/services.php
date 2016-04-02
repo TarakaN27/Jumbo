@@ -74,5 +74,6 @@ return [
     'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при расчете единиц',
     'Show expense only for admin and superadmin' => 'Показывать затраты по юрлицу только суперадминам и админам',
     'Without cuser for expense' => 'Без указания контрагента для затрат',
-    'Ignore at reports' => 'Не учитывать затраты в сводках'
+    'Ignore at reports' => 'Не учитывать затраты в сводках',
+    'Only for admins' => 'Только для администраторов'
 ];

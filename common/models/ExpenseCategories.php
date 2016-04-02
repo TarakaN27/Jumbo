@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $without_cuser
  * @property integer $ignore_at_report
+ * @property integer $private
  */
 class ExpenseCategories extends AbstractActiveRecord
 {
@@ -45,7 +46,7 @@ class ExpenseCategories extends AbstractActiveRecord
             [['name'], 'required'],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
-            [['parent_id', 'status', 'created_at', 'updated_at','without_cuser','ignore_at_report'], 'integer'],
+            [['parent_id', 'status', 'created_at', 'updated_at','without_cuser','ignore_at_report','private'], 'integer'],
             ['parent_id', 'default', 'value' => 0],
             [['name'], 'string', 'max' => 255],
             [['description'], 'string', 'max' => 32],
@@ -68,6 +69,7 @@ class ExpenseCategories extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'without_cuser' => Yii::t('app/services','Without cuser for expense'),
             'ignore_at_report' => Yii::t('app/services','Ignore at reports'),
+            'private' => Yii::t('app/services','Only for admins')
         ];
     }
 
@@ -111,10 +113,33 @@ class ExpenseCategories extends AbstractActiveRecord
     public static function getAllExpenseCategories()
     {
         $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
-        $arCat = self::getDb()->cache(function($db){
-            return ExpenseCategories::find()->all($db);
+        $isAdmin = Yii::$app->user->can('adminRights');
+        $arCat = self::getDb()->cache(function($db) use ($isAdmin){
+            $query = ExpenseCategories::find();
+            if(!$isAdmin)
+                $query->where('private = 0 OR private is NULL');
+            return $query->all($db);
         },3600*24,$dep);
-        return $arCat;
+
+        $arResult = [];
+        $arParent = [];
+        foreach($arCat as $key=>$t)
+            if($t->parent_id == 0 || empty($t->parent_id))
+            {
+                $arParent[] = $t->id;
+                $arResult[]= $t;
+                unset($arCat[$key]);
+            }
+
+        foreach($arCat as $key=>$t)
+            if(in_array($t->parent_id,$arParent))
+            {
+                $arResult[]= $t;
+                unset($arCat[$key]);
+            }
+
+
+        return $arResult;
     }
 
     /**
@@ -199,5 +224,6 @@ class ExpenseCategories extends AbstractActiveRecord
             self::updateAll(['parent_id' => $this->parent_id],'parent_id = :parent',['parent' => $this->id]);
         return parent::afterSave($insert, $changedAttributes);
     }
+
 
 }

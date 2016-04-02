@@ -56,8 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                             ],
                                             'without_cuser:boolean',
                                             'ignore_at_report:boolean',
+                                            'private:boolean',
                                             'created_at:datetime',
-                                            'updated_at:datetime',
+                                            'updated_at:datetime'
                                         ],
                                     ]) ?>
                                </div>
