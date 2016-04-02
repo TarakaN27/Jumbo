@@ -229,3 +229,30 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .width-30-percent{width:30%;}
 .width-100-percent{width: 100%;}
 .warning-attention{color:red;}
+.refresh-notification-btn{display: block;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    /* bottom: 0px; */
+    left: 70px;
+    margin-top: -15px;
+    cursor:pointer;
+}
+@keyframes rotate{
+    from {
+        transform:  rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+@-moz-keyframes rotate{from {-moz-transform:  rotate(0);}	to {-moz-transform: rotate(360deg);}}
+
+@-webkit-keyframes rotate{from {-webkit-transform:  rotate(0);}	to {-webkit-transform: rotate(360deg);}}
+
+.refresh-notification-btn span.rotate {
+    /* имя анимации, длительность, продолжительность циклов, "задержки" */
+    animation: rotate 0.5s infinite linear;
+    -moz-animation: rotate 0.5s infinite linear;
+    -webkit-animation: rotate 0.5s infinite linear;
+}

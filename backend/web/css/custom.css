@@ -6346,3 +6346,18 @@ ul.notifications {
     float: right;
     opacity: 1;
 }
+.colorSuccess {
+    color: #2ecc40;
+}
+
+.colorInfo {
+   color: #39cccc;
+}
+
+.colorWarning {
+    color: #ff851b;
+}
+
+.colorDanger {
+    color: #ff4136;
+}
