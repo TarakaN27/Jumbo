@@ -96,6 +96,7 @@ return [
     'Add company' => 'Добавить компанию',
     'Add bill' => 'Добавить счет',
     'Add promised payment' => 'Добавить обещанный платеж',
-    'Flush badge notification' => 'Сбросить уведомления'
+    'Flush badge notification' => 'Сбросить уведомления',
+    'Task' => 'Задача'
 
 ];
