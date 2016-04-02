@@ -69,3 +69,6 @@ function imageLoader(s, fun)//Pre-loads the sprites image
     genImage.src=s;
 }
 /*********END PRELOADER***********/
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})

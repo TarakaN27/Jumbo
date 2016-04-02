@@ -3,7 +3,7 @@ use backend\assets\AppAsset;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
+use backend\widgets\sideBarFooter\SideBarFooterWidget;
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -357,7 +357,7 @@ $menuItems[] = [
                             </ul>
                         </div>
                     </div>
-                    <!-- /sidebar menu -->
+                    <?=SideBarFooterWidget::widget();?>
                 </div>
             </div>
 

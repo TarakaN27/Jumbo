@@ -91,5 +91,10 @@ return [
     'Enrollment request' => 'Запрос на зачисление',
     'Enrollments' => 'Зачисления',
     'Select all' => 'Выбрать все',
-    'Deselect all' => 'Очистить'
+    'Deselect all' => 'Очистить',
+    'Add task' => 'Добавить задачу',
+    'Add company' => 'Добавить компанию',
+    'Add bill' => 'Добавить счет',
+    'Add promised payment' => 'Добавить обещанный платеж'
+
 ];
