@@ -204,7 +204,8 @@ return [
     'Contract number' => 'Номер контракта',
     'Contract date' => 'Дата контракта',
     'Responsibility' => 'Ответственный',
-    'Cuser for OP' => 'Погасить ОП другого контрагента'
+    'Cuser for OP' => 'Погасить ОП другого контрагента',
+    'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юнит будеты будут зачислены владельцу запроса на платеж'
 
 
 

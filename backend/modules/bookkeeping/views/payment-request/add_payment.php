@@ -8,6 +8,7 @@
 use wbraganca\dynamicform\DynamicFormWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use Yii;
 $this->title  = Yii::t('app/book','Add payment');
 $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
 $this->registerJsFile('@web/js/wm_app/helpers.js',[
@@ -370,13 +371,13 @@ $this->registerJs('
                                              'value' => Yii::$app->formatter->asDate($modelP->pay_date)
                                          ],
                                          'description:text'
-
                                      ]
                                 ])?>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <?php echo Html::hiddenInput('availableSumm',$modelP->pay_summ,['id' => 'aSumm'])?>
                             <h3><?php echo Yii::t('app/book','AvailableSumm');?>: <small id="aSummDispl"><?php echo $modelP->pay_summ; ?></small></h3>
+                            <p class="warning-attention"><?=Yii::t('app/book','Attention. Unit will be enroll for payment request owner!')?></p>
                         </div>
                     </div>
                     <?php foreach ($model as $i => $m): ?>
