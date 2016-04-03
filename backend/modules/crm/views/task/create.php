@@ -29,7 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     'sAssName' => $sAssName,
                     'data' => $data,
                     'obFile' => $obFile,
-                    'pTaskName' => $pTaskName
+                    'pTaskName' => $pTaskName,
+                    'dataWatchers' => $dataWatchers,
                 ]) ?>
             </div>
         </div>

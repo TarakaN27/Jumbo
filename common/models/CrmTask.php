@@ -82,6 +82,7 @@ class CrmTask extends AbstractActiveRecord
         EVENT_UPDATE_DIALOG = 'upd_dialog';
 
     public
+        $arrWatch = [],
         $arrAcc = [],
         $arrFiles = [],
         $hourEstimate = '',
@@ -204,7 +205,7 @@ class CrmTask extends AbstractActiveRecord
 
             [['title'], 'string', 'max' => 255],
             ['status','default','value'=>self::STATUS_OPENED],
-            [['arrAcc'], 'each', 'rule' => ['integer']],
+            [['arrAcc','arrWatch'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
             ['parent_id','validateParent']
         ];
@@ -240,7 +241,8 @@ class CrmTask extends AbstractActiveRecord
             'minutesEstimate' => Yii::t('app/crm', 'Minutes'),
             'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
             'arrFiles' => Yii::t('app/crm', 'arrFiles'),
-            'payment_request' => Yii::t('app/crm', 'Payment request')
+            'payment_request' => Yii::t('app/crm', 'Payment request'),
+            'arrWatch' => Yii::t('app/crm','Watchers')
         ];
     }
 
@@ -569,6 +571,27 @@ class CrmTask extends AbstractActiveRecord
                         }
                     }
                 }
+
+                //наблюдатели.
+                if(!empty($this->arrWatch))
+                {
+                    foreach($this->arrWatch as $key => $value) //проверим, чтобы наблюдатель не был соисполнителем
+                        if($value == $this->assigned_id)
+                            unset($this->arrWatch[$key]);
+
+                    if(!empty($this->arrWatch)) {
+                        $arWatch = BUser::find()->where(['id' => $this->arrWatch])->all(); //находим всех соисполнитлей
+                        if ($arWatch ) {
+                            foreach ($arWatch  as $obWatch)
+                            {
+                                $this->link('busersWatchers', $obWatch);
+                                $arBUIDs []  = $obWatch->id;
+                            }
+                        }
+                    }
+                }
+
+
 
                 /** @var Dialogs $obDialog */
                 $obDialog = new Dialogs();  //новый диалог

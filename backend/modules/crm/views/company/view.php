@@ -298,6 +298,7 @@ $this->registerJs("
 									'data' => $data,
 									'hideCuser' => TRUE,
 									'pTaskName' => '',
+                                    'dataWatchers' => [],
 								])?>
 							</div>
 						</div>

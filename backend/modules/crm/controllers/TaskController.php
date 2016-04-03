@@ -280,7 +280,7 @@ class TaskController extends AbstractBaseBackendController
                 'defaultOrder' => ['status'=>SORT_ASC]
             ],
         ]);
-
+        $dataWatchers = [];
         return $this->render('view', [
             'model' => $this->findModel($id),
             'obAccmpl' => $obAccmpl,
@@ -300,7 +300,8 @@ class TaskController extends AbstractBaseBackendController
             'arChild' => $arChild,
             'sAssName' =>$sAssName,
             'modelTask' => $modelTask,
-            'dataProviderChildtask' => $dataProviderChildtask
+            'dataProviderChildtask' => $dataProviderChildtask,
+            'dataWatchers' => $dataWatchers,
         ]);
     }
 
@@ -500,12 +501,24 @@ class TaskController extends AbstractBaseBackendController
                 $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
             }
 
+            $dataWatchers = [];
+            if(!empty($model->arrWatch))
+            {
+                $obWatchers = BUser::find()
+                    ->select(['id','fname','mname','lname'])
+                    ->where(['id' => $model->arrWatch])
+                    ->all();
+                $dataWatchers = ArrayHelper::map($obWatchers,'id','fio');
+            }
+
+
             return $this->render('create', [
                 'model' => $model,
                 'sAssName' => $sAssName,
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
                 'data' => $data,
+                'dataWatchers' => $dataWatchers,
                 'obFile' => $obFile,
                 'pTaskName' => $pTaskName
             ]);
@@ -527,6 +540,12 @@ class TaskController extends AbstractBaseBackendController
         if(!empty($model->deadline))
             $model->deadline = Yii::$app->formatter->asDatetime($model->deadline);
         $arAccOb = $model->busersAccomplices;
+        $arWatchers = $model->busersWatchers;
+        if(!empty($arWatchers))
+            foreach($arWatchers as $watcher)
+                $model->arrWatch[] = $watcher->id;
+
+
         $arAccObOld = [];
         $data = [];
         if($arAccOb)
@@ -559,6 +578,25 @@ class TaskController extends AbstractBaseBackendController
                     }
                 }
             }
+            $model->unlinkAll('busersWatchers',TRUE);
+            //наблюдатели.
+            if(!empty($model->arrWatch))
+            {
+                foreach($model->arrWatch as $key => $value) //проверим, чтобы наблюдатель не был соисполнителем
+                    if($value == $model->assigned_id)
+                        unset($model->arrWatch[$key]);
+
+                if(!empty($model->arrWatch)) {
+                    $arWatch = BUser::find()->where(['id' =>$model->arrWatch])->all(); //находим всех соисполнитлей
+                    if ($arWatch ) {
+                        foreach ($arWatch  as $obWatch)
+                        {
+                            $model->link('busersWatchers', $obWatch);
+                        }
+                    }
+                }
+            }
+
             //нужно у удаленных соисполнителелй удалить балуны
             $arAccDiff = array_diff($arAccObOld,$arAccNew);
             if(!empty($arAccDiff))
@@ -586,13 +624,24 @@ class TaskController extends AbstractBaseBackendController
                     $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
             }
 
+            $dataWatchers = [];
+            if(!empty($model->arrWatch))
+            {
+                $obWatchers = BUser::find()
+                    ->select(['id','fname','mname','lname'])
+                    ->where(['id' => $model->arrWatch])
+                    ->all();
+                $dataWatchers = ArrayHelper::map($obWatchers,'id','fio');
+            }
+
             return $this->render('update', [
                 'model' => $model,
                 'cuserDesc' => $cuserDesc,
                 'contactDesc' => $contactDesc,
                 'sAssName' => $sAssName,
                 'data' => $data,
-                'pTaskName' => $pTaskName
+                'pTaskName' => $pTaskName,
+                'dataWatchers' => $dataWatchers
             ]);
         }
     }

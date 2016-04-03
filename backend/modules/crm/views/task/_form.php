@@ -135,6 +135,30 @@ $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}
     ?>
 
     <?php
+    echo
+    $form->field($model, 'arrWatch')->widget(\kartik\select2\Select2::className(),[
+        'initValueText' => '', // set the initial display text
+        'data' => $dataWatchers,
+        'options' => [
+            'placeholder' => Yii::t('app/crm','Search for a users ...'),
+            'multiple' => true
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'minimumInputLength' => 2,
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                'dataType' => 'json',
+                'data' => new JsExpression('function(params) { return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+            'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+            'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+        ],
+    ]);
+    ?>
+
+    <?php
     if(!isset($hideCuser) && !isset($hideContact))
         echo $form->field($model, 'cmp_id')->widget(\kartik\select2\Select2::className(),[
             'initValueText' => $cuserDesc, // set the initial display text
