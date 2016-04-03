@@ -98,8 +98,7 @@ $('.editable').on('save', function(e, params) {
 if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
 {
     $columns = [
-        ['class' => 'yii\grid\SerialColumn'],
-        //'id',
+        'id',
         [
             'attribute' => 'title',
             'format' => 'html',
@@ -271,7 +270,7 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
     ];
 }else{
     $columns = [
-        ['class' => 'yii\grid\SerialColumn'],
+        'id',
         [
             'attribute' => 'title',
             'format' => 'html',
