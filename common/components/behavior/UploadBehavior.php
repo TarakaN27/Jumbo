@@ -166,10 +166,6 @@ class UploadBehavior extends Behavior{
             }
             $model->setAttribute($this->attributeName,$tmpName);
         }
-
-
-
-
     }
 
 	/**

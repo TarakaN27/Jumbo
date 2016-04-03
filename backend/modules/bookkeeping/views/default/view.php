@@ -36,9 +36,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
+                        'cuser.infoWithSite',
+                        'cuser.manager.fio',
                         [
-                            'attribute' => 'cuser_id',
-                            'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : 'N/A'
+                            'attribute' => 'payRequest.manager.fio',
+                            'label' => Yii::t('app/book','Payment request owner')
                         ],
                         [
                             'attribute' => 'pay_date',
