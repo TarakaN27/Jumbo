@@ -46,7 +46,7 @@ class RecalculateBonus
 			$arPayment [$tmp->id] = $tmp;
 
 		/** @var PaymentsSale $sale */
-		foreach($arSales as $sale)
+		foreach($arSales as $key => $sale)
 		{
 			if(!isset($arPayment[$sale->payment_id]))
 				continue;
@@ -59,22 +59,48 @@ class RecalculateBonus
 
 	protected function countingSimpleBonus(Payments $model,$saleUser)
 	{
-		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя с заднной компанией.
 			->joinWith('cuserID')
 			->joinWith('usersID')
 			->joinWith('exceptCusers')
-			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS])
-			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
+			->where([
+				BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
+				BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
+				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
+			])
 			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
+			->params([':idCUser' => $model->cuser_id])
 			->orderBy([
-				BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,
 				BonusScheme::tableName().'.updated_at' => SORT_DESC
 			])
-			->params([':idCUser' => $model->cuser_id])
 			->one();
+		if(!$obScheme)
+			$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+				->joinWith('cuserID')
+				->joinWith('usersID')
+				->joinWith('exceptCusers')
+				->where([
+					BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
+					BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
+				])
+				->andWhere(BonusSchemeToCuser::tableName().'.scheme_id IS NULL')
+				->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
+				->params([':idCUser' => $model->cuser_id])
+				->orderBy([
+					BonusScheme::tableName().'.updated_at' => SORT_DESC
+				])
+				->one();
 
 		if(empty($obScheme))
 			return FALSE;
+
+		//костыли
+		if($obScheme->id == 4 && $model->pay_date < strtotime('01.03.2016') && in_array($model->cuser_id,[170,8768]))
+		{
+			return false;
+		}
+
+
 
 		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры схемы
 
@@ -140,18 +166,43 @@ class RecalculateBonus
 		if(!empty($obSale))
 			$saleUser = $obSale->buser_id;
 
-		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+		$obScheme = BonusScheme::find()  //ищем схему для компании
 			->joinWith('cuserID')
 			->joinWith('usersID')
 			->joinWith('exceptCusers')
-			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE])
-			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
+			->where([
+				BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE,
+				BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
+				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
+			])
 			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
-			->orderBy([BonusSchemeToCuser::tableName().'.cuser_id IS NULL' => SORT_ASC,BonusScheme::tableName().'.updated_at' => SORT_DESC])
 			->params([':idCUser' => $model->cuser_id])
+			->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])
 			->one();
 
+		if(!$obScheme)  //если нет схемы для компании, ищем общую
+			$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+				->joinWith('cuserID')
+				->joinWith('usersID')
+				->joinWith('exceptCusers')
+				->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE])
+				->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
+				->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
+				->andWhere(BonusSchemeToCuser::tableName().'.scheme_id IS NULL')
+				->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])
+				->params([':idCUser' => $model->cuser_id])
+				->one();
+
 		if(empty($obScheme))
+			return FALSE;
+
+		//костыли
+		if(in_array($model->cuser_id,[6517,8753,208]) && $obScheme->id == 4 && $model->pay_date < strtotime('01.02.2016'))
+		{
+			return false;
+		}
+
+		if(!in_array($model->cuser_id,[6517,8753,208,170,8768]) && $model->pay_date < strtotime('01.03.2016'))
 			return FALSE;
 
 		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры бонусов на дату платежа

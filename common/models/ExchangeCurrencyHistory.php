@@ -110,6 +110,9 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
                 $returnValue = (float)$obCurr->nbrb_rate;
             }
         }else{                                          //иначе ищем в истории курсов валют
+
+            $date = is_numeric($date) ? date('Y-m-d',$date) : $date;
+
             /** @var ExchangeCurrencyHistory $obECH */
             $obECH = ExchangeCurrencyHistory::getCurrencyForDate($date,$iCurID);    //вытягиеваем курс из истории
             if($obECH)

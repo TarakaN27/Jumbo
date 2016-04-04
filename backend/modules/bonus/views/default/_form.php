@@ -58,7 +58,7 @@ $this->registerJs('
     <div class="type1 <?=$model->type== BonusScheme::TYPE_UNITS ? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?=Html::tag('h4',$serv->name);?>
+                <?=Html::tag('h4',$serv->name,['class' => 'weight-bold']);?>
                 <hr>
                 <div class="form-group">
                     <?=Html::label(Yii::t('app/bonus','Стоимость'),null,[
@@ -90,7 +90,7 @@ $this->registerJs('
     <div class="type2 type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?=Html::tag('h4',$serv->name);?>
+                <?=Html::tag('h4',$serv->name,['class' => 'weight-bold']);?>
                 <hr>
                 <div class="row">
                     <div class="col-md-6 col-sm-6 col-xs-12">
