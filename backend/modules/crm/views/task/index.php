@@ -306,6 +306,24 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             }
         ],
         [
+            'attribute' => 'title',
+            'format' => 'html',
+            'value' => function($model) use ($arNewTasks){
+
+                $postfix = in_array($model->id,$arNewTasks) ?
+                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                    :
+                    '';
+                $options = ['class' => 'link-upd'];
+
+                if($model->status == CrmTask::STATUS_CLOSE)
+                {
+                    $options = ['class' => 'link-upd line-through'];
+                }
+                return Html::a($model->title,['view','id' => $model->id],$options).$postfix;
+            }
+        ],
+        [
             'attribute' => 'cmp_id',
             'value' => function($model){
 
