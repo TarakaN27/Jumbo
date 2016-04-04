@@ -91,16 +91,17 @@ class SiteController extends Controller
         */
 
         //перерасчет юнитов
-
+        /*
         $obUnit = new RecalculateUnitBonus();
         $obUnit->run();
+        */
 
 
         //перерассчет бонусов
-        /*
+
         $obBonus = new RecalculateBonus();
         $obBonus->run();
-        */
+
 
         die;
     }
