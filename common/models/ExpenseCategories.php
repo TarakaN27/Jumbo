@@ -113,7 +113,7 @@ class ExpenseCategories extends AbstractActiveRecord
     public static function getAllExpenseCategories()
     {
         $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
-        $isAdmin = Yii::$app->user->can('adminRights');
+        $isAdmin = Yii::$app->user->can('superRights');
         $arCat = self::getDb()->cache(function($db) use ($isAdmin){
             $query = ExpenseCategories::find();
             if(!$isAdmin)

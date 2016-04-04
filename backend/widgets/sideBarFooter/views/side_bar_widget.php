@@ -12,7 +12,7 @@ use yii\helpers\Html;
 <div class="sidebar-footer hidden-small">
     <?php if(!Yii::$app->user->isGuest): ?>
         <?=Html::a(
-            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>T',
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>З',
             ['/crm/task/create'],
             [
                 'data-toggle' => 'tooltip',
@@ -29,7 +29,7 @@ use yii\helpers\Html;
         Yii::$app->user->can('only_jurist')
     ):?>
         <?=Html::a(
-            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>C',
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>К',
             ['/crm/company/create'],
             [
                 'data-toggle' => 'tooltip',
@@ -41,7 +41,7 @@ use yii\helpers\Html;
     <?php endif;?>
     <?php if(!Yii::$app->user->isGuest && (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))): ?>
         <?=Html::a(
-            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>B',
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>С',
             ['/documents/bills/create'],
             [
                 'data-toggle' => 'tooltip',
@@ -54,7 +54,7 @@ use yii\helpers\Html;
     <!---Обещанные платежи-------->
     <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
         <?=Html::a(
-            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>PP',
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>ОП',
             ['/bookkeeping/promised-payment/create'],
             [
                 'data-toggle' => 'tooltip',
