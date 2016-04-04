@@ -89,7 +89,7 @@ class RecalculateBonus
 			isset($obBServ->legal_person[$model->legal_id]) &&
 			$obBServ->legal_person[$model->legal_id] == 1)
 		{
-			$amount = $amount - CustomHelper::getVatMountByAmount($amount); //отнимем от суммы платежа налог
+			$amount = CustomHelper::getVatMountByAmount($amount); //отнимем от суммы платежа налог
 		}
 
 		$amount = round($amount*($obBServ->simple_percent/100),6);  //начисляем процент
@@ -203,7 +203,7 @@ class RecalculateBonus
 			isset($obBServ->legal_person[$model->legal_id]) &&
 			$obBServ->legal_person[$model->legal_id] == 1)
 		{
-			$amount = $amount - CustomHelper::getVatMountByAmount($amount);	  //отнимаем налог
+			$amount = CustomHelper::getVatMountByAmount($amount);	  //отнимаем налог
 		}
 
 		return $this->addBonus($saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус
