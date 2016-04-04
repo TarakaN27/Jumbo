@@ -109,6 +109,30 @@ class RedisNotification
 
 	/**************************end ключи для redis **********************/
 	/************************** общие методы ***************************/
+    /**
+     * Удалить все для пользователя
+     * @param $iUserID
+     * @return bool
+     */
+    public static function flushAllForUser($iUserID)
+    {
+        $arKeys = [
+            self::getNewTaskKey($iUserID),
+            self::getNewCompanyKey($iUserID),
+            self::getNewContactKey($iUserID),
+            self::getNewContactKey($iUserID),
+            self::getNewFeedKey($iUserID),
+            self::getNewMsgKey($iUserID),
+            self::getDialogKey($iUserID),
+            self::getPaymentRequestKey($iUserID),
+            self::getEnrollmentRequestKey($iUserID)
+        ];
+        foreach($arKeys as $key)
+            Yii::$app->redis->del($key);
+
+        return TRUE;
+    }
+
 	/**
 	 * Удаляем элемент из списка
 	 * @param $key

@@ -47,7 +47,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
                         'load-dialog' => ['post'],
                         'add-new-message' => ['post'],
                         'add-dialog' => ['post'],
-                        'add-new-dialog' => ['post']
+                        'add-new-dialog' => ['post'],
+                        'flush-notification' => ['post']
                     ],
                 ],
             ]
@@ -331,6 +332,14 @@ class AjaxServiceController extends AbstractBaseBackendController{
             throw new NotFoundHttpException();
         $obDialog->callViewedEvent();
         return 1;
+    }
+
+    /**
+     * @return bool
+     */
+    public function actionFlushNotification()
+    {
+        return RedisNotification::flushAllForUser(Yii::$app->user->id);
     }
 
 } 

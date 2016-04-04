@@ -219,5 +219,6 @@ return [
     'USER_cuser_groups' => 'Группы компаний',
     'fio' =>'ФИО сотрудника',
     'Role Str' => 'Роль',
-    'Company with site' => 'Компания и сайт'
+    'Company with site' => 'Компания и сайт',
+    'Manager' => 'Ответственный'
 ];

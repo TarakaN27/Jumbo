@@ -53,7 +53,8 @@ class CUser extends AbstractUser
         IS_CLOSED = 0,
         RESIDENT_YES = 1,
         RESIDENT_NO = 0,
-        SCENARIO_REGISTER = 'register';
+        SCENARIO_REGISTER = 'register',
+        SCENARIO_CHANGE_ASSIGNE = 'change_assigne';
 
     public
         $isNew = FALSE,
@@ -191,7 +192,7 @@ class CUser extends AbstractUser
              'message' => Yii::t('app/users','This ext_id has already been taken.')],
 
             //емаил
-            ['email', 'required'],
+            ['email', 'required','except' => self::SCENARIO_CHANGE_ASSIGNE],
             ['email', 'email'],
             ['email', 'unique', 'targetClass' => self::className(),
              'message' => Yii::t('app/users','This email address has already been taken.')],
@@ -219,7 +220,9 @@ class CUser extends AbstractUser
                             return false;
                         }
                         return true;
-                    }"],
+                    }",
+                'except' => self::SCENARIO_CHANGE_ASSIGNE
+            ],
 
 
             [['requisites_id','is_resident'],'integer'],
@@ -251,7 +254,9 @@ class CUser extends AbstractUser
                             return false;
                         }
                         return true;
-                    }"],
+                    }",
+                'except' => self::SCENARIO_CHANGE_ASSIGNE
+            ],
 
             ['allow_expense','default','value' => AbstractActiveRecord::NO]
         ];
@@ -286,7 +291,7 @@ class CUser extends AbstractUser
             'archive' => Yii::t('app/users','Archive'),
             'prospects_id' => Yii::t('app/users','Prospects'),
             'allow_expense' => Yii::t('app/users','Allow expense'),
-            'infoWithSite' => Yii::t('app/users','Company with site'),
+            'infoWithSite' => Yii::t('app/users','Contractor'),
         ];
     }
 

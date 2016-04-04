@@ -31,7 +31,8 @@ class PaymentRequestNotificationBehavior extends Behavior
 		return [
 			PaymentRequest::EVENT_PIN_MANAGER => 'pinManager',
 			PaymentRequest::EVENT_AFTER_INSERT => 'afterInsert',
-			PaymentRequest::EVENT_VIEWED => 'viewed'
+			PaymentRequest::EVENT_VIEWED => 'viewed',
+            PaymentRequest::EVENT_AFTER_DELETE => 'afterDelete'
 		];
 	}
 
@@ -123,5 +124,23 @@ class PaymentRequestNotificationBehavior extends Behavior
 		}
 		return TRUE;
 	}
+
+    /**
+     *
+     */
+    public function afterDelete()
+    {
+        $model = $this->owner;
+        if(empty($model->manager_id))
+        {
+            $arManagers = BUser::getManagersArr();
+            if(!empty($arManagers))
+                foreach($arManagers as $man)
+                    $arUsers [] = $man->id;
+        }else{
+            $arUsers [] = $model->manager_id;
+        }
+        RedisNotification::removePaymentRequestFromListForUsers($arUsers,$model->id);
+    }
 
 }

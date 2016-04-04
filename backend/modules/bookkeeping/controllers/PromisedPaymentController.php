@@ -3,6 +3,7 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
 use common\models\CUser;
 use Yii;
 use common\models\PromisedPayment;
@@ -59,11 +60,15 @@ class PromisedPaymentController extends AbstractBaseBackendController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $arTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
+        $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
+        $buserDesc = empty($searchModel->buser_id_p) ? '' : BUser::findOne($searchModel->buser_id_p)->getFio();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'arTotal' => $arTotal
+            'arTotal' => $arTotal,
+            'cuserDesc' => $cuserDesc,
+            'buserDesc' => $buserDesc
         ]);
     }
 

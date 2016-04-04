@@ -98,8 +98,24 @@ $('.editable').on('save', function(e, params) {
 if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
 {
     $columns = [
-        ['class' => 'yii\grid\SerialColumn'],
-        //'id',
+        [
+            'attribute' => 'id',
+            'format' => 'html',
+            'value' => function($model) use ($arNewTasks){
+                $postfix = in_array($model->id,$arNewTasks) ?
+                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                    :
+                    '';
+                $options = ['class' => 'link-upd'];
+
+                if($model->status == CrmTask::STATUS_CLOSE)
+                {
+                    $options = ['class' => 'link-upd line-through'];
+                }
+
+                return Html::a($model->id,['view','id' => $model->id],$options).$postfix;
+            }
+        ],
         [
             'attribute' => 'title',
             'format' => 'html',
@@ -271,7 +287,24 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
     ];
 }else{
     $columns = [
-        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'attribute' => 'id',
+            'format' => 'html',
+            'value' => function($model) use ($arNewTasks){
+
+                $postfix = in_array($model->id,$arNewTasks) ?
+                    ' <span class="label label-warning">'.Yii::t('app/crm','New').'</span>'
+                    :
+                    '';
+                $options = ['class' => 'link-upd'];
+
+                if($model->status == CrmTask::STATUS_CLOSE)
+                {
+                    $options = ['class' => 'link-upd line-through'];
+                }
+                return Html::a($model->id,['view','id' => $model->id],$options).$postfix;
+            }
+        ],
         [
             'attribute' => 'title',
             'format' => 'html',

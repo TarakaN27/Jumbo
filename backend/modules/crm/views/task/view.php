@@ -419,7 +419,8 @@ $this->registerJs("
                                         'data' => [],
                                         'hideCuser' => TRUE,
                                         'hideParent' => TRUE,
-                                        'hideContact' => TRUE
+                                        'hideContact' => TRUE,
+                                        'dataWatchers' => $dataWatchers,
                                     ])
                                 ?>
                             </div>

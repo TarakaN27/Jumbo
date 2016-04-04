@@ -40,7 +40,6 @@ class CrmCmpFile extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['name'],'required'],
             ['src','required', 'on' => ['insert']],
             [['cmp_id', 'created_at', 'updated_at','contact_id','task_id'], 'integer'],
             [['name', 'ext'], 'string', 'max' => 255],
@@ -104,6 +103,9 @@ class CrmCmpFile extends AbstractActiveRecord
                     'attribute' => 'src',
                     'scenarios' => ['insert'],
                     'path' => self::FILE_PATH.'/',
+                    'attributeName' => 'name',
+                    'checkIsExist' => TRUE,
+                    'checkBySingleAttribute' => 'task_id',
                     'url' => '',
                 ],
             ]);

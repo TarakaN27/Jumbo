@@ -3,6 +3,7 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\ExpenseCategories;
 use common\models\LegalPerson;
 use Yii;
 use common\models\Expense;
@@ -51,15 +52,19 @@ class ExpenseController extends AbstractBaseBackendController
         $addWhere = NULL;
         if(!Yii::$app->user->can('superRights'))
         {
-            $addWhere = LegalPerson::tableName().'.admin_expense is NULL OR '.LegalPerson::tableName().'.admin_expense = 0';
+            $cats = ExpenseCategories::getExpenseCatMap();
+            if(empty($cats))
+            {
+                $addWhere = ' 1=0 ';
+            }else{
+                $addWhere = '('.LegalPerson::tableName().'.admin_expense is NULL OR '.LegalPerson::tableName().'.admin_expense = 0 )';
+                $addWhere.= 'AND cat_id IN ('.implode(',',array_keys($cats)).')';
+            }
         }
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addWhere);
         $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,$addWhere);
 
-
-
-        //$arTotalIgnore =
 
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
@@ -151,7 +156,15 @@ class ExpenseController extends AbstractBaseBackendController
      */
     protected function findModel($id)
     {
-        if (($model = Expense::findOne($id)) !== null) {
+        $cat = ExpenseCategories::getExpenseCatMap();
+        $query = Expense::find()->joinWith('legal')->where([Expense::tableName().'.id' => $id,'cat_id' => array_keys($cat)]);
+        if(!Yii::$app->user->can('superRights'))
+        {
+            $addWhere = LegalPerson::tableName().'.admin_expense is NULL OR '.LegalPerson::tableName().'.admin_expense = 0 ';
+            $query->andWhere($addWhere);
+        }
+
+        if (($model = $query->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

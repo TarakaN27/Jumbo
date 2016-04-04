@@ -204,11 +204,11 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .task-status-td i.fa{  display: none; margin-left: 5px; }
 .task-status-td a:hover ~ i.fa{  display: inline-block;  }
 .grid-view .select2-selection__rendered{margin-top: -4px;}
-@media screen and (min-width:480px) and (max-width:1500px) {
+/*@media screen and (min-width:480px) and (max-width:1500px) {
     .select2-container--krajee {
         max-width: 200px;
     }
-}
+}*/
 .pp_paid{color:rgba(243, 156, 18, 0.88); }
 .pdd-left-5{padding-left: 5px;}
 .right-bar-cmp{
@@ -231,3 +231,32 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .pdd-top-8{padding-top: 8px;}
 .warning{color:#e74c3c;}
 .weight-bold{font-weight: bold;}
+.warning-attention{color:red;}
+.refresh-notification-btn{display: block;
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    /* bottom: 0px; */
+    left: 70px;
+    margin-top: -15px;
+    cursor:pointer;
+}
+@keyframes rotate{
+    from {
+        transform:  rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+@-moz-keyframes rotate{from {-moz-transform:  rotate(0);}	to {-moz-transform: rotate(360deg);}}
+
+@-webkit-keyframes rotate{from {-webkit-transform:  rotate(0);}	to {-webkit-transform: rotate(360deg);}}
+
+.refresh-notification-btn span.rotate {
+    /* имя анимации, длительность, продолжительность циклов, "задержки" */
+    animation: rotate 0.5s infinite linear;
+    -moz-animation: rotate 0.5s infinite linear;
+    -webkit-animation: rotate 0.5s infinite linear;
+}
+.list-cell__title{display: none;}

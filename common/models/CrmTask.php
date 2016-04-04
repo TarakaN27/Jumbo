@@ -82,6 +82,7 @@ class CrmTask extends AbstractActiveRecord
         EVENT_UPDATE_DIALOG = 'upd_dialog';
 
     public
+        $arrWatch = [],
         $arrAcc = [],
         $arrFiles = [],
         $hourEstimate = '',
@@ -204,7 +205,7 @@ class CrmTask extends AbstractActiveRecord
 
             [['title'], 'string', 'max' => 255],
             ['status','default','value'=>self::STATUS_OPENED],
-            [['arrAcc'], 'each', 'rule' => ['integer']],
+            [['arrAcc','arrWatch'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
             ['parent_id','validateParent']
         ];
@@ -240,7 +241,8 @@ class CrmTask extends AbstractActiveRecord
             'minutesEstimate' => Yii::t('app/crm', 'Minutes'),
             'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
             'arrFiles' => Yii::t('app/crm', 'arrFiles'),
-            'payment_request' => Yii::t('app/crm', 'Payment request')
+            'payment_request' => Yii::t('app/crm', 'Payment request'),
+            'arrWatch' => Yii::t('app/crm','Watchers')
         ];
     }
 
@@ -380,7 +382,7 @@ class CrmTask extends AbstractActiveRecord
      */
     public function getTaskFiles()
     {
-        return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id']);
+        return $this->hasMany(CrmCmpFile::className(),['task_id' => 'id'])->orderBy([CrmCmpFile::tableName().'.updated_at' => SORT_DESC]);
     }
 
     /**
@@ -487,7 +489,8 @@ class CrmTask extends AbstractActiveRecord
                 if(
                     ($this->status == self::STATUS_IN_PROGRESS && $this->task_control != 1)
                     ||
-                    ($this->status == self::STATUS_IN_PROGRESS && $this->created_by == Yii::$app->user->id))
+                    ($this->status == self::STATUS_IN_PROGRESS && $this->created_by == Yii::$app->user->id)
+                )
                 {
                     $this->status = self::STATUS_CLOSE;
                     if($this->save())
@@ -501,6 +504,14 @@ class CrmTask extends AbstractActiveRecord
                     if($this->save())
                         $rtnStatus = $this->status;
                 }
+
+                if($this->status == self::STATUS_IN_PROGRESS && $this->task_control == 1 && $this->created_by != Yii::$app->user->id)
+                {
+                    $this->status = self::STATUS_NEED_ACCEPT;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+
                 break;
 
             case self::STATUS_NEED_ACCEPT:
@@ -560,6 +571,27 @@ class CrmTask extends AbstractActiveRecord
                         }
                     }
                 }
+
+                //наблюдатели.
+                if(!empty($this->arrWatch))
+                {
+                    foreach($this->arrWatch as $key => $value) //проверим, чтобы наблюдатель не был соисполнителем
+                        if($value == $this->assigned_id)
+                            unset($this->arrWatch[$key]);
+
+                    if(!empty($this->arrWatch)) {
+                        $arWatch = BUser::find()->where(['id' => $this->arrWatch])->all(); //находим всех соисполнитлей
+                        if ($arWatch ) {
+                            foreach ($arWatch  as $obWatch)
+                            {
+                                $this->link('busersWatchers', $obWatch);
+                                $arBUIDs []  = $obWatch->id;
+                            }
+                        }
+                    }
+                }
+
+
 
                 /** @var Dialogs $obDialog */
                 $obDialog = new Dialogs();  //новый диалог
@@ -658,18 +690,8 @@ class CrmTask extends AbstractActiveRecord
                             ]
                         ];
 
-                        $tmpName = explode('.',$file->name);
-                        if(is_array($tmpName))
-                        {
-                            $tmpName = $tmpName[0];
-                        }else
-                        {
-                            $tmpName = $file->name;
-                        }
-                        
                         //добавляем файлы. Файлы сохраняются через поведение Uploadbehavior
                         $obFile = new CrmCmpFile();
-                        $obFile->name = empty($item['title']) ? $tmpName : $item['title'];
                         $obFile->task_id = $this->id;
                         $obFile->setScenario('insert');
                         if(!$obFile->save())

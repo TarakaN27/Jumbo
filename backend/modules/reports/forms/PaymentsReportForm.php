@@ -9,6 +9,7 @@
 namespace backend\modules\reports\forms;
 
 use backend\models\BUser;
+use common\components\helpers\PhpOfficeHelper;
 use common\models\CUser;
 use common\models\CuserProspects;
 use common\models\CuserQuantityHour;
@@ -530,6 +531,7 @@ class PaymentsReportForm extends Model{
         $objPHPExcel->getActiveSheet()->setCellValue('Y9',Yii::t('app/reports','Currency name'));
         $i=10;
 
+
         foreach($data['data'] as $key=>$dt)
         {
             foreach($dt as $d)
@@ -539,9 +541,10 @@ class PaymentsReportForm extends Model{
                 $calc=$d->calculate;
 
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date));
+                //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,);
+                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date + 86400));
                 $objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getNumberFormat()->setFormatCode('DD.MM.YYYY');
-                //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,Yii::$app->formatter->asDate($d->pay_date));
+
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($cuser)&&is_object($obProspects = $cuser->prospects) ? $obProspects->name : 'N/A');
 

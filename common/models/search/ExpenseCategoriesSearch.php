@@ -18,7 +18,7 @@ class ExpenseCategoriesSearch extends ExpenseCategories
     public function rules()
     {
         return [
-            [['id', 'parent_id', 'status', 'created_at', 'updated_at','without_cuser','ignore_at_report'], 'integer'],
+            [['id', 'parent_id', 'status', 'created_at', 'updated_at','without_cuser','ignore_at_report','private'], 'integer'],
             [['name', 'description'], 'safe'],
         ];
     }
@@ -66,7 +66,8 @@ class ExpenseCategoriesSearch extends ExpenseCategories
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'without_cuser' => $this->without_cuser,
-            'ignore_at_report' => $this->ignore_at_report
+            'ignore_at_report' => $this->ignore_at_report,
+            'private' => $this->private
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

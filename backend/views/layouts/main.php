@@ -3,7 +3,7 @@ use backend\assets\AppAsset;
 use yii\bootstrap\Nav;
 use yii\helpers\Html;
 use yii\helpers\Url;
-
+use backend\widgets\sideBarFooter\SideBarFooterWidget;
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -118,11 +118,24 @@ $menuItems[] = [
                     <div class = "profile">
                         <div class = "profile_pic">
                             <?php echo Html::img('@web/images/defaultUserAvatar.jpg', ['class' => 'img-circle profile_img']); ?>
+                            <?=Html::a(
+                                '<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>',
+                                NULL,
+                                [
+                                    'class' => 'refresh-notification-btn',
+                                    'data-toggle' => 'tooltip',
+                                    'data-placement' => 'top',
+                                    'data-original-title' => Yii::t('app/common','Flush badge notification'),
+                                ]
+                            )?>
                         </div>
                         <div class = "profile_info">
                             <span><?php echo Yii::t('app/common', 'Welcome') ?>,</span>
                             <h2><?php echo Yii::$app->user->identity->username; ?></h2>
+
                         </div>
+
+
                     </div>
                     <!-- /menu prile quick info -->
 
@@ -364,7 +377,7 @@ $menuItems[] = [
                             </ul>
                         </div>
                     </div>
-                    <!-- /sidebar menu -->
+                    <?=SideBarFooterWidget::widget();?>
                 </div>
             </div>
 

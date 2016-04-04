@@ -209,6 +209,7 @@ return [
     'Is sale' => 'Это продажа',
     'Maybe payment is sale' => 'Возможно платеж является продажей!',
     'Choose user' => 'Выбрать пользователя',
-    'Check is sale' => 'Проверка продажи'
-
+    'Check is sale' => 'Проверка продажи',
+    'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
+    'Payment request owner' => 'Владелец платежа'
 ];

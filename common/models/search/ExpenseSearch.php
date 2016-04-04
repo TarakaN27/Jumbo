@@ -56,6 +56,7 @@ class ExpenseSearch extends Expense
         $query = Expense::find()->with('currency','legal','cat','cuser');
 
         $query->joinWith('legal');
+        $query->joinWith('cat');
         $query = $this->queryHelper($query,$params,$additionQuery);
 
         $dataProvider = new ActiveDataProvider([

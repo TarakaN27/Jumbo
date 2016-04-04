@@ -207,6 +207,7 @@ $this->registerJs("
                                     'data' => $data,
                                     'hideContact' => TRUE,
                                     'pTaskName' => '',
+                                    'dataWatchers' => [],
                                 ])?>
                             </div>
                         </div>

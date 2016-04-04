@@ -66,6 +66,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'filter' => \common\models\ExpenseCategories::getYesNo()
                                             ],
                                             [
+                                                'attribute' => 'private',
+                                                'format' => 'boolean',
+                                                'filter' => \common\models\ExpenseCategories::getYesNo()
+                                            ],
+                                            [
                                                 'class' => 'yii\grid\ActionColumn',
                                                 'template' => '{view}'
                                             ],

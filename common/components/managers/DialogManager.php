@@ -14,6 +14,7 @@ use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
+use common\models\CrmTask;
 use common\models\CUser;
 use common\models\Dialogs;
 use common\models\managers\CUserCrmRulesManager;
@@ -29,6 +30,7 @@ use yii\data\Pagination;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\rbac\Rule;
 use yii\web\NotFoundHttpException;
 use Yii;
@@ -229,7 +231,17 @@ class DialogManager extends Component{
 
         //@todo подумать как сделать кеширование
             $query = Dialogs::find()
+                ->select([
+                    Dialogs::tableName().'.*',
+                    CrmTask::tableName().'.id as task_id',
+                    CrmTask::tableName().'.title as task_title',
+                    BUser::tableName().'.id as b_user_id',
+                    Buser::tableName().'.fname',
+                    Buser::tableName().'.lname',
+                    Buser::tableName().'.mname',
+                ])
                 ->joinWith('busers')
+                ->joinWith('tasks')
                 ->where(Dialogs::tableName().'.status = '.Dialogs::PUBLISHED.' AND ('.Dialogs::tableName().'.buser_id = :buserID OR '.
                 ' '.BUser::tableName().'.id = :buserID )'
                 )
@@ -269,6 +281,20 @@ class DialogManager extends Component{
         $arDialogs = [];    //собираем результирующий массив
         foreach($arDlgs as $dlg)
         {
+            if(!empty($dlg->crm_task_id))
+            {
+                $obTask = $dlg->tasks;
+                if(is_object($obTask))
+                    $dlg->theme = Yii::t('app/common','Task').': '.Html::a(
+                            $obTask->title,
+                            ['/crm/task/view','id' => $obTask->id],
+                            [
+                                'target' => '_blank'
+                            ]
+                        );
+            }
+
+
             $arDialogs [] = [
                 'dialog' => $dlg,
                 'msg' => array_key_exists($dlg->id,$arMsg) ? $arMsg[$dlg->id] : [],

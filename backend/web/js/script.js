@@ -69,3 +69,31 @@ function imageLoader(s, fun)//Pre-loads the sprites image
     genImage.src=s;
 }
 /*********END PRELOADER***********/
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+    $('.refresh-notification-btn').on('click',function(){
+       var
+           span = $(this).find('span');
+
+        span.addClass('rotate');
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: '/service/ajax-service/flush-notification',
+            dataType: "json",
+            data: {},
+            success: function(msg){
+                $('.badge').remove();
+                span.addClass('colorSuccess');
+                span.removeClass('rotate');
+            },
+            error: function(msg){
+                span.addClass('colorDanger');
+                span.removeClass('rotate');
+            }
+        });
+
+    });
+})
+
