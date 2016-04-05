@@ -115,7 +115,7 @@ class PaymentsManager extends Payments
 			->where(['cuser_id' => $iCUserID])
 			->all();
 
-		$arGroup = [$iCUserID];
+		$arGroup = [];
 		foreach($tmpGroup as $t)
 			$arGroup [] = $t->group_id;
 		if(!empty($arGroup))
