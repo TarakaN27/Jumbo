@@ -342,4 +342,22 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return RedisNotification::flushAllForUser(Yii::$app->user->id);
     }
 
+    /**
+     * @return false|int
+     * @throws NotFoundHttpException
+     * @throws \Exception
+     */
+    public function actionDeleteComment()
+    {
+        $pk = Yii::$app->request->post('pk');
+        /** @var Messages $obMsg */
+        $obMsg = Messages::findOne($pk);
+        if(!$obMsg)
+            throw new NotFoundHttpException();
+        return $obMsg->delete();
+    }
+
+
+
+
 } 
