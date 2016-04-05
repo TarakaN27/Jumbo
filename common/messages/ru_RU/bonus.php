@@ -18,7 +18,7 @@ return [
 	'Group by company' => 'Группировка по компании',
 	'Group by company group' => 'Группировка по группе компаний',
 	'Choose grouping type' => 'Выбрать тип группировки',
-	'Create Bonus Scheme' => 'Добавить бонусныую схему',
+	'Create Bonus Scheme' => 'Добавить бонусную схему',
 	'Multiple' => 'Учитывать несколько раз',
 	'Month Percent' => 'Проценты по месяцам',
 	'Month number' => 'Номер месяца',
@@ -57,5 +57,8 @@ return [
 	'Add user to except' => 'Добавить компанию в исключения',
 	'Scheme' => 'Бонусная схема',
 	'Bonus type' => 'Тип бонусной схемы',
-	'Service' => 'Услуга'
+	'Service' => 'Услуга',
+	'Choose bonus scheme' => 'Выбрать бонусную схему',
+	'Choose service' => 'Выбрать услугу',
+	'Choose bonus type' => 'Выбрать тип бонусной схемы'
 ];

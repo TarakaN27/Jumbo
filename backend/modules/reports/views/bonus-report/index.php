@@ -32,14 +32,9 @@ $rowContNum = $admin ? 6 : 12;
 				]);?>
 				<?php if($admin):?>
 				<div class="col-md-6 col-sm-6 col-xs-12">
-
 						<?=$form->field($model,'users')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
 							'data' => \backend\models\BUser::getAllMembersMap(),
-							'clientOptions' => [
-
-							]
 						])?>
-
 				</div>
 				<?php endif;?>
 
@@ -70,12 +65,13 @@ $rowContNum = $admin ? 6 : 12;
 							])?>
 						</div>
 						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
-							<?=$form->field($model,'bonusType')->dropDownList(\common\models\BonusScheme::getTypeMap(),[
-								'prompt' => Yii::t('app/bonus','Choose bonus type')
-							])?>
+							<?=$form->field($model,'bonusType')->dropDownList(
+								\common\models\BonusScheme::getBonusSchemeTypeMapByRights(),
+								['prompt' => Yii::t('app/bonus','Choose bonus type')])?>
 						</div>
 						<div class="col-md-<?=$rowNum;?> col-sm-<?=$rowNum;?> col-xs-12">
-							<?=$form->field($model,'scheme')->dropDownList(\common\models\BonusScheme::getBonusSchemeMap(),[
+							<?=$form->field($model,'scheme')->dropDownList(
+								\common\models\BonusScheme::getBonusSchemeByRights(),[
 								'prompt' => Yii::t('app/bonus','Choose bonus scheme')
 							])?>
 						</div>

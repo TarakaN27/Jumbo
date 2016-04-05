@@ -195,6 +195,27 @@ class BonusScheme extends AbstractActiveRecord
     }
 
     /**
+     * @return mixed
+     * @throws \Exception
+     */
+    protected static function getSchemesForNotAdminUser()
+    {
+        $dep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+        return self::getDb()->cache(function(){
+            $arScheme1 = self::find()   //выбираем схемы только для пользователя
+            ->select(['name',self::tableName().'.id','type'])
+                ->joinWith('usersID')
+                ->where([
+                    BonusSchemeToBuser::tableName().'.buser_id' => Yii::$app->user->id
+                ])
+                ->all();
+            return $arScheme1;
+        },86400,$dep);
+    }
+
+    /**
      * @return array
      */
     public static function getBonusSchemeByRights()
@@ -203,27 +224,20 @@ class BonusScheme extends AbstractActiveRecord
         {
             return self::getBonusSchemeMap();
         }
-
-        $dep = new TagDependency([
-            'tags' => NamingHelper::getCommonTag(self::className())
-        ]);
-        return self::getDb()->cache(function(){
-
-            $arScheme1 = self::find()   //выбираем схемы только для пользователя
-                ->select(['name',self::tableName().'.id'])
-                ->leftJoin('usersID')
-                ->where([
-                    BonusSchemeToBuser::tableName().'.buser_id' => Yii::$app->user->id
-                ])
-                ->all();
-            $arScheme2 = self::find()   //выбираем общие схемы
-                ->select(['name',self::tableName().'.id'])
-                ->leftJoin('usersID')
-                ->where(BonusSchemeToBuser::tableName().'.scheme_id is NULL')
-                ->all();
-
-            return ArrayHelper::merge(ArrayHelper::map($arScheme1,'id','name'),ArrayHelper::map($arScheme2,'id','name'));
-        },86400,$dep);
+        $tmp = self::getSchemesForNotAdminUser();
+        return array_unique(ArrayHelper::map($tmp,'id','name'));
     }
 
+    /**
+     * @return array
+     */
+    public static function getBonusSchemeTypeMapByRights()
+    {
+        if(Yii::$app->user->can('adminRights')) //для админов и суперадминов доступы все схемы
+        {
+            return self::getTypeMap();
+        }
+        $tmp = self::getSchemesForNotAdminUser();
+        return array_unique(ArrayHelper::map($tmp,'type','typeStr'));
+    }
 }

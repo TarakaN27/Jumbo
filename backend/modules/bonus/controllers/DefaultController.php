@@ -242,6 +242,7 @@ class DefaultController extends AbstractBaseBackendController
         {
             if($obForm->makeRequest())
             {
+                $model->trigger(BonusScheme::EVENT_AFTER_UPDATE);
                 Yii::$app->session->setFlash('success',Yii::t('app/bonus','User successfully connected'));
                 return $this->redirect('index');
             }
@@ -266,6 +267,7 @@ class DefaultController extends AbstractBaseBackendController
         {
             if($obForm->makeRequest())
             {
+                $model->trigger(BonusScheme::EVENT_AFTER_UPDATE);
                 Yii::$app->session->setFlash('success',Yii::t('app/bonus','Cuser successfully connected'));
                 return $this->redirect('index');
             }
@@ -293,13 +295,14 @@ class DefaultController extends AbstractBaseBackendController
      * @throws NotFoundHttpException
      */
     public function actionExceptUser($id)
-    {
+    {   /** @var BonusScheme $model */
         $model = $this->findModel($id);
         $obForm = new ExceptBonusSchemeCUser(['obScheme' => $model]);
         if($obForm->load(Yii::$app->request->post()))
         {
             if($obForm->makeRequest())
             {
+                $model->trigger(BonusScheme::EVENT_AFTER_UPDATE);
                 Yii::$app->session->setFlash('success',Yii::t('app/bonus','Cuser add to except'));
                 return $this->redirect('index');
             }
