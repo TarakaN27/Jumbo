@@ -105,7 +105,21 @@ $rowContNum = $admin ? 6 : 12;
 									'label' => Yii::t('app/bonus','Service name')
 								],
 								'cuser.infoWithSite',
-								'payment_id',
+								[
+									'attribute' => 'payment_id',
+									'format' => 'raw',
+									'value' => function($model){
+										return Html::a(
+											$model->payment_id,
+											['/bookkeeping/default/view','id' => $model->payment_id],
+											[
+												'target' => '_blank'
+											]
+										);
+									}
+								],
+								'payment.pay_summ:decimal',
+								'payment.currency.code',
 								'payment.pay_date:datetime',
 								[
 									'attribute' => 'scheme.type',
