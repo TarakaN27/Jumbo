@@ -115,7 +115,7 @@ class PaymentsManager extends Payments
 			->where(['cuser_id' => $iCUserID])
 			->all();
 
-		$arGroup = [];
+		$arGroup = [$iCUserID];
 		foreach($tmpGroup as $t)
 			$arGroup [] = $t->group_id;
 		if(!empty($arGroup))
@@ -129,7 +129,7 @@ class PaymentsManager extends Payments
 				foreach($tmp as $t)
 					$arCuser [] = $t->cuser_id;
 		}
-		return $arCuser;
+		return array_unique($arCuser);
 	}
 
 }
