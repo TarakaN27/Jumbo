@@ -53,10 +53,10 @@ class PromisedPaymentSearch extends PromisedPayment
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params,$additionQuery = NULL)
     {
         $query = PromisedPayment::find()->with('service');
-        $query = $this->queryHelper($query,$params);
+        $query = $this->queryHelper($query,$params,$additionQuery);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -78,9 +78,12 @@ class PromisedPaymentSearch extends PromisedPayment
      * @param $params
      * @return mixed
      */
-    protected function queryHelper($query,$params)
+    protected function queryHelper($query,$params,$additionQuery = NULL)
     {
         $this->load($params);
+
+        if(!empty($additionQuery))
+            $query->where($additionQuery);
 
         $query->andFilterWhere([
             'id' => $this->id,
@@ -118,11 +121,11 @@ class PromisedPaymentSearch extends PromisedPayment
      * @param $params
      * @return array
      */
-    public function countTotal($params)
+    public function countTotal($params,$additionQuery = NULL)
     {
         $query = PromisedPayment::find()->select(['amount','service_id',Services::tableName().'.name',Services::tableName().'.enroll_unit']);
         $query->joinWith('service');
-        $query = $this->queryHelper($query,$params);
+        $query = $this->queryHelper($query,$params,$additionQuery);
         if(!$this->bCountTotal)
             return [];
 

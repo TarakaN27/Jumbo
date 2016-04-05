@@ -194,4 +194,36 @@ class BonusScheme extends AbstractActiveRecord
         return ArrayHelper::map(self::getAllBonusScheme(),'id','name');
     }
 
+    /**
+     * @return array
+     */
+    public static function getBonusSchemeByRights()
+    {
+        if(Yii::$app->user->can('adminRights')) //для админов и суперадминов доступы все схемы
+        {
+            return self::getBonusSchemeMap();
+        }
+
+        $dep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+        return self::getDb()->cache(function(){
+
+            $arScheme1 = self::find()   //выбираем схемы только для пользователя
+                ->select(['name',self::tableName().'.id'])
+                ->leftJoin('usersID')
+                ->where([
+                    BonusSchemeToBuser::tableName().'.buser_id' => Yii::$app->user->id
+                ])
+                ->all();
+            $arScheme2 = self::find()   //выбираем общие схемы
+                ->select(['name',self::tableName().'.id'])
+                ->leftJoin('usersID')
+                ->where(BonusSchemeToBuser::tableName().'.scheme_id is NULL')
+                ->all();
+
+            return ArrayHelper::merge(ArrayHelper::map($arScheme1,'id','name'),ArrayHelper::map($arScheme2,'id','name'));
+        },86400,$dep);
+    }
+
 }
