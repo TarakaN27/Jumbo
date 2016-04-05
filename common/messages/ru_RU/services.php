@@ -34,7 +34,7 @@ return [
     'Update At' => 'Обновлено',
     'Exchange Rates' => 'Валюта и курсы валют',
     'Create Exchange Rates' => 'Добавить валюту',
-    'Code' => 'Код',
+    'Code' => 'Код валюты',
     'Nbrb' => 'Код НБРБ xml',
     'Cbr' => 'Код ЦБРФ xml',
     'Nbrb Rate' => 'Курс НБРБ',

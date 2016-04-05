@@ -60,5 +60,6 @@ return [
 	'Service' => 'Услуга',
 	'Choose bonus scheme' => 'Выбрать бонусную схему',
 	'Choose service' => 'Выбрать услугу',
-	'Choose bonus type' => 'Выбрать тип бонусной схемы'
+	'Choose bonus type' => 'Выбрать тип бонусной схемы',
+	'Code payment currency' => 'Валюта платежа'
 ];

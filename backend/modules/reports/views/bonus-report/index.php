@@ -96,6 +96,7 @@ $rowContNum = $admin ? 6 : 12;
 						<?=\yii\grid\GridView::widget([
 							'dataProvider' => $data['dataProvider'],
 							'columns' => [
+								'cuser.infoWithSite',
 								[
 									'attribute' => 'buser.fio',
 									'visible' => $admin
@@ -104,7 +105,6 @@ $rowContNum = $admin ? 6 : 12;
 									'attribute' => 'service.name',
 									'label' => Yii::t('app/bonus','Service name')
 								],
-								'cuser.infoWithSite',
 								[
 									'attribute' => 'payment_id',
 									'format' => 'raw',
@@ -119,7 +119,11 @@ $rowContNum = $admin ? 6 : 12;
 									}
 								],
 								'payment.pay_summ:decimal',
-								'payment.currency.code',
+								[
+									'attribute' => 'payment.currency.code',
+									'label' => Yii::t('app/bonus','Code payment currency')
+								],
+
 								'payment.pay_date:datetime',
 								[
 									'attribute' => 'scheme.type',
