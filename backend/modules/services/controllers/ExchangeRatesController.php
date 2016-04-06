@@ -9,9 +9,11 @@ use common\components\ExchangeRates\ExchangeRatesObmennikBY;
 use Yii;
 use common\models\ExchangeRates;
 use common\models\search\ExchangeRatesSearch;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 /**
  * ExchangeRatesController implements the CRUD actions for ExchangeRates model.
@@ -242,5 +244,28 @@ class ExchangeRatesController extends AbstractBaseBackendController
         }
 
         return $this->redirect(['view','id' => $id]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\base\ExitException
+     */
+    public function actionUpdateShowInWidget()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $value = Yii::$app->request->post('value');
+        if(empty($pk))
+            throw new InvalidParamException();
+        /** @var ExchangeRates $obRate */
+        $obRate = ExchangeRates::findOne($pk);
+        if(!$obRate)
+            throw new NotFoundHttpException();
+
+        $obRate->show_at_widget = (int)$value;
+        if(!$obRate->save())
+            throw new ServerErrorHttpException();
+
+        Yii::$app->end(200);
     }
 }

@@ -35,53 +35,54 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class = "clearfix"></div>
                                 </div>
                                 <div class = "x_content">
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'code',
-            'nbrb',
-            'cbr',
-            'nbrb_rate',
-            'cbr_rate',
-            [
-                'attribute' => 'use_rur_for_byr',
-                'value' => $model->getYesNoStr($model->use_rur_for_byr)
-            ],
-            [
-              'attribute' => 'use_base',
-              'value' => $model->getYesNoStr($model->use_base)
-            ],
-            [
-                'attribute' => 'base_id',
-                'value' => is_object($obBase = $model->base) ? $obBase->code : NULL
-            ],
-            'factor',
-            [
-                'attribute' => 'use_exchanger',
-                'value' => $model->getYesNoStr($model->use_exchanger)
-            ],
-            'bank_id',
-            [
-                'attribute' => 'is_default',
-                'value' => $model->getIsDefaultStr()
-            ],
-            [
-                'attribute' => 'need_upd',
-                'value' => $model->getNeedUpdateStr()
-            ],
-            [
-                'attribute' => 'created_at',
-                'value' => $model->getFormatedCreatedAt()
-            ],
-            [
-                'attribute' => 'updated_at',
-                'value' => $model->getFormatedUpdatedAt()
-            ],
-        ],
-    ]) ?>
- </div>
+                                    <?= DetailView::widget([
+                                        'model' => $model,
+                                        'attributes' => [
+                                            'id',
+                                            'name',
+                                            'show_at_widget:boolean',
+                                            'code',
+                                            'nbrb',
+                                            'cbr',
+                                            'nbrb_rate',
+                                            'cbr_rate',
+                                            [
+                                                'attribute' => 'use_rur_for_byr',
+                                                'value' => $model->getYesNoStr($model->use_rur_for_byr)
+                                            ],
+                                            [
+                                              'attribute' => 'use_base',
+                                              'value' => $model->getYesNoStr($model->use_base)
+                                            ],
+                                            [
+                                                'attribute' => 'base_id',
+                                                'value' => is_object($obBase = $model->base) ? $obBase->code : NULL
+                                            ],
+                                            'factor',
+                                            [
+                                                'attribute' => 'use_exchanger',
+                                                'value' => $model->getYesNoStr($model->use_exchanger)
+                                            ],
+                                            'bank_id',
+                                            [
+                                                'attribute' => 'is_default',
+                                                'value' => $model->getIsDefaultStr()
+                                            ],
+                                            [
+                                                'attribute' => 'need_upd',
+                                                'value' => $model->getNeedUpdateStr()
+                                            ],
+                                            [
+                                                'attribute' => 'created_at',
+                                                'value' => $model->getFormatedCreatedAt()
+                                            ],
+                                            [
+                                                'attribute' => 'updated_at',
+                                                'value' => $model->getFormatedUpdatedAt()
+                                            ],
+                                        ],
+                                    ]) ?>
+                                 </div>
                             </div>
                         </div>
 </div>

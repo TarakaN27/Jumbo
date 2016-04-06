@@ -97,6 +97,8 @@ return [
     'Add bill' => 'Добавить счет',
     'Add promised payment' => 'Добавить обещанный платеж',
     'Flush badge notification' => 'Сбросить уведомления',
-    'Task' => 'Задача'
+    'Task' => 'Задача',
+    'Update time' => 'Время обновления',
+    'Exchange rates' => 'Курсы валют'
 
 ];

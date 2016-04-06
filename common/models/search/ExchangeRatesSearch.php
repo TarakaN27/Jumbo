@@ -18,7 +18,7 @@ class ExchangeRatesSearch extends ExchangeRates
     public function rules()
     {
         return [
-            [['id', 'nbrb', 'cbr', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'nbrb', 'cbr', 'created_at', 'updated_at','show_at_widget'], 'integer'],
             [['name', 'code'], 'safe'],
             [['nbrb_rate', 'cbr_rate'], 'number'],
         ];
@@ -68,6 +68,7 @@ class ExchangeRatesSearch extends ExchangeRates
             'cbr_rate' => $this->cbr_rate,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'show_at_widget' => $this->show_at_widget
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

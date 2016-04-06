@@ -257,3 +257,4 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     -webkit-animation: rotate 0.5s infinite linear;
 }
 .list-cell__title{display: none;}
+.exchange-rates-link{cursor: pointer;}

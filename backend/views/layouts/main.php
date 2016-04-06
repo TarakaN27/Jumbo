@@ -48,6 +48,19 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_bookkeeper'))
     ];
     unset($subItems);
 }
+if(
+Yii::$app->user->can('adminRights') ||
+Yii::$app->user->can('only_bookkeeper') ||
+Yii::$app->user->can('only_manager')
+) {
+    $menuItems [] = [
+        'label' => '<i class="fa fa-university"></i> ' . Yii::t('app/common', 'Exchange rates'),
+        'url' => NULL,
+        'options' => [
+            'class' => 'exchange-rates-link'
+        ]
+    ];
+}
 
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
@@ -92,12 +105,6 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
 $menuItems[] = [
     'label' => '<i class="fa fa-envelope-o"></i> '.Yii::t('app/common','Messages'),
     'url' => ['/messenger/default/index']
-];
-
-//должен всегда идти последним
-$menuItems[] = [
-    'label' => '<i class="fa fa-university"></i> '.Yii::t('app/common','To dashboard'),
-    'url' => Yii::$app->homeUrl
 ];
 
 ?>
@@ -426,7 +433,16 @@ $menuItems[] = [
         <div id = "notif-group" class = "tabbed_notifications"></div>
     </div-->
     <?php echo \common\components\notification\widget\TabledNotificationWidget::widget();?>
-
+    <?php   //виджет с курсами валют.
+        if(
+            Yii::$app->user->can('adminRights') ||
+            Yii::$app->user->can('only_bookkeeper') ||
+            Yii::$app->user->can('only_manager')
+        )
+        {
+            echo \backend\components\widgets\exchangeRates\ExchangeRatesWidget::widget();
+        }
+    ?>
     <?php $this->endBody() ?>
     <?php if(!Yii::$app->user->isGuest):?>
         <!-- jira bug tracking -->
