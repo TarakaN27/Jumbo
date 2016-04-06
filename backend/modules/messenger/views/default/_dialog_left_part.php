@@ -10,7 +10,8 @@ use yii\helpers\Html;
 <div class="mail_list" data-id="<?=$model->id;?>">
     <a href="#nogo" data-id="<?php echo $model->id;?>" class="dialog-mail">
         <div class="left">
-            <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
+            <i class="fa fa-circle"></i>
+            <i class="fa fa-edit"></i>
         </div>
         <div class="right">
             <h3><?php echo is_object($obBuser = $model->owner) ? $obBuser->getFio() : 'N/A';?>

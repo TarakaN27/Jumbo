@@ -7,7 +7,17 @@
  */
 use yii\helpers\Html;
 use vova07\imperavi\Widget as ImperaviWidget;
+use yii\bootstrap\Modal;
 ?>
+<?php Modal::begin([
+	'id' => 'update-msg-dialog',
+	'header' => '<h2>'.Yii::t('app/common','Update message').'</h2>',
+	'footer' => Html::button(Yii::t('app/common','Save'),['class' => 'btn btn-success btn-save']),
+	'size' => Modal::SIZE_LARGE,
+]);?>
+
+
+<?php Modal::end(); ?>
 <div class="message_wrapper ">
 	<ul class="list-unstyled msg_list" data-id="<?=$obDialog->id;?>">
 		<?php echo $this->render('_dialogs_crm_comment',[
