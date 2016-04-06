@@ -11,6 +11,7 @@ use yii\grid\GridView;
 use common\components\helpers\CustomHelper;
 use common\models\CUser;
 use common\models\BUserCrmRules;
+use yii\web\JsExpression;
 
 $this->title = Yii::t('app/crm','CRM company');
 $columns = [
@@ -81,12 +82,51 @@ $columns = [
 		}
 	],
 	[
-		'attribute' => 'manager_id',
-		'value' => function($model){
-			$manager = $model->manager;
-			return is_object($manager) ? $manager->getFio() : NULL;
-		},
-		'filter' => \backend\models\BUser::getAllMembersMap()
+		'attribute' => 'manager.fio',
+		'filter' => \kartik\select2\Select2::widget([
+			'model' => $searchModel,
+			'attribute' => 'manager_id',
+			'initValueText' => $manValue, // set the initial display text
+			'options' => [
+				'placeholder' => Yii::t('app/crm','Search for a users ...')
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+				'minimumInputLength' => 2,
+				'ajax' => [
+					'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+					'dataType' => 'json',
+					'data' => new JsExpression('function(params) { return {q:params.term}; }')
+				],
+				'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+				'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+				'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+			],
+		])
+	],
+	[
+		'attribute' => 'managerCrc.fio',
+		'label' => Yii::t('app/users','CRC manager'),
+		'filter' => \kartik\select2\Select2::widget([
+			'model' => $searchModel,
+			'attribute' => 'manager_crc_id',
+			'initValueText' => $manCrcValue, // set the initial display text
+			'options' => [
+				'placeholder' => Yii::t('app/crm','Search for a users ...')
+			],
+			'pluginOptions' => [
+				'allowClear' => true,
+				'minimumInputLength' => 2,
+				'ajax' => [
+					'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+					'dataType' => 'json',
+					'data' => new JsExpression('function(params) { return {q:params.term}; }')
+				],
+				'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+				'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+				'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+			],
+		])
 	],
 	[
 		'attribute' => 'contractor',

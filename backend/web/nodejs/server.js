@@ -1,5 +1,6 @@
 /**
  * Created by Yauheni Motuz on 13.1.16.
+ * Нужно переписать с использованием redchet
  */
 var app = require('express')();
 var server = require('http').Server(app);

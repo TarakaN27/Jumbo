@@ -404,4 +404,22 @@ class BUser extends AbstractUser
 
         return $data;
     }
+
+    /**
+     * @param $ID
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function findOneByIdCachedForSelect2($ID)
+    {
+        $obDep = new TagDependency([
+            'tags' => [
+                NamingHelper::getObjectTag(self::className(),$ID),
+            ]
+        ]);
+        return self::getDb()->cache(function() use ($ID){
+            $obManCrc = BUser::find()->select(['id','fname','lname','mname'])->where(['id' => $ID])->one();
+            return $obManCrc ? $obManCrc->getFio() : NULL;
+        },86400,$obDep);
+    }
 }

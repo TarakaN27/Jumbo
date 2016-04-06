@@ -96,11 +96,20 @@ class CompanyController extends AbstractBaseBackendController
 		}
 
 		$arCompanyRedisList = RedisNotification::getCompanyListForUser(Yii::$app->user->id);
+		$manCrcValue = '';
+		if(!empty($searchModel->manager_crc_id))
+			$manCrcValue = BUser::findOneByIdCachedForSelect2($searchModel->manager_crc_id);
+
+		$manValue = '';
+		if(!empty($searchModel->manager_id))
+			$manValue = BUser::findOneByIdCachedForSelect2($searchModel->manager_id);
 
 		return $this->render('index',[
 			'dataProvider' => $dataProvider,
 			'searchModel' => $searchModel,
-			'arCompanyRedisList' => $arCompanyRedisList
+			'arCompanyRedisList' => $arCompanyRedisList,
+			'manCrcValue' => $manCrcValue,
+			'manValue' => $manValue
 		]);
 	}
 

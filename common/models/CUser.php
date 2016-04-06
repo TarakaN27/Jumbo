@@ -39,6 +39,7 @@ use common\components\entityFields\EntityFieldsTrait;
  * @property integer $archive
  * @property integer $prospects_id
  * @property integer $allow_expense
+ * @property integer $manager_crc_id
  */
 class CUser extends AbstractUser
 {
@@ -174,7 +175,7 @@ class CUser extends AbstractUser
             [[
                 'role','status','created_at',
                 'updated_at','manager_id','is_opened',
-                'created_by','contractor','allow_expense'
+                'created_by','contractor','allow_expense','manager_crc_id'
             ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
@@ -292,6 +293,8 @@ class CUser extends AbstractUser
             'prospects_id' => Yii::t('app/users','Prospects'),
             'allow_expense' => Yii::t('app/users','Allow expense'),
             'infoWithSite' => Yii::t('app/users','Contractor'),
+            'manager_crc_id' =>  Yii::t('app/users','CRC manager'),
+            'statusStr' => Yii::t('app/users', 'Status'),
         ];
     }
 
@@ -398,6 +401,14 @@ class CUser extends AbstractUser
     public function getCmpGroup()
     {
         return $this->hasMany(CUserGroups::className(), ['id' => 'group_id'])->viaTable(CuserToGroup::tableName(), ['cuser_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getManagerCrc()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'manager_crc_id']);
     }
 
     /**
