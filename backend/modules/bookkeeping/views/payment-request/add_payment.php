@@ -502,10 +502,10 @@ $this->registerJs('
                                                         'class' => ''
                                                     ])?>
                                                 </div>
-                                                <div class="col-md-6" >
+                                                <div class="col-md-7" >
                                                         <?=$form->field($m,"[{$i}]saleUser",[
-                                                                'template' => '{label}<div class="col-md-8 col-sm-8 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
-                                                                'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
+                                                                'template' => '<div class="col-md-12 col-sm-12 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
+                                                                //'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
                                                             ])
                                                             ->dropDownList(\backend\models\BUser::getAllMembersMap(),[
                                                                 'class' => 'selectDrop',
