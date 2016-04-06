@@ -19,7 +19,7 @@ class ExchangeRatesManager extends ExchangeRates
 	 */
 	public static function getCurrencyForWidget()
 	{
-		return ExchangeRates::find()->forWidget()->all();
+		return ExchangeRates::find()->forWidget()->orderBy(['code' => SORT_ASC])->all();
 	}
 
 }

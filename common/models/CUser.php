@@ -430,7 +430,7 @@ class CUser extends AbstractUser
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->all($db);
+            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->notArchive()->all($db);
         },86400,$dep);
 
         return $models;
@@ -554,6 +554,7 @@ class CUser extends AbstractUser
             return self::find()
                 ->with('requisites')
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
+                ->notArchive()
                 ->all($db);
         },3600*24,$dep);
     }
@@ -601,7 +602,7 @@ class CUser extends AbstractUser
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->where(['allow_expense' => self::CONTRACTOR_YES])->all($db);
+            return CUser::find()->with('requisites')->where(['allow_expense' => self::CONTRACTOR_YES])->notArchive()->all($db);
         },86400,$dep);
 
         return ArrayHelper::map($models,'id','infoWithSite');

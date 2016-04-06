@@ -73,11 +73,13 @@ class AjaxSelectController extends AbstractBaseBackendController
 			$obCUser = CUser::find()
 				->select([CUser::tableName().'.id','requisites_id'])
 				->joinWith('requisites')
+
 				->where(['like',CUserRequisites::tableName().'.corp_name',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
+				->notArchive()
 				->limit(10)
 				->all()
 			;
@@ -109,11 +111,13 @@ class AjaxSelectController extends AbstractBaseBackendController
 			$obCUser = CUser::find()
 				->select([CUser::tableName().'.id','requisites_id'])
 				->joinWith('requisites')
+
 				->where(['like',CUserRequisites::tableName().'.corp_name',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
-				->orWhere(['like',CUserRequisites::tableName().'.site',$q]);
+				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
+				->notArchive();
 
 			if(!Yii::$app->user->can('adminRights'))
 				$obCUser = $obCUser->andWhere([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
@@ -155,6 +159,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
 				->andWhere(['contractor' => CUser::CONTRACTOR_YES])
+				->notArchive()
 				->limit(10)
 				->all()
 			;
@@ -200,6 +205,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
 				->andWhere(['allow_expense' => CUser::CONTRACTOR_YES])
+				->notArchive()
 				->limit(10)
 				->all()
 			;
