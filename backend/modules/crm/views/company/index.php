@@ -69,6 +69,13 @@ $columns = [
 		'filter' => \common\models\CuserProspects::getProspectsTypeMap()
 	],
 	[
+		'attribute' => 'source_id',
+		'filter' => \common\models\CuserSource::getSourceMap(),
+		'value' => function($model){
+			return is_object($obSource = $model->source) ? $obSource->name : NULL;
+		}
+	],
+	[
 		'attribute' => 'c_email',
 		'label' => Yii::t('app/users','Email'),
 		'format' => 'html',

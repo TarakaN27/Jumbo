@@ -222,4 +222,9 @@ return [
     'Company with site' => 'Компания и сайт',
     'Manager' => 'Ответственный менеджер',
     'CRC manager' => 'Ответственный специалист CPC',
+    'Cuser source' => 'Источник клиента',
+    'USER_cuser_source' => 'Источники клиента',
+    'Cuser Sources' => 'Источники клиента',
+    'Create Cuser Source' => 'Добавить источник',
+    'Choose_user_source' => 'Выберите источник клиента'
 ];

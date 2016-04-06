@@ -31,7 +31,7 @@ class CUserSearch extends CUser
             [[
 
                 'id', 'ext_id', 'type', 'manager_id','prospects_id',
-                'role', 'status', 'created_at', 'updated_at','contractor','manager_crc_id'
+                'role', 'status', 'created_at', 'updated_at','contractor','manager_crc_id','source_id'
             ], 'integer'],
             [[
                 'phone','c_email','fio','username',
@@ -74,7 +74,7 @@ class CUserSearch extends CUser
      */
     public function search($params,$addQuery = NULL,$addParams = [])
     {
-        $query = CUser::find()->with('manager','userType','requisites','quantityHour','managerCrc');
+        $query = CUser::find()->with('manager','userType','requisites','quantityHour','managerCrc','source');
         $query->joinWith('requisites');
         $query->joinWith('quantityHour');
         if(!is_null($addQuery))
@@ -120,6 +120,7 @@ class CUserSearch extends CUser
             'status' => $this->status,
             'contractor' => $this->contractor,
             'prospects_id' => $this->prospects_id,
+            'source_id' => $this->source_id,
             CUser::tableName().'created_at' => $this->created_at,
             CUser::tableName().'updated_at' => $this->updated_at,
         ]);

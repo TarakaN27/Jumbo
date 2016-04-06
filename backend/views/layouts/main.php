@@ -358,6 +358,9 @@ $menuItems[] = [
                                             <li>
                                                 <a href = "<?= Url::to(['/users/cuser-prospects/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_prospects'); ?></a>
                                             </li>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/cuser-source/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_source'); ?></a>
+                                            </li>
                                         <?php endif;?>
                                         <?php if(
                                         Yii::$app->user->can('adminRights') ||

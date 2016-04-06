@@ -40,6 +40,7 @@ use common\components\entityFields\EntityFieldsTrait;
  * @property integer $prospects_id
  * @property integer $allow_expense
  * @property integer $manager_crc_id
+ * @property integer $source_id
  */
 class CUser extends AbstractUser
 {
@@ -175,7 +176,7 @@ class CUser extends AbstractUser
             [[
                 'role','status','created_at',
                 'updated_at','manager_id','is_opened',
-                'created_by','contractor','allow_expense','manager_crc_id'
+                'created_by','contractor','allow_expense','manager_crc_id','source_id'
             ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
@@ -295,6 +296,7 @@ class CUser extends AbstractUser
             'infoWithSite' => Yii::t('app/users','Contractor'),
             'manager_crc_id' =>  Yii::t('app/users','CRC manager'),
             'statusStr' => Yii::t('app/users', 'Status'),
+            'source_id' => Yii::t('app/users', 'Cuser source')
         ];
     }
 
@@ -409,6 +411,14 @@ class CUser extends AbstractUser
     public function getManagerCrc()
     {
         return $this->hasOne(BUser::className(),['id' => 'manager_crc_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getSource()
+    {
+        return $this->hasOne(CuserSource::className(),['id' => 'source_id']);
     }
 
     /**

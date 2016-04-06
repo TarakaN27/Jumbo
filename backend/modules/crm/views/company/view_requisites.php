@@ -36,6 +36,10 @@ use yii\widgets\DetailView;
 							'label' => Yii::t('app/users','Prospects'),
 							'value' => is_object($obPr = $model->prospects) ? $obPr->name : NULL
 						],
+						[
+							'attribute' => 'source.name',
+							'label' => Yii::t('app/users','Cuser Sources')
+						],
 						'manager.fio',
 						[
 							'attribute' => 'managerCrc.fio',
