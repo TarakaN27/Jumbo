@@ -65,7 +65,6 @@ class PaymentEnrollmentBehavior extends Behavior{
             return TRUE;
         }
 
-
         $obEnrollReq = new EnrollmentRequest();
         $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc);
         $obEnrollReq->service_id = $obSrv->id;

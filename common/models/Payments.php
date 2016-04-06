@@ -2,11 +2,9 @@
 
 namespace common\models;
 
-use common\components\behavior\UnitsPaymentsBehavior;
 use common\components\loggingUserBehavior\LogModelBehavior;
-use common\components\payment\PartnerPaymentBehavior;
+use common\components\payment\PaymentBonusBehavior;
 use common\components\payment\PaymentEnrollmentBehavior;
-use common\components\payment\PaymentPredefinedConditionBehavior;
 use common\components\payment\PaymentQuantityHoursBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -36,6 +34,8 @@ class Payments extends AbstractActiveRecord
 {
 
     public
+        $isSale = false,
+        $saleUser,
         $customProd,
         $showAll,
         $updateWithNewCondition,
@@ -137,9 +137,7 @@ class Payments extends AbstractActiveRecord
                     'class' => LogModelBehavior::className(),       //логирование платежей
                     'ignored' => ['created_at','updated_at']
                 ],
-                [
-                    'class' => UnitsPaymentsBehavior::className()    //начисление юнитов менеджерам
-                ],
+                PaymentBonusBehavior::className(),  //бонусы пользователям
                 /* отключили 11/02/2016
                 [
                     'class' => PaymentPredefinedConditionBehavior::className()  //устанавливаем предопределныеусловия для CUSER
@@ -228,5 +226,8 @@ class Payments extends AbstractActiveRecord
             ->andWhere(['cuser_id' => $userID])
             ->all();
     }
+
+
+
 
 }

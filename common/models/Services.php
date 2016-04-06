@@ -81,7 +81,7 @@ class Services extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'allow_enrollment' => Yii::t('app/services', 'Allow enrollment'),
             'b_user_enroll' => Yii::t('app/services', 'Responsibility for enrollment'),
-            'enroll_unit' => Yii::t('app/services', 'Unit enrollment'),
+            'enroll_unit' => Yii::t('app/services', 'Unit enrollment')
         ];
     }
 

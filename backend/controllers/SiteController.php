@@ -3,6 +3,9 @@ namespace backend\controllers;
 
 use backend\models\forms\BUserSignupForm;
 use common\components\anubis\Anubis;
+use common\components\crunchs\bonus\ImportSale;
+use common\components\crunchs\bonus\RecalculateBonus;
+use common\components\crunchs\bonus\RecalculateUnitBonus;
 use common\components\crunchs\Payment\RecalcPayment;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
@@ -75,8 +78,31 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
-        $recalc = new RecalcPayment();
-        $recalc->recalculateWithSetConditions();
+        //$recalc = new RecalcPayment();
+        //$recalc->recalculateWithSetConditions();
+
+        //импорт продаж
+        /*
+        $obImport = new ImportSale([
+            '@backend/runtime/sale_feb.csv',
+            '@backend/runtime/sale_jun.csv'
+        ]);
+        $obImport->run();
+        */
+
+        //перерасчет юнитов
+        /*
+        $obUnit = new RecalculateUnitBonus();
+        $obUnit->run();
+        */
+
+
+        //перерассчет бонусов
+
+        $obBonus = new RecalculateBonus();
+        $obBonus->run();
+
+
         die;
     }
 

@@ -205,11 +205,11 @@ return [
     'Contract date' => 'Дата контракта',
     'Responsibility' => 'Ответственный',
     'Cuser for OP' => 'Погасить ОП другого контрагента',
+    'Sale user' => 'Кто продал',
+    'Is sale' => 'Это продажа',
+    'Maybe payment is sale' => 'Возможно платеж является продажей!',
+    'Choose user' => 'Выбрать пользователя',
+    'Check is sale' => 'Проверка продажи',
     'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
     'Payment request owner' => 'Владелец платежа'
-
-
-
-
-
 ];

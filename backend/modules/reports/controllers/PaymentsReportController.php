@@ -13,24 +13,20 @@ use backend\components\AbstractBaseBackendController;
 use backend\modules\reports\forms\PaymentsReportForm;
 
 class PaymentsReportController extends AbstractBaseBackendController{
-
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $model = new PaymentsReportForm();
         $arData = [];
         if($model->load(\Yii::$app->request->post()) && $model->validate())
         {
-                $arData = $model->getData();
-
-
+            $arData = $model->getData();    //получаем отчет
         }
-
-
         return $this->render('index',[
             'model' => $model,
             'arData' => $arData
-
         ]);
     }
-
 } 

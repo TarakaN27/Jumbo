@@ -92,13 +92,15 @@ return [
     'Enrollments' => 'Зачисления',
     'Select all' => 'Выбрать все',
     'Deselect all' => 'Очистить',
+    'Remuneration' => 'Вознаграждения',
+    'Bonus scehemes' => 'Бонусные схемы',
+    'Bonus report' => 'Отчеты по бонусам',
+    'Reports' => 'Отчеты',
     'Add task' => 'Добавить задачу',
     'Add company' => 'Добавить компанию',
-    'Add bill' => 'Добавить счет',
     'Add promised payment' => 'Добавить обещанный платеж',
     'Flush badge notification' => 'Сбросить уведомления',
     'Task' => 'Задача',
     'Update time' => 'Время обновления',
     'Exchange rates' => 'Курсы валют'
-
 ];

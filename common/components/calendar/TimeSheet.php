@@ -208,7 +208,9 @@ class TimeSheet
 		];
 	}
 
-
+	/**
+	 * @return array
+	 */
 	public function getUsersTimeSheetData()
 	{
 		$arUsers = $this->getAllUsers();   //получаем всех пользователей;
@@ -272,6 +274,10 @@ class TimeSheet
 		];
 	}
 
+	/**
+	 * @param array $userIds
+	 * @return array
+	 */
 	protected function getLogWorkDayForUsers(array $userIds)
 	{
 		if(empty($userIds))
@@ -360,6 +366,9 @@ class TimeSheet
 		return $arReturn;
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function getCalendardays()
 	{
 		$arCDays = CalendarDaysManager::getDaysForRange($this->startDate,$this->endDate); //получаем не стандартные дни из календаря

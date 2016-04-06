@@ -28,7 +28,8 @@ return [
                         'app/documents' => 'documents.php',
                         'app/crm' => 'crm.php',
                         'app/config' => 'config.php',
-                        'app/dialogs' => 'dialogs.php'
+                        'app/dialogs' => 'dialogs.php',
+                        'app/bonus' => 'bonus.php'
                     ]
                 ]
             ]

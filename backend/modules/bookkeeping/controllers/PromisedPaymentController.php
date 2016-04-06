@@ -45,21 +45,19 @@ class PromisedPaymentController extends AbstractBaseBackendController
      */
     public function actionIndex()
     {
-        $arSearchParam = [];
+        $addQuery = [];
         if (Yii::$app->user->isManager()) {
             $tmp = CUser::getContractorForManager(Yii::$app->user->id);
             $arUserID = [];
             foreach ($tmp as $t)
                 $arUserID [] = $t->id;
-
-            $arSearchParam ['cuser_id'] = $arUserID;
+            $addQuery [PromisedPayment::tableName().'.cuser_id'] = $arUserID;
         }
 
+        $searchModel = new PromisedPaymentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addQuery);
 
-        $searchModel = new PromisedPaymentSearch($arSearchParam);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        $arTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
+        $arTotal = $searchModel->countTotal(Yii::$app->request->queryParams,$addQuery);
         $cuserDesc = empty($searchModel->cuser_id) ? '' : \common\models\CUser::findOne($searchModel->cuser_id)->getInfoWithSite();
         $buserDesc = empty($searchModel->buser_id_p) ? '' : BUser::findOne($searchModel->buser_id_p)->getFio();
 

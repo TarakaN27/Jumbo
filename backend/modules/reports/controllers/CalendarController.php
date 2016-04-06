@@ -38,11 +38,11 @@ class CalendarController extends AbstractBaseBackendController
 		return $tmp;
 	}
 
-
 	CONST
-		YEAR_START = 2016;
+		YEAR_START = 2016;  //С какого года доступен календарь
 
 	/**
+	 * Формируем доступные года. От YEAR_STRART до текущий год +1
 	 * @return int
 	 */
 	protected function getYears()
@@ -55,16 +55,18 @@ class CalendarController extends AbstractBaseBackendController
 		return $arReturn;
 	}
 
+	/**
+	 * @param null $year
+	 * @return string
+	 */
 	public function actionIndex($year = NULL)
 	{
-		if(is_null($year))
+		if(is_null($year))  //если год не задан, укащываем текущий
 			$year = (int)date('Y',time());
 
 		$obCalendar = new Calendar();
 		$arDays = $obCalendar->getCalendarForYearArray($year);
-
 		$arYears = $this->getYears();
-
 		return $this->render('index',[
 			'arDays' => $arDays,
 			'year' => $year,
@@ -103,6 +105,7 @@ class CalendarController extends AbstractBaseBackendController
 
 	/**
 	 * @return array
+	 * @throws NotAcceptableHttpException
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
 	 */
@@ -139,9 +142,17 @@ class CalendarController extends AbstractBaseBackendController
 		$obCalendar = new Calendar();
 		$arDays = $obCalendar->getCalendarForYearArray($year);
 		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-		return ['content' => $this->renderPartial('_calendar',['arDays' => $arDays,'year' => $year,'canEdit' =>$this->canEditCalendar()])];
+		return ['content' => $this->renderPartial('_calendar',[
+			'arDays' => $arDays,
+			'year' => $year,
+			'canEdit' =>$this->canEditCalendar()
+		])];
 	}
 
+	/**
+	 * Вынесено в отдельный метод, что бы при изменении прав доступа не менять во многих местах
+	 * @return bool
+	 */
 	protected function canEditCalendar()
 	{
 		return $canEdit = \Yii::$app->user->can('adminRights');

@@ -7,7 +7,6 @@ class m150729_073521_create_table_bind_user extends Migration
 {
     public function up()
     {
-
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
