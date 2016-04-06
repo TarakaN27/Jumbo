@@ -13,7 +13,11 @@
 	'columns' => [
 		'name',
 		'code',
-		'nbrb_rate'
+		[
+			'attribute' => 'nbrb_rate',
+			'label' => Yii::t('app/common','Rate')
+		],
+
 	]
 ])?>
 <div>

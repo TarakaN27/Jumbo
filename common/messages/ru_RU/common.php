@@ -102,5 +102,6 @@ return [
     'Flush badge notification' => 'Сбросить уведомления',
     'Task' => 'Задача',
     'Update time' => 'Время обновления',
-    'Exchange rates' => 'Курсы валют'
+    'Exchange rates' => 'Курсы валют',
+    'Rate' => 'Курс'
 ];
