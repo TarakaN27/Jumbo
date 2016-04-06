@@ -357,7 +357,35 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return $obMsg->delete();
     }
 
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateComment()
+    {
+        $pk = Yii::$app->request->get('pk');
+        /** @var Messages $obMsg */
+        $obMsg = Messages::findOne($pk);
+        if(!$obMsg)
+            throw new NotFoundHttpException();
 
+        if($obMsg->load(Yii::$app->request->post()) )
+        {
+            if($obMsg->save())
+                return [
+                    'type' => 'upd',
+                    'status' => 'ok',
+                    'msg' => $obMsg->msg
+                ];
+            else
+                return [
+                    'type' => 'upd',
+                    'status' => 'error'
+                ];
+        }
 
-
+        return ['type'=> 'form','body' => $this->renderPartial('update_comment',[
+            'model' => $obMsg
+        ])];
+    }
 } 

@@ -52,6 +52,8 @@ class LiveFeedTaskWidget extends Widget
 				DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-new-dialog-contact']) . '",
 			    DIALOG_LOAD_COMMENTS = "' . \yii\helpers\Url::to(['/ajax-service/load-dialog-comments']) . '",
 			    DIALOG_SEND_CRM_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-crm-msg']) . '",
+			    DIALOG_DEL_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/delete-comment']) . '",
+			    DIALOG_UPDATE_MSG = "' . \yii\helpers\Url::to(['/ajax-service/update-comment']) . '",
 			    DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
 			    DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
@@ -66,6 +68,10 @@ class LiveFeedTaskWidget extends Widget
 			    HIDE_MSG_TEXT = "'. Yii::t('app/common', 'HIDE_MSG_TEXT') .'",
 			    SHOW_MSG_TEXT = "'. Yii::t('app/common', 'SHOW_MSG_TEXT') .'",
 			    DIALOG_ERROR_ADD_MESSAGE = "'. Yii::t('app/common', 'DIALOG_ERROR_ADD_MESSAGE') .'",
+			    CONFIRM_DELETE_MSG = "'. Yii::t('app/common', 'CONFIRM_DELETE_MSG') .'",
+			    MESSAGE = "'. Yii::t('app/common', 'MESSAGE') .'",
+			    MSG_ERROR_DEL = "'. Yii::t('app/common', 'MSG_ERROR_DEL') .'",
+			    MSG_ERROR_UPDATE = "'. Yii::t('app/common', 'MSG_ERROR_UPDATE') .'",
 			    DIALOG_ERROR_ADD_DIALOG = "'.Yii::t('app/crm','DIALOG_ERROR_ADD_DIALOG').'";
 		',$view::POS_BEGIN);
 

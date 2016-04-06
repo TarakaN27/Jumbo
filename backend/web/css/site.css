@@ -257,3 +257,9 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     -webkit-animation: rotate 0.5s infinite linear;
 }
 .list-cell__title{display: none;}
+.bodyCmpMsg .msg-trash, .bodyCmpMsg .msg-edit,.msgBoxList .msg-edit,.msgBoxList .msg-trash ,.view-mail .msg-edit,.view-mail .msg-trash
+{padding-left: 2px;cursor: pointer;}
+.bodyCmpMsg .time{float: right;}
+.bodyCmpMsg{width: 100%;}
+.mrg-bottom-5{margin-bottom: 5px !important;}
+.inner_dialog_section_msg .time{font-size: 12px;}

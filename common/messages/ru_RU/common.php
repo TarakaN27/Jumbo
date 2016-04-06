@@ -94,9 +94,13 @@ return [
     'Deselect all' => 'Очистить',
     'Add task' => 'Добавить задачу',
     'Add company' => 'Добавить компанию',
-    'Add bill' => 'Добавить счет',
     'Add promised payment' => 'Добавить обещанный платеж',
     'Flush badge notification' => 'Сбросить уведомления',
-    'Task' => 'Задача'
+    'Task' => 'Задача',
+    'CONFIRM_DELETE_MSG' => 'Вы действительно хотите удалить сообщение?',
+    'MSG_ERROR_DEL' => 'Ошибка удаления сообщения',
+    'MESSAGE' => 'Сообщение',
+    'Update message' => 'Редактировать сообщение',
+    'Save' => 'Сохранить'
 
 ];
