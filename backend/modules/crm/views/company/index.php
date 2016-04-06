@@ -246,7 +246,7 @@ if(!Yii::$app->user->can('only_jurist'))
 			},
 		]
 	]);
-
+/*
 	array_push($columns,[
 		'class' => 'yii\grid\ActionColumn',
 		'template' => '{archive}',
@@ -269,6 +269,7 @@ if(!Yii::$app->user->can('only_jurist'))
 			},
 		]
 	]);
+*/
 }
 
 if(Yii::$app->user->can('adminRights')) {
