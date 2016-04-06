@@ -261,7 +261,7 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 }
 .list-cell__title{display: none;}
 .exchange-rates-link{cursor: pointer;}
-.maybesale .field-addpaymentform-0-saleuser .select2{
+.maybesale .select2{
     width: 100% !important;
 }
 .bodyCmpMsg .msg-trash, .bodyCmpMsg .msg-edit,.msgBoxList .msg-edit,.msgBoxList .msg-trash ,.view-mail .msg-edit,.view-mail .msg-trash
