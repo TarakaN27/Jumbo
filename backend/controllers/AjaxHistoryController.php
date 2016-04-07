@@ -75,9 +75,8 @@ class AjaxHistoryController extends AbstractBaseBackendController
         $models = $query->offset($pages->offset)
             ->limit($pages->limit)
             ->orderBy('updated_at DESC')
-            
             ->all();
-
+        
         $pageCount = $pages->getPageCount();
         $nextPage = NULL;
         if(($page+1) < $pageCount)

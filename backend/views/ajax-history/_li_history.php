@@ -16,5 +16,5 @@ use yii\helpers\Html;
         $td.= Html::tag('td',Yii::$app->formatter->asDatetime($model->created_at));
         $tr.= Html::tag('tr',$td);
     }
-    return $tr;
+    echo $tr;
 ?>
