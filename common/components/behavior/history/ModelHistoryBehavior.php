@@ -25,8 +25,26 @@ class ModelHistoryBehavior extends Behavior
     {
         return [
             CrmLogs::EVENT_BEFORE_UPDATE => 'beforeUpdate',
-            CrmLogs::EVENT_AFTER_UPDATE => 'afterUpdate'
+            CrmLogs::EVENT_AFTER_UPDATE => 'afterUpdate',
+            CrmLogs::EVENT_AFTER_INSERT => 'afterInsert'
         ];
+    }
+
+    /**
+     *  
+     */
+    public function afterInsert()
+    {
+        $msg = \Yii::t('app/crm','User {user} create new task',[
+                'user' => \Yii::$app->user->identity->getFio()
+            ]);
+
+         $obCrmLog = new CrmLogs();
+         $obCrmLog->changed_by = \Yii::$app->user->id;
+         $obCrmLog->entity = BaseStringHelper::basename($this->owner->className());
+         $obCrmLog->item_id = $this->owner->id;
+         $obCrmLog->description = $msg;
+         $obCrmLog->save();
     }
 
     /**

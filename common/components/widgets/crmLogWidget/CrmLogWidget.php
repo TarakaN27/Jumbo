@@ -13,6 +13,7 @@ use common\components\widgets\crmLogWidget\assets\CrmLogAssets;
 use yii\base\InvalidParamException;
 use yii\base\Widget;
 use yii\helpers\Url;
+use yii\web\View;
 
 class CrmLogWidget extends Widget
 {
@@ -45,6 +46,13 @@ class CrmLogWidget extends Widget
     {
         $view = $this->getView();
         CrmLogAssets::register($view);
+        $scriptInit = '';
+        if($this->autoInit)
+            $scriptInit = "$(function(){initEntityHistory();});";
+        elseif(!empty($this->clickEventsItem))
+            $scriptInit = "$(function(){ $('".$this->clickEventsItem."').on('click',initEntityHistory);});";
+
+        $view->registerJs($scriptInit,View::POS_END);
     }
 
     /**

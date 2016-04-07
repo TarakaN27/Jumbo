@@ -13,8 +13,8 @@ use yii\helpers\Html;
     {
         $td = '';
         $td.= Html::tag('td',$model->description);
-        $td.= Html::tag('td',Yii::$app->formatter->asDatetime($model->created_at));
+        $td.= Html::tag('td','<i class="fa fa-clock-o"></i> '.Yii::$app->formatter->asDatetime($model->created_at));
         $tr.= Html::tag('tr',$td);
     }
-    return $tr;
+    echo  $tr;
 ?>

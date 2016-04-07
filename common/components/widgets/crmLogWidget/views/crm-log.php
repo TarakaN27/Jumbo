@@ -7,8 +7,11 @@
  */
 use yii\helpers\Html;
 $table = Html::tag('table',NULL,['class' => 'table']);
+$btn = Html::button(Yii::t('app/common','Load more'),[
+    'class' => 'load-more hide btn btn-default'
+]);
 ?>
-<?=Html::tag('div',$table,[
+<?=Html::tag('div',$table.$btn,[
     'class' => 'crm-log-widget',
     'data-loaded' => 0,
     'data-entity' => $entityName,
@@ -18,3 +21,4 @@ $table = Html::tag('table',NULL,['class' => 'table']);
     'data-page' => 0,
     'data-url' => $url
 ])?>
+
