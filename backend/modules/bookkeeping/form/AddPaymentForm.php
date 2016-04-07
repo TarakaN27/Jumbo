@@ -16,6 +16,8 @@ use Yii;
 class AddPaymentForm extends AbstractModel{
 
     public
+        $isSale,
+        $saleUser,
         $condType,
         $customProduction,
         $showAll,
@@ -29,7 +31,7 @@ class AddPaymentForm extends AbstractModel{
     {
         return [
             [['summ','service','condID'],'required'],
-            [['service','condID','condType'], 'integer'],
+            [['service','condID','condType','isSale','saleUser'], 'integer'],
             [['summ','fullSumm','customProduction'], 'number'],
             [['comment'], 'string'],
 
@@ -54,7 +56,9 @@ class AddPaymentForm extends AbstractModel{
             'condID' => Yii::t('app/book', 'Condition'),
             'comment' => Yii::t('app/book', 'Comment'),
             'customProduction' => Yii::t('app/book','Custom amount production'),
-            'condType' => Yii::t('app/book','Condition type')
+            'condType' => Yii::t('app/book','Condition type'),
+            'isSale' => Yii::t('app/book','Is sale'),
+            'saleUser' => Yii::t('app/book','Sale user'),
         ];
     }
 

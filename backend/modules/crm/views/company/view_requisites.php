@@ -28,44 +28,31 @@ use yii\widgets\DetailView;
 					'model' => $model,
 					'attributes' => [
 						[
-							'attribute' => 'type',
-							'value' => is_object($obType = $model->userType) ? $obType->name : 'N/A'
+							'attribute' => 'userType.name',
+							'label' => Yii::t('app/users','Type'),
 						],
 						[
-							'attribute' => 'prospects_id',
+							'attribute' => 'prospects.name',
+							'label' => Yii::t('app/users','Prospects'),
 							'value' => is_object($obPr = $model->prospects) ? $obPr->name : NULL
 						],
 						[
-							'attribute' => 'manager_id',
-							'value' => is_object($obMng) ? $obMng->getFio() : NULL
+							'attribute' => 'source.name',
+							'label' => Yii::t('app/users','Cuser Sources')
 						],
+						'manager.fio',
 						[
-							'attribute' => 'contractor',
-							'value' => $model->getContractorStr()
+							'attribute' => 'managerCrc.fio',
+							'label' => Yii::t('app/users','CRC manager'),
 						],
+						'contractor:boolean',
 						'allow_expense:boolean',
-						[
-							'attribute' => 'archive',
-							'value' => $model->getArchiveStr()
-						],
-
-						[
-							'attribute' => 'is_resident',
-							'value' => $model->getIsResidentStr()
-						],
+						'archive:boolean',
+						'is_resident:boolean',
 						'r_country',
-						[
-							'attribute' => 'status',
-							'value' => $model->getStatusStr()
-						],
-						[
-							'attribute' => 'created_at',
-							'value' => $model->getFormatedCreatedAt()
-						],
-						[
-							'attribute' => 'updated_at',
-							'value' => $model->getFormatedUpdatedAt()
-						]
+						'statusStr',
+						'created_at:datetime',
+						'updated_at:datetime',
 					],
 				]) ?>
 

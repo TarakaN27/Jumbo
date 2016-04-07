@@ -8,15 +8,22 @@
 use wbraganca\dynamicform\DynamicFormWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
-use Yii;
+use yii\helpers\Json;
 $this->title  = Yii::t('app/book','Add payment');
 $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
+$this->registerCssFile('@web/css/select/select2.min.css');
 $this->registerJsFile('@web/js/wm_app/helpers.js',[
         'depends' => [
             'yii\web\YiiAsset',
             'yii\bootstrap\BootstrapAsset'],
         ]
     );
+$this->registerJsFile('@web/js/select/select2.full.js',[
+        'depends' => [
+            'yii\web\YiiAsset',
+            'yii\bootstrap\BootstrapAsset'],
+    ]
+);
 $this->registerJs('
     function countASumm()
     {
@@ -281,13 +288,62 @@ $this->registerJs('
                 }
             }
     }
+
+    function isSaleCheck(this1)
+    {
+        var
+            block = $(this1).offsetParent().offsetParent().find(".maybesale"),
+            lines = $(this1).attr("id"),
+            check = $("#"+lines.replace(/-service/gi,"-issale")),
+            saleUser = $("#"+lines.replace(/-service/gi,"-saleuser")),
+            value = $(this1).val();
+
+        if(value == undefined || value == "")
+            {
+                saleUser.val("");
+                check.prop("checked",false);
+                block.addClass("hide");
+                //saleUser.select2("val", "");
+                //addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: "'.\yii\helpers\Url::to(['is-sale']).'",
+            dataType: "json",
+            data: {iServID:value,iContrID:"'.$modelP->cntr_id.'",payDate:"'.$modelP->pay_date.'"},
+            success: function(msg){
+                if(msg)
+                  {
+                        block.removeClass("hide");
+                  }else{
+                        block.addClass("hide");
+                  }
+            },
+            error: function(msg){
+                block.removeClass("hide");
+                addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
+                return false;
+            }
+        });
+
+    }
 ',\yii\web\View::POS_END);
 $this->registerJs('
     countASumm();
     initBehavior();
     $(".dynamicform_wrapper").on("afterInsert", function(e, item) {
+        $(item).find(".maybesale").addClass("hide");
         initBehavior();
         initPayment();
+        var
+            selectDrop = $(this).find(".selectDrop");
+
+        selectDrop.select2("destroy");
+        selectDrop.select2();
+
     });
     $(".dynamicform_wrapper").on("afterDelete", function(e) {
         countASumm();
@@ -303,6 +359,8 @@ $this->registerJs('
             service = "#" + lineID.replace(/-summ/gi,"-service");
         findCondition(service);
     });
+    $(".selectDrop").select2();
+
 ',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
@@ -398,7 +456,7 @@ $this->registerJs('
                                         <?= $form->field($m, "[{$i}]service")->dropDownList(
                                             \common\models\Services::getServicesMap(),[
                                             'prompt' => Yii::t('app/book','Choose service'),
-                                            'onchange' => 'findCondition(this);',
+                                            'onchange' => 'findCondition(this);isSaleCheck(this);',
                                             'data-service-id' => $i
                                         ]) ?>
                                         <?= $form->field($m, "[{$i}]summ")->textInput([
@@ -417,7 +475,7 @@ $this->registerJs('
                                             'class' => 'form-control cond-class'
                                         ]) ?>
                                         <div class="row">
-                                            <div class="col-md-offset-2 pdd-left-15">
+                                            <div class="col-md-offset-2 pdd-left-5">
                                                 <?php if(Yii::$app->user->can('adminRights')):?>
                                                 <div class="col-md-6">
                                                 <?= $form->field($m,"[{$i}]showAll",[])->checkbox([
@@ -432,6 +490,30 @@ $this->registerJs('
                                                 </div>
 
                                             </div>
+                                        </div>
+                                        <div class="row maybesale <?php if(!$m->isSale)echo 'hide';?>">
+                                            <hr/>
+                                            <div class="col-md-offset-2 pdd-left-15">
+                                            <span class="warning "><?=Yii::t('app/book','Maybe payment is sale');?></span>
+                                             </div>
+                                            <div>
+                                                <div class="col-md-3 col-md-offset-2 pdd-left-15">
+                                                    <?= $form->field($m,"[{$i}]isSale",[])->checkbox([
+                                                        'class' => ''
+                                                    ])?>
+                                                </div>
+                                                <div class="col-md-7" >
+                                                        <?=$form->field($m,"[{$i}]saleUser",[
+                                                                'template' => '<div class="col-md-12 col-sm-12 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
+                                                                //'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
+                                                            ])
+                                                            ->dropDownList(\backend\models\BUser::getAllMembersMap(),[
+                                                                'class' => 'selectDrop',
+                                                                'prompt' => Yii::t('app/book','Choose user')
+                                                            ])?>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>

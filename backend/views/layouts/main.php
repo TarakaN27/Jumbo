@@ -48,6 +48,19 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_bookkeeper'))
     ];
     unset($subItems);
 }
+if(
+Yii::$app->user->can('adminRights') ||
+Yii::$app->user->can('only_bookkeeper') ||
+Yii::$app->user->can('only_manager')
+) {
+    $menuItems [] = [
+        'label' => '<i class="fa fa-university"></i> ' . Yii::t('app/common', 'Exchange rates'),
+        'url' => NULL,
+        'options' => [
+            'class' => 'exchange-rates-link'
+        ]
+    ];
+}
 
 if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 {
@@ -77,27 +90,9 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
     unset($subItems);
 }
 
-
-
-
-if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_manager'))
-{
-    $menuItems[] = [
-        'label' => '<i class="fa fa-money"></i> '.Yii::t('app/common','Units'),
-        'url' => ['/units/units-manager/index']
-    ];
-}
-
-
 $menuItems[] = [
     'label' => '<i class="fa fa-envelope-o"></i> '.Yii::t('app/common','Messages'),
     'url' => ['/messenger/default/index']
-];
-
-//должен всегда идти последним
-$menuItems[] = [
-    'label' => '<i class="fa fa-university"></i> '.Yii::t('app/common','To dashboard'),
-    'url' => Yii::$app->homeUrl
 ];
 
 ?>
@@ -288,7 +283,7 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
-                                <li><a><i class="fa fa-bar-chart-o"></i> <?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
+                                <li><a><i class="fa fa-bar-chart-o"></i><?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
                                             <a href="<?= Url::to(['/reports/calendar/index']); ?>"><?php echo Yii::t('app/common', 'Calendar'); ?></a>
@@ -296,17 +291,31 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/reports/timesheet/index']); ?>"><?php echo Yii::t('app/common', 'Timesheet'); ?></a>
                                         </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/reports/bonus-report/index']); ?>"><?php echo Yii::t('app/common', 'Bonus report'); ?></a>
+                                        </li>
                                         <?php if(Yii::$app->user->can('adminRights')):?>
-                                        <li>
-                                            <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
-                                        </li>
-                                        <li>
-                                            <a href="<?= Url::to(['/reports/units-reports/index']); ?>"><?php echo Yii::t('app/common', 'Units reports'); ?></a>
-                                        </li>
+                                            <li>
+                                                <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
+                                            </li>
                                         <?php endif;?>
                                     </ul>
                                 </li>
+                                <?php if(Yii::$app->user->can('adminRights')):?>
+                                <li>
+                                    <a>
+                                        <i class="fa fa-gift"></i><?php echo Yii::t('app/common', 'Remuneration'); ?>
+                                        <span class = "fa fa-chevron-down"></span>
+                                    </a>
+                                    <ul class = "nav child_menu" style = "display: none">
 
+                                        <li>
+                                            <a href = "<?= Url::to(['/bonus/default/index']); ?>"><?php echo Yii::t('app/common', 'Bonus scehemes'); ?></a>
+                                        </li>
+
+                                    </ul>
+                                </li>
+                                <?php endif;?>
                                 <li><a>
                                         <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'CRM'); ?>
                                         <span class="fa fa-chevron-down"></span>
@@ -337,12 +346,20 @@ $menuItems[] = [
                                             </a>
                                         </li>
                                         <?php endif;?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/user-groups/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_groups'); ?></a>
+                                            </li>
+                                        <?php endif;?>
                                         <?php if(Yii::$app->user->can('adminRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/user-types/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_types'); ?></a>
                                             </li>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/cuser-prospects/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_prospects'); ?></a>
+                                            </li>
+                                            <li>
+                                                <a href = "<?= Url::to(['/users/cuser-source/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_source'); ?></a>
                                             </li>
                                         <?php endif;?>
                                         <?php if(
@@ -426,7 +443,16 @@ $menuItems[] = [
         <div id = "notif-group" class = "tabbed_notifications"></div>
     </div-->
     <?php echo \common\components\notification\widget\TabledNotificationWidget::widget();?>
-
+    <?php   //виджет с курсами валют.
+        if(
+            Yii::$app->user->can('adminRights') ||
+            Yii::$app->user->can('only_bookkeeper') ||
+            Yii::$app->user->can('only_manager')
+        )
+        {
+            echo \backend\components\widgets\exchangeRates\ExchangeRatesWidget::widget();
+        }
+    ?>
     <?php $this->endBody() ?>
     <?php if(!Yii::$app->user->isGuest):?>
         <!-- jira bug tracking -->

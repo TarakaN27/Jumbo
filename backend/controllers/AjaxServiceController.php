@@ -13,6 +13,7 @@ use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
 use common\models\CrmTask;
 use common\models\Dialogs;
+use common\models\managers\ExchangeRatesManager;
 use common\models\Messages;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -48,7 +49,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
                         'add-new-message' => ['post'],
                         'add-dialog' => ['post'],
                         'add-new-dialog' => ['post'],
-                        'flush-notification' => ['post']
+                        'flush-notification' => ['post'],
+                        'load-exchange-rates' => ['post']
                     ],
                 ],
             ]
@@ -342,4 +344,70 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return RedisNotification::flushAllForUser(Yii::$app->user->id);
     }
 
+    /**
+     * @return string
+     */
+    public function actionLoadExchangeRates()
+    {
+        $arRates = ExchangeRatesManager::getCurrencyForWidget();
+        $maxUpdate = NULL;
+        foreach($arRates as $rate)
+        {
+            if(is_null($maxUpdate))
+                $maxUpdate = $rate->updated_at;
+            else
+                $maxUpdate = $maxUpdate > $rate->updated_at ? $maxUpdate : $rate->updated_at;
+        }
+        return $this->renderPartial('load_exchange_rates',[
+            'arRates' => $arRates,
+            'maxUpdate' => $maxUpdate
+        ]);
+    }
+
+    /**
+     * @return false|int
+     * @throws NotFoundHttpException
+     * @throws \Exception
+     */
+    public function actionDeleteComment()
+    {
+        $pk = Yii::$app->request->post('pk');
+        /** @var Messages $obMsg */
+        $obMsg = Messages::findOne($pk);
+        if(!$obMsg)
+            throw new NotFoundHttpException();
+        return $obMsg->delete();
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateComment()
+    {
+        $pk = Yii::$app->request->get('pk');
+        /** @var Messages $obMsg */
+        $obMsg = Messages::findOne($pk);
+        if(!$obMsg)
+            throw new NotFoundHttpException();
+
+        if($obMsg->load(Yii::$app->request->post()) )
+        {
+            if($obMsg->save())
+                return [
+                    'type' => 'upd',
+                    'status' => 'ok',
+                    'msg' => $obMsg->msg
+                ];
+            else
+                return [
+                    'type' => 'upd',
+                    'status' => 'error'
+                ];
+        }
+
+        return ['type'=> 'form','body' => $this->renderPartial('update_comment',[
+            'model' => $obMsg
+        ])];
+    }
 } 

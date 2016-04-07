@@ -2,11 +2,29 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ExchangeRatesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
+$this->registerCssFile('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css');
+$this->registerJsFile(
+    '//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js',
+    ['depends' => [
+        'yii\web\JqueryAsset',
+        'yii\web\YiiAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
+    ]]
+);
+$this->registerJs("
+$('.editable').editable({
+    clear: false,
+    validate: function(value) {
+		if($.trim(value) == '') {
+			return 'This field is required';
+		}
+	}
+});
+",\yii\web\View::POS_READY);
 $this->title = Yii::t('app/services', 'Exchange Rates');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -69,6 +87,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'cbr',
             'nbrb_rate',
             'cbr_rate',
+            [
+                'attribute' => 'show_at_widget',
+                'format' => 'raw',
+                'value' => function($model){
+                    $value = is_null($model) ? NULL : Yii::$app->formatter->asBoolean($model->show_at_widget);
+                    if(Yii::$app->user->can('adminRights') ||Yii::$app->user->can('only_bookkeeper'))
+                        return Html::a($value,'#',[
+                            'class' => 'editable',
+                            'data-type' => "select",
+                            'data-source' => "{0: 'Нет', 1: 'Да'}",
+                            'data-pk' => $model->id,
+                            'data-url' => Url::to(['update-show-in-widget']),
+                            'data-title' => Yii::t('app/service','Show at widget')
+                        ]);
+                    else
+                        return $value;
+                },
+                'filter' => \common\models\ExchangeRates::getYesNo()
+            ],
             [
                 'attribute' => 'updated_at',
                 'value' => function($model){

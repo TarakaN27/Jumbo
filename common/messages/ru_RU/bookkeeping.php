@@ -203,13 +203,13 @@ return [
     'Partial enrollment' => 'Частичное зачисление "Зачислить указанную часть расчетного кол-ва единиц и создать запрос на дозачисление остатка"',
     'Contract number' => 'Номер контракта',
     'Contract date' => 'Дата контракта',
-    'Responsibility' => 'Ответственный',
+    'Responsibility' => 'Ответственный менеджер',
     'Cuser for OP' => 'Погасить ОП другого контрагента',
+    'Sale user' => 'Кто продал',
+    'Is sale' => 'Это продажа',
+    'Maybe payment is sale' => 'Возможно платеж является продажей!',
+    'Choose user' => 'Выбрать пользователя',
+    'Check is sale' => 'Проверка продажи',
     'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
     'Payment request owner' => 'Владелец платежа'
-
-
-
-
-
 ];

@@ -8,7 +8,7 @@ use Yii;
 use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
-
+use yii\db\ActiveQuery;
 /**
  * This is the model class for table "{{%exchange_rates}}".
  *
@@ -29,6 +29,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $bank_id
  * @property string $factor
  * @property integer $use_rur_for_byr
+ * @property integer $show_at_widget
  */
 class ExchangeRates extends AbstractActiveRecord
 {
@@ -59,9 +60,10 @@ class ExchangeRates extends AbstractActiveRecord
              'message' => Yii::t('app/services','This code has already been taken.')],
 
             [[
-                 'nbrb', 'cbr', 'created_at', 'updated_at',
-                 'need_upd','is_default','use_base','base_id',
-                 'use_exchanger','bank_id','use_rur_for_byr'
+                'nbrb', 'cbr', 'created_at', 'updated_at',
+                'need_upd','is_default','use_base','base_id',
+                'use_exchanger','bank_id','use_rur_for_byr',
+                'show_at_widget'
             ],'integer'],
             [['nbrb_rate', 'cbr_rate','factor'], 'number'],
             [['name', 'code'], 'string', 'max' => 255],
@@ -109,7 +111,8 @@ class ExchangeRates extends AbstractActiveRecord
             'factor' => Yii::t('app/services', 'Factor'),
             'bank_id' => Yii::t('app/services', 'Bank ID'),
             'use_exchanger' => Yii::t('app/services', 'Use exchanger'),
-            'use_rur_for_byr' => Yii::t('app/services', 'Use currency rur for count byr')
+            'use_rur_for_byr' => Yii::t('app/services', 'Use currency rur for count byr'),
+            'show_at_widget' => Yii::t('app/services','Show in widget')
         ];
     }
 
@@ -246,6 +249,28 @@ class ExchangeRates extends AbstractActiveRecord
         //сохраняем историю
         return $obH->save();
     }
+}
 
-
+/**
+ * Класс для работы с запросами
+ * Тут добавляем scopes
+ * Class ExchangeRatesQuery
+ * @package common\models
+ */
+class ExchangeRatesQuery extends ActiveQuery
+{
+    /**
+     * Для виджета
+     * @return $this
+     */
+    public function forWidget()
+    {
+        return $this->select([
+            ExchangeRates::tableName().'.name',
+            ExchangeRates::tableName().'.code',
+            ExchangeRates::tableName().'.nbrb_rate',
+            ExchangeRates::tableName().'.updated_at',
+        ])
+            ->andWhere(['show_at_widget' => ExchangeRates::YES]);
+    }
 }

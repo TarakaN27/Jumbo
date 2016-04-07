@@ -72,18 +72,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'log_work_type',
                 'value' => $model->getLogWorkTypeStr()
             ],
+            'allow_unit:boolean',
             [
                 'attribute' => 'status',
                 'value' => $model->getStatusStr()
             ],
-            [
-                'attribute' => 'created_at',
-                'value' => $model->getFormatedCreatedAt()
-            ],
-            [
-                'attribute' => 'updated_at',
-                'value' => $model->getFormatedUpdatedAt()
-            ],
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
 

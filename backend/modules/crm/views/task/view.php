@@ -22,6 +22,7 @@ $this->registerJs("
         TASK_TIME_TRACKING_PAUSE_SUCCESS = '".Yii::t('app/crm','TASK_TIME_TRACKING_PAUSE_SUCCESS')."',
         TASK_OPEN_SUCCESS = '".Yii::t('app/crm','TASK_OPEN_SUCCESS')."',
         TASK_DONE_SUCCESS = '".Yii::t('app/crm','TASK_DONE_SUCCESS')."',
+        TASK_BEGIN_SUCCESS = '".Yii::t('app/crm','TASK_BEGIN_SUCCESS')."',
         TASK = '".Yii::t('app/crm','TASK')."'
         ;
 ",\yii\web\View::POS_HEAD);
@@ -154,8 +155,7 @@ $this->registerJs("
 
 
 
-<?php Modal::end();
-?>
+<?php Modal::end(); ?>
 <div class="row">
     <div class="col-md-12">
         <div class="x_panel">

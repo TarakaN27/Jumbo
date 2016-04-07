@@ -34,7 +34,7 @@ return [
     'Update At' => 'Обновлено',
     'Exchange Rates' => 'Валюта и курсы валют',
     'Create Exchange Rates' => 'Добавить валюту',
-    'Code' => 'Код',
+    'Code' => 'Код валюты',
     'Nbrb' => 'Код НБРБ xml',
     'Cbr' => 'Код ЦБРФ xml',
     'Nbrb Rate' => 'Курс НБРБ',
@@ -74,6 +74,8 @@ return [
     'Not user correcting factor with counting unit enrollment' => 'Не учитывать коэфициент при расчете единиц',
     'Show expense only for admin and superadmin' => 'Показывать затраты по юрлицу только суперадминам и админам',
     'Without cuser for expense' => 'Без указания контрагента для затрат',
+    'Cuser inactivity' => 'Период бездействия компании',
     'Ignore at reports' => 'Не учитывать затраты в сводках',
-    'Only for admins' => 'Только для администраторов'
+    'Only for admins' => 'Только для администраторов',
+    'Show in widget' => 'Показывать в виджете'
 ];

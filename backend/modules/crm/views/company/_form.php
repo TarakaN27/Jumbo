@@ -157,7 +157,32 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 				]) ?>
 		</div>
 		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'source_id', [
+				'template' => $fieldTempl,
+				'labelOptions'=>[
+					'class' => 'control-label'
+				]])
+				->dropDownList(\common\models\CuserSource::getSourceMap(),[
+					'prompt' => Yii::t('app/users','Choose_user_source')
+				]) ?>
+		</div>
+
+
+		<div class = "col-md-4 col-sm-4 col-xs-12">
 			<?= $form->field($model, 'manager_id', [
+				'template' => $fieldTempl,
+				'labelOptions'=>['class' => 'control-label']])
+				->widget(\kartik\select2\Select2::classname(),[
+					'data' => \backend\models\BUser::getAllMembersMap(),
+					'options' => ['placeholder' => Yii::t('app/users','Choose_manager')],
+					'pluginOptions' => [
+						'allowClear' => true
+					],
+				]);
+			?>
+		</div>
+		<div class = "col-md-4 col-sm-4 col-xs-12">
+			<?= $form->field($model, 'manager_crc_id', [
 				'template' => $fieldTempl,
 				'labelOptions'=>['class' => 'control-label']])
 				->widget(\kartik\select2\Select2::classname(),[

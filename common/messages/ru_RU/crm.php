@@ -255,5 +255,6 @@ return [
 	'Show child task log time' => 'Показать затраты подзадач',
 	'Sub task log work' => 'Затраты подзадач',
 	'Task ID' => 'ID задачи',
-	'Total without ignore' => 'Для сводного отчета'
+	'Total without ignore' => 'Для сводного отчета',
+	'TASK_BEGIN_SUCCESS' => 'Задача начата',
 ];

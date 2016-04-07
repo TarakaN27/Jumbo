@@ -9,6 +9,7 @@
 use yii\helpers\Html;
 use \vova07\imperavi\Widget as ImperaviWidget;
 use \kartik\select2\Select2;
+use yii\bootstrap\Modal;
 $this->registerCssFile('@web/css/editor/index.css');
 //регистрируем переменные для работы скрипта
 $this->registerJs('
@@ -16,6 +17,8 @@ var
     DIALOG_SEND_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/add-comment']) . '",
     DIALOG_LOAD_MORE_LF_DIALOGS = "' . \yii\helpers\Url::to(['/ajax-service/load-lf-dialogs']) . '",
     DIALOG_VIEWED_ACTION =  "' . \yii\helpers\Url::to(['/ajax-service/viewed-dialog']) . '",
+    DIALOG_DEL_MSG_URL = "' . \yii\helpers\Url::to(['/ajax-service/delete-comment']) . '",
+	DIALOG_UPDATE_MSG = "' . \yii\helpers\Url::to(['/ajax-service/update-comment']) . '",
     DIALOG_ERROR_TITLE = "' . Yii::t('app/common', 'DIALOG_ERROR_TITLE') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
     DIALOG_EMPTY_ID_TEXT = "' . Yii::t('app/common', 'DIALOG_EMPTY_ID_TEXT') . '",
@@ -24,6 +27,10 @@ var
     DIALOG_SUCCESS_ADD_COMMENT = "' . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_COMMENT') . '",
     DIALOG_SUCCESS_ADD_DIALOG = "' . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_DIALOG') . '",
     DIALOG_ERROR_LOAD_CONTENT = "' . Yii::t('app/common', 'DIALOG_ERROR_LOAD_CONTENT') . '",
+    CONFIRM_DELETE_MSG = "'. Yii::t('app/common', 'CONFIRM_DELETE_MSG') .'",
+	MESSAGE = "'. Yii::t('app/common', 'MESSAGE') .'",
+	MSG_ERROR_DEL = "'. Yii::t('app/common', 'MSG_ERROR_DEL') .'",
+	MSG_ERROR_UPDATE = "'. Yii::t('app/common', 'MSG_ERROR_UPDATE') .'",
     DIALOG_ERROR_ADDCOMMENT = "'. Yii::t('app/common', 'DIALOG_ERROR_ADDCOMMENT') .'";
 ', \yii\web\View::POS_HEAD);
 $this->registerJsFile('@web/js/wm_app/wm_live_feeds.js',
@@ -34,6 +41,13 @@ $this->registerJsFile('@web/js/wm_app/wm_live_feeds.js',
     ]
 );
 ?>
+<?php Modal::begin([
+    'id' => 'update-msg-dialog',
+    'header' => '<h2>'.Yii::t('app/common','Update message').'</h2>',
+    'footer' => Html::button(Yii::t('app/common','Save'),['class' => 'btn btn-success btn-save']),
+    'size' => Modal::SIZE_LARGE,
+]);?>
+<?php Modal::end(); ?>
 <div class = "x_panel">
     <div class = "x_title">
         <h2><?= Yii::t('app/common', 'Live feed') ?></h2>

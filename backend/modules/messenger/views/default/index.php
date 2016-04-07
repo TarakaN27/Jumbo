@@ -3,6 +3,7 @@
     use yii\helpers\Html;
     use vova07\imperavi\Widget as ImperaviWidget;
     use kartik\select2\Select2;
+    use yii\bootstrap\Modal;
     $this->title = Yii::t('app/msg','Dialogs');
     $this->registerJs("
         var
@@ -15,6 +16,12 @@
             DIALOG_EMPTY_MSG_TEXT = '" . Yii::t('app/common', 'DIALOG_EMPTY_MSG_TEXT') . "',
             DIALOG_ADD_DIALOG_URL = '".\yii\helpers\Url::to(['/ajax-service/add-dialog'])."',
             DIALOG_SUCCESS_ADD_DIALOG = '" . Yii::t('app/common', 'DIALOG_SUCCESS_ADD_DIALOG') . "',
+            DIALOG_DEL_MSG_URL = '" . \yii\helpers\Url::to(['/ajax-service/delete-comment']) . "',
+	        DIALOG_UPDATE_MSG = '" . \yii\helpers\Url::to(['/ajax-service/update-comment']) . "',
+	        CONFIRM_DELETE_MSG = '". Yii::t('app/common', 'CONFIRM_DELETE_MSG') ."',
+            MESSAGE = '". Yii::t('app/common', 'MESSAGE') ."',
+            MSG_ERROR_DEL = '". Yii::t('app/common', 'MSG_ERROR_DEL') ."',
+            MSG_ERROR_UPDATE = '". Yii::t('app/common', 'MSG_ERROR_UPDATE') ."',
             DIALOG_LOAD_MSG_URL = '".\yii\helpers\Url::to(['/ajax-service/load-dialog'])."';
     ",\yii\web\View::POS_HEAD);
     $this->registerJsFile('@web/js/wm_app/messenger.js',
@@ -31,6 +38,13 @@
     ");
 ?>
 <div class = "row">
+    <?php Modal::begin([
+        'id' => 'update-msg-dialog',
+        'header' => '<h2>'.Yii::t('app/common','Update message').'</h2>',
+        'footer' => Html::button(Yii::t('app/common','Save'),['class' => 'btn btn-success btn-save']),
+        'size' => Modal::SIZE_LARGE,
+    ]);?>
+    <?php Modal::end(); ?>
     <div class = "col-md-12 col-sm-12 col-xs-12">
         <div class = "x_panel">
             <div class = "x_title">

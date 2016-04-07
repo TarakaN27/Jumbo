@@ -80,9 +80,9 @@ function beginTask()
                 $('.pause-task').removeClass('hide'); //показываем кнопку приостановить
                 $('.done-task').removeClass('hide');
                 $('#taskStatusID').html(msg.text);
-                addSuccessNotify(TASK_TIME_TRACKING,TASK_TIME_TRACKING_BEGIN_SUCCESS)
+                addSuccessNotify(TASK,TASK_BEGIN_SUCCESS)
             }else{
-                addErrorNotify(TASK_TIME_TRACKING,msg.error);
+                addErrorNotify(TASK,msg.error);
             }
         },
         error: function(msg){
@@ -129,9 +129,9 @@ function pauseTask()
                 $('.begin-task').removeClass('hide'); //показываем кнопку приостановить
                 $('.done-task').addClass('hide');
                 $('#taskStatusID').html(msg.text);
-                addSuccessNotify(TASK_TIME_TRACKING,TASK_TIME_TRACKING_PAUSE_SUCCESS)
+                addSuccessNotify(TASK,TASK_TIME_TRACKING_PAUSE_SUCCESS)
             }else{
-                addErrorNotify(TASK_TIME_TRACKING,msg.error);
+                addErrorNotify(TASK,msg.error);
             }
         },
         error: function(msg){

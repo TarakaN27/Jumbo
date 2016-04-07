@@ -39,6 +39,8 @@ use common\components\entityFields\EntityFieldsTrait;
  * @property integer $archive
  * @property integer $prospects_id
  * @property integer $allow_expense
+ * @property integer $manager_crc_id
+ * @property integer $source_id
  */
 class CUser extends AbstractUser
 {
@@ -174,7 +176,7 @@ class CUser extends AbstractUser
             [[
                 'role','status','created_at',
                 'updated_at','manager_id','is_opened',
-                'created_by','contractor','allow_expense'
+                'created_by','contractor','allow_expense','manager_crc_id','source_id'
             ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
@@ -292,6 +294,9 @@ class CUser extends AbstractUser
             'prospects_id' => Yii::t('app/users','Prospects'),
             'allow_expense' => Yii::t('app/users','Allow expense'),
             'infoWithSite' => Yii::t('app/users','Contractor'),
+            'manager_crc_id' =>  Yii::t('app/users','CRC manager'),
+            'statusStr' => Yii::t('app/users', 'Status'),
+            'source_id' => Yii::t('app/users', 'Cuser source')
         ];
     }
 
@@ -384,9 +389,36 @@ class CUser extends AbstractUser
         return $this->hasOne(CuserQuantityHour::className(),['cuser_id' => 'id']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getProspects()
     {
         return $this->hasOne(CuserProspects::className(),['id' => 'prospects_id']);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getCmpGroup()
+    {
+        return $this->hasMany(CUserGroups::className(), ['id' => 'group_id'])->viaTable(CuserToGroup::tableName(), ['cuser_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getManagerCrc()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'manager_crc_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getSource()
+    {
+        return $this->hasOne(CuserSource::className(),['id' => 'source_id']);
     }
 
     /**
@@ -419,7 +451,7 @@ class CUser extends AbstractUser
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->all($db);
+            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->notArchive()->all($db);
         },86400,$dep);
 
         return $models;
@@ -543,6 +575,7 @@ class CUser extends AbstractUser
             return self::find()
                 ->with('requisites')
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
+                ->notArchive()
                 ->all($db);
         },3600*24,$dep);
     }
@@ -590,7 +623,7 @@ class CUser extends AbstractUser
             ]
         ]);
         $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->where(['allow_expense' => self::CONTRACTOR_YES])->all($db);
+            return CUser::find()->with('requisites')->where(['allow_expense' => self::CONTRACTOR_YES])->notArchive()->all($db);
         },86400,$dep);
 
         return ArrayHelper::map($models,'id','infoWithSite');

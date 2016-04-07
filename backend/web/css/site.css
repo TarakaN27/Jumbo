@@ -228,6 +228,9 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .width-16-percent{width:16%;}
 .width-30-percent{width:30%;}
 .width-100-percent{width: 100%;}
+.pdd-top-8{padding-top: 8px;}
+.warning{color:#e74c3c;}
+.weight-bold{font-weight: bold;}
 .warning-attention{color:red;}
 .refresh-notification-btn{display: block;
     position: absolute;
@@ -257,3 +260,18 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     -webkit-animation: rotate 0.5s infinite linear;
 }
 .list-cell__title{display: none;}
+.exchange-rates-link{cursor: pointer;}
+.maybesale .select2{
+    width: 100% !important;
+}
+.bodyCmpMsg .msg-trash, .bodyCmpMsg .msg-edit,.msgBoxList .msg-edit,.msgBoxList .msg-trash ,.view-mail .msg-edit,.view-mail .msg-trash
+{padding-left: 2px;cursor: pointer;}
+.bodyCmpMsg .time{float: right;}
+.bodyCmpMsg{width: 100%;}
+.mrg-bottom-5{margin-bottom: 5px !important;}
+.inner_dialog_section_msg .time{font-size: 12px;}
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+    padding: 5px;
+    font-size: 11px;
+}
+

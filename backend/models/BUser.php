@@ -9,7 +9,6 @@ use common\models\BUserCrmGroup;
 use common\models\BUserCrmRules;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
-use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 
@@ -32,6 +31,7 @@ use yii\helpers\ArrayHelper;
  * @property string $lname
  * @property string $mname
  * @property integer $log_work_type
+ * @property integer $allow_unit
  */
 class BUser extends AbstractUser
 {
@@ -146,7 +146,10 @@ class BUser extends AbstractUser
             [['fname','lname','mname'], 'string', 'min' => 2, 'max' => 255],
 
             ['log_work_type','default','value' => self::LOG_WORK_TYPE_DEFAULT],
-            ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())]
+            ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())],
+
+            ['allow_unit','integer'],
+            ['allow_unit','default','value' => 0]
         ];
     }
 
@@ -172,6 +175,8 @@ class BUser extends AbstractUser
             'mname' => Yii::t('app/users', 'Midle name'),
             'crm_group_id' => Yii::t('app/users', 'Crm Group Id'),
             'log_work_type' => Yii::t('app/crm','Log work type'),
+            'allow_unit' => Yii::t('app/users','Allow unit'),
+            'roleStr' => Yii::t('app/users','Role Str'),
             'fio' => Yii::t('app/users','Manager')
         ];
     }
@@ -398,5 +403,23 @@ class BUser extends AbstractUser
             ->one();
 
         return $data;
+    }
+
+    /**
+     * @param $ID
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function findOneByIdCachedForSelect2($ID)
+    {
+        $obDep = new TagDependency([
+            'tags' => [
+                NamingHelper::getObjectTag(self::className(),$ID),
+            ]
+        ]);
+        return self::getDb()->cache(function() use ($ID){
+            $obManCrc = BUser::find()->select(['id','fname','lname','mname'])->where(['id' => $ID])->one();
+            return $obManCrc ? $obManCrc->getFio() : NULL;
+        },86400,$obDep);
     }
 }

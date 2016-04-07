@@ -18,6 +18,7 @@ use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use common\models\CUser;
+use common\models\CUserGroups;
 use common\models\CuserServiceContract;
 use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
@@ -95,11 +96,20 @@ class CompanyController extends AbstractBaseBackendController
 		}
 
 		$arCompanyRedisList = RedisNotification::getCompanyListForUser(Yii::$app->user->id);
+		$manCrcValue = '';
+		if(!empty($searchModel->manager_crc_id))
+			$manCrcValue = BUser::findOneByIdCachedForSelect2($searchModel->manager_crc_id);
+
+		$manValue = '';
+		if(!empty($searchModel->manager_id))
+			$manValue = BUser::findOneByIdCachedForSelect2($searchModel->manager_id);
 
 		return $this->render('index',[
 			'dataProvider' => $dataProvider,
 			'searchModel' => $searchModel,
-			'arCompanyRedisList' => $arCompanyRedisList
+			'arCompanyRedisList' => $arCompanyRedisList,
+			'manCrcValue' => $manCrcValue,
+			'manValue' => $manValue
 		]);
 	}
 
@@ -201,6 +211,16 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
 		$data = [];
 
+		//получаем группы к которой принадлежит компания
+		$arGroups = CUserGroups::find()
+			->alias('gr')
+			->joinWith('cuserObjects cu')
+			->joinWith('cuserObjects.requisites')
+			->where([
+				'cu.id' => $id
+			])
+			->all();
+
 		/**
 		 * Добавление задачи
 		 */
@@ -291,7 +311,8 @@ class CompanyController extends AbstractBaseBackendController
 			'dataContact' => $dataContact,
 			'sAssName' => $sAssName,
 			'data' => $data,
-			'obQHour' => $obQHour
+			'obQHour' => $obQHour,
+			'arGroups' => $arGroups
 		]);
 	}
 
