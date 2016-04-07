@@ -12,6 +12,7 @@ use common\components\managers\DialogManager;
 use common\components\notification\RedisNotification;
 use common\components\notification\TabledNotification;
 use common\models\AbstractActiveRecord;
+use common\models\Messages;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
@@ -106,13 +107,12 @@ class TaskNotificationBehavior extends Behavior
 		}
 
 		// изменение полей. добавляем комментарий
-		if(!empty($this->arChangedFieldsDescription) && is_object($obDialog))
-		{
-			$msg = \Yii::t('app/msg','User {user} make changes for {task}:',[
-				'user' => \Yii::$app->user->identity->getFio(),
-				'task' => Html::a($this->owner->title,['/crm/task/view','id' => $this->owner->id])
-			]).' </br>'.implode(',</br>',$this->arChangedFieldsDescription);
-			DialogManager::addMessageToDialog($obDialog->id,\Yii::$app->user->id,$msg);
+		if(!empty($this->arChangedFieldsDescription) && is_object($obDialog)) {
+			$msg = \Yii::t('app/msg', 'User {user} make changes for {task}:', [
+					'user' => \Yii::$app->user->identity->getFio(),
+					'task' => Html::a($this->owner->title, ['/crm/task/view', 'id' => $this->owner->id])
+				]) . ' </br>' . implode(',</br>', $this->arChangedFieldsDescription);
+			DialogManager::addMessageToDialog($obDialog->id, \Yii::$app->user->id, $msg,Messages::YES);
 		}
 
 		return TRUE;

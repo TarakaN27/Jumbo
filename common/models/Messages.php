@@ -24,6 +24,7 @@ use yii\swiftmailer\Message;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property  integer $technical
  *
  * @property FilesToMessages[] $filesToMessages
  * @property Files[] $files
@@ -49,7 +50,7 @@ class Messages extends AbstractActiveRecord
         return [
             [['msg', 'buser_id', 'dialog_id'], 'required'],
             [['msg'], 'string'],
-            [['parent_id', 'lvl', 'buser_id', 'dialog_id', 'status', 'created_at', 'updated_at'], 'integer']
+            [['parent_id', 'lvl', 'buser_id', 'dialog_id', 'status', 'created_at', 'updated_at','technical'], 'integer']
         ];
     }
 
@@ -68,6 +69,7 @@ class Messages extends AbstractActiveRecord
             'status' => Yii::t('app/dialogs', 'Status'),
             'created_at' => Yii::t('app/dialogs', 'Created At'),
             'updated_at' => Yii::t('app/dialogs', 'Updated At'),
+            'technical' => Yii::t('app/dialogs', 'Technical message'),
         ];
     }
 
@@ -164,9 +166,28 @@ class Messages extends AbstractActiveRecord
  */
 class MessagesQuery extends ActiveQuery
 {
-
+    /**
+     * @param int $state
+     * @return $this
+     */
     public function active($state = Messages::PUBLISHED)
     {
         return $this->andWhere(['status' => $state]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function technical()
+    {
+        return $this->andWhere([Messages::tableName().'.technical' => Messages::YES]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function notTechnical()
+    {
+        return $this->andWhere(Messages::tableName().'.technical != '.Messages::YES.' OR '.Messages::tableName().'.technical IS NULL');
     }
 }

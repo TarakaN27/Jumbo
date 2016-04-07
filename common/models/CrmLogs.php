@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use backend\models\BUser;
 use Yii;
 
 /**
@@ -52,5 +53,13 @@ class CrmLogs extends AbstractActiveRecord
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBuser()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'changed_by']);
     }
 }

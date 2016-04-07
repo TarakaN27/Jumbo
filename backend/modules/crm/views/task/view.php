@@ -405,7 +405,12 @@ $this->registerJs("
                             </div>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
                                 <!-- история -->
-                                <p>no history</p>
+                                <?=\common\components\widgets\crmLogWidget\CrmLogWidget::widget([
+                                    'autoInit' => false,
+                                    'clickEventsItem' => '#profile-tab2',
+                                    'entityName' => \yii\helpers\StringHelper::basename(CrmTask::className()),
+                                    'itemID' => $model->id
+                                ])?>
                             </div>
                             <?php if(empty($model->parent_id)):?>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="profile-tab">

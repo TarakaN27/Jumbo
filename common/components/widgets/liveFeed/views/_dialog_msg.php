@@ -12,7 +12,7 @@ use yii\helpers\Html;
 
         <a><?php echo $msg->buser->getFio();?></a>
         <span class="time"><?php echo Yii::$app->formatter->asDatetime($msg->created_at); ?></span>
-        <?php if($msg->buser_id == Yii::$app->user->id):?>
+        <?php if($msg->buser_id == Yii::$app->user->id && $msg->technical != \common\models\Messages::YES):?>
             <?=Html::tag('span','<i class="fa fa-trash"></i>',[
                 'data-id' => $msg->id,
                 'class' => 'msg-trash'
