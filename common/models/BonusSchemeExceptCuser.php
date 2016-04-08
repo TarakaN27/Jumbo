@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "{{%bonus_scheme_except_cuser}}".
@@ -59,5 +60,20 @@ class BonusSchemeExceptCuser extends AbstractActiveRecordWTB
     public function getCuser()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cuser_id']);
+    }
+
+    /**
+     * 
+     * @param array $arCuser
+     * @return mixed
+     */
+    public static function getExceptSchemesForCuser(array $arCuser)
+    {
+        $arRecord = self::find()->where(['cuser_id' => $arCuser])->all();
+        $arResult = [];
+        foreach ($arRecord as $record)
+            $arResult [] = $record->scheme_id;
+        
+        return array_unique($arResult);
     }
 }

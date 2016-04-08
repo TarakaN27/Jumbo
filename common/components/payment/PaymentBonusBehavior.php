@@ -102,15 +102,19 @@ class PaymentBonusBehavior extends Behavior
 		if(!$obManager || $obManager->allow_unit != AbstractActiveRecord::YES)  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units
 			return FALSE;
 
+		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$iCUserID]);	//сземы искллючения для пользователя
+
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 			->joinWith('usersID')
 			->joinWith('exceptCusers')
 			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_UNITS])
-			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $obManager->id])
-			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser')
-			->orderBy(BonusSchemeToCuser::tableName().'.cuser_id IS NULL ASC , '.BonusScheme::tableName().'.updated_at DESC')
-			->params([':idCUser' => $iCUserID])
+			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $obManager->id]);
+
+			if($arExcept)
+				$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$iCUserID]);
+
+			$obScheme = $obScheme->orderBy(BonusSchemeToCuser::tableName().'.cuser_id IS NULL ASC , '.BonusScheme::tableName().'.updated_at DESC')
 			->one();
 
 		if(empty($obScheme))
@@ -275,37 +279,40 @@ class PaymentBonusBehavior extends Behavior
 	 */
 	protected function countingSimpleBonus(Payments $model)
 	{
+		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);	//схемы искллючения для пользователя
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя с заднной компанией.
-		->joinWith('cuserID')
-			->joinWith('usersID')
-			->joinWith('exceptCusers')
-			->where([
-				BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
-				BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser,
-				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
-			])
-			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
-			->params([':idCUser' => $model->cuser_id])
-			->orderBy([
-				BonusScheme::tableName().'.updated_at' => SORT_DESC
-			])
-			->one();
-		if(!$obScheme)
-			$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+				->joinWith('cuserID')
+				->joinWith('usersID')
+				->where([
+					BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
+					BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser,
+					BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
+				]);
+				if($arExcept)
+					$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
+
+				$obScheme = $obScheme->orderBy([
+					BonusScheme::tableName().'.updated_at' => SORT_DESC
+				])
+				->one();
+		if(!$obScheme) {
+			$obScheme = BonusScheme::find()//получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 				->joinWith('usersID')
 				->joinWith('exceptCusers')
 				->where([
-					BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
-					BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser,
+					BonusScheme::tableName() . '.type' => BonusScheme::TYPE_SIMPLE_BONUS,
+					BonusSchemeToBuser::tableName() . '.buser_id' => $model->saleUser,
 				])
-				->andWhere(BonusSchemeToCuser::tableName().'.scheme_id IS NULL')
-				->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
-				->params([':idCUser' => $model->cuser_id])
-				->orderBy([
-					BonusScheme::tableName().'.updated_at' => SORT_DESC
-				])
+				->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL');
+			if ($arExcept)
+				$obScheme->andWhere(['NOT IN', 'id', $arExcept]);
+
+			$obScheme = $obScheme->orderBy([
+				BonusScheme::tableName() . '.updated_at' => SORT_DESC
+			])
 				->one();
+		}
 
 		if(empty($obScheme))
 			return FALSE;
@@ -393,33 +400,33 @@ class PaymentBonusBehavior extends Behavior
 			else
 				$saleUser = $obSale->buser_id;
 		}
-
+		
+		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
 		$obScheme = BonusScheme::find()  //ищем схему для компании
-		->joinWith('cuserID')
+			->joinWith('cuserID')
 			->joinWith('usersID')
-			->joinWith('exceptCusers')
 			->where([
 				BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE,
 				BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
 				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
-			])
-			->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
-			->params([':idCUser' => $model->cuser_id])
-			->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])
-			->one();
+			]);
+			if(!empty($arExcept))
+				$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
+			$obScheme = $obScheme->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])->one();
 
 		if(!$obScheme)  //если нет схемы для компании, ищем общую
-			$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
+		{
+			$obScheme = BonusScheme::find()//получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 				->joinWith('usersID')
-				->joinWith('exceptCusers')
-				->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE])
-				->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $saleUser])
-				->andWhere(BonusSchemeExceptCuser::tableName().'.cuser_id != :idCUser OR  '.BonusSchemeExceptCuser::tableName().'.cuser_id IS NULL')
-				->andWhere(BonusSchemeToCuser::tableName().'.scheme_id IS NULL')
-				->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])
-				->params([':idCUser' => $model->cuser_id])
+				->where([BonusScheme::tableName() . '.type' => BonusScheme::TYPE_COMPLEX_TYPE])
+				->andWhere([BonusSchemeToBuser::tableName() . '.buser_id' => $saleUser]);
+			if (!empty($arExcept))
+				$obScheme->andWhere(['NOT IN', BonusScheme::tableName() . '.id', $arExcept]);
+			$obScheme = $obScheme->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL')
+				->orderBy([BonusScheme::tableName() . '.updated_at' => SORT_DESC])
 				->one();
+		}
 
 		if(empty($obScheme))
 			return FALSE;
