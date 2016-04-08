@@ -26,7 +26,7 @@ class RecalcPayment
 		$ar_except = [];
 		$special = NULL;
 
-		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_3.csv'));
+		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_4.csv'),';');
 		if(empty($arData))
 			return FALSE;
 

@@ -78,9 +78,10 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
-        //$recalc = new RecalcPayment();
-        //$recalc->recalculateWithSetConditions();
-
+        /*
+        $recalc = new RecalcPayment();
+        $recalc->recalculateWithSetConditions();
+        */
         //импорт продаж
         /*
         $obImport = new ImportSale([
@@ -98,9 +99,10 @@ class SiteController extends Controller
 
 
         //перерассчет бонусов
-
+        /*
         $obBonus = new RecalculateBonus();
         $obBonus->run();
+        */
 
 
         die;
