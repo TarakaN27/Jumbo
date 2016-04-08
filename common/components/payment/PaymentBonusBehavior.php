@@ -439,7 +439,8 @@ class PaymentBonusBehavior extends Behavior
 			->where([
 				BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_TYPE,
 				BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
-				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
+				BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id,
+				'payment_base' => $paymentBase
 			]);
 			if(!empty($arExcept))
 				$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
@@ -450,7 +451,10 @@ class PaymentBonusBehavior extends Behavior
 			$obScheme = BonusScheme::find()//получаем схему бонуса для пользователя.
 			->joinWith('cuserID')
 				->joinWith('usersID')
-				->where([BonusScheme::tableName() . '.type' => BonusScheme::TYPE_COMPLEX_TYPE])
+				->where([
+					BonusScheme::tableName() . '.type' => BonusScheme::TYPE_COMPLEX_TYPE,
+					'payment_base' => $paymentBase
+				])
 				->andWhere([BonusSchemeToBuser::tableName() . '.buser_id' => $saleUser]);
 			if (!empty($arExcept))
 				$obScheme->andWhere(['NOT IN', BonusScheme::tableName() . '.id', $arExcept]);
