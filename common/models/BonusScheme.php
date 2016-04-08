@@ -20,15 +20,38 @@ use yii\helpers\Json;
  * @property integer $grouping_type
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $payment_base
  */
 class BonusScheme extends AbstractActiveRecord
 {
     CONST
+        BASE_PAYMENT = 0,   //counting bonus by each payment
+        BASE_SALE = 1,      //counting bonus by each sale
         TYPE_UNITS = 1,         //тип бонусной схемы unit
         TYPE_SIMPLE_BONUS =2,   //тип бонусной схемы бонусы за продажи(для аккаунтеров)
         TYPE_COMPLEX_TYPE = 3,  //комплексный тип (для АНТОНА!)
         GROUP_BY_COMPANY = 1,   //группировка платежей по одной компании
         GROUP_BY_CMP_GROUP =2;  //группировка платежей по группе компаний
+
+    /**
+     * @return array
+     */
+    public static function getPaymentBaseArr()
+    {
+        return [
+            self::BASE_PAYMENT => Yii::t('app/bonus','Base payment'),
+            self::BASE_SALE => Yii::t('app/bonus','Base sale')
+        ];
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getPaymentBaseStr()
+    {
+        $tmp = self::getPaymentBaseArr();
+        return isset($tmp[$this->payment_base]) ? $tmp[$this->payment_base] : NULL;
+    }
 
     /**
      * @return array
@@ -90,7 +113,7 @@ class BonusScheme extends AbstractActiveRecord
             [[
                 'type', 'num_month',
                 'grouping_type', 'created_at', 'updated_at',
-                'infinite'
+                'infinite','payment_base'
             ], 'integer'],
             [['name'], 'string', 'max' => 255],
             ['grouping_type','default','value' => self::GROUP_BY_COMPANY],
@@ -112,6 +135,7 @@ class BonusScheme extends AbstractActiveRecord
             'grouping_type' => Yii::t('app/bonus', 'Grouping Type'),
             'created_at' => Yii::t('app/bonus', 'Created At'),
             'updated_at' => Yii::t('app/bonus', 'Updated At'),
+            'payment_base' => Yii::t('app/bonus', 'Payment base')
         ];
     }
 

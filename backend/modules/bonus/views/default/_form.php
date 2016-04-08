@@ -41,10 +41,10 @@ $this->registerJs('
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'type')->dropDownList(
-        $model::getTypeMap(),[
-        'prompt' => Yii::t('app/bonus','Choose type')
-    ]) ?>
+        <?= $form->field($model, 'type')->dropDownList(
+            $model::getTypeMap(),[
+            'prompt' => Yii::t('app/bonus','Choose type')
+        ]) ?>
 
     <?php
         $options = [];
@@ -53,8 +53,10 @@ $this->registerJs('
         echo $form->field($model, 'num_month')->textInput($options) ?>
 
     <?= $form->field($model, 'grouping_type')->dropDownList($model::getGroupByMap(),[
-        'prompt' => Yii::t('app/bonus','Choose grouping type')
-    ]) ?>
+        'prompt' => Yii::t('app/bonus','Choose grouping type'),]) ?>
+    <div class="type2 type3  <?=$model->type!= BonusScheme::TYPE_UNITS ? '' : 'hide'?>">
+        <?= $form->field($model, 'payment_base')->dropDownList(BonusScheme::getPaymentBaseArr())?>
+    </div>
     <div class="type1 <?=$model->type== BonusScheme::TYPE_UNITS ? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>
             <div class="col-md-4 col-sm-4 col-xs-12">

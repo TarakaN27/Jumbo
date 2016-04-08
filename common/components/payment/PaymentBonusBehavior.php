@@ -74,6 +74,9 @@ class PaymentBonusBehavior extends Behavior
 			$this->saveSale($model);
 			$this->countingSimpleBonus($model);
 			$this->countingComplexBonus($model);
+		}else{
+			$this->countingSimpleBonus($model,BonusScheme::BASE_PAYMENT);
+			$this->countingComplexBonus($model.BonusScheme::BASE_SALE);
 		}
 
 		return TRUE;
@@ -277,16 +280,35 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool
 	 * @throws ServerErrorHttpException
 	 */
-	protected function countingSimpleBonus(Payments $model)
+	protected function countingSimpleBonus(Payments $model,$paymentBase = BonusScheme::BASE_SALE)
 	{
+
+		if($paymentBase == BonusScheme::BASE_PAYMENT)
+		{
+			$obManager = BUser::find()      //находим менеджера, для которого зачисляется unit
+			->select(['b.id','b.allow_unit'])
+				->alias('b')
+				->leftJoin(PaymentRequest::tableName().' as r','r.manager_id = b.id')
+				->where(['r.id' => $model->prequest_id])
+				->one();
+
+			if(!$obManager )  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units
+				return FALSE;
+
+			$saleUser = $obManager->id;
+		}else{
+			$saleUser = $model->saleUser;
+		}
+
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);	//схемы искллючения для пользователя
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя с заднной компанией.
 				->joinWith('cuserID')
 				->joinWith('usersID')
 				->where([
 					BonusScheme::tableName().'.type' => BonusScheme::TYPE_SIMPLE_BONUS,
-					BonusSchemeToBuser::tableName().'.buser_id' => $model->saleUser,
-					BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id
+					BonusSchemeToBuser::tableName().'.buser_id' => $saleUser,
+					BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id,
+					'payment_base' => $paymentBase
 				]);
 				if($arExcept)
 					$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
@@ -302,7 +324,8 @@ class PaymentBonusBehavior extends Behavior
 				->joinWith('exceptCusers')
 				->where([
 					BonusScheme::tableName() . '.type' => BonusScheme::TYPE_SIMPLE_BONUS,
-					BonusSchemeToBuser::tableName() . '.buser_id' => $model->saleUser,
+					BonusSchemeToBuser::tableName() . '.buser_id' => $saleUser,
+					'payment_base' => $paymentBase
 				])
 				->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL');
 			if ($arExcept)
@@ -336,7 +359,7 @@ class PaymentBonusBehavior extends Behavior
 
 		$amount = round($amount*($obBServ->simple_percent/100),6);
 
-		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавим бонус
+		return $this->addBonus($saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавим бонус
 	}
 
 	/**
@@ -370,7 +393,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool
 	 * @throws ServerErrorHttpException
 	 */
-	protected function countingComplexBonus($model)
+	protected function countingComplexBonus($model,$paymentBase = BonusScheme::BASE_SALE)
 	{
 		$arCuserGroup = PaymentsManager::getUserByGroup($model->cuser_id);  //получаем пользователей группы
 		$inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
@@ -380,6 +403,9 @@ class PaymentBonusBehavior extends Behavior
 			->where(['cuser_id' => $arCuserGroup])
 			->orderBy(['sale_date' => SORT_ASC,'id' => SORT_ASC])
 			->one();
+
+		if($paymentBase == BonusScheme::BASE_PAYMENT && empty($obSale))
+			return FALSE;
 
 		if(empty($obSale))  //есил не было продажи, то бонус начисляется текущему продашему
 		{
@@ -395,11 +421,16 @@ class PaymentBonusBehavior extends Behavior
 				])
 				->orderBy(['pay_date' => SORT_DESC])
 				->one();
-			if(empty($obLast))
+			if(empty($obLast)) {
+				if($paymentBase == BonusScheme::BASE_PAYMENT)
+					return FALSE;
+
 				$saleUser = $model->saleUser;
+			}
 			else
 				$saleUser = $obSale->buser_id;
 		}
+
 		
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
 		$obScheme = BonusScheme::find()  //ищем схему для компании
@@ -485,6 +516,9 @@ class PaymentBonusBehavior extends Behavior
 
 		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус
 	}
+
+
+
 
 	/**
 	 * Добавляем бонус
