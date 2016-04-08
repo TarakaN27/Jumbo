@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\behavior\history\ModelHistoryBehavior;
 use common\components\behavior\notifications\TaskNotificationBehavior;
 use common\components\behavior\Task\TaskActionBehavior;
 use common\components\behavior\Task\TaskQuantityHoursBehavior;
@@ -14,6 +15,7 @@ use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\swiftmailer\Message;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
@@ -440,6 +442,18 @@ class CrmTask extends AbstractActiveRecord
         return ArrayHelper::merge($arParent,[
             TaskNotificationBehavior::className(),      //уведомления
             TaskActionBehavior::className(),            //поведение действий
+            [
+                'class' => ModelHistoryBehavior::className(),   //история изменений модели
+                'changedFields' => [
+                    'title' => false,
+                    'description' => false,
+                    'deadline' => false,
+                    'priority' => 'getPriorityStr',
+                    'type' => 'getTypeStr',
+                    'time_estimate' => 'getFormatedTimeEstimate',
+                    'status' => 'getStatusStr'
+                ]
+            ]
         ]);
     }
 
@@ -631,7 +645,7 @@ class CrmTask extends AbstractActiveRecord
                         'User {user} create new task',[
                             'user' => Yii::$app->user->identity->getFio()
                         ]
-                        ));
+                        ),Messages::YES);
                 }
 
                 $arBUIDs = array_unique($arBUIDs);

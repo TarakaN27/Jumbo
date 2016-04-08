@@ -25,7 +25,7 @@ use yii\helpers\Html;
         <div class="bodyCmpMsg">
             <div>
                     <span><strong><?php echo is_object($obUser = $model->buser)? $obUser->getFio() : $model->buser_id;?></strong></span>
-                    <?php if($model->buser_id == Yii::$app->user->id):?>
+                    <?php if($model->buser_id == Yii::$app->user->id && $model->technical != \common\models\Messages::YES):?>
                         <?=Html::tag('span','<i class="fa fa-trash"></i>',[
                             'data-id' => $model->id,
                             'class' => 'msg-trash'

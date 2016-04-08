@@ -352,9 +352,11 @@ class DialogManager extends Component{
      * @param $dID
      * @return ActiveDataProvider
      */
-    public function getCommentsForDialog($dID,$order = SORT_DESC)
+    public function getCommentsForDialog($dID,$order = SORT_DESC,$showTechnical = FALSE)
     {
         $query = Messages::find()->where(['dialog_id' => $dID])->with('buser');
+        if(!$showTechnical)
+            $query->notTechnical();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -484,7 +486,7 @@ class DialogManager extends Component{
      * @param $msg
      * @return bool
      */
-    public static function addMessageToDialog($iDialogID,$iAuthor,$msg)
+    public static function addMessageToDialog($iDialogID,$iAuthor,$msg,$technical = Messages::NO)
     {
         $obMsg = new Messages();
         $obMsg->msg = $msg;
@@ -492,6 +494,7 @@ class DialogManager extends Component{
         $obMsg->lvl = 0;
         $obMsg->buser_id = $iAuthor;
         $obMsg->dialog_id = $iDialogID;
+        $obMsg->technical = $technical;
         $obMsg->status = Messages::PUBLISHED;
         return $obMsg->save();
     }
