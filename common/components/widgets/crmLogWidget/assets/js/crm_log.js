@@ -6,6 +6,7 @@ function loadMsgLog()
 {
     var
         container = $('.crm-log-widget'),
+        btn = $('.crm-log-widget .load-more'),
         url = container.attr('data-url'),
         page = container.attr('data-page'),
         entity = container.attr('data-entity'),
@@ -27,18 +28,33 @@ function loadMsgLog()
             var
                 table = container.find('table');
             table.append(msg.tr);
+            if(msg.page)
+            {
+                container.attr('data-page',msg.page);
+                btn.removeClass('hide');
+            }else{
+                btn.addClass('hide');
+            }
         },
         error: function(msg){
             addErrorNotify('История','Ошибка загрузки истории');
             return false;
         }
     });
-
 }
 
 function initEntityHistory() {
     var
         loaded = $('.crm-log-widget').attr('data-loaded');
     if(loaded == 0)
+    {
         loadMsgLog();
+        $('.crm-log-widget').attr('data-loaded',1);
+    }
 }
+
+$(function(){
+    $('.crm-log-widget .load-more').on('click',function(){
+        loadMsgLog();
+    });
+});

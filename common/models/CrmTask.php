@@ -15,6 +15,7 @@ use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\swiftmailer\Message;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
@@ -644,7 +645,7 @@ class CrmTask extends AbstractActiveRecord
                         'User {user} create new task',[
                             'user' => Yii::$app->user->identity->getFio()
                         ]
-                        ));
+                        ),Messages::YES);
                 }
 
                 $arBUIDs = array_unique($arBUIDs);

@@ -84,7 +84,6 @@ class AjaxHistoryController extends AbstractBaseBackendController
 
         return [
             'tr' => $this->renderPartial('_li_history',['models' => $models]),
-            'button' => Html::button('load more'),
             'page' => $nextPage
         ];
     }
