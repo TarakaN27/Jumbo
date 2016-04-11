@@ -76,7 +76,7 @@ class PaymentBonusBehavior extends Behavior
 			$this->countingComplexBonus($model);
 		}else{
 			$this->countingSimpleBonus($model,BonusScheme::BASE_PAYMENT);
-			$this->countingComplexBonus($model.BonusScheme::BASE_SALE);
+			$this->countingComplexBonus($model,BonusScheme::BASE_SALE);
 		}
 
 		return TRUE;
