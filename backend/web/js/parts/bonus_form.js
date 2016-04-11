@@ -88,5 +88,21 @@ jQuery(document).ready(function(){
     //
     $('#preloader').remove();
     $('.bonus-scheme-form').removeClass('hide');
+
+    $('.legal-check-box').on('change',function(){
+        var
+            id = $(this).attr('data-id');
+        if(id == undefined)
+            return false;
+
+        if($(this).prop("checked"))         //если отмечено юр. лицо открываем настройки для резидентов
+        {
+            $('#'+id).removeClass('hide');
+        }else{  //скрываем настройки и сбрасываем параметры
+            $('#'+id).addClass('hide');
+            $('#'+id+' input[type="checkbox"]').prop('checked',false);
+            $('#'+id+' input[type="text"]').val('');
+        }
+    });
 });
 

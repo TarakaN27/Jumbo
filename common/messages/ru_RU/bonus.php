@@ -64,6 +64,10 @@ return [
 	'Code payment currency' => 'Валюта платежа',
 	'Payment base' => 'База расчета процента',
 	'Base payment' => 'Все платежи клиента',
-	'Base sale' => 'Продажи'
+	'Base sale' => 'Продажи',
+	'deduct tax' => 'Вычитать',
+	'Custom tax' => 'Кастомный НДС',
+	'Resident' => 'Резидент',
+	'Not resident' => 'Не резидент',
 
 ];

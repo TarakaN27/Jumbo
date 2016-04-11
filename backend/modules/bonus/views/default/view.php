@@ -138,15 +138,35 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                             $head = Html::tag('th',Yii::t('app/bonus','Legal person'));
                                             $head.= Html::tag('th',Yii::t('app/bonus','Deduct VAT'));
+                                            $head.= Html::tag('th',Yii::t('app/bonus','Detail'));
                                             $str = Html::tag('thead',Html::tag('tr',$head));
                                             unset($head);
 
                                             $arLG = $model->legal_person;
                                             foreach($arLegal as $key=>$value)
                                             {
-                                                $bVal = isset($arLG[$key]) ? $arLG[$key] : 0;
+                                                $bVal = isset($arLG[$key]) && isset($arLG[$key]['deduct']) ? $arLG[$key]['deduct'] : 0;
                                                 $tmp = Html::tag('th',$value);
-                                                $tmp.= Html::tag('td',Yii::$app->formatter->asBoolean($bVal));
+                                                $tmp.= Html::tag('td',Yii::$app->formatter->asBoolean($bVal));$tmpTable = '';
+                                                $tmpTable = '';
+                                                if($bVal)
+                                                {
+                                                    $tmpBody = '';
+                                                    $head = Html::tag('th','');
+                                                    $head.= Html::tag('th',Yii::t('app/bonus','deduct tax'));
+                                                    $head.= Html::tag('th',Yii::t('app/bonus','Custom tax'));
+                                                    $tmpHead = Html::tag('thead',Html::tag('tr',$head));
+                                                    $tmpTd = Html::tag('td',Yii::t('app/bonus','Resident'));
+                                                    $tmpTd.= Html::tag('td',isset($arLG[$key]) && isset($arLG[$key]['res']) ? Yii::$app->formatter->asBoolean($arLG[$key]['res']) : '');
+                                                    $tmpTd.= Html::tag('td',isset($arLG[$key]) && isset($arLG[$key]['res_tax']) ? $arLG[$key]['res_tax'] : '');
+                                                    $tmpBody.=Html::tag('tr',$tmpTd);
+                                                    $tmpTd = Html::tag('td',Yii::t('app/bonus','Not resident'));
+                                                    $tmpTd.= Html::tag('td',isset($arLG[$key]) && isset($arLG[$key]['not_res']) ? Yii::$app->formatter->asBoolean($arLG[$key]['not_res']) : '');
+                                                    $tmpTd.= Html::tag('td',isset($arLG[$key]) && isset($arLG[$key]['not_res_tax']) ? $arLG[$key]['not_res_tax'] : '');
+                                                    $tmpBody.=Html::tag('tr',$tmpTd);
+                                                    $tmpTable = Html::tag('table',Html::tag('tbody',$tmpHead.$tmpBody),['class' => 'table table-bordered']);
+                                                }
+                                                $tmp.=Html::tag('td',$tmpTable);
                                                 $str.=Html::tag('tr',$tmp);
                                             }
                                             return Html::tag('table',Html::tag('tbody',$str),['class' => 'table table-bordered']);

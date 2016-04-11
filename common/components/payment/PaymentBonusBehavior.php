@@ -32,6 +32,7 @@ use common\models\AbstractActiveRecord;
 use backend\models\BUser;
 use common\models\CUser;
 use yii\db\Query;
+use yii\web\NotAcceptableHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use Yii;
@@ -275,13 +276,15 @@ class PaymentBonusBehavior extends Behavior
 	}
 
 	/**
-	 * Простой бонус
 	 * @param Payments $model
+	 * @param int $paymentBase
 	 * @return bool
+	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	protected function countingSimpleBonus(Payments $model,$paymentBase = BonusScheme::BASE_SALE)
 	{
+
 
 		if($paymentBase == BonusScheme::BASE_PAYMENT)
 		{
@@ -352,9 +355,23 @@ class PaymentBonusBehavior extends Behavior
 
 		if(is_array($obBServ->legal_person) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
 			isset($obBServ->legal_person[$model->legal_id]) &&
-			$obBServ->legal_person[$model->legal_id] == 1)
+			isset($obBServ->legal_person[$model->legal_id]['deduct']) &&
+			isset($obBServ->legal_person[$model->legal_id]['deduct']) == 1)
 		{
-			$amount = CustomHelper::getVatMountByAmount($amount); //отнимем от суммы платежа налог
+			$obCuser = CUser::find()->select(['id','is_resident'])->where(['id' => $model->cuser_id])->one();	//пользователь
+			if(!$obCuser)
+				throw  new NotFoundHttpException();
+
+			$key = $obCuser->is_resident ? 'res' : 'not_res';
+			if(isset($obBServ->legal_person[$model->legal_id][$key]))
+			{
+				$tax = NULL;
+				if(isset($obBServ->legal_person[$model->legal_id][$key.'_tax']) && is_numeric($obBServ->legal_person[$model->legal_id][$key.'_tax']))
+					$tax = $obBServ->legal_person[$model->legal_id][$key.'_tax'];
+
+				$amount = CustomHelper::getVatMountByAmount($amount,$tax); //отнимем от суммы платежа налог
+			}
+
 		}
 
 		$amount = round($amount*($obBServ->simple_percent/100),6);
@@ -511,11 +528,25 @@ class PaymentBonusBehavior extends Behavior
 		else
 			$amount = $amount*($percent/100);
 
-		if(is_array($obBServ->legal_person) &&  //если ля юр. лица указан, что нужно отнять налог
+		if(is_array($obBServ->legal_person) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
 			isset($obBServ->legal_person[$model->legal_id]) &&
-			$obBServ->legal_person[$model->legal_id] == 1)
+			isset($obBServ->legal_person[$model->legal_id]['deduct']) &&
+			isset($obBServ->legal_person[$model->legal_id]['deduct']) == 1)
 		{
-			$amount = CustomHelper::getVatMountByAmount($amount);	  //отнимаем налог
+			$obCuser = CUser::find()->select(['id','is_resident'])->where(['id' => $model->cuser_id])->one();	//пользователь
+			if(!$obCuser)
+				throw  new NotFoundHttpException();
+
+			$key = $obCuser->is_resident ? 'res' : 'not_res';
+			if(isset($obBServ->legal_person[$model->legal_id][$key]))
+			{
+				$tax = NULL;
+				if(isset($obBServ->legal_person[$model->legal_id][$key.'_tax']) && is_numeric($obBServ->legal_person[$model->legal_id][$key.'_tax']))
+					$tax = $obBServ->legal_person[$model->legal_id][$key.'_tax'];
+
+				$amount = CustomHelper::getVatMountByAmount($amount,$tax); //отнимем от суммы платежа налог
+			}
+
 		}
 
 		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус

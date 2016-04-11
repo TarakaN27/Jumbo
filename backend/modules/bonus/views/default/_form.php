@@ -92,35 +92,17 @@ $this->registerJs('
     <div class="type2 type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>
             <div class="col-md-4 col-sm-4 col-xs-12">
-                <?=Html::tag('h4',$serv->name,['class' => 'weight-bold']);?>
-                <hr>
+                <?=Html::tag('h4',$serv->name,['class' => 'weight-bold-title']);?>
+                <hr class="hr-green"/>
                 <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-12">
-                    <?=Html::tag('h4',Yii::t('app/bonus','Deduct tax for legal person'))?>
-                    <hr/>
-                    <?php foreach($arLP as $key => $lp):?>
-                        <div class="form-group">
-                            <?php
-                               $checked = FALSE;
-                                if(isset($arBServices[$serv->id])) {
-                                    $tmpLp = $arBServices[$serv->id]->legal_person;
-                                    if(isset($tmpLp[$key]) && isset($tmpLp[$key]) == 1)
-                                        $checked = TRUE;
-                                }
-                                echo Html::checkbox('legal['.$serv->id.']['.$key.']',$checked);
-                            ?>
-                            <?=Html::label($lp);?>
-                        </div>
-                    <?php endforeach;?>
-                    </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 ch_type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE])? '' : 'hide'?>" >
+                    <div class="col-md-12 col-sm-12 col-xs-12 ch_type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE])? '' : 'hide'?>" >
                         <?=Html::tag('h4',Yii::t('app/bonus','Month percent'))?>
                         <hr/>
                         <div class="monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">
                             <?php if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
                                 foreach($arBServices[$serv->id]->month_percent as $key => $item):
-                            ?>
-                            <?php
+                                    ?>
+                                    <?php
                                     $inputEl = Html::textInput('months['.$serv->id.']['.$key.']',$item,[
                                         'id' => 'mid_'.$serv->id.'_'.$key
                                     ]);
@@ -130,26 +112,117 @@ $this->registerJs('
                                         'id' => 'div_mid_'.$serv->id.'_'.$key
                                     ]);
                                     ?>
-                            <?php endforeach;?>
+                                <?php endforeach;?>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-6 col-xs-12 simple_percent ch_type2 <?= in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
+                    <div class="col-md-12 col-sm-12 col-xs-12 simple_percent ch_type2 <?= in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
                         <?=Html::tag('h4',Yii::t('app/bonus','Simple month percent'))?>
                         <hr/>
                         <?php
-                            $valueSP = NULL;
-                            if(isset($arBServices[$serv->id]))
-                                $valueSP = $arBServices[$serv->id]->simple_percent;
-                            echo Html::textInput('simple_percent['.$serv->id.']',$valueSP,['class' => 'form-control']);
+                        $valueSP = NULL;
+                        if(isset($arBServices[$serv->id]))
+                            $valueSP = $arBServices[$serv->id]->simple_percent;
+                        echo Html::textInput('simple_percent['.$serv->id.']',$valueSP,['class' => 'form-control']);
                         ?>
                     </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                    <?=Html::tag('h4',Yii::t('app/bonus','Deduct tax for legal person'))?>
+                    <hr/>
+                    <?php foreach($arLP as $key => $lp):?>
+                        <div class="form-group">
+                            <?php
+                               $checked = FALSE;
+                                if(isset($arBServices[$serv->id])) {
+                                    $tmpLp = $arBServices[$serv->id]->legal_person;
+                                    if(isset($tmpLp[$key]) && isset($tmpLp[$key]["deduct"]) && $tmpLp[$key]["deduct"] == '1')
+                                        $checked = TRUE;
+                                }
+                                echo Html::checkbox('legal['.$serv->id.']['.$key.'][deduct]',$checked,[
+                                    'data-id' => $serv->id.'_'.$key,
+                                    'class' => 'legal-check-box'
+                                ]);
+                            ?>
+                            <?=Html::label($lp);?>
+
+                        </div>
+                        <div class="form-group <?=$checked ? '' : 'hide';?>" id="<?=$serv->id.'_'.$key;?>">
+                            <table class="table table-bordered text-center">
+                                <tr>
+                                    <th>
+
+                                    </th>
+                                    <th class="text-center">
+                                        <?=Html::label(Yii::t('app/bonus','deduct tax'));?>
+                                    </th>
+                                    <th class="text-center">
+                                        <?=Html::label(Yii::t('app/bonus','Custom tax'));?>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th >
+                                        <?=Html::label(Yii::t('app/bonus','Resident'));?>
+                                    </th>
+                                    <td>
+                                        <?php
+                                            $checked = FALSE;
+                                            if(isset($arBServices[$serv->id])) {
+                                                $tmpLp = $arBServices[$serv->id]->legal_person;
+                                                if(isset($tmpLp[$key]) && isset($tmpLp[$key]['res']) && $tmpLp[$key]['res'] == '1')
+                                                    $checked = TRUE;
+                                            }
+                                            echo Html::checkbox('legal['.$serv->id.']['.$key.'][res]',$checked);
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                            $value = NULL;
+                                            if(isset($arBServices[$serv->id])) {
+                                                $tmpLp = $arBServices[$serv->id]->legal_person;
+                                                if(isset($tmpLp[$key]) && isset($tmpLp[$key]['res_tax']))
+                                                    $value = $tmpLp[$key]['res_tax'];
+                                            }
+                                            echo Html::textInput('legal['.$serv->id.']['.$key.'][res_tax]',$value)?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <?=Html::label(Yii::t('app/bonus','Not resident'));?>
+                                    </th>
+                                    <td>
+                                        <?php
+                                            $checked = FALSE;
+                                            if(isset($arBServices[$serv->id])) {
+                                                $tmpLp = $arBServices[$serv->id]->legal_person;
+                                                if(isset($tmpLp[$key]) && isset($tmpLp[$key]['not_res']) && $tmpLp[$key]['not_res'] == 1)
+                                                    $checked = TRUE;
+                                            }
+                                            echo Html::checkbox('legal['.$serv->id.']['.$key.'][not_res]',$checked);
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                            $value = NULL;
+                                            if(isset($arBServices[$serv->id])) {
+                                                $tmpLp = $arBServices[$serv->id]->legal_person;
+                                                if(isset($tmpLp[$key]) && isset($tmpLp[$key]['not_res_tax']))
+                                                    $value = $tmpLp[$key]['not_res_tax'];
+                                            }
+                                            echo Html::textInput('legal['.$serv->id.']['.$key.'][not_res_tax]',$value);
+                                        ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        <hr/>
+                        </div>
+                    <?php endforeach;?>
+                    </div>
+
                 </div>
             </div>
         <?php endforeach;?>
     </div>
-
     <div class="form-group">
-        <div class = "col-md-6 col-sm-6 col-xs-12">
+        <div class = "col-md-12 col-sm-12 col-xs-12">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/bonus', 'Create') : Yii::t('app/bonus', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>
     </div>

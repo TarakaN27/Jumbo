@@ -230,7 +230,7 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .width-100-percent{width: 100%;}
 .pdd-top-8{padding-top: 8px;}
 .warning{color:#e74c3c;}
-.weight-bold{font-weight: bold;}
+.weight-bold-title{font-weight: bold !important;color: #1ABB9C;}
 .warning-attention{color:red;}
 .refresh-notification-btn{display: block;
     position: absolute;
@@ -274,4 +274,9 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     padding: 5px;
     font-size: 11px;
 }
-
+.hr-green {
+    border: none; /* Убираем границу */
+    background-color: #1ABB9C; /* Цвет линии */
+    color: #1ABB9C; /* Цвет линии для IE6-7 */
+    height: 2px; /* Толщина линии */
+}
