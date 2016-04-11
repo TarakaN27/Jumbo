@@ -611,6 +611,9 @@ class PaymentBonusBehavior extends Behavior
 			$this->saveSale($model);
 			$this->countingSimpleBonus($model);
 			$this->countingComplexBonus($model);
+		}else{
+			$this->countingSimpleBonus($model,BonusScheme::BASE_PAYMENT);
+			$this->countingComplexBonus($model,BonusScheme::BASE_SALE);
 		}
 	}
 
