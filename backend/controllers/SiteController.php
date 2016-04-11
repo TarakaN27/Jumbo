@@ -7,6 +7,7 @@ use common\components\crunchs\bonus\ImportSale;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
 use common\components\crunchs\Payment\RecalcPayment;
+use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\models\BuserInviteCode;
@@ -103,9 +104,6 @@ class SiteController extends Controller
         $obBonus = new RecalculateBonus();
         $obBonus->run();
         */
-        
-
-
         die;
     }
 
