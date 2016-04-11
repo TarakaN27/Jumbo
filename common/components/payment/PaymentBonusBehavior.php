@@ -285,14 +285,14 @@ class PaymentBonusBehavior extends Behavior
 
 		if($paymentBase == BonusScheme::BASE_PAYMENT)
 		{
-			$obManager = BUser::find()      //находим менеджера, для которого зачисляется unit
+			$obManager = BUser::find()      //находим менеджера
 			->select(['b.id','b.allow_unit'])
 				->alias('b')
 				->leftJoin(PaymentRequest::tableName().' as r','r.manager_id = b.id')
 				->where(['r.id' => $model->prequest_id])
 				->one();
 
-			if(!$obManager )  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units
+			if(!$obManager )  //проверяем нашли ли менеджера
 				return FALSE;
 
 			$saleUser = $obManager->id;
@@ -404,7 +404,7 @@ class PaymentBonusBehavior extends Behavior
 			->orderBy(['sale_date' => SORT_ASC,'id' => SORT_ASC])
 			->one();
 
-		if($paymentBase == BonusScheme::BASE_PAYMENT && empty($obSale))
+		if($paymentBase == BonusScheme::BASE_PAYMENT && empty($obSale))	//если не было продажи и тип базы начисления за каждый платеж, то вернем false
 			return FALSE;
 
 		if(empty($obSale))  //есил не было продажи, то бонус начисляется текущему продашему
