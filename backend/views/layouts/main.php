@@ -332,20 +332,12 @@ $menuItems[] = [
                                                 <?=\common\components\notification\widget\DialogNewWidget::widget();?>
                                             </a>
                                         </li>
-                                        <?php if(
-                                        Yii::$app->user->can('adminRights') ||
-                                        Yii::$app->user->can('only_bookkeeper') ||
-                                        Yii::$app->user->can('only_manager') ||
-                                        Yii::$app->user->can('only_jurist') ||
-                                        Yii::$app->user->can('only_e_marketer')
-                                        ):?>
                                         <li>
                                             <a href="<?= Url::to(['/crm/company/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Company'); ?>
                                                 <?=\common\components\notification\widget\CompanyNewWidget::widget();?>
                                             </a>
                                         </li>
-                                        <?php endif;?>
                                         <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/users/user-groups/index']) ?>">&minus;&minus;<?php echo Yii::t('app/users', 'USER_cuser_groups'); ?></a>

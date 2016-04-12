@@ -86,7 +86,12 @@ $this->registerJs("
 
 				<section class="pull-right">
 				<?=  Html::a(Yii::t('app/crm', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-
+				<?php if(
+				Yii::$app->user->can('adminRights') ||
+				Yii::$app->user->can('only_bookkeeper') ||
+				Yii::$app->user->can('only_manager') ||
+				Yii::$app->user->can('only_jurist')
+				):?>
 				<?= Html::a('<i class="fa fa-plus"></i> '.Yii::t('app/crm', 'Create company'), ['create'], ['class' => 'btn btn-success']) ?>
 				<?php if(Yii::$app->user->crmCanEditModel(
 					$model,
@@ -119,7 +124,7 @@ $this->registerJs("
 						'data-pjax' => '0',
 					]);?>
 				<?php endif;?>
-
+				<?php endif; ?>
 				<?php if(Yii::$app->user->can('adminRights')):?>
 				<?= Html::a('<i class="fa fa-trash"></i> '.Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
 						'title' => Yii::t('yii', 'Delete'),
@@ -142,14 +147,14 @@ $this->registerJs("
 						<div class="row">
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<table>
-									<tr>
-										<th><?=YII::t('app/crm','Company type')?>: <th>
-										<td><?=is_object($userType = $model->userType) ? $userType->name : $model->type;?></td>
-									</tr>
+									<?php if(
+									Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER
+									):?>
 									<tr>
 										<th><?=YII::t('app/crm','FIO')?>: <th>
 										<td><?=is_object($obRequisite) ? $obRequisite->getContactFIO() : '';?></td>
 									</tr>
+									<?php endif;?>
 									<tr>
 										<th><?=YII::t('app/crm','Type')?>: <th>
 										<td><?=is_object($obType = $model->userType) ? $obType->name : '';?></td>
@@ -162,6 +167,9 @@ $this->registerJs("
 							</div>
 							<div class="col-md-6 col-sm-6 col-xs-12">
 								<table>
+									<?php if(
+									Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER
+									):?>
 									<tr>
 										<th><?=YII::t('app/crm','Phone')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_phone : '';?></td>
@@ -170,6 +178,7 @@ $this->registerJs("
 										<th><?=YII::t('app/crm','Email')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_email : '';?></td>
 									</tr>
+									<?php endif;?>
 									<tr>
 										<th><?=YII::t('app/crm','Site')?>: </th>
 										<td><?=is_object($obRequisite) ? $obRequisite->site : '';?></td>
@@ -337,20 +346,22 @@ $this->registerJs("
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 									<?php
-									\common\components\customComponents\Modal\CustomModal::begin([
-										'header' => '<h2>'.Yii::t('app/crm','Change assigned').'</h2>',
-										'size' => Modal::SIZE_DEFAULT,
-										'toggleButton' => [
-											'tag' => 'a',
-											'class' => 'link-btn-cursor',
-											'label' => '<i class="fa fa-pencil"></i> '.Yii::t('app/crm','Change'),
-										]
-									]);
-									echo $this->render('_part_form_change_assigned',[
-										'model' => $model,
-										'sAssName' => is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id
-									]);
-									\common\components\customComponents\Modal\CustomModal::end();
+									if(Yii::$app->user->can('adminRights') || $model->manager_id == Yii::$app->user->id) {
+										\common\components\customComponents\Modal\CustomModal::begin([
+											'header' => '<h2>' . Yii::t('app/crm', 'Change assigned') . '</h2>',
+											'size' => Modal::SIZE_DEFAULT,
+											'toggleButton' => [
+												'tag' => 'a',
+												'class' => 'link-btn-cursor',
+												'label' => '<i class="fa fa-pencil"></i> ' . Yii::t('app/crm', 'Change'),
+											]
+										]);
+										echo $this->render('_part_form_change_assigned', [
+											'model' => $model,
+											'sAssName' => is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id
+										]);
+										\common\components\customComponents\Modal\CustomModal::end();
+									}
 									?>
 								</li>
 							</ul>
@@ -369,6 +380,9 @@ $this->registerJs("
 							</div>
 						</div>
 					</section>
+					<?php if(
+						Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER
+					):?>
 					<section class="wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Contacts')?></h2>
@@ -415,6 +429,7 @@ $this->registerJs("
 							<br />
 						</div>
 					</section>
+					<?php endif;?>
 					<section class="panel wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Project files')?></h2>

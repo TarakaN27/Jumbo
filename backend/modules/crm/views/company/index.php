@@ -40,6 +40,7 @@ $columns = [
 		'attribute' => 'fio',
 		'label' => Yii::t('app/users','FIO'),
 		'format' => 'html',
+		'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
 		'value' => function($model){
 			/** @var CUserRequisites $obR */
 			$obR = $model->requisites;
@@ -52,6 +53,7 @@ $columns = [
 		'attribute' => 'phone',
 		'label' => Yii::t('app/users','Phone'),
 		'format' => 'html',
+		'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
 		'value' => function($model)
 		{
 			/** @var CUserRequisites $obR */
@@ -79,6 +81,7 @@ $columns = [
 		'attribute' => 'c_email',
 		'label' => Yii::t('app/users','Email'),
 		'format' => 'html',
+		'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
 		'value' => function($model)
 		{
 			/** @var CUserRequisites $obR */
@@ -137,6 +140,7 @@ $columns = [
 	],
 	[
 		'attribute' => 'contractor',
+		'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
 		'value' => function($model){
 			return $model->getContractorStr();
 		},
@@ -222,6 +226,7 @@ if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_jurist') ||
 array_push($columns,[
 	'label' => '',
 	'format' => 'raw',
+	'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
 	'value' => function($model){
 		return Html::a(
 			'<i class="fa fa-eye"></i>',
@@ -293,7 +298,12 @@ if(Yii::$app->user->can('adminRights')) {
 			<div class = "x_title">
 				<h2><?php echo Html::encode($this->title)?></h2>
 				<section class="pull-right">
-					<?php if(!Yii::$app->user->can('only_e_marketer')):?>
+					<?php if(
+						Yii::$app->user->can('adminRights') ||
+						Yii::$app->user->can('only_bookkeeper') ||
+						Yii::$app->user->can('only_manager') ||
+						Yii::$app->user->can('only_jurist')
+					):?>
 						<?php echo \yii\helpers\Html::a(Yii::t('app/crm','Add_new_company'),['create'],['class'=>'btn btn-primary']);?>
 					<?php endif;?>
 				</section>
