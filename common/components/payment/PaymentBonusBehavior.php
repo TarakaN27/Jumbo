@@ -451,13 +451,6 @@ class PaymentBonusBehavior extends Behavior
 			else
 				$saleUser = $obSale->buser_id;
 		}
-
-		if($saleUser == 12)
-		{
-			$a = 12;
-
-			$b= $a+2;
-		}
 		
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
 		if($paymentBase == BonusScheme::BASE_SALE)
@@ -497,7 +490,7 @@ class PaymentBonusBehavior extends Behavior
 			return FALSE;
 
 		//костыли
-		if(in_array($model->cuser_id,[6517,8753,208]) && $obScheme->id == 4 && $model->pay_date < strtotime('01.02.2016'))
+		if(in_array($model->cuser_id,[6517,8753,208]) && $obScheme->id == 3 && $model->pay_date < strtotime('01.02.2016'))
 		{
 			return false;
 		}
