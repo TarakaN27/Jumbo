@@ -282,7 +282,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
 	 */
-	protected function countingSimpleBonus(Payments $model,$paymentBase = BonusScheme::BASE_SALE)
+	public function countingSimpleBonus(Payments $model,$paymentBase = BonusScheme::BASE_SALE)
 	{
 
 
@@ -313,7 +313,7 @@ class PaymentBonusBehavior extends Behavior
 					BonusSchemeToCuser::tableName().'.cuser_id' => $model->cuser_id,
 					'payment_base' => $paymentBase
 				]);
-				if($arExcept)
+				if(!empty($arExcept))
 					$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
 
 				$obScheme = $obScheme->orderBy([
@@ -331,8 +331,8 @@ class PaymentBonusBehavior extends Behavior
 					'payment_base' => $paymentBase
 				])
 				->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL');
-			if ($arExcept)
-				$obScheme->andWhere(['NOT IN', 'id', $arExcept]);
+			if (!empty($arExcept))
+				$obScheme->andWhere(['NOT IN', BonusScheme::tableName().'.id', $arExcept]);
 
 			$obScheme = $obScheme->orderBy([
 				BonusScheme::tableName() . '.updated_at' => SORT_DESC
@@ -349,7 +349,7 @@ class PaymentBonusBehavior extends Behavior
 			return FALSE;
 
 
-		$amount = $this->getAmount();
+		$amount = $this->getAmount($model);
 		if(empty($amount))
 			return FALSE;
 
@@ -382,10 +382,8 @@ class PaymentBonusBehavior extends Behavior
 	/**
 	 * @return float|null
 	 */
-	protected function getAmount()
+	protected function getAmount(Payments $model)
 	{
-		/** @var Payments $model */
-		$model = $this->owner;
 		$amount = NULL;
 		//для кастомных условий, бонус считается от прибыли
 		if(PaymentCondition::find()->where(['id' => $model->condition_id,'type' => PaymentCondition::TYPE_CUSTOM])->exists())
@@ -410,7 +408,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool
 	 * @throws ServerErrorHttpException
 	 */
-	protected function countingComplexBonus($model,$paymentBase = BonusScheme::BASE_SALE)
+	public function countingComplexBonus($model,$paymentBase = BonusScheme::BASE_SALE)
 	{
 		$arCuserGroup = PaymentsManager::getUserByGroup($model->cuser_id);  //получаем пользователей группы
 		$inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
@@ -522,7 +520,7 @@ class PaymentBonusBehavior extends Behavior
 		if(empty($percent))
 			return FALSE;
 
-		$amount = $this->getAmount();
+		$amount = $this->getAmount($model);
 		if(empty($amount))
 			return FALSE;
 		else

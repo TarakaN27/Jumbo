@@ -9,6 +9,7 @@
 namespace common\components\crunchs\bonus;
 
 
+use common\components\payment\PaymentBonusBehavior;
 use common\models\BUserBonus;
 use common\models\Payments;
 use common\models\PaymentsSale;
@@ -22,18 +23,24 @@ use common\models\ExchangeCurrencyHistory;
 use common\models\managers\PaymentsManager;
 use common\models\PaymentCondition;
 use common\models\PaymentsCalculations;
+use yii\web\Controller;
 use yii\web\ServerErrorHttpException;
 use Yii;
 
 class RecalculateBonus
 {
 
-
-	
 	public function run()
 	{
+		$arPaymentsTmp = Payments::find()->all();
+		$arPayments = [];
+		foreach ($arPaymentsTmp as $payment)
+			$arPayments[$payment->id] = $payment;
+
 		$arSales = PaymentsSale::find()->all();
 
+
+		/*
 		$arPID = [];
 		foreach($arSales as $sale)
 		{
@@ -44,16 +51,40 @@ class RecalculateBonus
 		$arPayment = [];
 		foreach($arPaymentTmp as $tmp)
 			$arPayment [$tmp->id] = $tmp;
+*/
+		$obCount = new PaymentBonusBehavior();
 
 		/** @var PaymentsSale $sale */
 		foreach($arSales as $key => $sale)
 		{
-			if(!isset($arPayment[$sale->payment_id]))
+			if(!isset($arPayments[$sale->payment_id]))
 				continue;
 
-			$this->countingSimpleBonus($arPayment[$sale->payment_id],$sale->buser_id);
-			$this->countingComplexBonus($arPayment[$sale->payment_id],$sale->buser_id);
+
+			$model = $arPayments[$sale->payment_id];
+			$model->saleUser = $sale->buser_id;
+
+			$obCount->countingSimpleBonus($model);
+			$obCount->countingComplexBonus($model);
+
+			/*
+			$this->countingSimpleBonus($arPayments[$sale->payment_id],$sale->buser_id);
+			$this->countingComplexBonus($arPayments[$sale->payment_id],$sale->buser_id);
+			*/
+
+			unset($arPayments[$sale->payment_id]);
 		}
+
+		foreach ($arPayments as $pay)
+		{
+			$obCount->countingSimpleBonus($pay,BonusScheme::BASE_PAYMENT);
+			$obCount->countingComplexBonus($pay,BonusScheme::BASE_PAYMENT);
+		}
+
+
+
+		echo 'done';
+		return TRUE;
 	}
 
 

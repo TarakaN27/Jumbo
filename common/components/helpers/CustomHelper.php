@@ -271,7 +271,7 @@ class CustomHelper {
     public static function getVatMountByAmount($amount,$customVat = NULL)
     {
         $vat = is_null($customVat) ? CustomHelper::getVat() : $customVat;
-        return round($amount/(1+$vat/100),7);
+        return round($amount/(1+$vat/100),8);
     }
 
     /**
