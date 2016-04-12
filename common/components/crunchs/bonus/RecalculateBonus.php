@@ -60,9 +60,10 @@ class RecalculateBonus
 			if(!isset($arPayments[$sale->payment_id]))
 				continue;
 
-
+			/** @var Payments $model */
 			$model = $arPayments[$sale->payment_id];
 			$model->saleUser = $sale->buser_id;
+			$model->isSale = TRUE;
 
 			$obCount->countingSimpleBonus($model);
 			$obCount->countingComplexBonus($model);

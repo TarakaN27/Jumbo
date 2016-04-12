@@ -284,8 +284,6 @@ class PaymentBonusBehavior extends Behavior
 	 */
 	public function countingSimpleBonus(Payments $model,$paymentBase = BonusScheme::BASE_SALE)
 	{
-
-
 		if($paymentBase == BonusScheme::BASE_PAYMENT)
 		{
 			$obManager = BUser::find()      //находим менеджера
@@ -304,6 +302,8 @@ class PaymentBonusBehavior extends Behavior
 		}
 
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);	//схемы искллючения для пользователя
+		if($paymentBase == BonusScheme::BASE_SALE)
+			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя с заднной компанией.
 				->joinWith('cuserID')
 				->joinWith('usersID')
@@ -342,6 +342,12 @@ class PaymentBonusBehavior extends Behavior
 
 		if(empty($obScheme))
 			return FALSE;
+
+		//костыли
+		if($obScheme->id == 4 && $model->pay_date < strtotime('01.03.2016') && in_array($model->cuser_id,[170,8768]))
+		{
+			return false;
+		}
 
 		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры схемы
 
@@ -446,8 +452,17 @@ class PaymentBonusBehavior extends Behavior
 				$saleUser = $obSale->buser_id;
 		}
 
+		if($saleUser == 12)
+		{
+			$a = 12;
+
+			$b= $a+2;
+		}
 		
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
+		if($paymentBase == BonusScheme::BASE_SALE)
+			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
+
 		$obScheme = BonusScheme::find()  //ищем схему для компании
 			->joinWith('cuserID')
 			->joinWith('usersID')
@@ -459,7 +474,7 @@ class PaymentBonusBehavior extends Behavior
 			]);
 			if(!empty($arExcept))
 				$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
-			$obScheme = $obScheme->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])->one();
+			$obScheme = $obScheme->orderBy(['payment_base' => SORT_DESC,BonusScheme::tableName().'.updated_at' => SORT_DESC])->one();
 
 		if(!$obScheme)  //если нет схемы для компании, ищем общую
 		{
@@ -474,12 +489,22 @@ class PaymentBonusBehavior extends Behavior
 			if (!empty($arExcept))
 				$obScheme->andWhere(['NOT IN', BonusScheme::tableName() . '.id', $arExcept]);
 			$obScheme = $obScheme->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL')
-				->orderBy([BonusScheme::tableName() . '.updated_at' => SORT_DESC])
+				->orderBy(['payment_base' => SORT_DESC,BonusScheme::tableName() . '.updated_at' => SORT_DESC])
 				->one();
 		}
 
 		if(empty($obScheme))
 			return FALSE;
+
+		//костыли
+		if(in_array($model->cuser_id,[6517,8753,208]) && $obScheme->id == 4 && $model->pay_date < strtotime('01.02.2016'))
+		{
+			return false;
+		}
+
+		if(!in_array($model->cuser_id,[6517,8753,208,170,8768]) && $model->pay_date < strtotime('01.03.2016'))
+			return FALSE;
+
 
 		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры бонусов на дату платежа
 
