@@ -86,7 +86,12 @@ $this->registerJs("
 
 				<section class="pull-right">
 				<?=  Html::a(Yii::t('app/crm', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-
+				<?php if(
+				Yii::$app->user->can('adminRights') ||
+				Yii::$app->user->can('only_bookkeeper') ||
+				Yii::$app->user->can('only_manager') ||
+				Yii::$app->user->can('only_jurist')
+				):?>
 				<?= Html::a('<i class="fa fa-plus"></i> '.Yii::t('app/crm', 'Create company'), ['create'], ['class' => 'btn btn-success']) ?>
 				<?php if(Yii::$app->user->crmCanEditModel(
 					$model,
@@ -119,7 +124,7 @@ $this->registerJs("
 						'data-pjax' => '0',
 					]);?>
 				<?php endif;?>
-
+				<?php endif; ?>
 				<?php if(Yii::$app->user->can('adminRights')):?>
 				<?= Html::a('<i class="fa fa-trash"></i> '.Yii::t('app/crm', 'Delete'), ['delete', 'id' => $model->id], [
 						'title' => Yii::t('yii', 'Delete'),
@@ -337,20 +342,22 @@ $this->registerJs("
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 									<?php
-									\common\components\customComponents\Modal\CustomModal::begin([
-										'header' => '<h2>'.Yii::t('app/crm','Change assigned').'</h2>',
-										'size' => Modal::SIZE_DEFAULT,
-										'toggleButton' => [
-											'tag' => 'a',
-											'class' => 'link-btn-cursor',
-											'label' => '<i class="fa fa-pencil"></i> '.Yii::t('app/crm','Change'),
-										]
-									]);
-									echo $this->render('_part_form_change_assigned',[
-										'model' => $model,
-										'sAssName' => is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id
-									]);
-									\common\components\customComponents\Modal\CustomModal::end();
+									if(Yii::$app->user->can('adminRights') || $model->manager_id == Yii::$app->user->id) {
+										\common\components\customComponents\Modal\CustomModal::begin([
+											'header' => '<h2>' . Yii::t('app/crm', 'Change assigned') . '</h2>',
+											'size' => Modal::SIZE_DEFAULT,
+											'toggleButton' => [
+												'tag' => 'a',
+												'class' => 'link-btn-cursor',
+												'label' => '<i class="fa fa-pencil"></i> ' . Yii::t('app/crm', 'Change'),
+											]
+										]);
+										echo $this->render('_part_form_change_assigned', [
+											'model' => $model,
+											'sAssName' => is_object($obMan = $model->manager) ? $obMan->getFio() : $model->manager_id
+										]);
+										\common\components\customComponents\Modal\CustomModal::end();
+									}
 									?>
 								</li>
 							</ul>

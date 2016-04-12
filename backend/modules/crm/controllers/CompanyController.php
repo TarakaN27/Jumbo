@@ -50,7 +50,12 @@ class CompanyController extends AbstractBaseBackendController
 				],
 				[
 					'allow' => true,
-					'roles' => ['user','e_marketer','jurist','moder','bookkeeper','admin']
+					'actions' => ['index','view-requisites','view'],
+					'roles' => ['user']
+				],
+				[
+					'allow' => true,
+					'roles' => ['e_marketer','jurist','moder','bookkeeper','admin']
 				]
 			]
 		];
@@ -73,7 +78,7 @@ class CompanyController extends AbstractBaseBackendController
 			case BUserCrmRules::RULE_THEMSELF: //только свои. Ответственный и создал компанию
 				$dataProvider = $searchModel->search(
 					Yii::$app->request->queryParams,
-					'('.CUser::tableName().'.manager_id = :userID OR '.CUser::tableName().'.created_by = :userID )' ,
+					'('.CUser::tableName().'.manager_id = :userID OR '.CUser::tableName().'.created_by = :userID  OR '.CUser::tableName().'.manager_crc_id = :userID )' ,
 					[
 						':userID' => Yii::$app->user->id
 					]

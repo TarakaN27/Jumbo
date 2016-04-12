@@ -293,7 +293,12 @@ if(Yii::$app->user->can('adminRights')) {
 			<div class = "x_title">
 				<h2><?php echo Html::encode($this->title)?></h2>
 				<section class="pull-right">
-					<?php if(!Yii::$app->user->can('only_e_marketer')):?>
+					<?php if(
+						Yii::$app->user->can('adminRights') ||
+						Yii::$app->user->can('only_bookkeeper') ||
+						Yii::$app->user->can('only_manager') ||
+						Yii::$app->user->can('only_jurist')
+					):?>
 						<?php echo \yii\helpers\Html::a(Yii::t('app/crm','Add_new_company'),['create'],['class'=>'btn btn-primary']);?>
 					<?php endif;?>
 				</section>
