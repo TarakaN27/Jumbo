@@ -418,6 +418,7 @@ class PaymentBonusBehavior extends Behavior
 	{
 		$arCuserGroup = PaymentsManager::getUserByGroup($model->cuser_id);  //получаем пользователей группы
 		$inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
+		
 
 		$saleUser = NULL;   //определеяем кому начислять бонус
 		$obSale = PaymentsSale::find()
@@ -565,7 +566,7 @@ class PaymentBonusBehavior extends Behavior
 
 		}
 
-		return $this->addBonus($model->saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус
+		return $this->addBonus($saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус
 	}
 
 
