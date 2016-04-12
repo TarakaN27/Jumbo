@@ -236,6 +236,13 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                 ])
                 ->andWhere('(paid is NULL OR paid = 0)')
                 ->all();
+
+            $arPPIDs = [];
+            foreach ($arPromised as $pr)
+                $arPPIDs [] = $pr->id;
+
+            $sumPPRepay = (float)PromisedPayRepay::find()->where(['pr_pay_id' => $arPPIDs])->sum('amount');
+
             $obPayment = $model->payment;
             $obForm->arPromised = $arPromised;
 
@@ -247,6 +254,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
             if(!empty($countPromised))
             {
+                $countPromised = $countPromised-$sumPPRepay;
                 if($countPromised >= $model->amount)
                 {
                     $obForm->enroll = 0;
