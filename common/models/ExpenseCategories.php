@@ -158,19 +158,12 @@ class ExpenseCategories extends AbstractActiveRecord
     public static function getExpenseCatMapWithoutParent()
     {
         $tmp = self::getAllExpenseCategories();
-        $parent = [];
-        foreach($tmp as $t)
-            if(!empty($t->parent_id))
-                $parent [] = $t->parent_id;
-
         $arResult = [];
-        foreach($tmp as $cat)
-        {
-            if(!in_array($cat->id,$parent))
-                $arResult[$cat->id] = $cat->name;
-        }
-        return $arResult;
+        foreach($tmp as $key => $t)
+            if(!empty($t->parent_id) && $t->parent_id != 0)
+                $arResult [] = $t;
 
+        return ArrayHelper::map($arResult,'id','name');
     }
 
 
