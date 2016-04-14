@@ -226,5 +226,7 @@ return [
     'USER_cuser_source' => 'Источники клиента',
     'Cuser Sources' => 'Источники клиента',
     'Create Cuser Source' => 'Добавить источник',
-    'Choose_user_source' => 'Выберите источник клиента'
+    'Choose_user_source' => 'Выберите источник клиента',
+    'It is partner' => 'Партнер',
+    'Partner manager' => 'Ответственный менеджер по работе с партнером'
 ];

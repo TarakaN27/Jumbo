@@ -45,6 +45,9 @@ return [
         'bonus' => [
             'class' => 'backend\modules\bonus\Module',
         ],
+        'partners' => [
+            'class' => 'backend\modules\partners\Module',
+        ],
     ],
     'components' => [
 

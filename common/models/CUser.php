@@ -14,6 +14,8 @@ use yii\db\ActiveQuery;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use common\components\entityFields\EntityFieldsTrait;
+use yii\web\JsExpression;
+
 /**
  * This is the model class for table "{{%c_user}}".
  *
@@ -41,6 +43,8 @@ use common\components\entityFields\EntityFieldsTrait;
  * @property integer $allow_expense
  * @property integer $manager_crc_id
  * @property integer $source_id
+ * @property integer $partner
+ * @property integer $partner_manager_id
  */
 class CUser extends AbstractUser
 {
@@ -176,7 +180,7 @@ class CUser extends AbstractUser
             [[
                 'role','status','created_at',
                 'updated_at','manager_id','is_opened',
-                'created_by','contractor','allow_expense','manager_crc_id','source_id'
+                'created_by','contractor','allow_expense','manager_crc_id','source_id','partner','partner_manager_id'
             ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
@@ -260,7 +264,22 @@ class CUser extends AbstractUser
                 'except' => self::SCENARIO_CHANGE_ASSIGNE
             ],
 
-            ['allow_expense','default','value' => AbstractActiveRecord::NO]
+            ['allow_expense','default','value' => AbstractActiveRecord::NO],
+            ['partner','default','value' => AbstractActiveRecord::NO],
+
+            ['partner_manager_id','required',
+                'when' => function($model){
+                    if($this->partner)
+                        return TRUE;
+                    return FALSE;
+                },
+                'whenClient' => new JsExpression("
+                    function(attribute,value){
+                        return $('#cuser-partner').prop('checked');   
+                    }
+                ")
+            ]
+
         ];
     }
 
@@ -296,7 +315,9 @@ class CUser extends AbstractUser
             'infoWithSite' => Yii::t('app/users','Contractor'),
             'manager_crc_id' =>  Yii::t('app/users','CRC manager'),
             'statusStr' => Yii::t('app/users', 'Status'),
-            'source_id' => Yii::t('app/users', 'Cuser source')
+            'source_id' => Yii::t('app/users', 'Cuser source'),
+            'partner' => Yii::t('app/users', 'It is partner'),
+            'partner_manager_id' => Yii::t('app/users', 'Partner manager')
         ];
     }
 
@@ -419,6 +440,14 @@ class CUser extends AbstractUser
     public function getSource()
     {
         return $this->hasOne(CuserSource::className(),['id' => 'source_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPartnerManager()
+    {
+        return $this->hasOne(BUser::className(),['id' => 'partner_manager_id']);
     }
 
     /**
@@ -668,5 +697,14 @@ class CUserQuery extends ActiveQuery
             '( '.CUser::tableName().'.archive != :archive or '.CUser::tableName().'.archive IS NULL )',[
             ':archive' => CUser::ARCHIVE_YES
         ]);
+    }
+
+    /**
+     * Партнеры
+     * @return $this
+     */
+    public function partner()
+    {
+        return $this->andWhere([CUser::tableName().'.partner' => AbstractActiveRecord::YES]);
     }
 }

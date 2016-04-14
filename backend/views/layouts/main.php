@@ -170,12 +170,6 @@ $menuItems[] = [
                                             <li>
                                                 <?=Html::a(Yii::t('app/common', 'CRM group'),['/config/b-user-crm-group/index']);?>
                                             </li>
-
-                                            <?php if(Yii::$app->user->can('superRights')):?>
-                                            <li>
-                                                <a href = "<?= Url::to(['/users/partner/index']) ?>"><?php echo Yii::t('app/users', 'USER_partner'); ?></a>
-                                            </li>
-                                            <?php endif;?>
                                         </ul>
                                     </li>
                                 <?php endif;?>
@@ -374,6 +368,18 @@ $menuItems[] = [
                                             </a>
                                         </li>
 
+                                    </ul>
+                                </li>
+                                <li><a>
+                                        <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'Partners'); ?>
+                                        <span class="fa fa-chevron-down"></span>
+                                    </a>
+                                    <ul class="nav child_menu" style="display: none">
+                                        <li>
+                                            <a href="<?= Url::to(['/partners/partners/index']); ?>">
+                                                <?php echo Yii::t('app/common', 'Partner'); ?>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             </ul>

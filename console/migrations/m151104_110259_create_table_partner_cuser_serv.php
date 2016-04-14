@@ -24,7 +24,7 @@ class m151104_110259_create_table_partner_cuser_serv extends Migration
             'updated_at' => Schema::TYPE_INTEGER ,
         ], $tableOptions);
 
-        $this->addForeignKey("FK_pcs_partner_id", "{{%partner_cuser_serv}}", "partner_id", "{{%partner}}", "id", 'CASCADE','RESTRICT');
+        $this->addForeignKey("FK_pcs_partner_id", "{{%partner_cuser_serv}}", "partner_id", "{{%c_user}}", "id", 'CASCADE','RESTRICT');
         $this->addForeignKey("FK_pcs_cuser_id", "{{%partner_cuser_serv}}", "cuser_id", "{{%c_user}}", "id", 'CASCADE','RESTRICT');
         $this->addForeignKey("FK_pcs_service_id", "{{%partner_cuser_serv}}", "service_id", "{{%services}}", "id", 'CASCADE','RESTRICT');
 

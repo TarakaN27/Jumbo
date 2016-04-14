@@ -88,6 +88,18 @@ function blockRequisitesTypes(){
 $this->registerJs("
 blockRequisitesTypes();
 $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
+$('#cuser-partner').on('change',function(){
+	var
+		partnerManager = $('#cuser-partner_manager_id');
+	if($(this).prop('checked'))
+	{
+		partnerManager.removeAttr('disabled');
+	}else{
+		partnerManager.val('');
+		partnerManager.trigger('change');
+		partnerManager.attr('disabled','disabled');
+	}
+});
 ",\yii\web\View::POS_READY);
 
 ?>
@@ -229,7 +241,34 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
 		<?php endif;?>
 
 	</div>
+	<section class="partnerInfo">
+		<div class="ln_solid"></div>
+		<h4 class = "h4_ml_10">Параметры партнера</h4>
+		<div class = "form-group">
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?= $form->field($model,'partner')->checkbox();?>
+			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?php
+				$options = [
+					'placeholder' => Yii::t('app/users','Choose_manager')
+				];
+				if(!$model->partner)
+					$options['disabled'] = 'disabled';
 
+				echo $form->field($model,'partner_manager_id', [
+					'template' => $fieldTempl,
+					'labelOptions'=>['class' => 'control-label']])
+					->widget(\kartik\select2\Select2::classname(),[
+					'data' => \backend\models\BUser::getAllMembersMap(),
+					'options' => $options,
+					'pluginOptions' => [
+						'allowClear' => true
+					],
+				]);?>
+			</div>
+		</div>
+	</section>
 	<section class="jPersonInfo hideBlockClass">
 		<div class="ln_solid"></div>
 		<h4 class = "h4_ml_10">Сведение о юридическом лице</h4>

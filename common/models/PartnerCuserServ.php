@@ -19,9 +19,10 @@ use yii\helpers\ArrayHelper;
  * @property string $connect
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $archive
  *
  * @property CUser $cuser
- * @property Partner $partner
+ * @property CUser $partner
  */
 class PartnerCuserServ extends AbstractActiveRecord
 {
@@ -40,14 +41,18 @@ class PartnerCuserServ extends AbstractActiveRecord
     {
         return [
             [['partner_id', 'cuser_id','service_id'], 'required'],
-            [['partner_id', 'cuser_id','service_id', 'created_at', 'updated_at'], 'integer'],
+            [['partner_id', 'cuser_id','service_id', 'created_at', 'updated_at','archive'], 'integer'],
             ['connect','date', 'format' => 'php:d.m.Y'],
             [['connect'], 'safe'],
             [['service_id','cuser_id'],'uniqueValid']
         ];
     }
 
-
+    /**
+     * Проверяем, чтобы для каждого партнера была одна уникальная связка
+     * @param $attribute
+     * @param $param
+     */
     public function uniqueValid($attribute,$param)
     {
         if(self::find()->where([
@@ -56,8 +61,6 @@ class PartnerCuserServ extends AbstractActiveRecord
             'service_id' => $this->service_id
         ])->exists())
             $this->addError($attribute,Yii::t('app/users','Link already exists'));
-
-
     }
 
     /**
@@ -73,6 +76,7 @@ class PartnerCuserServ extends AbstractActiveRecord
             'connect' => Yii::t('app/users', 'Connect'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'archive' => Yii::t('app/users','Archive')
         ];
     }
 
@@ -89,7 +93,7 @@ class PartnerCuserServ extends AbstractActiveRecord
      */
     public function getPartner()
     {
-        return $this->hasOne(Partner::className(), ['id' => 'partner_id']);
+        return $this->hasOne(CUser::className(), ['id' => 'partner_id']);
     }
 
     /**
@@ -123,7 +127,7 @@ class PartnerCuserServ extends AbstractActiveRecord
         $tmp = parent::behaviors();
         return ArrayHelper::merge($tmp,[
            [
-               'class' => PartnerLinkCuserServBehavior::className() //поведение для начисления прибыли партнерам
+
            ]
         ]);
     }
