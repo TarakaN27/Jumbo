@@ -74,11 +74,11 @@ $this->title = Yii::t('app/users','Partners')
                         [
                             'label' => '',
                             'format' => 'raw',
-                            'value' => function(){
+                            'value' => function($model){
                                 $arLinks = [
                                     [
                                         'title' => Yii::t('app/users','Partner link lids'),
-                                        'href' => ['link-lid']
+                                        'href' => ['link-lead','pid' => $model->id]
                                     ]
                                 ];
                                 return \common\components\helpers\CustomHtmlHelper::dropDownSettings($arLinks);

@@ -16,7 +16,7 @@ use Yii;
  *
  * @property CUser $cuser
  */
-class PartnerPurse extends \yii\db\ActiveRecord
+class PartnerPurse extends AbstractActiveRecord
 {
     /**
      * @inheritdoc

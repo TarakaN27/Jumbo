@@ -2,12 +2,7 @@
 
 namespace common\models;
 
-use common\components\partner\PartnerLinkCuserServBehavior;
-use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
-
-use yii\caching\TagDependency;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%partner_cuser_serv}}".
@@ -23,6 +18,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CUser $cuser
  * @property CUser $partner
+ * @property Services $service
  */
 class PartnerCuserServ extends AbstractActiveRecord
 {
@@ -40,27 +36,13 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['partner_id', 'cuser_id','service_id'], 'required'],
-            [['partner_id', 'cuser_id','service_id', 'created_at', 'updated_at','archive'], 'integer'],
-            ['connect','date', 'format' => 'php:d.m.Y'],
+            [['partner_id', 'cuser_id', 'service_id'], 'required'],
+            [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive'], 'integer'],
             [['connect'], 'safe'],
-            [['service_id','cuser_id'],'uniqueValid']
+            [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id']],
+            [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id']],
+            [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id']],
         ];
-    }
-
-    /**
-     * Проверяем, чтобы для каждого партнера была одна уникальная связка
-     * @param $attribute
-     * @param $param
-     */
-    public function uniqueValid($attribute,$param)
-    {
-        if(self::find()->where([
-            'partner_id' => $this->partner_id,
-            'cuser_id' => $this->cuser_id,
-            'service_id' => $this->service_id
-        ])->exists())
-            $this->addError($attribute,Yii::t('app/users','Link already exists'));
     }
 
     /**
@@ -76,7 +58,7 @@ class PartnerCuserServ extends AbstractActiveRecord
             'connect' => Yii::t('app/users', 'Connect'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
-            'archive' => Yii::t('app/users','Archive')
+            'archive' => Yii::t('app/users', 'Archive'),
         ];
     }
 
@@ -101,46 +83,6 @@ class PartnerCuserServ extends AbstractActiveRecord
      */
     public function getService()
     {
-        return $this->hasOne(Services::className(),['id' => 'service_id']);
-    }
-
-    /**
-     * @param $partnerID
-     * @return mixed
-     * @throws \Exception
-     */
-    public static function getLinkedServices($partnerID)
-    {
-        $obDep  = new TagDependency([
-            'tags' => NamingHelper::getCommonTag(self::className())
-        ]);
-        return self::getDb()->cache(function($db) use ($partnerID){
-            return self::find()->where(['partner_id' => $partnerID])->all($db);
-        },86400,$obDep);
-    }
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        $tmp = parent::behaviors();
-        return ArrayHelper::merge($tmp,[
-           [
-
-           ]
-        ]);
-    }
-
-    /**
-     * @param bool $insert
-     * @return bool
-     */
-    public function beforeSave($insert)
-    {
-        if(!empty($this->connect))
-            $this->connect = date('Y-m-d',strtotime($this->connect));
-
-        return parent::beforeSave($insert);
+        return $this->hasOne(Services::className(), ['id' => 'service_id']);
     }
 }
