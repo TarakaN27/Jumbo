@@ -100,9 +100,10 @@ class SiteController extends Controller
 
 
         //перерассчет бонусов
-        
+        /*
         $obBonus = new RecalculateBonus();
         $obBonus->run();
+        */
         die;
     }
 
