@@ -228,5 +228,12 @@ return [
     'Create Cuser Source' => 'Добавить источник',
     'Choose_user_source' => 'Выберите источник клиента',
     'It is partner' => 'Партнер',
-    'Partner manager' => 'Ответственный менеджер по работе с партнером'
+    'Partner manager' => 'Ответственный менеджер по работе с партнером',
+    'Partner lead link' => 'Связь партнер-лид',
+    'Choose service' => 'Выберите услугу',
+    'Partner link lead' => 'Связи партер - лид',
+    'Add link' => 'Добавить связь',
+    'Restore partner lead link' => 'Восстановить связь партнер - лид',
+    'Archive partner lead link' => 'Архивация связи партнер - лид'
+
 ];

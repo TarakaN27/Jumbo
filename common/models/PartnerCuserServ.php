@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\web\ServerErrorHttpException;
 
 /**
  * This is the model class for table "{{%partner_cuser_serv}}".
@@ -22,6 +23,15 @@ use Yii;
  */
 class PartnerCuserServ extends AbstractActiveRecord
 {
+
+    public
+        $archiveDate = NULL;
+
+    CONST
+        SCENARIO_ARCHIVE = 'archive',
+        EVENT_BEFORE_ARCHIVE = 'before_archive',
+        EVENT_AFTER_ARCHIVE = 'after_archive';
+
     /**
      * @inheritdoc
      */
@@ -36,12 +46,13 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['partner_id', 'cuser_id', 'service_id'], 'required'],
+            [['partner_id', 'cuser_id', 'service_id'], 'required','except' => self::SCENARIO_ARCHIVE],
             [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive'], 'integer'],
-            [['connect'], 'safe'],
-            [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id']],
-            [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id']],
-            [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id']],
+            [['connect','archiveDate'], 'safe'],
+            [['service_id','cuser_id'],'uniqueValid','except' => self::SCENARIO_ARCHIVE],
+            [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
+            [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
+            [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
         ];
     }
 
@@ -60,6 +71,21 @@ class PartnerCuserServ extends AbstractActiveRecord
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'archive' => Yii::t('app/users', 'Archive'),
         ];
+    }
+
+    /**
+     * Проверяем, чтобы для каждого партнера была одна уникальная связка
+     * @param $attribute
+     * @param $param
+     */
+    public function uniqueValid($attribute,$param)
+    {
+        if(self::find()->where([
+            'partner_id' => $this->partner_id,
+            'cuser_id' => $this->cuser_id,
+            'service_id' => $this->service_id
+        ])->exists())
+            $this->addError($attribute,Yii::t('app/users','Link already exists'));
     }
 
     /**
@@ -84,5 +110,54 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function getService()
     {
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(!empty($this->connect))
+            $this->connect = date('Y-m-d',strtotime($this->connect));
+
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return int
+     * @throws ServerErrorHttpException
+     */
+    public function archive()
+    {
+        $this->setScenario(self::SCENARIO_ARCHIVE);
+        $this->callTriggerBeforeArchive();
+        if ($this->archive)
+        {
+            $this->archive = self::NO;
+        }else{
+            $this->archive = self::YES;
+        }
+        if(!$this->save())
+            throw new ServerErrorHttpException();
+
+        $this->callTriggerAfterArchive();
+        return $this->archive;
+    }
+
+    /**
+     *
+     */
+    public function callTriggerBeforeArchive()
+    {
+        $this->trigger(self::EVENT_BEFORE_ARCHIVE);
+    }
+
+    /**
+     *
+     */
+    public function callTriggerAfterArchive()
+    {
+        $this->trigger(self::EVENT_AFTER_ARCHIVE);
     }
 }

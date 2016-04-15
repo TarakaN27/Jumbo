@@ -7,7 +7,14 @@
  */
 use yii\helpers\Html;
 use yii\grid\GridView;
-$this->title = Yii::t('app/users','Partner link lead')
+$this->registerCssFile('@web/css/craftpip-jquery-confirm/css/jquery-confirm.css');
+$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/moment.min2.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/craftpip-jquery-confirm/js/jquery-confirm.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/parts/partner_link_grid.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+
+$this->title = Yii::t('app/users','Partner link lead');
+
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -27,7 +34,38 @@ $this->title = Yii::t('app/users','Partner link lead')
             <div class = "x_content">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
+                    'columns' => [
+                        'id',
+                        [
+                            'attribute' => 'cuser_id',
+                            'value' => 'cuser.infoWithSite',
+                        ],
+                        [
+                            'attribute' => 'service_id',
+                            'value' => 'service.name'
+                        ],
+                        'connect:date',
+                        'created_at:datetime',
+                        [
+                            'attribute' => 'archive',
+                            'format' => 'raw',
+                            'value' => function($model){
+                                $str = '<i class="fa fa-archive"></i>';
+                                $options = [
+                                    'class' => 'archive-btn',
+                                    'data-pk' => $model->id,
+                                    'data-value' => $model->archive,
+                                    'data-toggle' => 'tooltip',
+                                    'data-placement' => 'top',
+                                    'data-original-title' => $model->archive ? Yii::t('app/users','Restore partner lead link') : Yii::t('app/users','Archive partner lead link'),
+                                ];
+                                if($model->archive)
+                                    $options['class']  = 'archive-btn green';
 
+                               return Html::a($str,NULL,$options);
+                            }
+                        ]
+                    ]
                 ]); ?>
             </div>
         </div>

@@ -280,3 +280,6 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     color: #1ABB9C; /* Цвет линии для IE6-7 */
     height: 2px; /* Толщина линии */
 }
+.wm-select-2-style .select2-selection{  height: 34px;  }
+.archive-btn{cursor: pointer;}
+.daterangepicker{ z-index: 9999999999}

@@ -24,6 +24,7 @@ class AppAsset extends AssetBundle
        'css/animate.min.css',
        'css/icheck/flat/green.css',
        'css/site.css',
+        'css/craftpip-jquery-confirm/css/jquery-confirm.css'
     ];
     public $js = [
         'js/script.js',
@@ -36,7 +37,8 @@ class AppAsset extends AssetBundle
         'js/notify/pnotify.buttons.js',
         'js/notify/pnotify.nonblock.js',
         'js/wm_app/custom_notify.js',
-        'js/jquery-confirm/jquery.confirm.min.js'
+        'js/craftpip-jquery-confirm/js/jquery-confirm.js'
+        //'js/jquery-confirm/jquery.confirm.min.js'
         //'js/tooltips/toltips.js'
         //'js/socket_io/socket.io.js',
         //'js/wm_app/notification.js'

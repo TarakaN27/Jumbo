@@ -9,15 +9,48 @@ use wbraganca\dynamicform\DynamicFormWidget;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\web\JsExpression;
+$this->registerCssFile('@web/css/select/select2.min.css');
+$this->registerJsFile('@web/js/select/select2.full.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/moment.min2.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJs("
+function swInitSelect2(item)
+{
+    item.select2({
+            data : ".\yii\helpers\Json::encode($select2Data).",
+            ajax: {
+                url: '".\yii\helpers\Url::to(['/ajax-select/get-cmp'])."',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) { return {q:params.term}; },
+                processResults: function (data, params) {return {results: data.results};},
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: function(cmp_id) { return cmp_id.text; }, // omitted for brevity, see the source of this page
+            templateSelection: function (cmp_id) { return cmp_id.text; }, // omitted for brevity, see the source of this page
+        });
+}
+function initDatePicker(item)
+{
+    item.daterangepicker({
+        singleDatePicker: true,
+        calender_style: \"picker_2\",
+        locale :{
+            format: 'DD.MM.YYYY',
+        }
+    });
+}
+",\yii\web\View::POS_END);
 
 $this->registerJs("
-
-/*
-$(\".dynamicform_wrapper\").on(\"afterInsert\", function(e, item) {
-    console.log(item);
-    console.log(e);
+swInitSelect2($('.wm-select2'));
+initDatePicker($('.datePicker'));
+$('.dynamicform_wrapper').on('afterInsert', function(e, item) {
+    swInitSelect2($(item).find('.wm-select2'));
+    initDatePicker($(item).find('.datePicker'));
 });
-*/
 ",\yii\web\View::POS_READY);
 
 ?>
@@ -27,14 +60,13 @@ $(\".dynamicform_wrapper\").on(\"afterInsert\", function(e, item) {
             <div class = "x_title">
                 <h2><?php echo Html::encode($this->title)?></h2>
                 <section class="pull-right">
-
+                    <?= Html::a(Yii::t('app/services', 'To list'), ['link-lead','pid' => $pid], ['class' => 'btn btn-warning']) ?>
                 </section>
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
                 <?php $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
                 <div class="panel panel-default">
-                    <div class="panel-heading"><h4><i class="glyphicon glyphicon-envelope"></i> <?=Yii::t('app/users','Partners lead links')?></h4></div>
                     <div class="panel-body">
                         <?php DynamicFormWidget::begin([
                             'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
@@ -47,12 +79,9 @@ $(\".dynamicform_wrapper\").on(\"afterInsert\", function(e, item) {
                             'model' => $models[0],
                             'formId' => 'dynamic-form',
                             'formFields' => [
-                                'full_name',
-                                'address_line1',
-                                'address_line2',
-                                'city',
-                                'state',
-                                'postal_code',
+                                'cuser_id',
+                                'service_id',
+                                'connect',
                             ],
                         ]); ?>
 
@@ -75,38 +104,25 @@ $(\".dynamicform_wrapper\").on(\"afterInsert\", function(e, item) {
                                         }
                                         ?>
                                         <div class="row">
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-4 wm-select-2-style">
                                                 <?= $form->field($model, "[{$i}]cuser_id")->dropDownList(
                                                     $select2Data,[
-                                                    'class' => '.wm-select2'
+                                                    'class' => 'wm-select2 form-control'
                                                 ]);
-
-
-                                                /*widget(\kartik\select2\Select2::className(),[
-                                                    //'initValueText' => $sAssName, // set the initial display text
-                                                    'data' => $select2Data,
-                                                    'options' => [
-                                                        'placeholder' => Yii::t('app/crm','Search for a users ...')
-                                                    ],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true,
-                                                        'minimumInputLength' => 2,
-                                                        'ajax' => [
-                                                            'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
-                                                            'dataType' => 'json',
-                                                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                                                        ],
-                                                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                                                        'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-                                                        'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-                                                    ],
-                                                ]) */?>
+                                                ?>
                                             </div>
                                             <div class="col-sm-4">
-                                                <?= $form->field($model, "[{$i}]service_id")->dropDownList(\common\models\Services::getServicesMap()) ?>
+                                                <?= $form->field($model, "[{$i}]service_id")->dropDownList(
+                                                    \common\models\Services::getServicesMap(),
+                                                    [
+                                                        'prompt' => Yii::t('app/users','Choose service')
+                                                    ]
+                                                ) ?>
                                             </div>
                                             <div class="col-sm-4">
-                                                <?= $form->field($model, "[{$i}]connect")->textInput(['maxlength' => true]) ?>
+                                                <?= $form->field($model, "[{$i}]connect")->textInput([
+                                                    'class' => 'datePicker form-control'
+                                                ]) ?>
                                             </div>
                                         </div><!-- .row -->
                                     </div>
@@ -116,9 +132,11 @@ $(\".dynamicform_wrapper\").on(\"afterInsert\", function(e, item) {
                         <?php DynamicFormWidget::end(); ?>
                     </div>
                 </div>
-
-
-
+                <div class="form-group">
+                    <div class = "col-md-6 col-sm-6 col-xs-12">
+                        <?= Html::submitButton(Yii::t('app/users', 'Save'), ['class' => 'btn btn-success']) ?>
+                    </div>
+                </div>
                 <?php ActiveForm::end();?>
             </div>
         </div>

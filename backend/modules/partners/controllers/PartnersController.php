@@ -42,7 +42,7 @@ class PartnersController extends AbstractBaseBackendController
      */
     public function actionLinkLead($pid)
     {
-        $query = PartnerCuserServ::find()->where(['cuser_id' => $pid]);
+        $query = PartnerCuserServ::find()->where(['partner_id' => $pid]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query
         ]);
@@ -60,7 +60,9 @@ class PartnersController extends AbstractBaseBackendController
 
         if(Yii::$app->request->post('PartnerCuserServ'))
         {
-            $models = AbstractModel::createMultiple(PartnerCuserServ::classname(),['partner_id' => $pid]);
+            $models = AbstractModel::createMultiple(PartnerCuserServ::classname());
+            foreach ($models as &$mod)
+                $mod->partner_id = $pid;
             AbstractModel::loadMultiple($models,Yii::$app->request->post());
             $valid = AbstractModel::validateMultiple($models);
             if($valid)
@@ -87,7 +89,8 @@ class PartnersController extends AbstractBaseBackendController
             }
             $arCUserID = [];
             foreach ($models as $model)
-                if(!empty($model->cuser_id) && !in_array($model->cuser_id,$arCUserID));
+                if(!empty($model->cuser_id) && !in_array($model->cuser_id,$arCUserID))
+                    $arCUserID [] = $model->cuser_id;
             if($arCUserID)
                 $select2Data = ArrayHelper::map(
                     CUser::find()->where(['id' => $arCUserID])->with('requisites')->all(),
@@ -97,7 +100,8 @@ class PartnersController extends AbstractBaseBackendController
         }
         return $this->render('add-link',[
             'models' => $models,
-            'select2Data' => $select2Data
+            'select2Data' => $select2Data,
+            'pid' => $pid
         ]);
     }
 

@@ -189,7 +189,8 @@ $('.addNewDialog').on("click",addNewDialogs);
 function deleteMsg(this1)
 {
     $.confirm({
-        text: CONFIRM_DELETE_MSG,
+        title:MESSAGE,
+        content: CONFIRM_DELETE_MSG,
         confirm: function() {
             var
                 pk = $(this1).attr('data-id');
