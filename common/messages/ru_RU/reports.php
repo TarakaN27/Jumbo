@@ -72,7 +72,7 @@ return [
     'controllSumm' => 'Контрольная сумма',
     'Condition currency' => 'Курс условия',
     'Group by date' => 'Группировка по дате',
-    'Group by manager' => 'Группировка по ответсвенному',
+    'Group by manager' => 'Группировка по ответственному',
     'Group type' => 'Тип группировки',
     'Responsibility' => 'Ответственный',
     'Group by service' => 'Группировка по услугам',
