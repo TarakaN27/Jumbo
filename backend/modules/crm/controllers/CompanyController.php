@@ -13,6 +13,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\widgets\Alert;
 use common\components\notification\RedisNotification;
+use common\models\AbstractActiveRecord;
 use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
@@ -122,13 +123,20 @@ class CompanyController extends AbstractBaseBackendController
 	 * @return string
 	 * @throws \yii\db\Exception
 	 */
-	public function actionCreate()
+	public function actionCreate($is_partner = FALSE)
 	{
 		$model = new CUser();
 		$model->setDummyFields(); //@todo утановлены заглушки на имя пользователя и емаил. При необходимости убрать!
 		$model->manager_id = Yii::$app->user->id;
 		$model->created_by = Yii::$app->user->id;
 		$modelR = new CUserRequisites();
+
+		if($is_partner)
+		{
+			$model->partner_manager_id = Yii::$app->user->id;
+			$model->partner = AbstractActiveRecord::YES;
+		}
+
 		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
 
 			if($model->is_resident != CUser::RESIDENT_YES)

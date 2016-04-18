@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\components\behavior\partners\PartnerCuserServActionBehavior;
 use Yii;
+use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -131,17 +134,23 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function archive()
     {
         $this->setScenario(self::SCENARIO_ARCHIVE);
-        $this->callTriggerBeforeArchive();
-        if ($this->archive)
+        $tr = Yii::$app->db->beginTransaction();
+        try {
+            $this->callTriggerBeforeArchive();
+            if ($this->archive) {
+                $this->archive = self::NO;
+            } else {
+                $this->archive = self::YES;
+            }
+            if (!$this->save())
+                throw new ServerErrorHttpException();
+            $this->callTriggerAfterArchive();
+            $tr->commit();
+        }catch (Exception $e)
         {
-            $this->archive = self::NO;
-        }else{
-            $this->archive = self::YES;
+            $tr->rollBack();
         }
-        if(!$this->save())
-            throw new ServerErrorHttpException();
 
-        $this->callTriggerAfterArchive();
         return $this->archive;
     }
 
@@ -159,5 +168,16 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function callTriggerAfterArchive()
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVE);
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        $arParent =  parent::behaviors();
+        return ArrayHelper::merge($arParent,[
+            PartnerCuserServActionBehavior::className()
+        ]);
     }
 }

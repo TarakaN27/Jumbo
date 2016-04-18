@@ -234,6 +234,9 @@ return [
     'Partner link lead' => 'Связи партер - лид',
     'Add link' => 'Добавить связь',
     'Restore partner lead link' => 'Восстановить связь партнер - лид',
-    'Archive partner lead link' => 'Архивация связи партнер - лид'
+    'Archive partner lead link' => 'Архивация связи партнер - лид',
+    'At first you must unlink lead from partner' => 'Одна или несколько услуг используются в связях партнер - лид. 
+    Сначала вы должны удалить связь, а затем удалять услугу у партнера',
+    'Service successfully added to allow list' => 'Услуги успешно добавлены в список разрешенных'
 
 ];

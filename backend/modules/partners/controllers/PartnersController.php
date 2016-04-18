@@ -10,6 +10,9 @@ namespace backend\modules\partners\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\modules\partners\models\PartnerAllowForm;
+use backend\widgets\Alert;
+use common\models\AbstractActiveRecord;
 use common\models\CUser;
 use common\models\PartnerCuserServ;
 
@@ -19,6 +22,8 @@ use yii\data\ActiveDataProvider;
 use common\models\AbstractModel;
 use Exception;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class PartnersController extends AbstractBaseBackendController
 {
@@ -53,6 +58,11 @@ class PartnersController extends AbstractBaseBackendController
         ]);
     }
 
+    /**
+     * @param $pid
+     * @return string
+     * @throws \yii\db\Exception
+     */
     public function actionAddLink($pid)
     {
         $models =  [new PartnerCuserServ(['partner_id' => $pid])];
@@ -102,6 +112,70 @@ class PartnersController extends AbstractBaseBackendController
             'models' => $models,
             'select2Data' => $select2Data,
             'pid' => $pid
+        ]);
+    }
+
+    /**
+     * Арживация и восстановление связи партнер -- лид
+     * @return int
+     * @throws NotFoundHttpException
+     * @throws \yii\web\ServerErrorHttpException
+     */
+    public function actionArchive()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $date = Yii::$app->request->post('date');
+        $currentVal = Yii::$app->request->post('val');
+        /** @var  PartnerCuserServ $model */
+        $model = PartnerCuserServ::find()->where(['id' => $pk])->one();
+        if(!$model)
+            throw new NotFoundHttpException('Model not found');
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if($model->archive == $currentVal)
+        {
+            $model->archiveDate = $date;
+            return $model->archive();
+        }
+
+        return $model->archive;
+    }
+
+    /***
+     * @param $id
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionDelete($id)
+    {
+        $model = PartnerCuserServ::find()->where(['id' => $id])->one();
+        if(!$model)
+            throw new NotFoundHttpException('Model not found');
+        $model->delete();
+        return $this->redirect(['link-lead']);
+    }
+
+    public function actionAllowServices($id)
+    {
+        $obPartner = CUser::find()->where(['id' => $id,'partner' => AbstractActiveRecord::YES])->one();
+        if(!$obPartner)
+            throw new NotFoundHttpException('Partner not found');
+        $model = new PartnerAllowForm(['iPartnerID' => $obPartner->id]);
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            if($model->makeRequest())
+            {
+                Yii::$app->session->set(Alert::TYPE_SUCCESS,Yii::t('app/users','Service successfully added to allow list'));
+                return $this->redirect(['index']);
+            }else{
+                Yii::$app->session->set(Alert::TYPE_ERROR,Yii::t('app/users','Service successfully added to allow list'));
+                    
+            }
+        }
+        return $this->render('allow_services',[
+            'obPartner' => $obPartner,
+            'model' => $model
         ]);
     }
 

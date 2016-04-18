@@ -451,6 +451,22 @@ class CUser extends AbstractUser
     }
 
     /**
+     * @return ActiveQuery
+     */
+    public function getPartnerAllowServiceIds()
+    {
+        return $this->hasMany(PartnerAllowService::className(),['cuser_id' => 'id']);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getPartnerAllowServices()
+    {
+        return $this->hasMany(Services::className(), ['id' => 'service_id'])->viaTable(PartnerAllowService::tableName(), ['cuser_id' => 'id']);
+    }
+
+    /**
      * @return array
      */
     public function behaviors()

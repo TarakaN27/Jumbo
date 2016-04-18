@@ -23,7 +23,11 @@ $this->title = Yii::t('app/users','Partners')
                         Yii::$app->user->can('only_manager') ||
                         Yii::$app->user->can('only_jurist')
                     ):?>
-                        <?php echo \yii\helpers\Html::a(Yii::t('app/crm','Add_new_company'),['create'],['class'=>'btn btn-primary']);?>
+                        <?php echo \yii\helpers\Html::a(
+                            Yii::t('app/crm','Add_new_company'),
+                            ['/crm/company/create','is_partner' => \common\models\AbstractActiveRecord::YES],
+                            ['class'=>'btn btn-primary']
+                        );?>
                     <?php endif;?>
                 </section>
                 <div class = "clearfix"></div>
@@ -79,6 +83,10 @@ $this->title = Yii::t('app/users','Partners')
                                     [
                                         'title' => Yii::t('app/users','Partner link lids'),
                                         'href' => ['link-lead','pid' => $model->id]
+                                    ],
+                                    [
+                                        'title' => Yii::t('app/users','Partner allow services'),
+                                        'href' => ['allow-services','id' => $model->id]
                                     ]
                                 ];
                                 return \common\components\helpers\CustomHtmlHelper::dropDownSettings($arLinks);
