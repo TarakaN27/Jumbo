@@ -14,6 +14,7 @@ use backend\modules\partners\models\PartnerAllowForm;
 use backend\widgets\Alert;
 use common\models\AbstractActiveRecord;
 use common\models\CUser;
+use common\models\PartnerAllowService;
 use common\models\PartnerCuserServ;
 
 use common\models\search\CUserSearch;
@@ -24,9 +25,31 @@ use Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\filters\AccessControl;
 
 class PartnersController extends AbstractBaseBackendController
 {
+
+    /**
+     * переопределяем права на контроллер и экшены
+     * @return array
+     */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['admin','partner_manager']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
+
+
     /**
      * @return string
      */
@@ -67,6 +90,8 @@ class PartnersController extends AbstractBaseBackendController
     {
         $models =  [new PartnerCuserServ(['partner_id' => $pid])];
         $select2Data = [];
+
+        $arServMap = PartnerAllowService::getServicesMapForPartner($pid);   //get allow service for partner
 
         if(Yii::$app->request->post('PartnerCuserServ'))
         {
@@ -111,7 +136,8 @@ class PartnersController extends AbstractBaseBackendController
         return $this->render('add-link',[
             'models' => $models,
             'select2Data' => $select2Data,
-            'pid' => $pid
+            'pid' => $pid,
+            'arServMap' => $arServMap
         ]);
     }
 
@@ -152,7 +178,7 @@ class PartnersController extends AbstractBaseBackendController
         if(!$model)
             throw new NotFoundHttpException('Model not found');
         $model->delete();
-        return $this->redirect(['link-lead']);
+        return $this->redirect(['link-lead','pid' => $id]);
     }
 
     public function actionAllowServices($id)

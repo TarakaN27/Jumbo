@@ -113,7 +113,7 @@ $('.dynamicform_wrapper').on('afterInsert', function(e, item) {
                                             </div>
                                             <div class="col-sm-4">
                                                 <?= $form->field($model, "[{$i}]service_id")->dropDownList(
-                                                    \common\models\Services::getServicesMap(),
+                                                    $arServMap,
                                                     [
                                                         'prompt' => Yii::t('app/users','Choose service')
                                                     ]

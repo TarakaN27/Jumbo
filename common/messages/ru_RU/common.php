@@ -108,6 +108,8 @@ return [
     'MSG_ERROR_DEL' => 'Ошибка удаления сообщения',
     'MESSAGE' => 'Сообщение',
     'Update message' => 'Редактировать сообщение',
-    'Save' => 'Сохранить'
+    'Save' => 'Сохранить',
+    'Partner schemes serv group' => 'Группы партнерских схем',
+    'Partner schemes' => 'Партнерские схемы'
 
 ];

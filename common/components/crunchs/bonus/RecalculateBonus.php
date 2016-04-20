@@ -29,7 +29,10 @@ use Yii;
 
 class RecalculateBonus
 {
-
+	/**
+	 * @return bool
+	 * @throws \yii\web\NotFoundHttpException
+	 */
 	public function run()
 	{
 		$arPaymentsTmp = Payments::find()->all();
@@ -62,6 +65,21 @@ class RecalculateBonus
 			$obCount->countingSimpleBonus($pay,BonusScheme::BASE_PAYMENT);
 			$obCount->countingComplexBonus($pay,BonusScheme::BASE_PAYMENT);
 		}
+		echo 'done'.PHP_EOL;
+		return TRUE;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function recalculatePartnerBonus()
+	{
+		$arPaymentsTmp = Payments::find()->all();
+		$obCount = new PaymentBonusBehavior();
+
+		foreach ($arPaymentsTmp as $payment)
+			$obCount->countingPartnerBonus($payment);
+
 		echo 'done'.PHP_EOL;
 		return TRUE;
 	}

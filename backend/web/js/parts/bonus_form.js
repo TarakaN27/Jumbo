@@ -77,7 +77,12 @@ jQuery(document).ready(function(){
                 $('.ch_type3').removeClass('hide');
                 numMonth.removeAttr('disabled','disabled');
             }
-        }else{
+        }else if(type == B_TYPE_COMPLEX_PARTNER)
+        {
+            $('.type2,.type3,.type1').addClass('hide');
+            $('.type4').removeClass('hide');
+        }
+        else{
             $('.type1,.type2,.type3').addClass('hide');
             numMonth.removeAttr('disabled','disabled');
             numMonth.val('');

@@ -35,4 +35,15 @@ class RecalculateController extends AbstractConsoleController
         $obRecalc->run();
         return Controller::EXIT_CODE_NORMAL;
     }
+
+    /**
+     * Recalculate partner manager bonus
+     * @return int
+     */
+    public function actionBonusPartner()
+    {
+        $obRecalc = new RecalculateBonus();
+        $obRecalc->recalculatePartnerBonus();
+        return Controller::EXIT_CODE_NORMAL;
+    }
 }

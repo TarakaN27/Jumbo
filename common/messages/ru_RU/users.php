@@ -236,7 +236,22 @@ return [
     'Restore partner lead link' => 'Восстановить связь партнер - лид',
     'Archive partner lead link' => 'Архивация связи партнер - лид',
     'At first you must unlink lead from partner' => 'Одна или несколько услуг используются в связях партнер - лид. 
-    Сначала вы должны удалить связь, а затем удалять услугу у партнера',
-    'Service successfully added to allow list' => 'Услуги успешно добавлены в список разрешенных'
+    Сначала вы должны удалить связь, а затем удалить услугу у партнера',
+    'Service successfully added to allow list' => 'Услуги успешно добавлены в список разрешенных',
+    'Ranges' => 'Диапазоны',
+    'Min' => 'От',
+    'Max' => 'До',
+    'Percent' => 'Процент',
+    'Start Period' => 'Стартовый период',
+    'Regular Period' => 'Регулярный период',
+    'Legal' => 'Парметры Юр. лиц',
+    'Scheme currency' => 'Валюта схемы',
+    'Create Partner Schemes Services Group' => 'Добавить группу',
+    'Partner Schemes Services Groups' => 'Партнерские группы услуг',
+    'Partner schemes' => 'Партнерские схемы',
+    'Partner service group' => 'Группа партнерских услуг',
+    'Create Partner Schemes' => 'Добавить партнерскую схему',
+    'Partner services Group id' => 'Группа партнерских услуг',
+    'USER_role_partner_manager' => 'Менеджер по работе с партнерами'
 
 ];

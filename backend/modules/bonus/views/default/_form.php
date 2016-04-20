@@ -20,7 +20,8 @@ $this->registerJs('
     var
         B_TYPE_UNIT = '.BonusScheme::TYPE_UNITS.',
         B_TYPE_SIMPLE = '.BonusScheme::TYPE_SIMPLE_BONUS.',
-        B_TYPE_COMPLEX = '.BonusScheme::TYPE_COMPLEX_TYPE.';
+        B_TYPE_COMPLEX = '.BonusScheme::TYPE_COMPLEX_TYPE.',
+        B_TYPE_COMPLEX_PARTNER = '.BonusScheme::TYPE_COMPLEX_PARTNER.';
 ',\yii\web\View::POS_HEAD);
 ?>
 <div id="preloader">
@@ -48,7 +49,7 @@ $this->registerJs('
 
     <?php
         $options = [];
-        if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE]))
+        if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_COMPLEX_PARTNER]))
             $options['disabled'] = 'disabled';
         echo $form->field($model, 'num_month')->textInput($options) ?>
 
@@ -89,13 +90,13 @@ $this->registerJs('
             </div>
         <?php endforeach;?>
     </div>
-    <div class="type2 type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">
+    <div class="type2 type3 type4 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_PARTNER])? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>
             <div class="col-md-4 col-sm-4 col-xs-12">
                 <?=Html::tag('h4',$serv->name,['class' => 'weight-bold-title']);?>
                 <hr class="hr-green"/>
                 <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xs-12 ch_type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE])? '' : 'hide'?>" >
+                    <div class="col-md-12 col-sm-12 col-xs-12 ch_type3 <?= in_array($model->type,[BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_COMPLEX_PARTNER])? '' : 'hide'?>" >
                         <?=Html::tag('h4',Yii::t('app/bonus','Month percent'))?>
                         <hr/>
                         <div class="monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">

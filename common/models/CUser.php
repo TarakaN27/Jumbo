@@ -45,6 +45,7 @@ use yii\web\JsExpression;
  * @property integer $source_id
  * @property integer $partner
  * @property integer $partner_manager_id
+ * @property integer $partner_scheme
  */
 class CUser extends AbstractUser
 {
@@ -180,7 +181,8 @@ class CUser extends AbstractUser
             [[
                 'role','status','created_at',
                 'updated_at','manager_id','is_opened',
-                'created_by','contractor','allow_expense','manager_crc_id','source_id','partner','partner_manager_id'
+                'created_by','contractor','allow_expense','manager_crc_id','source_id','partner','partner_manager_id',
+                'partner_scheme'
             ],'integer'],
 
             [['password_hash','password_reset_token','email'],'string', 'max' => 255],
@@ -317,7 +319,8 @@ class CUser extends AbstractUser
             'statusStr' => Yii::t('app/users', 'Status'),
             'source_id' => Yii::t('app/users', 'Cuser source'),
             'partner' => Yii::t('app/users', 'It is partner'),
-            'partner_manager_id' => Yii::t('app/users', 'Partner manager')
+            'partner_manager_id' => Yii::t('app/users', 'Partner manager'),
+            'partner_scheme' => Yii::t('app/users','Partner scheme')
         ];
     }
 
@@ -467,6 +470,14 @@ class CUser extends AbstractUser
     }
 
     /**
+     * @return ActiveQuery
+     */
+    public function getPartnerScheme()
+    {
+        return $this->hasOne(PartnerSchemes::className(),['id' => 'partner_scheme']);
+    }
+
+    /**
      * @return array
      */
     public function behaviors()
@@ -547,7 +558,7 @@ class CUser extends AbstractUser
      */
     protected function getUniqID()
     {
-        return md5(uniqid('dummy').microtime());
+        return md5(uniqid('dummy',false).microtime());
     }
 
     /**
@@ -578,7 +589,7 @@ class CUser extends AbstractUser
         ]);
         return self::getDb()->cache(function() use ($model_id){
             return self::findOne($model_id);
-        },3600*24,$obDep);
+        },86400,$obDep);
     }
 
     /**
@@ -622,7 +633,7 @@ class CUser extends AbstractUser
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
                 ->notArchive()
                 ->all($db);
-        },3600*24,$dep);
+        },86400,$dep);
     }
 
     /**

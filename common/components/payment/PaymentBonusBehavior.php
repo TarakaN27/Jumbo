@@ -21,6 +21,7 @@ use common\models\CUserGroups;
 use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\PaymentsManager;
+use common\models\PartnerCuserServ;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
@@ -32,6 +33,7 @@ use common\models\AbstractActiveRecord;
 use backend\models\BUser;
 use common\models\CUser;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\web\NotAcceptableHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -69,6 +71,7 @@ class PaymentBonusBehavior extends Behavior
 		$iService = $model->service_id;   // ID услуги
 
 		$this->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
+		$this->countingPartnerBonus($model);
 
 		if($model->isSale && !empty($model->saleUser))  //если платеж является продажей
 		{
@@ -542,8 +545,7 @@ class PaymentBonusBehavior extends Behavior
 		$amount = $this->getAmount($model);
 		if(empty($amount))
 			return FALSE;
-		else
-			$amount = $amount*($percent/100);
+
 
 		if(is_array($obBServ->legal_person) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
 			isset($obBServ->legal_person[$model->legal_id]) &&
@@ -565,6 +567,9 @@ class PaymentBonusBehavior extends Behavior
 			}
 
 		}
+
+
+		$amount = $amount*($percent/100);
 
 		return $this->addBonus($saleUser,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //добавляем бонус
 	}
@@ -622,6 +627,7 @@ class PaymentBonusBehavior extends Behavior
 		$iService = $model->service_id;   // ID услуги
 
 		$this->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
+		$this->countingPartnerBonus($model);
 
 		if($model->isSale && !empty($model->saleUser))  //если платеж продажа
 		{
@@ -634,5 +640,175 @@ class PaymentBonusBehavior extends Behavior
 		}
 	}
 
+	/**
+	 * @param Payments $model
+	 * @return bool
+	 * @throws NotFoundHttpException
+	 * @throws ServerErrorHttpException
+	 */
+	public function countingPartnerBonus(Payments $model)
+	{
+		$arPartnersLead = PartnerCuserServ::find()		//get link partner - lead
+			->where(['cuser_id' => $model->cuser_id,'service_id' => $model->service_id])
+			->andWhere('archive IS NULL OR archive = 0')
+			->all();
 
+		if(empty($arPartnersLead))						//If links not found return FALSE
+			return FALSE;
+
+		$arPartnerIds = array_unique(ArrayHelper::getColumn($arPartnersLead,'partner_id'));
+
+		$arPartner = CUser::find()->select(['id','partner_manager'])->where(['id' => $arPartnerIds])->partner()->all();	//Get partner with managers
+		if(empty($arPartner))
+			return FALSE;
+
+		$arPartner = ArrayHelper::map($arPartner,'id','partner_manager');
+
+		foreach ($arPartnersLead as $lead)
+		{
+			if(!isset($arPartner[$lead->partner_id]))
+				continue;
+			$iManID = $arPartner[$lead->partner_id]; 	//Partner manager
+			/** @var BonusScheme $obScheme */
+			$obScheme = $this->getBonusSchemeForPartnerBonus($lead->cuser_id,$iManID);
+			if(empty($obScheme))
+				continue;
+
+			$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date,$model->service_id,$obScheme->id);    //получаем параметры схемы
+			if(empty($obBServ))
+				continue;
+
+			$arCuserGroups = [$lead->cuser_id];
+			if($obScheme->grouping_type == BonusScheme::GROUP_BY_CMP_GROUP)
+				$arCuserGroups = PaymentsManager::getUserByGroup($model->cuser_id);
+
+			$iMonNum = $this->getMonthFromFirstPayment($arCuserGroups,$model->pay_date);	//Month number from first payment by Cuser
+			if(empty($iMonNum))
+				continue;
+
+			$percent = $this->getPercentByMonthNumber($obBServ,$iMonNum);				//Percent for manager by month number
+
+			if(empty($percent))
+				continue;
+
+			$amount = $this->getAmount($model);		//Get amount for counting bonus
+			$amount = $this->getAmountWithoutTaxForLegalPerson($obBServ,$model->legal_id,$model->cuser_id,$amount);		//Get amount without tax if need
+
+			$amount = $amount*($percent/100);		//Counting percent
+
+			return $this->addBonus($iManID,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount);  //Add bonus for partner manager
+		}
+
+		return TRUE;
+	}
+
+	/**
+	 * @param $iCuserID
+	 * @param $iManID
+	 * @return mixed
+	 */
+	protected function getBonusSchemeForPartnerBonus($iCuserID,$iManID)
+	{
+		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$iCuserID]);	//схемы искллючения для пользователя
+		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя с заднной компанией.
+		->joinWith('cuserID')
+			->joinWith('usersID')
+			->where([
+				BonusScheme::tableName().'.type' => BonusScheme::TYPE_COMPLEX_PARTNER,
+				BonusSchemeToBuser::tableName().'.buser_id' => $iManID,
+				BonusSchemeToCuser::tableName().'.cuser_id' => $iCuserID,
+			]);
+		if(!empty($arExcept))
+			$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$arExcept]);
+		$obScheme = $obScheme->orderBy([BonusScheme::tableName().'.updated_at' => SORT_DESC])->one();
+
+		if(!$obScheme) {
+			$obScheme = BonusScheme::find()//получаем схему бонуса для пользователя.
+				->joinWith('cuserID')
+				->joinWith('usersID')
+				->where([
+					BonusScheme::tableName() . '.type' => BonusScheme::TYPE_COMPLEX_PARTNER,
+					BonusSchemeToBuser::tableName() . '.buser_id' => $iManID,
+				])
+				->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL');
+			if (!empty($arExcept))
+				$obScheme->andWhere(['NOT IN', BonusScheme::tableName().'.id', $arExcept]);
+			$obScheme = $obScheme->orderBy([BonusScheme::tableName() . '.updated_at' => SORT_DESC])->one();
+		}
+
+		return $obScheme;
+	}
+
+	/**
+	 * @param array $arCuser
+	 * @param $iPayDate
+	 * @return int
+	 */
+	protected function getMonthFromFirstPayment(array $arCuser,$iPayDate)
+	{
+		$iPayDate = is_numeric($iPayDate) ? $iPayDate : strtotime($iPayDate);
+		$obPayment = Payments::find()
+			->select(['id','pay_date'])
+			->where(['cuser_id' => $arCuser])
+			->andWhere('pay_date < :iPayDate')
+			->params([':iPayDate' => $iPayDate])
+			->orderBy(['pay_date' => SORT_ASC])
+			->one();
+
+		if(!$obPayment)
+			return 1;
+
+		$date1 = new \DateTime();
+		$date1->setTimestamp($iPayDate);
+		$date2 = new \DateTime();
+		$date2->setTimestamp($obPayment->pay_date);
+		$interval = $date1->diff($date2);
+		unset($date1,$date2);
+		return ((int)$interval->m)+1;    //вренем разницу в месяцах между двумя датами
+
+	}
+
+	/**
+	 * @param $obBServ
+	 * @param $iMonNum
+	 * @return mixed|null
+	 */
+	protected function getPercentByMonthNumber($obBServ,$iMonNum)
+	{
+		$percent = NULL;
+		if(is_array($obBServ->month_percent) && isset($obBServ->month_percent[$iMonNum]) && !empty($obBServ->month_percent[$iMonNum]))
+			$percent = $obBServ->month_percent[$iMonNum];
+		return $percent;
+	}
+
+	/**
+	 * @param $obBServ
+	 * @param $iLegalID
+	 * @param $iCuserID
+	 * @param $amount
+	 * @return float
+	 * @throws NotFoundHttpException
+	 */
+	protected function getAmountWithoutTaxForLegalPerson($obBServ,$iLegalID,$iCuserID,$amount)
+	{
+		if(is_array($obBServ->legal_person) &&
+			isset($obBServ->legal_person[$iLegalID],$obBServ->legal_person[$iLegalID]['deduct']) &&
+			$obBServ->legal_person[$iLegalID]['deduct'] == 1)
+		{
+			$obCuser = CUser::find()->select(['id','is_resident'])->where(['id' => $iCuserID])->one();	//пользователь
+			if(!$obCuser)
+				throw  new NotFoundHttpException();
+
+			$key = $obCuser->is_resident ? 'res' : 'not_res';
+			if(isset($obBServ->legal_person[$iLegalID][$key]))
+			{
+				$tax = NULL;
+				if(isset($obBServ->legal_person[$iLegalID][$key.'_tax']) && is_numeric($obBServ->legal_person[$iLegalID][$key.'_tax']))
+					$tax = $obBServ->legal_person[$iLegalID][$key.'_tax'];
+
+				$amount = CustomHelper::getVatMountByAmount($amount,$tax); //отнимем от суммы платежа налог
+			}
+		}
+		return $amount;
+	}
 }

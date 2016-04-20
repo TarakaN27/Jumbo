@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%partner_allow_service}}".
@@ -61,5 +62,15 @@ class PartnerAllowService extends AbstractActiveRecordWTB
     public function getCuser()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cuser_id']);
+    }
+
+    /**
+     * @param $ID
+     * @return array
+     */
+    public static function getServicesMapForPartner($ID)
+    {
+        $arServices = self::find()->with('service')->where(['cuser_id' => $ID])->all();
+        return ArrayHelper::map($arServices,'service_id','service.name');
     }
 }

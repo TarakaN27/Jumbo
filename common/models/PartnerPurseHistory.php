@@ -22,6 +22,10 @@ use Yii;
  */
 class PartnerPurseHistory extends AbstractActiveRecord
 {
+    CONST
+        TYPE_INCOMING = 5,
+        TYPE_EXPENSE =10;
+
     /**
      * @inheritdoc
      */

@@ -29,6 +29,9 @@ class UserRoleRule extends Rule{
             case 'admin':
                 return $role == User::ROLE_SUPERADMIN || $role == User::ROLE_ADMIN;
                 break;
+            case 'partner_manager':
+                return $role == User::ROLE_PARTNER_MANAGER || $role == User::ROLE_MANAGER;
+                break;
             case 'moder':
                 return $role == User::ROLE_MANAGER;
                 break;
@@ -47,6 +50,7 @@ class UserRoleRule extends Rule{
                     $role == User::ROLE_ADMIN ||
                     $role == User::ROLE_BOOKKEEPER ||
                     $role == User::ROLE_MANAGER ||
+                    $role == User::ROLE_PARTNER_MANAGER ||
                     $role == User::ROLE_USER ||
                     $role == User::ROLE_JURIST ||
                     $role == User::ROLE_E_MARKETER;

@@ -281,5 +281,5 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     height: 2px; /* Толщина линии */
 }
 .wm-select-2-style .select2-selection{  height: 34px;  }
-.archive-btn{cursor: pointer;}
+.archive-btn,.addRange,.removeRange{cursor: pointer;}
 .daterangepicker{ z-index: 9999999999}

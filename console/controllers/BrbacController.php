@@ -53,6 +53,9 @@ class BrbacController extends AbstractConsoleController {
 		$onlyManager = $auth->createPermission('only_manager');
 		$onlyManager->description = 'Только для менеджера';
 
+		$onlyPartnerManager = $auth->createPermission('onlyPartnerManager');
+		$onlyPartnerManager->description = 'Только для менеджера по партнерам';
+
 		$adminRights = $auth->createPermission('adminRights');
 		$adminRights->description = 'Админские права';
 
@@ -75,6 +78,7 @@ class BrbacController extends AbstractConsoleController {
         $auth->add($rightdForAll);
 		$auth->add($onlyJurist);
 		$auth->add($onlyEMarketer);
+		$auth->add($onlyPartnerManager);
 
 		$this->stdout('OK'. PHP_EOL, Console::FG_GREEN);
 
@@ -111,6 +115,13 @@ class BrbacController extends AbstractConsoleController {
 		$moder->description = 'Модератор';
 		$moder->ruleName = $rule->name;
 		$auth->add($moder);
+
+
+		//partnerManager
+		$partnerManager = $auth->createRole('partner_manager');
+		$partnerManager->description = 'Менеджер по работе с партнерами';
+		$partnerManager->ruleName = $rule->name;
+		$auth->add($partnerManager);
 
         //moder
         $bookkeeper = $auth->createRole('bookkeeper');
@@ -151,6 +162,12 @@ class BrbacController extends AbstractConsoleController {
 		$auth->addChild($moder, $user);
 		$auth->addChild($moder, $onlyManager);
 		$auth->addChild($moder, $rightdForAll);
+
+		//partnerManager
+		$auth->addChild($partnerManager, $user);
+		$auth->addChild($partnerManager, $onlyManager);
+		$auth->addChild($partnerManager, $rightdForAll);
+		$auth->addChild($partnerManager, $onlyPartnerManager);
 
 		//admin
 		$auth->addChild($admin, $user);

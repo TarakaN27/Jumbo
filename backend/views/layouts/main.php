@@ -370,7 +370,9 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <li><a>
+                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('onlyPartnerManager')):?>
+                                <li>
+                                    <a>
                                         <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'Partners'); ?>
                                         <span class="fa fa-chevron-down"></span>
                                     </a>
@@ -379,9 +381,20 @@ $menuItems[] = [
                                             <a href="<?= Url::to(['/partners/partners/index']); ?>">
                                                 <?php echo Yii::t('app/common', 'Partner'); ?>
                                             </a>
-                                        </li>
+                                         </li>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('onlyPartnerManager')):?>
+                                            <li>
+                                                <a href="<?= Url::to(['/partners/partner-schemes/index']); ?>">
+                                                    <?php echo Yii::t('app/common', 'Partner schemes'); ?>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common', 'Partner schemes serv group'),['/partners/partner-schemes-serv-group/index']);?>
+                                            </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
+                                <?php endif;?>
                             </ul>
                         </div>
                     </div>

@@ -19,6 +19,7 @@ use yii\web\ServerErrorHttpException;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $archive
+ * @property integer $st_period_checked
  *
  * @property CUser $cuser
  * @property CUser $partner
@@ -50,7 +51,7 @@ class PartnerCuserServ extends AbstractActiveRecord
     {
         return [
             [['partner_id', 'cuser_id', 'service_id'], 'required','except' => self::SCENARIO_ARCHIVE],
-            [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive'], 'integer'],
+            [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive','st_period_checked'], 'integer'],
             [['connect','archiveDate'], 'safe'],
             [['service_id','cuser_id'],'uniqueValid','except' => self::SCENARIO_ARCHIVE],
             [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
@@ -73,6 +74,7 @@ class PartnerCuserServ extends AbstractActiveRecord
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'archive' => Yii::t('app/users', 'Archive'),
+            'st_period_checked' => Yii::t('app/users', 'Start period checked')
         ];
     }
 

@@ -25,13 +25,14 @@ use yii\helpers\Json;
 class BonusScheme extends AbstractActiveRecord
 {
     CONST
-        BASE_PAYMENT = 0,   //counting bonus by each payment
-        BASE_SALE = 1,      //counting bonus by each sale
-        TYPE_UNITS = 1,         //тип бонусной схемы unit
-        TYPE_SIMPLE_BONUS =2,   //тип бонусной схемы бонусы за продажи(для аккаунтеров)
-        TYPE_COMPLEX_TYPE = 3,  //комплексный тип (для АНТОНА!)
-        GROUP_BY_COMPANY = 1,   //группировка платежей по одной компании
-        GROUP_BY_CMP_GROUP =2;  //группировка платежей по группе компаний
+        BASE_PAYMENT = 0,           //counting bonus by each payment
+        BASE_SALE = 1,              //counting bonus by each sale
+        TYPE_UNITS = 1,             //тип бонусной схемы unit
+        TYPE_SIMPLE_BONUS =2,       //тип бонусной схемы бонусы за продажи(для аккаунтеров)
+        TYPE_COMPLEX_TYPE = 3,      //комплексный тип (для АНТОНА!)
+        TYPE_COMPLEX_PARTNER = 4,   //комплексный тип для менеджеров партнеров
+        GROUP_BY_COMPANY = 1,       //группировка платежей по одной компании
+        GROUP_BY_CMP_GROUP =2;      //группировка платежей по группе компаний
 
     /**
      * @return array
@@ -81,7 +82,8 @@ class BonusScheme extends AbstractActiveRecord
         return [
             self::TYPE_UNITS => Yii::t('app/bonus','Type units'),
             self::TYPE_SIMPLE_BONUS => Yii::t('app/bonus','Type simple bonus'),
-            self::TYPE_COMPLEX_TYPE => Yii::t('app/bonus','Type complex')
+            self::TYPE_COMPLEX_TYPE => Yii::t('app/bonus','Type complex'),
+            self::TYPE_COMPLEX_PARTNER => Yii::t('app/bonus','Type complex partner'),
         ];
 
     }

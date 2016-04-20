@@ -502,6 +502,27 @@ class CustomHelper {
         return $obDate->getTimestamp();
     }
 
+    /**
+     * Получет массив, собирает массив где ключи переменная массива, а значение - само занчение массива
+     * @param array $array
+     * @param $attribute
+     * @return array
+     */
+    public static function getMapObjectByAttribute(array $array,$attribute)
+    {
+        if(count($array) === 0)
+            return [];
+
+        $arResult = [];
+        foreach ($array as $item)
+        {
+            $key = is_object($item) ? $item->$attribute : $item[$attribute];
+            $arResult[$key] = $item;
+        }
+        return $arResult;
+    }
+    
+
 
 
 }

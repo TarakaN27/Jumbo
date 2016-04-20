@@ -43,6 +43,7 @@ class BUser extends AbstractUser
         ROLE_E_MARKETER = 6,
         ROLE_JURIST = 7,
         ROLE_MANAGER = 10,
+        ROLE_PARTNER_MANAGER = 11,
         ROLE_BOOKKEEPER = 15,
         ROLE_ADMIN = 20,
         ROLE_SUPERADMIN = 25,
@@ -70,7 +71,8 @@ class BUser extends AbstractUser
             self::ROLE_ADMIN => Yii::t('app/users','USER_role_admin'),
             self::ROLE_SUPERADMIN => Yii::t('app/users','USER_role_superadmin'),
             self::ROLE_JURIST => Yii::t('app/users','USER_role_jurist'),
-            self::ROLE_E_MARKETER => Yii::t('app/users','USER_role_e_marketer')
+            self::ROLE_E_MARKETER => Yii::t('app/users','USER_role_e_marketer'),
+            self::ROLE_PARTNER_MANAGER => Yii::t('app/users','USER_role_partner_manager')
         ];
     }
 
