@@ -11,6 +11,7 @@ namespace console\controllers;
 
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\Payment\RecalcQuantityHours;
+use common\components\partners\PartnerPercentCounting;
 use console\components\AbstractConsoleController;
 use yii\console\Controller;
 
@@ -44,6 +45,17 @@ class RecalculateController extends AbstractConsoleController
     {
         $obRecalc = new RecalculateBonus();
         $obRecalc->recalculatePartnerBonus();
+        return Controller::EXIT_CODE_NORMAL;
+    }
+
+    /**
+     * @param $date
+     * @return int
+     */
+    public function actionCountingPartnerPercent($date)
+    {
+        $obCalc = new PartnerPercentCounting();
+        $obCalc->countPercentByMonth($date);
         return Controller::EXIT_CODE_NORMAL;
     }
 }
