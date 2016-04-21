@@ -30,10 +30,10 @@ class UserRoleRule extends Rule{
                 return $role == User::ROLE_SUPERADMIN || $role == User::ROLE_ADMIN;
                 break;
             case 'partner_manager':
-                return $role == User::ROLE_PARTNER_MANAGER || $role == User::ROLE_MANAGER;
+                return $role == User::ROLE_PARTNER_MANAGER ;
                 break;
             case 'moder':
-                return $role == User::ROLE_MANAGER;
+                return $role == User::ROLE_MANAGER || $role == User::ROLE_PARTNER_MANAGER;
                 break;
             case 'bookkeeper':
                 return $role == User::ROLE_BOOKKEEPER;

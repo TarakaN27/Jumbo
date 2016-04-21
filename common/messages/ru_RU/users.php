@@ -252,6 +252,13 @@ return [
     'Partner service group' => 'Группа партнерских услуг',
     'Create Partner Schemes' => 'Добавить партнерскую схему',
     'Partner services Group id' => 'Группа партнерских услуг',
-    'USER_role_partner_manager' => 'Менеджер по работе с партнерами'
+    'USER_role_partner_manager' => 'Менеджер по работе с партнерами',
+    'Partner link lids' => 'Лиды партнера',
+    'Partner allow services' => 'Разрешенные услуги',
+    'Partner leads' => 'Лиды партнера',
+    'Start period checked' => 'Стартовый период пройден',
+    'Begin date must be less than end date' => 'Начальная дата должна меньше конечной даты',
+    'Begin date' => 'Начальная дата',
+    'End date' => 'Конечная дата'
 
 ];

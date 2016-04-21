@@ -40,7 +40,13 @@ $this->title = Yii::t('app/users','Partners')
                     'filterModel' => $searchModel,
                     'filterSelector' => 'select[name="per-page"]',
                     'columns' => [
-                        'id',
+                        [
+                            'attribute' => 'id',
+                            'format' => 'raw',
+                            'value' => function($model){
+                                return Html::a($model->id,['view'],['class'=>'link-upd']);
+                            }
+                        ],
                         [
                             'attribute' => 'corp_name',
                             'label' => Yii::t('app/users','Partner'),
@@ -94,12 +100,18 @@ $this->title = Yii::t('app/users','Partners')
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{view}{update}'
+                            'template' => '{view}{update}',
+                            'buttons' => [
+                                'update' => function ($url, $model) {
+
+                                    $url = \yii\helpers\Url::to(['/crm/company/update','id' => $model->id]);
+
+                                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                                        'title' => Yii::t('app', 'Update'),
+                                    ]);
+                                }
+                            ],
                         ],
-                        [
-                            'class' => 'yii\grid\ActionColumn',
-                            'template' => '{delete}'
-                        ]
                     ]
                     
                     //'columns' => $columns

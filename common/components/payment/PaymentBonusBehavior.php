@@ -658,11 +658,11 @@ class PaymentBonusBehavior extends Behavior
 
 		$arPartnerIds = array_unique(ArrayHelper::getColumn($arPartnersLead,'partner_id'));
 
-		$arPartner = CUser::find()->select(['id','partner_manager'])->where(['id' => $arPartnerIds])->partner()->all();	//Get partner with managers
+		$arPartner = CUser::find()->select(['id','partner_manager_id'])->where(['id' => $arPartnerIds])->partner()->all();	//Get partner with managers
 		if(empty($arPartner))
 			return FALSE;
 
-		$arPartner = ArrayHelper::map($arPartner,'id','partner_manager');
+		$arPartner = ArrayHelper::map($arPartner,'id','partner_manager_id');
 
 		foreach ($arPartnersLead as $lead)
 		{

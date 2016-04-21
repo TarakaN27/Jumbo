@@ -28,7 +28,7 @@ return [
         'type' => 2,
         'description' => 'Только для емаил маркетолага',
     ],
-    'onlyPartnerManager' => [
+    'only_partner_manager' => [
         'type' => 2,
         'description' => 'Только для менеджера по партнерам',
     ],
@@ -72,10 +72,11 @@ return [
         'description' => 'Менеджер по работе с партнерами',
         'ruleName' => 'userRole',
         'children' => [
+            'only_partner_manager',
             'user',
+            'moder',
             'only_manager',
             'forAll',
-            'onlyPartnerManager',
         ],
     ],
     'bookkeeper' => [

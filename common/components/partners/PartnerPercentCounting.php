@@ -304,7 +304,8 @@ class PartnerPercentCounting
                 $payment->id,
                 '',
                 time(),
-                time()
+                time(),
+                $percent[$payment->service_id]
             ];
 
             $fullAmount+=$amount;

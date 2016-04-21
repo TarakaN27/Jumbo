@@ -320,7 +320,8 @@ class CUser extends AbstractUser
             'source_id' => Yii::t('app/users', 'Cuser source'),
             'partner' => Yii::t('app/users', 'It is partner'),
             'partner_manager_id' => Yii::t('app/users', 'Partner manager'),
-            'partner_scheme' => Yii::t('app/users','Partner scheme')
+            'partner_scheme' => Yii::t('app/users','Partner scheme'),
+            'info' => Yii::t('app/users','Corp name'),
         ];
     }
 

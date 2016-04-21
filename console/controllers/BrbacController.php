@@ -53,7 +53,7 @@ class BrbacController extends AbstractConsoleController {
 		$onlyManager = $auth->createPermission('only_manager');
 		$onlyManager->description = 'Только для менеджера';
 
-		$onlyPartnerManager = $auth->createPermission('onlyPartnerManager');
+		$onlyPartnerManager = $auth->createPermission('only_partner_manager');
 		$onlyPartnerManager->description = 'Только для менеджера по партнерам';
 
 		$adminRights = $auth->createPermission('adminRights');
@@ -164,10 +164,11 @@ class BrbacController extends AbstractConsoleController {
 		$auth->addChild($moder, $rightdForAll);
 
 		//partnerManager
+		$auth->addChild($partnerManager, $onlyPartnerManager);
 		$auth->addChild($partnerManager, $user);
+		$auth->addChild($partnerManager,$moder);
 		$auth->addChild($partnerManager, $onlyManager);
 		$auth->addChild($partnerManager, $rightdForAll);
-		$auth->addChild($partnerManager, $onlyPartnerManager);
 
 		//admin
 		$auth->addChild($admin, $user);

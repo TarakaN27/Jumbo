@@ -11,6 +11,7 @@ namespace backend\modules\partners\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\modules\partners\models\PartnerAllowForm;
+use backend\modules\partners\models\PartnerDetailLeadsForm;
 use backend\widgets\Alert;
 use common\models\AbstractActiveRecord;
 use common\models\CUser;
@@ -19,9 +20,11 @@ use common\models\PartnerCuserServ;
 
 use common\models\search\CUserSearch;
 use Yii;
+use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
 use common\models\AbstractModel;
 use Exception;
+use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -181,6 +184,12 @@ class PartnersController extends AbstractBaseBackendController
         return $this->redirect(['link-lead','pid' => $id]);
     }
 
+    /**
+     * @param $id
+     * @return string|Response
+     * @throws NotFoundHttpException
+     * @throws InvalidParamException
+     */
     public function actionAllowServices($id)
     {
         $obPartner = CUser::find()->where(['id' => $id,'partner' => AbstractActiveRecord::YES])->one();
@@ -202,6 +211,52 @@ class PartnersController extends AbstractBaseBackendController
         return $this->render('allow_services',[
             'obPartner' => $obPartner,
             'model' => $model
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     * @throws InvalidParamException
+     */
+    public function actionView($id)
+    {
+        $obPartner = CUser::find()->with('requisites','manager','partnerManager')->where(['id' => $id,'partner' => AbstractActiveRecord::YES])->one();
+        if(!$obPartner)
+            throw new NotFoundHttpException('Partner not found');
+
+        $arLeadsProvider = new ActiveDataProvider([
+            'query' => PartnerCuserServ::find()->with('partner','cuser','service')->where(['partner_id' => $id]),
+            'pagination' => [
+                'pageSize' => -1,
+            ],
+        ]);
+
+        return $this->render('view',[
+            'obPartner' => $obPartner,
+            'arLeadsProvider' => $arLeadsProvider,
+            'pid' => $id
+        ]);
+    }
+
+    public function actionViewLeadDetail($pid)
+    {
+        $obPartner = CUser::find()->where(['id' => $pid,'partner' => AbstractActiveRecord::YES])->one();
+        if(!$obPartner)
+            throw new NotFoundHttpException('Partner not found');
+        
+        $model = new PartnerDetailLeadsForm(['obPartner' => $obPartner]);
+
+        $data = [];
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            $data = $model->makeRequest();
+        }
+
+        return $this->render('view-lead-detail',[
+            'model' => $model,
+            'data' => $data
         ]);
     }
 

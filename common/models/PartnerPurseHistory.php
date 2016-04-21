@@ -15,6 +15,7 @@ use Yii;
  * @property integer $expense_id
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $percent
  *
  * @property Expense $expense
  * @property CUser $cuser
@@ -42,7 +43,7 @@ class PartnerPurseHistory extends AbstractActiveRecord
         return [
             [['cuser_id', 'amount'], 'required'],
             [['cuser_id', 'type', 'payment_id', 'expense_id', 'created_at', 'updated_at'], 'integer'],
-            [['amount'], 'number'],
+            [['amount','percent'], 'number'],
             [['expense_id'], 'exist', 'skipOnError' => true, 'targetClass' => Expense::className(), 'targetAttribute' => ['expense_id' => 'id']],
             [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id']],
             [['payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payments::className(), 'targetAttribute' => ['payment_id' => 'id']],
@@ -63,6 +64,7 @@ class PartnerPurseHistory extends AbstractActiveRecord
             'expense_id' => Yii::t('app/users', 'Expense ID'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'percent' => Yii::t('app/users','Percent')
         ];
     }
 
