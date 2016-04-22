@@ -697,6 +697,31 @@ class CUser extends AbstractUser
         return ArrayHelper::map($models,'id','infoWithSite');
     }
 
+    /**
+     * @param array $ids
+     * @return array
+     */
+    public static function getInfoByIds(array $ids)
+    {
+        $query = self::find()
+            ->select([
+                'c.id',
+                'c.requisites_id',
+                'r.id as rid',
+                'c.type',
+                'r.j_lname',
+                'r.j_fname',
+                'r.j_mname',
+                'r.corp_name',
+                'r.site'
+            ])
+            ->alias('c')
+            ->joinWith('requisites r')
+            ->where(['c.id' => $ids])
+            ->all();
+        return ArrayHelper::map($query,'id','infoWithSite');
+    }
+
 }
 
 /**

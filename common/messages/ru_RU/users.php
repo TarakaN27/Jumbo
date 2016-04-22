@@ -263,6 +263,15 @@ return [
     'Partner archive date' => 'Дата архивации партнера',
     'Choose partner schemes' => 'Выбрать парнерскую схему',
     'Partner scheme' => 'Партнерская схема',
-    'Partner purse not exists.' => 'У партнера пока нет кошелька'
+    'Partner purse not exists.' => 'У партнера пока нет кошелька',
+    'Partner detail' => 'Детали партнера',
+    'Amount partner purse' => 'Сумма начисленных процентов',
+    'Withdrawal partner purse' => 'Сумма выплаченных средств',
+    'Amount available partner purse' => 'Сумма доступных средств для вывода',
+    'Partner purse' => 'Партнерский кошелёк',
+    'View detail lead statistic' => 'Детальная статистика по лидам',
+    'Payment ID' => 'Платеж',
+    'Amount' => 'Сумма'
+
 
 ];

@@ -6,6 +6,7 @@
  * Time: 10.35
  */
 use yii\helpers\Html;
+$this->title = Yii::t('app/users',Yii::t('app/users','Partner detail'))
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -58,6 +59,13 @@ use yii\helpers\Html;
                                 'id',
                                 'amount:decimal',
                                 'withdrawal:decimal',
+                                'availableAmount:decimal',
+                                /*
+                                [
+                                    'label' => Yii::t('app/users','Amount available partner purse'),
+                                    'value' => Yii::$app->formatter->as
+                                ],
+                                */
                                 'created_at:datetime',
                                 'updated_at:datetime'
                             ]

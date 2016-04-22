@@ -48,10 +48,11 @@ class PartnerPurse extends AbstractActiveRecord
         return [
             'id' => Yii::t('app/users', 'ID'),
             'cuser_id' => Yii::t('app/users', 'Cuser ID'),
-            'amount' => Yii::t('app/users', 'Amount'),
-            'withdrawal' => Yii::t('app/users', 'Withdrawal'),
+            'amount' => Yii::t('app/users', 'Amount partner purse'),
+            'withdrawal' => Yii::t('app/users', 'Withdrawal partner purse'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'availableAmount' => Yii::t('app/users','Amount available partner purse')
         ];
     }
 
@@ -61,5 +62,13 @@ class PartnerPurse extends AbstractActiveRecord
     public function getCuser()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cuser_id']);
+    }
+
+    /**
+     * @return float
+     */
+    public function getAvailableAmount()
+    {
+        return (float)$this->amount -(float)$this->withdrawal;
     }
 }
