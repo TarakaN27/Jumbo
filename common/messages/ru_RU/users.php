@@ -259,6 +259,10 @@ return [
     'Start period checked' => 'Стартовый период пройден',
     'Begin date must be less than end date' => 'Начальная дата должна меньше конечной даты',
     'Begin date' => 'Начальная дата',
-    'End date' => 'Конечная дата'
+    'End date' => 'Конечная дата',
+    'Partner archive date' => 'Дата архивации партнера',
+    'Choose partner schemes' => 'Выбрать парнерскую схему',
+    'Partner scheme' => 'Партнерская схема',
+    'Partner purse not exists.' => 'У партнера пока нет кошелька'
 
 ];

@@ -39,13 +39,34 @@ use yii\helpers\Html;
                             'attribute' => 'partner_manager_id',
                             'value' => is_object($obPMan = $obPartner->partnerManager) ? $obPMan->getFio() : NULL
                         ],
+                        [
+                            'attribute' => 'partner_scheme',
+                            'value' => is_object($obPSch = $obPartner->partnerScheme) ? $obPSch->name : NULL
+                        ],
                         'contractor:boolean',
                         'allow_expense:boolean',
                         'is_resident:boolean',
                         'r_country',
-
                     ]
                 ])?>
+                <?=Html::tag('h4',Yii::t('app/users','Partner purse'))?>
+                <?php
+                    if(is_object($obPurse))
+                        echo \yii\widgets\DetailView::widget([
+                            'model' => $obPurse,
+                            'attributes' => [
+                                'id',
+                                'amount:decimal',
+                                'withdrawal:decimal',
+                                'created_at:datetime',
+                                'updated_at:datetime'
+                            ]
+                        ]);
+                    else
+                        echo Yii::t('app/users','Partner purse not exists.')
+                    ?>
+
+
                 <?=Html::tag('h4',Yii::t('app/users','Partner leads'))?>
                 <?php echo \yii\grid\GridView::widget([
                     'dataProvider' => $arLeadsProvider,

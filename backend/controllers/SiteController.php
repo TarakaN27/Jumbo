@@ -10,6 +10,7 @@ use common\components\crunchs\Payment\RecalcPayment;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
+use common\components\partners\PartnerPercentCounting;
 use common\models\BuserInviteCode;
 use Gears\Pdf;
 use Yii;
@@ -100,9 +101,17 @@ class SiteController extends Controller
 
 
         //перерассчет бонусов
-        
+        /*
         $obBonus = new RecalculateBonus();
-        $obBonus->run();
+        $obBonus->recalculatePartnerBonus();
+        */
+
+        /*
+        $obCalc = new PartnerPercentCounting();
+        $obCalc->countPercentByMonth('01-04-2016');
+        */
+        
+       
         die;
     }
 

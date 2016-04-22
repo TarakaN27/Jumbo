@@ -65,6 +65,7 @@ class CUser extends AbstractUser
 
     public
         $isNew = FALSE,
+        $partner_archive_date = NULL,
         $password;
 
 
@@ -269,7 +270,7 @@ class CUser extends AbstractUser
             ['allow_expense','default','value' => AbstractActiveRecord::NO],
             ['partner','default','value' => AbstractActiveRecord::NO],
 
-            ['partner_manager_id','required',
+            [['partner_manager_id','partner_scheme'],'required',
                 'when' => function($model){
                     if($this->partner)
                         return TRUE;
@@ -280,7 +281,8 @@ class CUser extends AbstractUser
                         return $('#cuser-partner').prop('checked');   
                     }
                 ")
-            ]
+            ],
+            ['partner_archive_date','date','format' => 'php:d.m.Y']
 
         ];
     }
@@ -322,6 +324,7 @@ class CUser extends AbstractUser
             'partner_manager_id' => Yii::t('app/users', 'Partner manager'),
             'partner_scheme' => Yii::t('app/users','Partner scheme'),
             'info' => Yii::t('app/users','Corp name'),
+            'partner_archive_date' => Yii::t('app/users','Partner archive date')
         ];
     }
 
@@ -476,6 +479,14 @@ class CUser extends AbstractUser
     public function getPartnerScheme()
     {
         return $this->hasOne(PartnerSchemes::className(),['id' => 'partner_scheme']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPartnerPurse()
+    {
+        return $this->hasOne(PartnerPurse::className(),['cuser_id' => 'id']);
     }
 
     /**

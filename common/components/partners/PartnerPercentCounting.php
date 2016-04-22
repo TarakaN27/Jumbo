@@ -109,7 +109,7 @@ class PartnerPercentCounting
         $query = PartnerSchemes::find()
             ->alias('ps')
             ->joinWith('partnerSchemesServices p')
-            ->where(['ps' => $arSchemes])
+            ->where(['ps.id' => $arSchemes])
             ->all();
         
         if(empty($query))
@@ -127,6 +127,7 @@ class PartnerPercentCounting
         return PartnerCuserServ::find()
             ->select(['service_id','cuser_id','connect'])
             ->where(['partner_id' => $iPartnerId])
+            ->andWhere('archive is NULL or archive = 0')
             ->all();
     }
 
@@ -149,7 +150,7 @@ class PartnerPercentCounting
             foreach ($leads as $lead) {
                 $query = (new Query())
                     ->from(Payments::tableName())
-                    ->select(['id', 'pay_date', 'pay_summ', 'service_id','currency_id','legal_id'])
+                    ->select(['id', 'pay_date', 'pay_summ', 'service_id','currency_id','legal_id','cuser_id'])
                     ->where(['cuser_id' => $lead->cuser_id, 'service_id' => $lead->service_id])
                     ->andWhere('pay_date >= :beginMonth AND pay_date <=:endMonth AND pay_date >= :connect')
                     ->params([
@@ -177,17 +178,18 @@ class PartnerPercentCounting
     {
         foreach ($arPayments as &$payment)
         {
-            $date = date('Y-m-d',$payment->pay_date);
-            $currency = $payment->currency_id;
+            $date = date('Y-m-d',$payment['pay_date']);
+            $currency = $payment['currency_id'];
             if(isset($this->exchangeCurrency[$currency]) && isset($this->exchangeCurrency[$currency][$date]))
             {
                 $exchRate = $this->exchangeCurrency[$currency][$date];
             }else{
-                $exchRate = ExchangeCurrencyHistory::getCurrencyForDate($date,$currency);
+                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
+
                 $this->exchangeCurrency[$currency][$date] = $exchRate;
             }
 
-            $payment->pay_summ = $payment->pay_summ*$exchRate;
+            $payment['pay_summ'] = $payment['pay_summ']*$exchRate;
         }
 
         return $arPayments;
@@ -205,24 +207,24 @@ class PartnerPercentCounting
 
         foreach ($arPayments as $payment)
         {
-            if(!isset($arPartnerServGroups[$payment->service_id]) || empty($arPartnerServGroups[$payment->service_id]))
+            if(!isset($arPartnerServGroups[$payment['service_id']]) || empty($arPartnerServGroups[$payment['service_id']]))
                 continue;
 
-            $group = $arPartnerServGroups[$payment->service_id];
+            $group = $arPartnerServGroups[$payment['service_id']];
 
-            $date = date('Y-m-d',$payment->pay_date);
+            $date = date('Y-m-d',$payment['pay_date']);
             if(isset($this->exchangeCurrency[$currency]) && isset($this->exchangeCurrency[$currency][$date]))
             {
                 $exchRate = $this->exchangeCurrency[$currency][$date];
             }else{
-                $exchRate = ExchangeCurrencyHistory::getCurrencyForDate($date,$currency);
+                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
                 $this->exchangeCurrency[$currency][$date] = $exchRate;
             }
 
             if(isset($amount[$group]))
-                $amount[$group]+= $payment->pay_summ/$exchRate;
+                $amount[$group]+= $payment['pay_summ']/$exchRate;
             else
-                $amount[$group] = $payment->pay_summ/$exchRate;
+                $amount[$group] = $payment['pay_summ']/$exchRate;
         }
 
         return $amount;
@@ -252,8 +254,12 @@ class PartnerPercentCounting
             {
                 foreach ($serv->ranges as $range)
                 {
-                    if($range['left'] >= $fullAmount && $fullAmount <= $range['right'])
-                        $percent = $range['percent'];
+                    $left = (float)$range['left'];
+                    $right = (float)$range['right'];
+                    $percentTmp = (float)$range['percent'];
+
+                    if($left <= $fullAmount && $fullAmount <= $right)
+                        $percent = $percentTmp;
                 }
             }
 
@@ -291,21 +297,21 @@ class PartnerPercentCounting
         $fullAmount = 0;
         foreach ($arPayments as $payment)
         {
-            if(!isset($percent[$payment->service_id]) || !isset($arCuserResident[$payment->cuser_id]))
+            if(!isset($percent[$payment['service_id']]) || !isset($arCuserResident[$payment['cuser_id']]))
                 continue;
 
-            $amount = $this->getAmount($percent[$payment->service_id],$payment->pay_summ,$payment->legal_id,$arCuserResident[$payment->cuser_id]);
+            $amount = $this->getAmount($percent[$payment['service_id']],$payment['pay_summ'],$payment['legal_id'],$arCuserResident[$payment['cuser_id']]);
 
             $rows [] = [
                 '',
                 $partner->id,
                 $amount,
                 PartnerPurseHistory::TYPE_INCOMING,
-                $payment->id,
+                $payment['id'],
                 '',
                 time(),
                 time(),
-                $percent[$payment->service_id]
+                $percent[$payment['service_id']]['percent']
             ];
 
             $fullAmount+=$amount;

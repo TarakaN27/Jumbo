@@ -443,6 +443,10 @@ class CompanyController extends AbstractBaseBackendController
 		if(!$model)
 			throw new NotFoundHttpException();
 		$modelR = $model->requisites;
+
+		if($model->partner)
+			$model->partner_archive_date = Yii::$app->formatter->asDate('NOW');
+
 		if(empty($modelR))
 			$modelR = new CUserRequisites();
 

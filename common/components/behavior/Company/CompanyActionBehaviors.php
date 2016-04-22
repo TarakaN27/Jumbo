@@ -11,6 +11,7 @@ namespace common\components\behavior\Company;
 
 use common\models\Dialogs;
 use common\models\Messages;
+use common\models\PartnerCuserServ;
 use yii\base\Behavior;
 use common\models\AbstractActiveRecord;
 use common\models\CUser;
@@ -22,6 +23,7 @@ class CompanyActionBehaviors extends Behavior
 {
 	public
 		$alreadyChecked = FALSE,
+		$archivePartner = FALSE,
 		$arChangedFields = [],
 		$arCheckField = [
 			'archive' => 'getArchiveStr',
@@ -138,11 +140,26 @@ class CompanyActionBehaviors extends Behavior
 				}
 			}
 		}
+		//архивация партнера
+		if($obOld->partner == AbstractActiveRecord::YES && $model->partner != AbstractActiveRecord::YES)
+			$this->archivePartner = TRUE;
+		//архивация все компании, нужно заархивировать и партнера
+		if(!$this->archivePartner && $obOld->archive != AbstractActiveRecord::YES && $model->archive == AbstractActiveRecord::YES)
+		{
+			if(empty($this->owner->partner_archive_date))
+			{
+				$this->owner->partner_archive_date = Yii::$app->formatter->asDate('NOW');
+			}
+			$this->archivePartner = TRUE;
+		}
 
 		return TRUE;
 	}
 
-
+	/**
+	 * @return bool
+	 * @throws \yii\db\Exception
+	 */
 	public function afterUpdate()
 	{
 		if($this->alreadyChecked)
@@ -188,6 +205,20 @@ class CompanyActionBehaviors extends Behavior
 			}
 		}
 		$this->alreadyChecked = TRUE;
+
+		if($this->archivePartner)	//архивация партнера
+		{
+			$arLeads = PartnerCuserServ::find()
+				->where(['partner_id' => $model->id])
+				->andWhere('archive is NULL OR archive = 0')
+				->all();
+			/** @var PartnerCuserServ $lead */
+			foreach ($arLeads as $lead)
+			{
+				$lead->archiveDate = $model->partner_archive_date;
+				$lead->archive();
+			}
+		}
 		return TRUE;
 	}
 

@@ -245,7 +245,7 @@ $('#cuser-partner').on('change',function(){
 		<div class="ln_solid"></div>
 		<h4 class = "h4_ml_10">Параметры партнера</h4>
 		<div class = "form-group">
-			<div class = "col-md-4 col-sm-4 col-xs-12">
+			<div class = "col-md-4 col-sm-4 col-xs-12 ppd-top-23">
 				<?= $form->field($model,'partner')->checkbox();?>
 			</div>
 			<div class = "col-md-4 col-sm-4 col-xs-12">
@@ -267,6 +267,33 @@ $('#cuser-partner').on('change',function(){
 					],
 				]);?>
 			</div>
+			<div class = "col-md-4 col-sm-4 col-xs-12">
+				<?php
+					echo $form->field($model,'partner_scheme', [
+						'template' => $fieldTempl,
+						'labelOptions'=>['class' => 'control-label']])->dropDownList(\common\models\PartnerSchemes::getSchemesMap(),[
+						'prompt' => Yii::t('app/users','Choose partner schemes')
+					]);
+				?>
+			</div>
+			
+
+			<?php if($model->partner) :?>
+				<div class = "col-md-4 col-sm-4 col-xs-12">
+					<?php
+							echo $form->field($model,'partner_archive_date')->widget(DatePicker::className(), [
+								'options' => [
+									'class' => 'form-control'
+								],
+								'pluginOptions' => [
+									'autoclose' => TRUE,
+									'format' => 'dd.mm.yyyy',
+									'defaultDate' => date('Y.m.d', time())
+								]
+							]);
+					?>
+				</div>
+			<?php endif;?>
 		</div>
 	</section>
 	<section class="jPersonInfo hideBlockClass">

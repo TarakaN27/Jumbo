@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%partner_schemes}}".
@@ -78,5 +81,28 @@ class PartnerSchemes extends AbstractActiveRecord
     public function getCurrency()
     {
         return $this->hasOne(ExchangeRates::className(),['id' => 'currency_id']);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public static function getSchemesArr()
+    {
+        $dep = new TagDependency([
+            'tags' => NamingHelper::getCommonTag(self::className())
+        ]);
+        return self::getDb()->cache(function($db){
+            return self::find()->all();
+        },86400,$dep);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSchemesMap()
+    {
+        $arTmp = self::getSchemesArr();
+        return ArrayHelper::map($arTmp,'id','name');
     }
 }

@@ -225,6 +225,8 @@ class PartnersController extends AbstractBaseBackendController
         $obPartner = CUser::find()->with('requisites','manager','partnerManager')->where(['id' => $id,'partner' => AbstractActiveRecord::YES])->one();
         if(!$obPartner)
             throw new NotFoundHttpException('Partner not found');
+        
+        $obPurse = $obPartner->partnerPurse;
 
         $arLeadsProvider = new ActiveDataProvider([
             'query' => PartnerCuserServ::find()->with('partner','cuser','service')->where(['partner_id' => $id]),
@@ -236,7 +238,8 @@ class PartnersController extends AbstractBaseBackendController
         return $this->render('view',[
             'obPartner' => $obPartner,
             'arLeadsProvider' => $arLeadsProvider,
-            'pid' => $id
+            'pid' => $id,
+            'obPurse' => $obPurse
         ]);
     }
 

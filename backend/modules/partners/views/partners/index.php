@@ -44,7 +44,7 @@ $this->title = Yii::t('app/users','Partners')
                             'attribute' => 'id',
                             'format' => 'raw',
                             'value' => function($model){
-                                return Html::a($model->id,['view'],['class'=>'link-upd']);
+                                return Html::a($model->id,['view','id' => $model->id],['class'=>'link-upd']);
                             }
                         ],
                         [
