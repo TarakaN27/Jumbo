@@ -41,7 +41,7 @@ class DefaultController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
-                    'actions' => ['index','view','create','update'],
+                    'actions' => ['index','view','create','update','get-conditions','find-condition'],
                     'allow' => true,
                     'roles' => ['moder']
                 ],

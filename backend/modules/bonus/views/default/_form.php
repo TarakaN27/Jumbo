@@ -100,20 +100,39 @@ $this->registerJs('
                         <?=Html::tag('h4',Yii::t('app/bonus','Month percent'))?>
                         <hr/>
                         <div class="monthList" data-col="<?=$serv->id?>" data-num="<?=(int)$model->num_month?>">
-                            <?php if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
-                                foreach($arBServices[$serv->id]->month_percent as $key => $item):
-                                    ?>
-                                    <?php
-                                    $inputEl = Html::textInput('months['.$serv->id.']['.$key.']',$item,[
-                                        'id' => 'mid_'.$serv->id.'_'.$key
+                            <?php
+                                $countMonth = 0;
+
+                            if(isset($arBServices[$serv->id]) && !empty($arBServices[$serv->id]->month_percent))
+                            {
+                                $countMonth = count($arBServices[$serv->id]->month_percent);
+                                foreach($arBServices[$serv->id]->month_percent as $key => $item) {
+
+                                    $inputEl = Html::textInput('months[' . $serv->id . '][' . $key . ']', $item, [
+                                        'id' => 'mid_' . $serv->id . '_' . $key
                                     ]);
                                     $labelEl = Html::label($key);
-                                    echo Html::tag('div',$labelEl.$inputEl,[
+                                    echo Html::tag('div', $labelEl . $inputEl, [
                                         'class' => 'form-group',
-                                        'id' => 'div_mid_'.$serv->id.'_'.$key
+                                        'id' => 'div_mid_' . $serv->id . '_' . $key
                                     ]);
-                                    ?>
-                                <?php endforeach;?>
+                                }
+                            }
+
+                            for ($i = $countMonth+1;$i<=(int)$model->num_month;$i++)
+                            {
+                                $inputEl = Html::textInput('months[' . $serv->id . '][' . $i . ']', NULL, [
+                                    'id' => 'mid_' . $serv->id . '_' . $i
+                                ]);
+                                $labelEl = Html::label($i);
+                                echo Html::tag('div', $labelEl . $inputEl, [
+                                    'class' => 'form-group',
+                                    'id' => 'div_mid_' . $serv->id . '_' . $i
+                                ]);
+                            }
+                            ?>
+
+
                         </div>
                     </div>
                     <div class="col-md-12 col-sm-12 col-xs-12 simple_percent ch_type2 <?= in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS])? '' : 'hide'?>">

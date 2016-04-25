@@ -26,7 +26,7 @@ class RecalcPayment
 		$ar_except = [];
 		$special = NULL;
 
-		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_4.csv'),';');
+		$arData = CustomHelper::csv_to_array(\Yii::getAlias('@backend/runtime/sverka_5.csv'),';');
 		if(empty($arData))
 			return FALSE;
 
@@ -55,7 +55,12 @@ class RecalcPayment
 			$arPaymentID[] = $clc->payment_id;
 		}
 
-		$arPaymentTmp = Payments::find()->where(['id' => $arPaymentID])->all();
+		$arPaymentTmp = Payments::find()->where([
+			'id' => $arPaymentID
+		])
+			->andWhere('pay_date >= :begindate')
+			->params([':begindate' => strtotime('25.03.2016 00:00:00')])
+			->all();
 
 		$arPayment = [];
 		$arExch = [];
@@ -256,7 +261,7 @@ class RecalcPayment
 				}
 		}
 
-
+*/
 		if(isset($newCond))
 			unset($newCond);
 		$arConds = PaymentCondition::find()->where(['id' => array_keys($arNewCond)])->all();
@@ -285,7 +290,7 @@ class RecalcPayment
 			}
 
 		}
-*/
+
 
 		$tr->commit();
 
