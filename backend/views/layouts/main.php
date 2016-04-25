@@ -373,7 +373,7 @@ $menuItems[] = [
                                 <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')):?>
                                 <li>
                                     <a>
-                                        <i class="fa fa-cube"></i><?php echo Yii::t('app/common', 'Partners'); ?>
+                                        <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>
                                         <span class="fa fa-chevron-down"></span>
                                     </a>
                                     <ul class="nav child_menu" style="display: none">

@@ -25,20 +25,19 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
-        'columns' => [
+                    'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-
-                        [ 'attribute' => 'id',
- 'format' => 'html',
- 'value' => function($model){
+                        [
+                            'attribute' => 'id',
+                            'format' => 'html',
+                            'value' => function($model){
                                                 return Html::a($model->id,['update','id' => $model->id],['class' => 'link-upd']);
-                                              } ],
-            'name',
-            'start_period',
-            'regular_period',
-            'created_at',
-            // 'updated_at',
-
+                            }
+                        ],
+                        'name',
+                        'start_period',
+                        'regular_period',
+                        'created_at:datetime',
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{update}{view}'
