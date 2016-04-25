@@ -106,19 +106,19 @@ $this->registerJsFile('@web/js/parts/partner_schemes.js',[
                                         <td>
                                             <?php
                                                 $value = isset($item['left']) ? $item['left'] : NULL;
-                                                echo Html::textInput('range['.$servID.'][0][left]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][left]',$value,['class' => 'form-control']);
                                             ?>
                                         </td>
                                         <td>
                                             <?php
                                                 $value = isset($item['right']) ? $item['right'] : NULL;
-                                                echo Html::textInput('range['.$servID.'][0][right]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][right]',$value,['class' => 'form-control']);
                                             ?>
                                         </td>
                                         <td>
                                             <?php
                                                 $value = isset($item['percent']) ? $item['percent'] : NULL;
-                                                echo Html::textInput('range['.$servID.'][0][percent]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][percent]',$value,['class' => 'form-control']);
                                             ?>
                                         </td>
                                     </tr>

@@ -13,6 +13,7 @@ use common\models\CUser;
 use common\models\ExchangeCurrencyHistory;
 use common\models\PartnerCuserServ;
 use common\models\PartnerPurseHistory;
+use common\models\Services;
 use yii\base\Model;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -66,18 +67,22 @@ class PartnerDetailLeadsForm extends Model
         $arPrev = $this->getPervPeriodStat($beginTime);   //получаем сумму
         $arLeads =  $this->getLeads();
         $arCurrPeriod = $this->getCurrentPeriodStat($beginTime,$endTime);
+
         $arStatIncomingByLead = $this->getStatIncomingByLeads($arCurrPeriod);
         $arStatWithdrawal = $this->getStatWithdrawal($arCurrPeriod);
         $arStatFull = $this->getStatFullSortByDate($arCurrPeriod);
         $arStatIncomingByLead = $this->normalizeStatIncomingByLead($arStatIncomingByLead);
         $arLeadsDetail = $this->getLeadsDetail($arLeads);
-
+        //$arServIds = array_unique(ArrayHelper::getColumn($arCurrPeriod,'service_id'));
+        //$arService = ArrayHelper::map(Services::find()->select(['id','name'])->where(['id' => $arServIds])->all(),'id','name');
+        $arService = array_unique(ArrayHelper::map($arCurrPeriod,'payment.service_id','payment.service.name'));
         return [
             'prev' => $arPrev,
             'incoming' => $arStatIncomingByLead,
             'fullStat' => $arStatFull,
             'withdrawal' => $arStatWithdrawal,
-            'arLeads' => $arLeadsDetail
+            'arLeads' => $arLeadsDetail,
+            'arService' => $arService
         ];
     }
 

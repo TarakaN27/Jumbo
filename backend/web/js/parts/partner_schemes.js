@@ -31,7 +31,6 @@ jQuery(document).ready(function(){
             td2 = $(document.createElement('td')),
             td3 = $(document.createElement('td')),
             td4 = $(document.createElement('td')),
-            td5 = $(document.createElement('td')),
             inputMin = $(document.createElement('input')),
             inputMax = $(document.createElement('input')),
             inputPercent = $(document.createElement('input')),
@@ -53,7 +52,6 @@ jQuery(document).ready(function(){
         tr.append(td2);
         tr.append(td3);
         tr.append(td4);
-        tr.append(td5);
 
         $('.servRange[data-serv="'+servID+'"]').append(tr);
         $(this).attr('data-col',colNext);

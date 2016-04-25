@@ -36,6 +36,17 @@ class PartnerPurseHistory extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public static function getTypeMap()
+    {
+        return [
+            self::TYPE_INCOMING => Yii::t('app/users','Partner type incoming'),
+            self::TYPE_EXPENSE => Yii::t('app/users','Partner type expense')
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -66,6 +77,12 @@ class PartnerPurseHistory extends AbstractActiveRecord
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'percent' => Yii::t('app/users','Percent')
         ];
+    }
+
+    public function getTypeStr()
+    {
+        $tmp = self::getTypeMap();
+        return $tmp[$this->type] ? $tmp[$this->type] : NULL;
     }
 
     /**

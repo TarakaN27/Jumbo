@@ -16,6 +16,7 @@ use yii\helpers\Html;
 class CustomGridView extends GridView{
 
     public
+        $addTrClass = NULL,
         $addTrData = [];
 
     /**
@@ -42,6 +43,15 @@ class CustomGridView extends GridView{
         {
             foreach($this->addTrData as $dt)
                 $options['data-tr-'.$dt] = $model->$dt;
+        }
+        
+        if(!empty($this->addTrClass) && $this->addTrClass instanceof Closure)
+        {
+            $tmpClass = call_user_func($this->addTrClass,$model);
+            if(isset($options['class']))
+                $options['class'].=' '.$tmpClass;
+            else
+                $options['class']=' '.$tmpClass;
         }
 
         return Html::tag('tr', implode('', $cells), $options);

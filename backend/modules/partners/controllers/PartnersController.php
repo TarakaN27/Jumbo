@@ -243,6 +243,12 @@ class PartnersController extends AbstractBaseBackendController
         ]);
     }
 
+    /**
+     * @param $pid
+     * @return string
+     * @throws NotFoundHttpException
+     * @throws InvalidParamException
+     */
     public function actionViewLeadDetail($pid)
     {
         $obPartner = CUser::find()->where(['id' => $pid,'partner' => AbstractActiveRecord::YES])->one();

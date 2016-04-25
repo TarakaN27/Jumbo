@@ -271,7 +271,13 @@ return [
     'Partner purse' => 'Партнерский кошелёк',
     'View detail lead statistic' => 'Детальная статистика по лидам',
     'Payment ID' => 'Платеж',
-    'Amount' => 'Сумма'
+    'Amount' => 'Сумма',
+    'Partner incoming amount' => 'Приход',
+    'Partner expense amount' => 'Вывод средств',
+    'Expense ID' => 'ID затрат',
+    'Partner type incoming' => 'Зачисление',
+    'Partner type expense' => 'Выплата',
+    'Partner full stat' => 'История операций'
 
 
 ];

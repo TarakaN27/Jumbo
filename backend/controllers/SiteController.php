@@ -106,10 +106,10 @@ class SiteController extends Controller
         $obBonus->recalculatePartnerBonus();
         */
 
-        /*
+
         $obCalc = new PartnerPercentCounting();
-        $obCalc->countPercentByMonth('01-04-2016');
-        */
+        $obCalc->countPercentByMonth('01-02-2016');
+
         
        
         die;
