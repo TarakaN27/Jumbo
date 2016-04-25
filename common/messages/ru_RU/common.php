@@ -110,6 +110,7 @@ return [
     'Update message' => 'Редактировать сообщение',
     'Save' => 'Сохранить',
     'Partner schemes serv group' => 'Группы партнерских схем',
-    'Partner schemes' => 'Партнерские схемы'
+    'Partner schemes' => 'Партнерские схемы',
+    'Partners' => 'Партнерка'
 
 ];
