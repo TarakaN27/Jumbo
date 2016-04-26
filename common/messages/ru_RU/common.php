@@ -112,5 +112,4 @@ return [
     'Partner schemes serv group' => 'Группы партнерских схем',
     'Partner schemes' => 'Партнерские схемы',
     'Partners' => 'Партнерка'
-
 ];

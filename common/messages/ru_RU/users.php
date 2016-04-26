@@ -277,7 +277,8 @@ return [
     'Expense ID' => 'ID затрат',
     'Partner type incoming' => 'Зачисление',
     'Partner type expense' => 'Выплата',
-    'Partner full stat' => 'История операций'
+    'Partner full stat' => 'История операций',
+    'Partner Schemes' => 'Партнерские схемы'
 
 
 ];
