@@ -315,6 +315,7 @@ $this->registerJs("
 				</div>
 				<!-- start project-detail sidebar -->
 				<div class="col-md-3 col-sm-3 col-xs-12">
+					<!--Группа компаний-->
 					<?php if(!empty($arGroups)):?>
 					<section>
 						<div class="x_title">
@@ -340,6 +341,8 @@ $this->registerJs("
 						</div>
 					</section>
 					<?php endif;?>
+					<!--End группа компаний-->
+					<!--ответственный-->
 					<section class="wm-side-bar-right">
 						<div class="x_title">
 							<h2><?php echo Yii::t('app/crm','Assigned At')?></h2>
@@ -380,6 +383,32 @@ $this->registerJs("
 							</div>
 						</div>
 					</section>
+					<!--End ответсвенный-->
+					<!--Ответственный специалист CPC -->
+					<section class="wm-side-bar-right">
+						<div class="x_title">
+							<h2><?php echo Yii::t('app/users','CRC manager')?></h2>
+							<ul class="nav navbar-right panel_toolbox">
+								<li>
+								</li>
+							</ul>
+							<div class="clearfix"></div>
+						</div>
+						<div class="media event">
+							<a class="pull-left border-aero profile_thumb">
+								<i class="fa fa-user aero"></i>
+							</a>
+							<div class="media-body" style="height: 50px;vertical-align: middle;">
+								<p class="title"><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getFio() : $model->manager_crc_id;?></p>
+								<?php if(Yii::$app->user->can('superRights')):?>
+								<p> <small><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getRoleStr() : 'N/A';?></small>
+									<?php endif;?>
+								</p>
+							</div>
+						</div>
+					</section>
+					<!-- end ответственный специалист-->
+
 					<?php if(
 						Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER
 					):?>

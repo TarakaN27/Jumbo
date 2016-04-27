@@ -11,7 +11,11 @@ use yii\web\JsExpression;
 
 $fieldCheckBoxTmpl = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>';
 $fieldTempl = '<div>{label}{input}</div><ul class="parsley-errors-list" >{error}</ul>';
-
+$this->registerJsFile('@web/js/parts/task_form.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJs('
+    var 
+        URL_CMP_INFO = "'.\yii\helpers\Url::to(['/ajax-service/get-cmp-info']).'";
+',\yii\web\View::POS_BEGIN);
 ?>
 
 <div class="crm-task-form">

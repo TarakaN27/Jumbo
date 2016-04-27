@@ -258,6 +258,11 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
 	public function actionGetCrmContact($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
@@ -283,6 +288,11 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
 	public function actionGetParentCrmTask($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
