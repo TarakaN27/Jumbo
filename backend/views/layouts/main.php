@@ -202,6 +202,13 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>
                                              </li>
                                         <?php endif;?>
+                                        
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/services', 'SERVICES_expanse_cat_link'),['/services/partner-expense-cat-link/index'])?>
+                                            </li>
+                                        <?php endif;?>
+                                        
                                     </ul>
                                 </li>
                                 <?php endif;?>
@@ -392,6 +399,9 @@ $menuItems[] = [
                                                 <?=Html::a(Yii::t('app/common', 'Partner schemes serv group'),['/partners/partner-schemes-serv-group/index']);?>
                                             </li>
                                         <?php endif;?>
+                                        <li>
+                                            <?=Html::a(Yii::t('app/common','Partner. Withdrawal request'),['/partners/partner-withdrawal-request/index']);?>
+                                        </li>
                                     </ul>
                                 </li>
                                 <?php endif;?>

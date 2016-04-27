@@ -77,5 +77,6 @@ return [
     'Cuser inactivity' => 'Период бездействия компании',
     'Ignore at reports' => 'Не учитывать затраты в сводках',
     'Only for admins' => 'Только для администраторов',
-    'Show in widget' => 'Показывать в виджете'
+    'Show in widget' => 'Показывать в виджете',
+    'SERVICES_expanse_cat_link' => 'Партнер. Связи категорий затрат'
 ];

@@ -278,7 +278,25 @@ return [
     'Partner type incoming' => 'Зачисление',
     'Partner type expense' => 'Выплата',
     'Partner full stat' => 'История операций',
-    'Partner Schemes' => 'Партнерские схемы'
-
-
+    'Partner Schemes' => 'Партнерские схемы',
+    'This link already exists' => 'Связь уже существует',
+    'Partner Expense Cat Links' => 'Партнерка. Связь категорий затрат',
+    'Legal Person ID' => 'Юр. лицо',
+    'Expanse Cat ID' => 'Категория затрат',
+    'Create Partner Expense Cat Link' => 'Добавить связь',
+    'Type money' => 'Деньги',
+    'Type services' => 'Услуги',
+    'Choose type' => 'Выберите тип',
+    'Choose legal person' => 'Выберите юр.лицо',
+    'Choose Service' => 'Выберите услугу',
+    'Choose expanse category' => 'Выберите категорию затрат',
+    'Links successfully added' => 'Связи успешно дабавлены',
+    'Partner Withdrawal Requests' => 'Партнер. Запрос на вывод средств.',
+    'Create Partner Withdrawal Request' => 'Добавить запрос',
+    'Currency ID' => 'Валюта',
+    'Partner request date' => 'Дата запроса',
+    'Status new' => 'Новый',
+    'Status manager processed' => 'Обрабатывается менеджером',
+    'Status done' => 'Завершен',
+    'Created By' => 'Кто добавил'
 ];

@@ -12,6 +12,7 @@ namespace backend\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use common\components\helpers\CustomHelper;
+use common\models\AbstractActiveRecord;
 use common\models\CrmCmpContacts;
 use common\models\CrmTask;
 use common\models\CUser;
@@ -44,7 +45,8 @@ class AjaxSelectController extends AbstractBaseBackendController
 						'get-contractor' => ['post'],
 						'get-b-user' => ['post'],
 						'get-crm-contact' => ['post'],
-						'get-parent-crm-task' => ['post']
+						'get-parent-crm-task' => ['post'],
+						'get-partners' => ['post']
 					],
 				],
 			]
@@ -258,6 +260,11 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
 	public function actionGetCrmContact($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
@@ -283,6 +290,11 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
 	public function actionGetParentCrmTask($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
@@ -319,6 +331,73 @@ class AjaxSelectController extends AbstractBaseBackendController
 			$out['results'] = ['id' => $id, 'text' => $id.' - '.CustomHelper::cuttingString(CrmTask::findOne($id)->title,100)];
 		}
 
+		return $out;
+	}
+
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
+	public function actionGetPartners($q = null, $id = null)
+	{
+		$out = ['results' => ['id' => '', 'text' => '']];
+		if (!is_null($q)) {
+
+			$obCUser = CUser::find()
+				->select([
+					CUser::tableName().'.id',
+					CUser::tableName().'.requisites_id',
+					CUser::tableName().'.partner',
+					CUserRequisites::tableName().'.type_id as req_type',
+					CUserRequisites::tableName().'.corp_name',
+					CUserRequisites::tableName().'.j_fname',
+					CUserRequisites::tableName().'.j_mname',
+					CUserRequisites::tableName().'.j_lname',
+					CUserRequisites::tableName().'.site',
+
+				])
+				->joinWith('requisites')
+				->where(['like',CUserRequisites::tableName().'.corp_name',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_lname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
+				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
+				->andWhere([CUser::tableName().'.partner' => AbstractActiveRecord::YES])
+				->notArchive()
+				->limit(10)
+				->all()
+			;
+			/** @var CUser $user */
+			foreach($obCUser as $user)
+				$out['results'] []= [
+					'id' => $user->id,
+					'text' => $user->getInfoWithSite()
+				];
+			$out['results'] = array_values($out['results']);
+
+		}
+		elseif ($id > 0) {
+			$out['results'] = [
+				'id' => $id,
+				'text' => is_object($obUser = CUser::find()
+					->select([
+						CUser::tableName().'.id',
+						CUser::tableName().'.requisites_id',
+						CUser::tableName().'.partner',
+						CUserRequisites::tableName().'.type_id as req_type',
+						CUserRequisites::tableName().'.corp_name',
+						CUserRequisites::tableName().'.j_fname',
+						CUserRequisites::tableName().'.j_mname',
+						CUserRequisites::tableName().'.j_lname',
+						CUserRequisites::tableName().'.site',
+
+					])
+					->joinWith('requisites')
+					->where(['contractor' => CUser::CONTRACTOR_YES,'id' => $id])
+					->one()) ? $obUser->getInfoWithSite() : NULL
+			];
+		}
 		return $out;
 	}
 }
