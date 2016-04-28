@@ -722,6 +722,35 @@ class CUser extends AbstractUser
         return ArrayHelper::map($query,'id','infoWithSite');
     }
 
+    /**
+     * Get user info by id
+     * can be used for select2 plugin init state
+     * @param $id
+     * @return null
+     */
+    public static function getCuserInfoById($id)
+    {
+        $query = self::find()
+            ->select([
+                'c.id',
+                'c.requisites_id',
+                'r.id as rid',
+                'c.type',
+                'r.type_id',
+                'r.j_lname',
+                'r.j_fname',
+                'r.j_mname',
+                'r.corp_name',
+                'r.site'
+            ])
+            ->alias('c')
+            ->joinWith('requisites r')
+            ->where(['c.id' => $id])
+            ->one();
+
+        return $query ? $query->getInfoWithSite() : NULL;
+    }
+
 }
 
 /**

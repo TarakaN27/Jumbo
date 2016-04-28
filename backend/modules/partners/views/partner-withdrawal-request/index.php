@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\web\JsExpression;
+use common\models\PartnerWithdrawalRequest;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PartnerWithdrawalRequestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -160,7 +161,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',
-                                        'template' => '{view}'
+                                        'template' => '{view}{proccess1}',
+                                        'buttons' => [
+                                            'proccess1' => function($url, $model, $key)
+                                            {
+                                                if($model->type == PartnerWithdrawalRequest::TYPE_MONEY && $model->status = PartnerWithdrawalRequest::STATUS_NEW)
+                                                    return Html::a('<i class="fa fa-credit-card"></i>',['process1','id' => $model->id]);
+                                                return NULL;
+                                            }
+                                        ]
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',

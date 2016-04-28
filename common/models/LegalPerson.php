@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $docx_id
  * @property integer $act_tpl_id
  * @property integer $admin_expense
+ * @property integer $partner_cntr
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -42,7 +43,12 @@ class LegalPerson extends AbstractActiveRecord
     {
         return [
             [['description','doc_requisites'], 'string'],
-            [['status', 'created_at', 'updated_at','use_vat','docx_id','act_tpl_id','admin_expense'], 'integer'],
+            [[
+                'status', 'created_at',
+                'updated_at','use_vat',
+                'docx_id','act_tpl_id',
+                'admin_expense','partner_cntr'
+            ], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
@@ -67,7 +73,8 @@ class LegalPerson extends AbstractActiveRecord
             'use_vat' => Yii::t('app/services', 'Use vat'),
             'docx_id' => Yii::t('app/services', 'Docx ID'),
             'act_tpl_id' => Yii::t('app/services', 'Act template'),
-            'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin')
+            'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin'),
+            'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor')
         ];
     }
 

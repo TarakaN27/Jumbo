@@ -4,12 +4,16 @@ namespace backend\modules\partners\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use backend\modules\partners\models\Process1Form;
 use common\models\CUser;
+use common\models\CuserToGroup;
 use Yii;
 use common\models\PartnerWithdrawalRequest;
 use common\models\search\PartnerWithdrawalRequestSearch;
+use yii\base\Exception;
+use yii\bootstrap\Alert;
 use yii\web\NotFoundHttpException;
-
+use common\models\AbstractModel;
 
 /**
  * PartnerWithdrawalRequestController implements the CRUD actions for PartnerWithdrawalRequest model.
@@ -23,19 +27,40 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
     public function actionIndex()
     {
         $searchModel = new PartnerWithdrawalRequestSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $addCond = NULL;
+        $addParams = NULL;
+        //@todo проверить
+        if(Yii::$app->user->can('only_partner_manager'))
+        {
+            $addCond = PartnerWithdrawalRequest::tableName().'.status = :statusNew ';
+            $addParams = [
+                ':statusNew' => PartnerWithdrawalRequest::STATUS_NEW
+            ];
+        }
+        //@todo проверить
+        if(Yii::$app->user->can('only_manager'))
+        {
+            $addCond = PartnerWithdrawalRequest::tableName().'.type = :type AND '.PartnerWithdrawalRequest::tableName().'.status = :statusNew ';
+            $addParams = [
+                ':type' => PartnerWithdrawalRequest::TYPE_SERVICE,
+                ':statusNew' => PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED
+            ];
+        }
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addCond,$addParams);
 
         $partnerDesc = '';
         if($searchModel->partner_id)
-            $partnerDesc = is_object($obP = CUser::find()->joinWith('requisites')->where([CUser::tableName().'.id' => $searchModel->partner_id])->one()) ? $obP->getInfoWithSite() : NULL;
+            $partnerDesc = CUser::getCuserInfoById($searchModel->partner_id);
 
         $managerDesc = '';
         if($searchModel->manager_id)
-            $managerDesc = is_object($obMan = BUser::find()->where(['id' => $searchModel->manager_id])->one()) ? $obMan->getFio() : NULL;
+            $managerDesc = BUser::findOneByIdCachedForSelect2($searchModel->manager_id);
 
         $pManDesc = '';
         if($searchModel->partnerManager)
-            $pManDesc = is_object($obPMan = BUser::find()->where(['id' => $searchModel->partnerManager])->one()) ? $obPMan->getFio() : NULL;
+            $pManDesc = BUser::findOneByIdCachedForSelect2($searchModel->partnerManager);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -127,5 +152,79 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $id
+     * @return string
+     * @throws Exception
+     * @throws NotFoundHttpException
+     */
+    public function actionProcess1($id)
+    {
+        $model = $this->findModel($id);
+        if($model->type != $model::TYPE_MONEY || $model->status != $model::STATUS_NEW)
+            throw new Exception($message = "Illegal request", $code = 404);
+
+        $models = [new Process1Form([
+            'obRequest' => $model,
+            'amount' => $model->amount
+        ])];
+
+        if(Yii::$app->request->post('Process1Form'))
+        {
+            $models = AbstractModel::createMultiple(Process1Form::classname());
+            foreach ($models as &$mod)
+                $mod->obRequest = $model;
+            AbstractModel::loadMultiple($models,Yii::$app->request->post());
+            $valid = AbstractModel::validateMultiple($models);
+            
+            $amount = 0;
+            foreach ($models as $item)
+            {
+                $amount+=(float)$item->amount;
+            }
+            
+            if($amount != $model->amount)
+            {
+                $valid = false;
+                /** @var Process1Form $item */
+                foreach ($models as &$item)
+                    $item->addError('amount',Yii::t('app/users','Invalid amount'));
+            }
+
+            if($valid)
+            {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    $bFlag = TRUE;
+                    /** @var Process1Form $item */
+                    foreach ($models as $item)
+                        if(!$item->makeRequest())
+                        {
+                            $bFlag = FALSE;
+                            break;
+                        }
+                    if($bFlag)
+                    {
+                        $transaction->commit();
+                        Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_SUCCESS,Yii::t('app/users',''));
+                        return $this->redirect(['index']);
+                    }else{
+                        $transaction->rollBack();
+                    }
+                }catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+            }
+        }
+        
+        $arContractor = CuserToGroup::getUserByGroup($model->partner_id);       //Get contractors by partner id
+
+        return $this->render('process1',[
+            'model' => $model,
+            'arContractor' => $arContractor,
+            'models' => $models
+        ]);
     }
 }

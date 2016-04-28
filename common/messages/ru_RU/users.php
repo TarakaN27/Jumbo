@@ -298,5 +298,10 @@ return [
     'Status new' => 'Новый',
     'Status manager processed' => 'Обрабатывается менеджером',
     'Status done' => 'Завершен',
-    'Created By' => 'Кто добавил'
+    'Created By' => 'Кто добавил',
+    'Partner withdrawal request' => 'Запрос на вывод средств',
+    'Is required' => 'Обязательное поле',
+    'Partner withdrawal params' => 'Детали вывода средств',
+    'Available amount' => 'Доступная сумма',
+    'Invalid amount' => 'Неверно задана сумма'
 ];

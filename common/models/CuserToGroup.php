@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%cuser_to_group}}".
@@ -59,5 +60,44 @@ class CuserToGroup extends AbstractActiveRecordWTB
     public function getCuser()
     {
         return $this->hasOne(CUser::className(), ['id' => 'cuser_id']);
+    }
+
+    /**
+     * @param $userID
+     * @return array
+     */
+    public static function getUserByGroup($userID)
+    {
+        $iGroup = self::find()->where(['cuser_id' => $userID])->one();      //get group id for user
+        if(!empty($iGroup))     //if user have group
+        {
+            $query = CUser::find()  //find all user for user group
+                ->select([
+                    CUser::tableName().'id',
+                    CUser::tableName().'requisites_id',
+                    CUser::tableName().'type',
+                    CUser::tableName().'.archive',
+                    CuserToGroup::tableName().'group_id',
+                    CuserToGroup::tableName().'cuser_id',
+                    CUserRequisites::tableName().'id',
+                    CUserRequisites::tableName().'.id',
+                    CUserRequisites::tableName().'.type_id',
+                    CUserRequisites::tableName().'.j_lname',
+                    CUserRequisites::tableName().'.j_fname',
+                    CUserRequisites::tableName().'.j_mname'
+                ])
+                ->with('cmpGroup')
+                ->with('requisites')
+                ->where([
+                    CuserToGroup::tableName().'.group_id' => $iGroup->group_id
+                ])
+                ->notArchive()
+                ->all();
+            $arResult = ArrayHelper::map($query,'id','infoWithSite');
+        }else{
+            $arResult = [ $userID => CUser::getCuserInfoById($userID)];
+        }
+
+        return $arResult;
     }
 }

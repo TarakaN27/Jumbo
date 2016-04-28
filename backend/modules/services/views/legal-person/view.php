@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => $model->getStatusStr()
                         ],
                         'admin_expense:boolean',
+                        'partner_cntr:boolean',
                         'created_at:datetime',
                         'updated_at:datetime',
                     ],

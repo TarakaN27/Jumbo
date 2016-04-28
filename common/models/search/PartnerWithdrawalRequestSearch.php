@@ -55,14 +55,16 @@ class PartnerWithdrawalRequestSearch extends PartnerWithdrawalRequest
      *
      * @return ActiveDataProvider
      */
-    public function search($params,$addCond = NULL)
+    public function search($params,$addCond = NULL,$addParams = null)
     {
         $query = PartnerWithdrawalRequest::find()->joinWith('partner');
 
         if(!is_null($addCond))
             $query = $query->where($addCond);
 
-
+        if(!is_null($addParams))
+            $query->params($addParams);
+        
         $tableNamePWR = PartnerWithdrawalRequest::tableName();      //getTableName
         $tablePartner = CUser::tableName();
 

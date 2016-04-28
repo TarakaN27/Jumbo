@@ -42,7 +42,11 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'admin_expense')->checkbox()?>
         </div>
     </div>
-
+    <div class="form-group">
+        <div class = "col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+            <?= $form->field($model, 'partner_cntr')->checkbox()?>
+        </div>
+    </div>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/services', 'Create') : Yii::t('app/services', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
