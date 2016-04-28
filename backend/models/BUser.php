@@ -424,4 +424,17 @@ class BUser extends AbstractUser
             return $obManCrc ? $obManCrc->getFio() : NULL;
         },86400,$obDep);
     }
+
+    /**
+     * Бухгалтер для создания запроса на вывод средств.
+     * @return null
+     */
+    public static function getBookkeeperForPartnerWithdrawal()
+    {
+        $pk = Yii::$app->config->get('psw_bookkeeper_id');
+        if(empty($pk))
+            return NULL;
+
+        return self::find()->select(['id','fname','lname','mname'])->where(['id' => $pk])->one();
+    }
 }
