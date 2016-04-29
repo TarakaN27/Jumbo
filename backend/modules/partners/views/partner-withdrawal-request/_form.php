@@ -74,6 +74,8 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         ]
     ]) ?>
 
+    <?= $form->field($model,'description')->textarea()?>
+
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/users', 'Create') : Yii::t('app/users', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

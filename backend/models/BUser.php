@@ -435,6 +435,6 @@ class BUser extends AbstractUser
         if(empty($pk))
             return NULL;
 
-        return self::find()->select(['id','fname','lname','mname'])->where(['id' => $pk])->one();
+        return self::find()->select(['id','fname','lname','mname'])->where(['id' => $pk,'role' => self::ROLE_BOOKKEEPER])->one();
     }
 }

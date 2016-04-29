@@ -30,10 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ['class' => 'yii\grid\SerialColumn'],
                                     [
                                         'attribute' => 'id',
-                                         'format' => 'html',
-                                         'value' => function($model){
-                                                return Html::a($model->id,['update','id' => $model->id],['class' => 'link-upd']);
-                                         }
+                                        'format' => 'html',
                                     ],
                                     [
                                         'attribute' => 'partner_id',
@@ -161,18 +158,48 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',
-                                        'template' => '{view}{proccess1}',
+                                        'template' => '{view}{process1}{process2}{process3}',
                                         'buttons' => [
-                                            'proccess1' => function($url, $model, $key)
-                                            {
-                                                if($model->type == PartnerWithdrawalRequest::TYPE_MONEY && $model->status = PartnerWithdrawalRequest::STATUS_NEW)
-                                                    return Html::a('<i class="fa fa-credit-card"></i>',['process1','id' => $model->id]);
-                                                return NULL;
+                                            'process1' => function($url, $model, $key)
+                                                {
+                                                    return Html::a('<i class="fa fa-credit-card"></i>', ['process1', 'id' => $model->id]);
+                                                },
+                                            'process2' => function($url,$model,$key)
+                                                {
+                                                    return Html::a('<i class="fa fa-credit-card"></i>', ['process2', 'id' => $model->id]);
+                                                },
+                                            'process3' => function($url,$model,$key)
+                                                {
+                                                    return Html::a('<i class="fa fa-credit-card"></i>', ['process3', 'id' => $model->id]);
+                                                }
+                                        ],
+                                        'visibleButtons' => [
+                                            'process1' => function($model, $key, $index)
+                                                {
+                                                    return $model->type == PartnerWithdrawalRequest::TYPE_MONEY && $model->status == PartnerWithdrawalRequest::STATUS_NEW;
+                                                },
+                                            'process2' => function($model, $key, $index){
+                                                return $model->type == PartnerWithdrawalRequest::TYPE_SERVICE && $model->status == PartnerWithdrawalRequest::STATUS_NEW;
+                                            },
+                                            'process3' => function($model, $key, $index){
+
+                                                return $model->type == PartnerWithdrawalRequest::TYPE_SERVICE &&
+                                                        $model->status == PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED &&
+                                                        (
+                                                            $model->manager_id == Yii::$app->user->id ||
+                                                            Yii::$app->user->can('adminRights')
+                                                        );
                                             }
                                         ]
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',
+                                        'visibleButtons' =>
+                                            [
+                                                'delete' => function ($model, $key, $index) {
+                                                    return $model->status == PartnerWithdrawalRequest::STATUS_NEW;
+                                                }
+                                            ],
                                         'template' => '{delete}'
                                     ],
                                 ],

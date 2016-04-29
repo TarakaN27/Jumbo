@@ -11,12 +11,15 @@ namespace backend\modules\partners\models;
 
 use common\models\AbstractActiveRecord;
 use common\models\LegalPerson;
+use common\models\PartnerWBookkeeperRequest;
+use common\models\PartnerWithdrawalRequest;
 use yii\base\Model;
 use Yii;
 
 class Process1Form extends Model
 {
     public
+        $obBookkeeper,
         $obRequest,
         $amount,
         $currency,
@@ -65,18 +68,27 @@ class Process1Form extends Model
     }
 
     /**
-     * 
+     * @return bool
      */
     public function makeRequest()
     {
-        
-        
-        
-        
-        
+        if(!$this->obBookkeeper)
+            return FALSE;
+
+        if(!$this->obRequest)
+            return FALSE;
+
+        $obBRequest = new PartnerWBookkeeperRequest();
+        $obBRequest->partner_id = $this->obRequest->partner_id;
+        $obBRequest->buser_id = $this->obBookkeeper->id;
+        $obBRequest->contractor_id = $this->contractor;
+        $obBRequest->amount = $this->amount;
+        $obBRequest->currency_id = $this->obRequest->currency_id;
+        $obBRequest->legal_id = $this->legalPerson;
+        $obBRequest->request_id = $this->obRequest->id;
+        $obBRequest->created_by = Yii::$app->user->id;
+        $obBRequest->status = PartnerWBookkeeperRequest::STATUS_NEW;
+        return $obBRequest->save();
     }
-
-
-
 
 }

@@ -264,6 +264,12 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/bookkeeping/payment-condition/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_payment_condition'); ?></a>
                                             </li>
                                         <?php endif;?>
+                                        <!-- Запросы на выведение средств-->
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+                                            <li>
+                                                <?=Html::a(Yii::t('app/common', 'BOOK_partner_withdrawal_b_request'),['/bookkeeping/partner-w-bookkeeper-request/index'])?>
+                                            </li>
+                                        <?php endif;?>
                                         <!---Затраты ---------------------->
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
@@ -377,19 +383,19 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')):?>
+                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || Yii::$app->user->can('only_manager')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>
                                         <span class="fa fa-chevron-down"></span>
                                     </a>
                                     <ul class="nav child_menu" style="display: none">
-                                        <li>
-                                            <a href="<?= Url::to(['/partners/partners/index']); ?>">
-                                                <?php echo Yii::t('app/common', 'Partner'); ?>
-                                            </a>
-                                         </li>
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('onlyPartnerManager')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')):?>
+                                            <li>
+                                                <a href="<?= Url::to(['/partners/partners/index']); ?>">
+                                                    <?php echo Yii::t('app/common', 'Partner'); ?>
+                                                </a>
+                                            </li>
                                             <li>
                                                 <a href="<?= Url::to(['/partners/partner-schemes/index']); ?>">
                                                     <?php echo Yii::t('app/common', 'Partner schemes'); ?>

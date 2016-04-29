@@ -111,5 +111,6 @@ return [
     'Save' => 'Сохранить',
     'Partner schemes serv group' => 'Группы партнерских схем',
     'Partner schemes' => 'Партнерские схемы',
-    'Partners' => 'Партнерка'
+    'Partners' => 'Партнерка',
+    'BOOK_partner_withdrawal_b_request' => 'Партнер. Запрос на вывод средств'
 ];

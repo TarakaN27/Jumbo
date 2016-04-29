@@ -303,5 +303,8 @@ return [
     'Is required' => 'Обязательное поле',
     'Partner withdrawal params' => 'Детали вывода средств',
     'Available amount' => 'Доступная сумма',
-    'Invalid amount' => 'Неверно задана сумма'
+    'Invalid amount' => 'Неверно задана сумма',
+    'Warning! You must set bookkeeper for partner withdrawal!' => 'Внимание! Вы должны указать бухгалтера для вывода средств!',
+    'Bookkeeper for partner withdrawal' => 'Бухгалтер для вывода средств',
+    'Request successfully processed' => 'Запрос успешно обработан'
 ];

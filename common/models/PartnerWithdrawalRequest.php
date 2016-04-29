@@ -18,6 +18,7 @@ use backend\models\BUser;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ * @property string $description
  *
  * @property BUser $createdBy
  * @property CUser $partner
@@ -26,13 +27,16 @@ use backend\models\BUser;
 class PartnerWithdrawalRequest extends AbstractActiveRecord
 {
     CONST
-        TYPE_MONEY = 5,                 //Type money
-        TYPE_SERVICE = 10;              //Type service
+        TYPE_MONEY = 5,                     //Type money
+        TYPE_SERVICE = 10;                  //Type service
 
     CONST
-        STATUS_NEW = 5,                 //new request
-        STATUS_MANAGER_PROCESSED = 10,  //when request have type SERVICE, and request goes to manager
-        STATUS_DONE = 15;               //request is done
+        STATUS_NEW = 5,                     //new request
+        STATUS_MANAGER_PROCESSED = 10,      //when request have type SERVICE, and request goes to manager
+        STATUS_DONE = 15;                   //request is done
+
+    CONST
+        SCENARIO_SET_MANAGER = 'set_manager';   //Scenario for set manager
 
     /**
      * @inheritdoc
@@ -77,7 +81,9 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id']],
             [['manager_id'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['manager_id' => 'id']],
-            [['date'],'safe']
+            [['date'],'safe'],
+            ['description','string','max' => 255],
+            ['manager_id','required','on' => self::SCENARIO_SET_MANAGER]
         ];
     }
 
@@ -98,6 +104,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
             'status' => Yii::t('app/users', 'Status'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
+            'description' => Yii::t('app/users','Description')
         ];
     }
 

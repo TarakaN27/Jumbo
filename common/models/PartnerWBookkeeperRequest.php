@@ -31,6 +31,22 @@ use backend\models\BUser;
  */
 class PartnerWBookkeeperRequest extends AbstractActiveRecord
 {
+    CONST
+        STATUS_NEW = 5,
+        STATUS_DONE = 10;
+
+    /**
+     * @return array
+     */
+    public static function getStatusMap()
+    {
+        return [
+            self::STATUS_NEW => Yii::t('app/users','Status new'),
+            self::STATUS_DONE => Yii::t('app/users','Status done')
+        ];
+
+    }
+
     /**
      * @inheritdoc
      */
@@ -77,6 +93,16 @@ class PartnerWBookkeeperRequest extends AbstractActiveRecord
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
         ];
+    }
+
+    /**
+     * Get string status
+     * @return string
+     */
+    public function getStatusStr()
+    {
+        $arTmp = self::getStatusMap();
+        return isset($arTmp[$this->status]) ? $arTmp[$this->status] : NULL;
     }
 
     /**

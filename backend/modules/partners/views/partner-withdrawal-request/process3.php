@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: zhenya
- * Date: 27.4.16
- * Time: 16.39
+ * Date: 29.4.16
+ * Time: 15.41
  */
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -16,6 +16,7 @@ $this->registerJsFile('@web/js/parts/pw_process_1_form.js',[
         'yii\bootstrap\BootstrapPluginAsset',
     ]
 ]);
+
 $this->title = Yii::t('app/users','Partner withdrawal request');
 ?>
 <div class = "row">
@@ -29,42 +30,37 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
             </div>
             <div class = "x_content">
                 <div class="row">
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <?php echo \yii\widgets\DetailView::widget([
-                                'model' => $model,
-                                'attributes' => [
-                                    'id',
-                                    [
-                                        'attribute' => 'created_by',
-                                        'value' => is_object($obCrBy = $model->createdBy) ? $obCrBy->getFio() : NULL
-                                    ],
-                                    'amount:decimal',
-                                    [
-                                        'attribute' => 'currency_id',
-                                        'value' => is_object($obCurr = $model->currency) ? $obCurr->code : NULL
-                                    ],
-                                    'date:date',
-                                    [
-                                        'attribute' => 'type',
-                                        'value' => $model->getTypeStr()
-                                    ],
-                                    [
-                                        'attribute' => 'status',
-                                        'value' => $model->getStatusStr()
-                                    ],
-                                    'created_at:datetime',
-                                    'description:text'
-                                ]
-                            ])?>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <p><?=Yii::t('app/users','Available amount')?>:<span id="avAmount" data-amount="<?=$model->amount;?>"></span></p>
-                            <p><?=Yii::t('app/users','Bookkeeper for partner withdrawal')?>:
-                                <span class="<?php if(!is_object($obBookkeeper)):?>colorDanger<?php else:?>colorSuccess  <?php endif;?>">
-                                    <?=is_object($obBookkeeper) ? $obBookkeeper->getFio() : Yii::t('app/users','Warning! You must set bookkeeper for partner withdrawal!');?>
-                                </span>
-                            </p>
-                        </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <?php echo \yii\widgets\DetailView::widget([
+                            'model' => $model,
+                            'attributes' => [
+                                'id',
+                                [
+                                    'attribute' => 'created_by',
+                                    'value' => is_object($obCrBy = $model->createdBy) ? $obCrBy->getFio() : NULL
+                                ],
+                                'amount:decimal',
+                                [
+                                    'attribute' => 'currency_id',
+                                    'value' => is_object($obCurr = $model->currency) ? $obCurr->code : NULL
+                                ],
+                                'date:date',
+                                [
+                                    'attribute' => 'type',
+                                    'value' => $model->getTypeStr()
+                                ],
+                                [
+                                    'attribute' => 'status',
+                                    'value' => $model->getStatusStr()
+                                ],
+                                'created_at:datetime',
+                                'description:text'
+                            ]
+                        ])?>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <p><?=Yii::t('app/users','Available amount')?>:<span id="avAmount" data-amount="<?=$model->amount;?>"></span></p>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -81,7 +77,7 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                     'min' => 1, // 0 or 1 (default 1)
                                     'insertButton' => '.add-item', // css class
                                     'deleteButton' => '.remove-item', // css class
-                                    'model' => $models[0],
+                                    'model' => $arModels[0],
                                     'formId' => 'dynamic-form',
                                     'formFields' => [
                                         'cuser_id',
@@ -91,7 +87,7 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                 ]); ?>
 
                                 <div class="container-items"><!-- widgetContainer -->
-                                    <?php foreach ($models as $i => $model): ?>
+                                    <?php foreach ($arModels as $i => $obModel): ?>
                                         <div class="item panel panel-default"><!-- widgetBody -->
                                             <div class="panel-heading">
                                                 <h3 class="panel-title pull-left"><?=Yii::t('app/users','Partner withdrawal params')?></h3>
@@ -103,28 +99,41 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                             </div>
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-4 wm-select-2-style">
-                                                        <?= $form->field($model, "[{$i}]amount")->textInput([
+                                                    <div class="col-sm-3 wm-select-2-style">
+                                                        <?= $form->field($obModel, "[{$i}]amount")->textInput([
                                                             'class' => 'amounts form-control'
                                                         ]);?>
                                                     </div>
-                                                    <div class="col-sm-4">
-                                                        <?= $form->field($model, "[{$i}]legalPerson")->dropDownList(
+                                                    <div class="col-sm-3 wm-select-2-style">
+                                                        <?=$form->field($obModel,"[{$i}]serviceID")->dropDownList(
+                                                            \common\models\Services::getServicesMap(),[
+                                                                'prompt' => Yii::t('app/users','Choose service')
+                                                            ]
+                                                        )?>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <?= $form->field($obModel, "[{$i}]legalPersonID")->dropDownList(
                                                             LegalPerson::getLegalPersonMap(),
                                                             [
                                                                 'prompt' => Yii::t('app/users','Choose legal person')
                                                             ]
                                                         ) ?>
                                                     </div>
-                                                    <div class="col-sm-4">
-                                                        <?= $form->field($model, "[{$i}]contractor")->dropDownList(
-                                                            $arContractor,
-                                                            [
-                                                                'prompt' => Yii::t('app/users','Choose contractor')
-                                                            ]
-                                                        ) ?>
+                                                    <div class="col-sm-3">
+                                                        <?= $form->field($obModel, "[{$i}]description")->textarea(); ?>
                                                     </div>
                                                 </div><!-- .row -->
+                                                <?php if(!empty($obModel->arCustomErrors)):?>
+                                                    <div class="row">
+                                                        <ul>
+                                                            <?php foreach ($obModel->arCustomErrors as $strError):?>
+                                                                <li>
+                                                                    <?=Html::encode($strError);?>
+                                                                </li>
+                                                            <?php endforeach;?>
+                                                        </ul>
+                                                    </div>
+                                                <?php endif;?>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
@@ -132,13 +141,11 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                 <?php DynamicFormWidget::end(); ?>
                             </div>
                         </div>
-                        <?php if($obBookkeeper):?>
-                            <div class="form-group">
-                                <div class = "col-md-6 col-sm-6 col-xs-12">
-                                    <?= Html::submitButton(Yii::t('app/users', 'Save'), ['class' => 'btn btn-success']) ?>
-                                </div>
+                        <div class="form-group">
+                            <div class = "col-md-6 col-sm-6 col-xs-12">
+                                <?= Html::submitButton(Yii::t('app/users', 'Save'), ['class' => 'btn btn-success']) ?>
                             </div>
-                        <?php endif;?>
+                        </div>
                         <?php ActiveForm::end();?>
                     </div>
                 </div>

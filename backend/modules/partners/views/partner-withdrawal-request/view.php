@@ -18,13 +18,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     <section class="pull-right">
                         <?=  Html::a(Yii::t('app/users', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                         <?= Html::a(Yii::t('app/users', 'Create Partner Withdrawal Request'), ['create'], ['class' => 'btn btn-success']) ?>
-                        <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [
-                                'class' => 'btn btn-danger',
-                                'data' => [
-                                'confirm' => Yii::t('app/users', 'Are you sure you want to delete this item?'),
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?php if($model->status == \common\models\PartnerWithdrawalRequest::STATUS_NEW):?>
+                            <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-danger',
+                                    'data' => [
+                                    'confirm' => Yii::t('app/users', 'Are you sure you want to delete this item?'),
+                                    'method' => 'post',
+                                ],
+                            ]) ?>
+                        <?php endif;?>
                     </section>
                     <div class = "clearfix"></div>
                 </div>
@@ -55,6 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => is_object($obCreated = $model->createdBy) ? $obCreated->getFio() : NULL
                                 ],
                                 'date:date',
+                                'description:text',
                                 [
                                     'attribute' => 'status',
                                     'value' => $model->getStatusStr()
