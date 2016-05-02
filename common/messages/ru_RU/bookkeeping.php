@@ -211,5 +211,6 @@ return [
     'Choose user' => 'Выбрать пользователя',
     'Check is sale' => 'Проверка продажи',
     'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
-    'Payment request owner' => 'Владелец платежа'
+    'Payment request owner' => 'Владелец платежа',
+    'Total in BYR' => 'Итого в BYR'
 ];
