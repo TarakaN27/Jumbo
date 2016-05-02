@@ -17,6 +17,7 @@ use Yii;
  * @property string $description
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $pw_request_id
  *
  * @property ExchangeRates $currency
  * @property ExpenseCategories $cat
@@ -44,7 +45,11 @@ class Expense extends AbstractActiveRecord
                 'legal_id',  'cat_id'
             ], 'required'],
             [[
-                'pay_date', 'currency_id', 'legal_id', 'cuser_id', 'cat_id', 'created_at', 'updated_at'], 'integer'],
+                'pay_date', 'currency_id',
+                'legal_id', 'cuser_id',
+                'cat_id', 'created_at',
+                'updated_at','pw_request_id'
+            ], 'integer'],
             [['pay_summ'], 'number'],
             [['description'], 'string'],
             [['cuser_id'],'required','when' => function(){
@@ -76,6 +81,7 @@ class Expense extends AbstractActiveRecord
             'description' => Yii::t('app/book', 'Description'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'pw_request_id' => Yii::t('app/book','Partner withdrawal request id')
         ];
     }
 
@@ -139,5 +145,13 @@ class Expense extends AbstractActiveRecord
     public function getFormatedPayDate()
     {
         return date('d.m.Y',$this->pay_date);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPartnerWithdrawalRequest()
+    {
+        return $this->hasOne(PartnerWithdrawalRequest::className(),['id' => 'pw_request_id']);
     }
 }

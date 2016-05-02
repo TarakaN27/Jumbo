@@ -99,19 +99,24 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                             </div>
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-3 wm-select-2-style">
+                                                    <div class="col-sm-2 wm-select-2-style">
                                                         <?= $form->field($obModel, "[{$i}]amount")->textInput([
                                                             'class' => 'amounts form-control'
                                                         ]);?>
                                                     </div>
                                                     <div class="col-sm-3 wm-select-2-style">
+                                                        <?=$form->field($obModel,"[{$i}]contractorID")->dropDownList(
+                                                            $arContractor
+                                                        )?>
+                                                    </div>
+                                                    <div class="col-sm-2 wm-select-2-style">
                                                         <?=$form->field($obModel,"[{$i}]serviceID")->dropDownList(
                                                             \common\models\Services::getServicesMap(),[
                                                                 'prompt' => Yii::t('app/users','Choose service')
                                                             ]
                                                         )?>
                                                     </div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col-sm-2">
                                                         <?= $form->field($obModel, "[{$i}]legalPersonID")->dropDownList(
                                                             LegalPerson::getLegalPersonMap(),
                                                             [

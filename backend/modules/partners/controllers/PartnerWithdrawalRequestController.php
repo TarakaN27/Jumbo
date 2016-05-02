@@ -367,9 +367,13 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                 }
             }
         }
+
+        $arContractor = CuserToGroup::getUserByGroup($model->partner_id);       //Get contractors by partner id
+
         return $this->render('process3',[
             'model' => $model,
-            'arModels' => $arModels
+            'arModels' => $arModels,
+            'arContractor' => $arContractor
         ]);
     }
 }

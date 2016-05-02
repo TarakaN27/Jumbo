@@ -306,5 +306,8 @@ return [
     'Invalid amount' => 'Неверно задана сумма',
     'Warning! You must set bookkeeper for partner withdrawal!' => 'Внимание! Вы должны указать бухгалтера для вывода средств!',
     'Bookkeeper for partner withdrawal' => 'Бухгалтер для вывода средств',
-    'Request successfully processed' => 'Запрос успешно обработан'
+    'Request successfully processed' => 'Запрос успешно обработан',
+    'Contractor ID' => 'Контрагент',
+    'Empty responsibility for enrollment!' => 'Необходимо задать ответственного по зачислению для услуги',
+    'Service not found!' => 'Услуга не найдена'
 ];
