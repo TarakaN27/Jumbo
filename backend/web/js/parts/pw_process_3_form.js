@@ -51,6 +51,7 @@ function fillConditionSelect(selector,options)
  */
 function PWFindCondition()
 {
+    console.log('ola');
         var
             bClear = true,
             payDate = $('#pay_date').val(),
@@ -137,6 +138,7 @@ function PWFindCondition()
 $(function () {
     $('#dynamic-form').on('change','.change-event',PWFindCondition);        //bind function to change event
     hidePPreloader();                       //when document is ready hide preloader and show content
+    $('#dynamic-form .change-event').trigger('change');
 });
 
 
