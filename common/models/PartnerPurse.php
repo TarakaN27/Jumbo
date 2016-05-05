@@ -71,4 +71,22 @@ class PartnerPurse extends AbstractActiveRecord
     {
         return (float)$this->amount -(float)$this->withdrawal;
     }
+
+    /**
+     * @param $iPartnerId
+     * @return PartnerPurse
+     */
+    public static function getPurse($iPartnerId)
+    {
+        $obPurse = self::find()->where(['cuser_id' => $iPartnerId])->one();
+        if(!$obPurse)
+        {
+            $obPurse = new PartnerPurse();
+            $obPurse->amount = 0;
+            $obPurse->withdrawal = 0;
+            $obPurse->cuser_id = $iPartnerId;
+        }
+        return $obPurse;
+    }
+
 }

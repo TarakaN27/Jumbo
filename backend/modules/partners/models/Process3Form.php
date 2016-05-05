@@ -10,10 +10,16 @@ namespace backend\modules\partners\models;
 
 
 use common\models\EnrollmentRequest;
+use common\models\ExchangeCurrencyHistory;
 use common\models\Expense;
 use common\models\PartnerExpenseCatLink;
+use common\models\PartnerPurse;
+use common\models\PartnerPurseHistory;
+use common\models\PaymentCondition;
 use common\models\Services;
 use yii\base\Model;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 class Process3Form extends Model
 {
@@ -56,26 +62,20 @@ class Process3Form extends Model
     }
 
     /**
-     *
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function makeRequest()
     {
-        if(!$this->saveExpense())
+        if(null == $obExpenceID = $this->saveExpense())         //expanse
             return FALSE;
 
+        if(!$this->createEnrollment())                          //enrollment
+            return FALSE;
 
-
-
-
-
-
-
-
-
-
-
-
-
+        if(!$this->partnerPurseOperation($obExpenceID))         //partner purse
+            return FALSE;
 
         return TRUE;
     }
@@ -106,9 +106,16 @@ class Process3Form extends Model
         $obExpense->description = $this->description;
         $obExpense->pw_request_id = $this->obRequest->id;
 
-        return $obExpense->save();
+        if($obExpense->save())
+            return $obExpense->id;
+
+        return NULL;
     }
 
+    /**
+     * @return bool
+     * @throws NotFoundHttpException
+     */
     protected function createEnrollment()
     {
         /** @var Services $obServ */
@@ -137,17 +144,63 @@ class Process3Form extends Model
             return FALSE;
         }
 
+        $obCond = PaymentCondition::find()->where(['id' => $this->conditionID])->one();
+        if(!$obCond)
+            throw new NotFoundHttpException('Condition not found');
+
+        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$this->obRequest->currency_id);
+        if(!$pCurr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$obCond->cond_currency);
+
+        if(!$curr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $amount = round($this->amount*$pCurr/$curr,6);
+
         $obEnrollReq = new EnrollmentRequest();
-        $obEnrollReq->amount = $this->countAmoutForEnrollment($model,$obCond,$obCalc);
-        $obEnrollReq->service_id = $obSrv->id;
-        $obEnrollReq->assigned_id = $obSrv->b_user_enroll;
-        $obEnrollReq->payment_id = $model->id;
-        $obEnrollReq->cuser_id = $model->cuser_id;
-        $obEnrollReq->pay_amount = $model->pay_summ;
-        $obEnrollReq->pay_currency = $model->currency_id;
-        $obEnrollReq->pay_date = $model->pay_date;
+        $obEnrollReq->amount = $amount;
+        $obEnrollReq->service_id = $this->serviceID;
+        $obEnrollReq->assigned_id = $obServ->b_user_enroll;
+
+        $obEnrollReq->cuser_id = $this->obRequest->cuser_id;
+        $obEnrollReq->pay_amount = $this->amount;
+        $obEnrollReq->pay_currency = $this->obRequest->currency_id;
+        $obEnrollReq->pay_date = $this->obRequest->pay_date;
+        $obEnrollReq->pw_request_id = $this->obRequest->id;
         $obEnrollReq->status = EnrollmentRequest::STATUS_NEW;
         $obEnrollReq->added_by = \Yii::$app->user->id;
         return $obEnrollReq->save();
+    }
+
+    /**
+     * @param $iExpenseID
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function partnerPurseOperation($iExpenseID)
+    {
+        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$this->obRequest->currency_id);
+        if(!$pCurr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $amount = $this->amount*$pCurr;
+
+        $obPurseHistory = new PartnerPurseHistory();
+        $obPurseHistory->amount = $amount;
+        $obPurseHistory->type = PartnerPurseHistory::TYPE_EXPENSE;
+        $obPurseHistory->cuser_id = $this->obRequest->partner_id;
+        $obPurseHistory->expense_id = $iExpenseID;
+        if($obPurseHistory->save())
+            throw new ServerErrorHttpException('Can not save expense');
+        
+        $obPurse = PartnerPurse::getPurse($this->obRequest->partner_id);
+        $obPurse->withdrawal+=$amount;
+        if(!$obPurse->save())
+            throw new ServerErrorHttpException('Can not save purse');
+
+        return TRUE;
     }
 }

@@ -23,9 +23,14 @@ $this->registerJsFile('@web/js/parts/pw_process_3_form.js',[
         'yii\bootstrap\BootstrapPluginAsset',
     ]
 ]);
+$this->registerJs('
+    var
+        FIND_CONDITION_URL = "'.\yii\helpers\Url::to(['/ajax-select/get-condition']).'";
+',\yii\web\View::POS_HEAD);
 
 $this->title = Yii::t('app/users','Partner withdrawal request');
 ?>
+
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
         <div class = "x_panel">
@@ -36,8 +41,14 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
-                <div class="row">
+                <div id="preloader">
+                    <div class="loader mrg-auto"></div>
+                </div>
+                <div class="row pMainContent hide">
                     <div class="col-md-6 col-sm-6 col-xs-12">
+                        <?=Html::hiddenInput('pay_date',$model->date,['id' => 'pay_date']);?>
+                        <?=Html::hiddenInput('currency_id',$model->currency_id,['id' => 'currency_id']);?>
+
                         <?php echo \yii\widgets\DetailView::widget([
                             'model' => $model,
                             'attributes' => [
@@ -69,7 +80,7 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                         <p><?=Yii::t('app/users','Available amount')?>:<span id="avAmount" data-amount="<?=$model->amount;?>"></span></p>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row pMainContent hide">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <?php $form=ActiveForm::begin([
                             'id' => 'dynamic-form'

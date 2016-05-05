@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $added_by
  * @property integer $parent_id
  * @property integer $part_enroll
+ * @property integer $pw_request_id
  *
  * @property CUser $cuser
  * @property BUser $assigned
@@ -86,7 +87,8 @@ class EnrollmentRequest extends AbstractActiveRecord
                 'status',
                 'added_by',
                 'parent_id',
-                'part_enroll'
+                'part_enroll',
+                'pw_request_id'
             ], 'integer'],
             [['service_id', 'cuser_id'], 'required'],
             [['amount', 'pay_amount'], 'number'],
@@ -115,7 +117,8 @@ class EnrollmentRequest extends AbstractActiveRecord
             'status' => Yii::t('app/book','Status'),
             'added_by' => Yii::t('app/book','Added by'),
             'parent_id' => Yii::t('app/book','Parent request'),
-            'part_enroll' => Yii::t('app/book','Partial enrollment')
+            'part_enroll' => Yii::t('app/book','Partial enrollment'),
+            'pw_request_id' => Yii::t('app/book','Partner withdrawal request')
         ];
     }
 
@@ -183,6 +186,15 @@ class EnrollmentRequest extends AbstractActiveRecord
     public function getChild()
     {
         return $this->hasOne(self::className(),['parent_id' => 'id']);
+    }
+
+    /**
+     * Запрос на вывод средств партнера
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPartnerWithdrawalRequest()
+    {
+        return $this->hasOne(PartnerWithdrawalRequest::className(),['id' => 'pw_request_id']);
     }
 
     /**

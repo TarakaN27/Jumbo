@@ -16,8 +16,12 @@ use common\models\AbstractActiveRecord;
 use common\models\CrmCmpContacts;
 use common\models\CrmTask;
 use common\models\CUser;
+use common\models\ExchangeCurrencyHistory;
+use common\models\PaymentCondition;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\db\Query;
 use common\models\CUserRequisites;
@@ -399,5 +403,40 @@ class AjaxSelectController extends AbstractBaseBackendController
 			];
 		}
 		return $out;
+	}
+
+	/**
+	 * @return array
+	 * @throws NotFoundHttpException
+	 */
+	public function actionGetCondition()
+	{
+		$iServId = Yii::$app->request->post('iservId');
+		$iLegalId = Yii::$app->request->post('iLegalId');
+		$amount = Yii::$app->request->post('amount');
+		$iCuserId = Yii::$app->request->post('iCuserId');
+		$iPayDate = Yii::$app->request->post('iPayDate');
+		$iCurrID = Yii::$app->request->post('iCurrID');
+
+		if(empty($iServId) || empty($iLegalId) || empty($amount) || empty($iCuserId) || empty($iPayDate) || empty($iCurrID))
+		{
+			throw new InvalidParamException('');
+		}
+
+		$exhRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($iPayDate,$iCurrID);
+		if(!$exhRate)
+			throw new NotFoundHttpException('Exchange rate not found');
+
+		$amount = (float)$amount*(float)$exhRate;
+		
+		$obCuser = CUser::find()->select(['id','is_resident'])->where(['id' => $iCuserId])->one();
+		if(!$obCuser)
+			throw new NotFoundHttpException('Cuser not found');
+
+		$obConditions = PaymentCondition::getAppropriateConditions($iServId,$iLegalId,$amount,$obCuser->is_resident,$iPayDate);
+		if(empty($obConditions))
+			return [];
+
+		return PaymentCondition::find()->select(['id','name'])->where(['id'=>array_unique($obConditions)])->all();
 	}
 }
