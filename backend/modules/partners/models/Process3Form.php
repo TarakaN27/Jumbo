@@ -33,10 +33,10 @@ class Process3Form extends Model
     public function rules()
     {
         return [
-            [['serviceID','amount','legalPersonID','contractorID'],'required'],
+            [['serviceID','amount','legalPersonID','contractorID','conditionID'],'required'],
             ['description','string','max' => 255],
             ['amount','number'],
-            [['serviceID','legalPersonID','contractorID'],'integer']
+            [['serviceID','legalPersonID','contractorID','conditionID'],'integer']
         ];
     }
 
@@ -50,7 +50,8 @@ class Process3Form extends Model
             'amount' => \Yii::t('app/users','Amount'),
             'legalPersonID' => \Yii::t('app/users','Legal person'),
             'description' => \Yii::t('app/users','Description'),
-            'contractorID' => \Yii::t('app/users','Contractor ID')
+            'contractorID' => \Yii::t('app/users','Contractor ID'),
+            'conditionID' => \Yii::t('app/users','Condition ID')
         ];
     }
 

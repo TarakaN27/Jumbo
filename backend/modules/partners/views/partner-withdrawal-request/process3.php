@@ -16,6 +16,13 @@ $this->registerJsFile('@web/js/parts/pw_process_1_form.js',[
         'yii\bootstrap\BootstrapPluginAsset',
     ]
 ]);
+$this->registerJsFile('@web/js/parts/pw_process_3_form.js',[
+    'depends' => [
+        'yii\web\JqueryAsset',
+        'yii\web\YiiAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
+    ]
+]);
 
 $this->title = Yii::t('app/users','Partner withdrawal request');
 ?>
@@ -99,32 +106,44 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                             </div>
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-2 wm-select-2-style">
+                                                    <div class="col-sm-4 wm-select-2-style">
                                                         <?= $form->field($obModel, "[{$i}]amount")->textInput([
-                                                            'class' => 'amounts form-control'
+                                                            'class' => 'amounts form-control change-event'
                                                         ]);?>
                                                     </div>
-                                                    <div class="col-sm-3 wm-select-2-style">
+                                                    <div class="col-sm-4 wm-select-2-style">
                                                         <?=$form->field($obModel,"[{$i}]contractorID")->dropDownList(
-                                                            $arContractor
-                                                        )?>
-                                                    </div>
-                                                    <div class="col-sm-2 wm-select-2-style">
-                                                        <?=$form->field($obModel,"[{$i}]serviceID")->dropDownList(
-                                                            \common\models\Services::getServicesMap(),[
-                                                                'prompt' => Yii::t('app/users','Choose service')
+                                                            $arContractor,[
+                                                                'class' => 'form-control change-event'
                                                             ]
                                                         )?>
                                                     </div>
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-4 wm-select-2-style">
+                                                        <?=$form->field($obModel,"[{$i}]serviceID")->dropDownList(
+                                                            \common\models\Services::getServicesMap(),[
+                                                                'prompt' => Yii::t('app/users','Choose service'),
+                                                                 'class' => 'form-control change-event'
+                                                            ]
+                                                        )?>
+                                                    </div>
+                                                    <div class="col-sm-4">
                                                         <?= $form->field($obModel, "[{$i}]legalPersonID")->dropDownList(
                                                             LegalPerson::getLegalPersonMap(),
                                                             [
-                                                                'prompt' => Yii::t('app/users','Choose legal person')
+                                                                'prompt' => Yii::t('app/users','Choose legal person'),
+                                                                'class' => 'form-control change-event'
                                                             ]
                                                         ) ?>
                                                     </div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col-sm-4">
+                                                        <?= $form->field($obModel, "[{$i}]conditionID")->dropDownList(
+                                                            [],
+                                                            [
+                                                                'prompt' => Yii::t('app/users','Choose condition ID')
+                                                            ]
+                                                        ) ?>
+                                                    </div>
+                                                    <div class="col-sm-4">
                                                         <?= $form->field($obModel, "[{$i}]description")->textarea(); ?>
                                                     </div>
                                                 </div><!-- .row -->

@@ -309,5 +309,7 @@ return [
     'Request successfully processed' => 'Запрос успешно обработан',
     'Contractor ID' => 'Контрагент',
     'Empty responsibility for enrollment!' => 'Необходимо задать ответственного по зачислению для услуги',
-    'Service not found!' => 'Услуга не найдена'
+    'Service not found!' => 'Услуга не найдена',
+    'Condition ID' => 'Условие',
+    'Choose condition ID' => 'Выбрать условие'
 ];
