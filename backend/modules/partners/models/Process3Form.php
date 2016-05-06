@@ -87,13 +87,13 @@ class Process3Form extends Model
     protected function saveExpense()
     {
         if(!$this->obRequest)
-            return FALSE;
+            return NULL;
 
         $obCat = PartnerExpenseCatLink::getCatByServAndLP($this->serviceID,$this->legalPersonID,PartnerExpenseCatLink::TYPE_SERVICES);
         if(!$obCat)
         {
             $this->arCustomErrors [] = \Yii::t('app/users','Category expense not found!');
-            return FALSE;
+            return NULL;
         }
 
         $obExpense = new Expense();
@@ -148,11 +148,11 @@ class Process3Form extends Model
         if(!$obCond)
             throw new NotFoundHttpException('Condition not found');
 
-        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$this->obRequest->currency_id);
+        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->date),$this->obRequest->currency_id);
         if(!$pCurr)
             throw new NotFoundHttpException('Currency not found');
 
-        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$obCond->cond_currency);
+        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->date),$obCond->cond_currency);
 
         if(!$curr)
             throw new NotFoundHttpException('Currency not found');
@@ -164,10 +164,10 @@ class Process3Form extends Model
         $obEnrollReq->service_id = $this->serviceID;
         $obEnrollReq->assigned_id = $obServ->b_user_enroll;
 
-        $obEnrollReq->cuser_id = $this->obRequest->cuser_id;
+        $obEnrollReq->cuser_id = $this->obRequest->partner_id;
         $obEnrollReq->pay_amount = $this->amount;
         $obEnrollReq->pay_currency = $this->obRequest->currency_id;
-        $obEnrollReq->pay_date = $this->obRequest->pay_date;
+        $obEnrollReq->pay_date = $this->obRequest->date;
         $obEnrollReq->pw_request_id = $this->obRequest->id;
         $obEnrollReq->status = EnrollmentRequest::STATUS_NEW;
         $obEnrollReq->added_by = \Yii::$app->user->id;
@@ -182,7 +182,7 @@ class Process3Form extends Model
      */
     public function partnerPurseOperation($iExpenseID)
     {
-        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->pay_date),$this->obRequest->currency_id);
+        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->obRequest->date),$this->obRequest->currency_id);
         if(!$pCurr)
             throw new NotFoundHttpException('Currency not found');
 
@@ -193,8 +193,9 @@ class Process3Form extends Model
         $obPurseHistory->type = PartnerPurseHistory::TYPE_EXPENSE;
         $obPurseHistory->cuser_id = $this->obRequest->partner_id;
         $obPurseHistory->expense_id = $iExpenseID;
-        if($obPurseHistory->save())
-            throw new ServerErrorHttpException('Can not save expense');
+        if(!$obPurseHistory->save())
+            throw new ServerErrorHttpException('Can not save purse history');
+
         
         $obPurse = PartnerPurse::getPurse($this->obRequest->partner_id);
         $obPurse->withdrawal+=$amount;

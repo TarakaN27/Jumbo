@@ -3,11 +3,14 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\managers\PartnerWBookkeeperRequestManager;
 use Yii;
 use common\models\PartnerWBookkeeperRequest;
 use common\models\search\PartnerWBookkeeperRequestSearch;
+use yii\base\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 
 /**
@@ -23,6 +26,9 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
     {
         $searchModel = new PartnerWBookkeeperRequestSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        
+        
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -37,8 +43,13 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model ,
         ]);
     }
 
@@ -66,6 +77,7 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
      * @param integer $id
      * @return mixed
      */
+    /*
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -78,6 +90,7 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
             ]);
         }
     }
+    */
 
     /**
      * Deletes an existing PartnerWBookkeeperRequest model.
@@ -107,4 +120,50 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    /**
+     * @param $id
+     * @throws NotFoundHttpException
+     */
+    public function actionProcess($id)
+    {
+        /** @var PartnerWBookkeeperRequestManager $model */
+        $model = PartnerWBookkeeperRequestManager::find()
+            ->with('buser','partner','contractor','currency','legal')
+            ->where(['id' => $id])
+            ->one();
+
+        if(!$model)
+            throw new NotFoundHttpException('Request not found');
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $model->status = PartnerWBookkeeperRequest::STATUS_DONE;
+                if(!$model->save())
+                    throw new ServerErrorHttpException();
+
+                if(!$model->processPartnerWithdrawal())
+                    throw new ServerErrorHttpException();
+                
+                $transaction->commit();
+                return $this->redirect(['index']);
+            }catch (Exception $e)
+            {
+                $transaction->rollBack();
+            }
+        }
+        return $this->render('process',[
+            'model' => $model
+        ]);
+    }
+
+    public function actionPdf($id)
+    {
+        $model = PartnerWBookkeeperRequestManager::find()->where(['id' => $id])->one();
+
+
+    }
+
 }

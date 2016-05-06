@@ -31,28 +31,73 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'id',
                             'format' => 'html',
                             'value' => function($model){
-                                                return Html::a($model->id,['update','id' => $model->id],['class' => 'link-upd']);
+                                return $model->id;
                             }
                         ],
-                        'buser_id',
-                        'partner_id',
-                        'contractor_id',
-                        'amount',
-                        // 'currency_id',
-                        // 'legal_id',
-                        // 'request_id',
-                        // 'created_by',
-                        // 'status',
-                        // 'created_at',
-                        // 'updated_at',
+                        [
+                            'attribute' => 'buser_id',
+                            'value' => 'buser.fio',
+                            'visible' => Yii::$app->user->can('adminRights')
+                        ],
+                        [
+                            'attribute' => 'partner_id',
+                            'value' => 'partner.infoWithSite'
+                        ],
+                        [
+                            'attribute' => 'contractor_id',
+                            'value' => 'contractor.infoWithSite'
+                        ],
+                        'amount:decimal',
+                        [
+                            'attribute' => 'currency_id',
+                            'value' => 'currency.code',
+                            'filter' => \common\models\ExchangeRates::getRatesCodes()
+                        ],
+                        [
+                            'attribute' => 'legal_id',
+                            'value' => 'legal.name',
+                            'filter' => \common\models\LegalPerson::getLegalPersonMap()
+                        ],
+                        [
+                            'attribute' => 'status',
+                            'value' => 'statusStr',
+                            'filter' => \common\models\PartnerWBookkeeperRequest::getStatusMap()
+                        ],
+                        'created_at:datetime',
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{update}{view}'
+                            'template' => '{pdf}',
+                            'buttons' => [
+                                'pdf' => function($url, $model, $key){
+                                    return Html::a('<i class="fa fa-file-pdf-o"></i>',$url,[
+                                        'target' => '_blank'
+                                    ]);
+                                }
+                            ]
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{delete}'
+                            'template' => '{process}',
+                            'buttons' => [
+                                'process' => function($url, $model, $key){
+                                    
+                                    if($model->status != \common\models\PartnerWBookkeeperRequest::STATUS_NEW)
+                                        return NULL;
+                                    
+                                    return Html::a('<i class="fa fa-credit-card"></i>',$url);
+                                }
+                            ]
                         ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{view}'
+                        ],
+                        /*
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{delete}',
+                        ],
+                        */
                     ],
                 ]); ?>
             </div>

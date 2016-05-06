@@ -134,4 +134,5 @@ class PartnerExpenseCatLink extends AbstractActiveRecord
     {
         return self::find()->where(['service_id' => $serviID,'legal_person_id' => $legalPersonID,'type' => $iType])->one();
     }
+
 }

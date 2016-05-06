@@ -311,5 +311,7 @@ return [
     'Empty responsibility for enrollment!' => 'Необходимо задать ответственного по зачислению для услуги',
     'Service not found!' => 'Услуга не найдена',
     'Condition ID' => 'Условие',
-    'Choose condition ID' => 'Выбрать условие'
+    'Choose condition ID' => 'Выбрать условие',
+    'Legal ID' => 'Юр. лицо',
+    'Request ID' => 'ID запроса'
 ];

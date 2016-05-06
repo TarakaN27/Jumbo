@@ -18,7 +18,12 @@ class PartnerWBookkeeperRequestSearch extends PartnerWBookkeeperRequest
     public function rules()
     {
         return [
-            [['id', 'buser_id', 'partner_id', 'contractor_id', 'currency_id', 'legal_id', 'request_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
+            [[
+                'id', 'buser_id', 'partner_id',
+                'contractor_id', 'currency_id', 'legal_id',
+                'request_id', 'created_by', 'status',
+                'created_at', 'updated_at'
+            ], 'integer'],
             [['amount'], 'number'],
         ];
     }
@@ -41,7 +46,7 @@ class PartnerWBookkeeperRequestSearch extends PartnerWBookkeeperRequest
      */
     public function search($params)
     {
-        $query = PartnerWBookkeeperRequest::find();
+        $query = PartnerWBookkeeperRequest::find()->with('buser','partner','contractor','currency','legal');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

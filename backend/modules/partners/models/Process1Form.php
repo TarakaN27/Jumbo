@@ -87,6 +87,7 @@ class Process1Form extends Model
         $obBRequest->legal_id = $this->legalPerson;
         $obBRequest->request_id = $this->obRequest->id;
         $obBRequest->created_by = Yii::$app->user->id;
+        $obBRequest->description = $this->description;
         $obBRequest->status = PartnerWBookkeeperRequest::STATUS_NEW;
         return $obBRequest->save();
     }

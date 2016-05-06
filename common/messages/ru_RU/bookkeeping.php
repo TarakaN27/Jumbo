@@ -211,5 +211,10 @@ return [
     'Choose user' => 'Выбрать пользователя',
     'Check is sale' => 'Проверка продажи',
     'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
-    'Payment request owner' => 'Владелец платежа'
+    'Payment request owner' => 'Владелец платежа',
+    'Partner Wbookkeeper Requests' => 'Партнер. Запросы на вывод средств',
+    'Files' => 'Файлы',
+    'Attach files' => 'Прикрепить файлы',
+    'Process partner withdrawal request' => 'Обработка запроса на вывод средств партнера'
+
 ];
