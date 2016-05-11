@@ -12,11 +12,13 @@ namespace backend\controllers;
 use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
 use common\models\CrmTask;
+use common\models\CUser;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\ExchangeRatesManager;
 use common\models\Messages;
 use common\models\PartnerPurse;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -419,20 +421,55 @@ class AjaxServiceController extends AbstractBaseBackendController{
      */
     public function actionPartnerGetPurse()
     {
+            $pk = Yii::$app->request->post('pk');
+            $date = Yii::$app->request->post('date');
+            $currID = Yii::$app->request->post('currID');
+
+            if (empty($pk) || empty($date) || empty($currID))
+                    throw new NotFoundHttpException();
+
+            $obPurse = PartnerPurse::getPurse($pk);
+            if (!$obPurse)
+                    throw new NotFoundHttpException();
+
+            $amount = (float)$obPurse->getAvailableAmount();
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date), $currID);
+
+            return Yii::$app->formatter->asDecimal($amount / $curr);
+    }
+
+        /**
+         * @return array
+         */
+    public function actionGetCmpInfo()
+    {
         $pk = Yii::$app->request->post('pk');
-        $date = Yii::$app->request->post('date');
-        $currID = Yii::$app->request->post('currID');
+        if(empty($pk))
+            throw  new InvalidParamException();
 
-        if(empty($pk) || empty($date) || empty($currID))
-            throw new NotFoundHttpException();
+        /** @var Cuser $obCuser */
+        $obCuser = CUser::find()
+            ->joinWith('manager man')
+            ->joinWith('managerCrc manC')
+            ->select([
+                CUser::tableName().'.id',
+                CUser::tableName().'.manager_id',
+                CUser::tableName().'.manager_crc_id',
+                'man.id as manID',
+                'man.lname',
+                'man.mname',
+                'man.fname',
+                'manC.id as manCID',
+                'manC.lname',
+                'manC.fname',
+                'manC.mname'
+            ])
+            ->where([CUser::tableName().'.id' => $pk])
+            ->one();
 
-        $obPurse = PartnerPurse::getPurse($pk);
-        if(!$obPurse)
-            throw new NotFoundHttpException();
-
-        $amount = (float)$obPurse->getAvailableAmount();
-        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date),$currID);
-
-        return Yii::$app->formatter->asDecimal($amount/$curr);
+        return [
+            $obCuser->getAttributeLabel('manager_id') => is_object($obMan = $obCuser->manager) ? $obMan->getFio() : $obCuser->manager_id,
+            $obCuser->getAttributeLabel('manager_crc_id') => is_object($obCpc = $obCuser->managerCrc) ? $obCpc->getFio() : $obCuser->manager_crc_id
+        ];
     }
 } 

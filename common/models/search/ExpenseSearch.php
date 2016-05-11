@@ -2,12 +2,14 @@
 
 namespace common\models\search;
 
+use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\ExpenseCategories;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Expense;
+use yii\web\NotFoundHttpException;
 
 /**
  * ExpenseSearch represents the model behind the search form about `common\models\Expense`.
@@ -147,6 +149,7 @@ class ExpenseSearch extends Expense
     public function totalCount($params,$additionQuery=NULL)
     {
         $query = Expense::find()->select([
+            'pay_date',
             'pay_summ',
             'currency_id',
             ExchangeRates::tableName().'.code',
@@ -167,15 +170,32 @@ class ExpenseSearch extends Expense
 
         $arResult = [
             'total' => [],
-            'withoutIgnore' =>[]
+            'totalByr' => 0,
+            'withoutIgnore' =>[],
+            'totalWithoutIgnore' => 0
         ];
+        $arDateHist = [];
+        /** @var Expense $exp */
         foreach($arExp as $exp)
         {
+            $date = date('Y-m-d',$exp->pay_date);
+            if(isset($arDateHist[$date][$exp->currency_id]))
+            {
+                $curr = $arDateHist[$date][$exp->currency_id];
+            }else{
+                $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate($exp->pay_date,$exp->currency_id);
+                if(!$curr)
+                    throw new NotFoundHttpException('Currency not found');
+                $arDateHist[$date][$exp->currency_id] = $curr;
+            }
+
             $name = is_object($exp->currency) ? $exp->currency->code : $exp->currency_id;
             if(isset($arResult['total'][$name]))
                 $arResult['total'][$name]+=$exp->pay_summ;
             else
                 $arResult['total'][$name] = $exp->pay_summ;
+            
+            $arResult['totalByr']+=(float)$exp->pay_summ*(float)$curr;
 
             if($exp->cat->ignore_at_report != self::YES)
             {
@@ -183,6 +203,8 @@ class ExpenseSearch extends Expense
                     $arResult['withoutIgnore'][$name]+=$exp->pay_summ;
                 else
                     $arResult['withoutIgnore'][$name] = $exp->pay_summ;
+
+                $arResult['totalWithoutIgnore']+=(float)$exp->pay_summ*(float)$curr;
             }
         }
 

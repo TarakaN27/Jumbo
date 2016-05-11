@@ -215,6 +215,6 @@ return [
     'Partner Wbookkeeper Requests' => 'Партнер. Запросы на вывод средств',
     'Files' => 'Файлы',
     'Attach files' => 'Прикрепить файлы',
-    'Process partner withdrawal request' => 'Обработка запроса на вывод средств партнера'
-
+    'Process partner withdrawal request' => 'Обработка запроса на вывод средств партнера',
+    'Total in BYR' => 'Итого в BYR'
 ];

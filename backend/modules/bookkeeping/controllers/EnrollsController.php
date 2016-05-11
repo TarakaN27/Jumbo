@@ -59,7 +59,7 @@ class EnrollsController extends Controller
         $addQuery = [];
         $addParams = [];
 
-        if(!Yii::$app->user->can('adminRights') && Yii::$app->user->can('only_bookkeeper'))
+        if(!Yii::$app->user->can('adminRights') && (Yii::$app->user->can('only_bookkeeper') || Yii::$app->user->can('only_manager')))
         {
             $addQuery = '( buser_id = :user OR '.CUser::tableName().'.manager_id = :user OR serv.b_user_enroll = :user )';
             $addParams = [

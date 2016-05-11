@@ -52,7 +52,7 @@ class RecalculateController extends AbstractConsoleController
      * @param $date
      * @return int
      */
-    public function actionCountingPartnerPercent($date)
+    public function actionCountingPartnerPercent($date=NULL)
     {
         $obCalc = new PartnerPercentCounting();
         $obCalc->countPercentByMonth($date);

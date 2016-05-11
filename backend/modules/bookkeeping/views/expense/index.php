@@ -117,24 +117,32 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class="col-md-4 col-md-offset-8">
                                         <?php if(!empty($arTotal) && !empty($arTotal['total'])):?>
                                             <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
-                                            <table class="table table-striped table-bordered">
+                                            <table class="table table-bordered">
                                                 <?php foreach($arTotal['total'] as $key => $value):?>
                                                     <tr>
                                                         <th><?=$key;?></th>
                                                         <td><?=Yii::$app->formatter->asDecimal($value);?></td>
                                                     </tr>
                                                 <?php endforeach;?>
+                                                <tr class="incomingPurse">
+                                                    <th><?=Yii::t('app/book','Total in BYR')?></th>
+                                                    <td><?=Yii::$app->formatter->asDecimal($arTotal['totalByr']);?></td>
+                                                </tr>
                                             </table>
                                         <?php endif;?>
                                         <?php if(!empty($arTotal) && !empty($arTotal['withoutIgnore'])):?>
                                             <?=Html::tag('h3',Yii::t('app/crm','Total without ignore'))?>
-                                            <table class="table table-striped table-bordered">
+                                            <table class="table table-bordered">
                                                 <?php foreach($arTotal['withoutIgnore'] as $key => $value):?>
                                                     <tr>
                                                         <th><?=$key;?></th>
                                                         <td><?=Yii::$app->formatter->asDecimal($value);?></td>
                                                     </tr>
                                                 <?php endforeach;?>
+                                                <tr class="incomingPurse">
+                                                    <th><?=Yii::t('app/book','Total in BYR')?></th>
+                                                    <td><?=Yii::$app->formatter->asDecimal($arTotal['totalWithoutIgnore']);?></td>
+                                                </tr>
                                             </table>
                                         <?php endif;?>
                                     </div>
