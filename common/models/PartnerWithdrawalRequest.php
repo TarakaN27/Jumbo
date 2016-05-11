@@ -36,6 +36,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
         STATUS_DONE = 15;                   //request is done
 
     CONST
+        SCENARIO_CREATE_REQUEST = 'create_request',
         SCENARIO_SET_MANAGER = 'set_manager';   //Scenario for set manager
 
     /**
@@ -75,7 +76,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['partner_id', 'type'], 'required'],
+            [['partner_id', 'type','amount','currency','date'], 'required'],
             [['partner_id', 'type', 'currency_id', 'manager_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
             [['amount'], 'number'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['created_by' => 'id']],
@@ -83,9 +84,32 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
             [['manager_id'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['manager_id' => 'id']],
             [['date'],'safe'],
             ['description','string','max' => 255],
-            ['manager_id','required','on' => self::SCENARIO_SET_MANAGER]
+            ['manager_id','required','on' => self::SCENARIO_SET_MANAGER],
+            ['amount','customValidateAmount','on' => self::SCENARIO_CREATE_REQUEST]
         ];
     }
+
+    /**
+     * @param $attribute
+     * @param $params
+     */
+    public function customValidateAmount($attribute,$params)
+    {
+        $obPurse = PartnerPurse::getPurse($this->partner_id);
+        if(!$obPurse)
+        {
+            $this->addError($attribute,'Purse not found');
+        }else{
+            $avAmount = (float)$obPurse->getAvailableAmount();
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($this->date),$this->currency_id);
+            $amount = (float)$this->amount*$curr;
+            if($amount > $avAmount)
+            {
+                $this->addError($attribute,Yii::t('app/users','Amount can not be more than available amount'));
+            }
+        }
+    }
+
 
     /**
      * @inheritdoc

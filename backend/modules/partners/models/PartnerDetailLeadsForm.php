@@ -25,6 +25,10 @@ class PartnerDetailLeadsForm extends Model
         $endDate = NULL,
         $obPartner = NULL;
 
+    protected
+        $incomSum = 0,
+        $withdSum = 0;
+
     /**
      * @return array
      */
@@ -78,6 +82,10 @@ class PartnerDetailLeadsForm extends Model
         $arService = array_unique(ArrayHelper::map($arCurrPeriod,'payment.service_id','payment.service.name'));
         return [
             'prev' => $arPrev,
+            'curr' => [
+                'incoming' => $this->incomSum,
+                'expense' => $this->withdSum
+            ],
             'incoming' => $arStatIncomingByLead,
             'fullStat' => $arStatFull,
             'withdrawal' => $arStatWithdrawal,
@@ -105,10 +113,20 @@ class PartnerDetailLeadsForm extends Model
             ->sum('h.amount');
 
         $sumExpense = PartnerPurseHistory::find()
-            ->select(['h.id','p.id as pid','p.pay_date','h.type','h.amount','h,payment_id'])
+            ->select([
+                'h.id',
+                'p.id as pid',
+                'p.pay_date',
+                'h.type',
+                'h.amount',
+                'h.payment_id',
+                'ex.id as exid',
+                'ex.pay_date as ex_pay_date'
+            ])
             ->alias('h')
             ->joinWith('payment p')
-            ->where('p.pay_date < :beginDate')
+            ->joinWith('expense ex')
+            ->where(' (p.pay_date < :beginDate) OR (ex.pay_date < :beginDate)')
             ->andWhere([
                 'h.type' => PartnerPurseHistory::TYPE_EXPENSE,
                 'h.cuser_id' => $this->obPartner->id
@@ -138,12 +156,15 @@ class PartnerDetailLeadsForm extends Model
                 'p.currency_id',
                 'p.pay_date',
                 'p.service_id',
-                's.name as serv_name'
+                's.name as serv_name',
+                'ex.id as exid',
+                'ex.pay_date as ex_pay_date'
             ])
             ->alias('h')
             ->joinWith('payment p')
             ->joinWith('payment.service s')
-            ->where('p.pay_date >= :beginDate AND p.pay_date <= :endDate ')
+            ->joinWith('expense ex')
+            ->where(' (p.pay_date >= :beginDate AND p.pay_date <= :endDate) OR (ex.pay_date >= :beginDate AND ex.pay_date <= :endDate) ')
             ->andWhere(['h.cuser_id' => $this->obPartner->id])
             ->params([':beginDate' => $beginDate,':endDate' => $endDate])
             ->all();
@@ -172,6 +193,7 @@ class PartnerDetailLeadsForm extends Model
             if($stat->type != PartnerPurseHistory::TYPE_INCOMING)
                 continue;
 
+            $this->incomSum+=$stat->amount;
             $obPayment = $stat->payment;
             if(!$obPayment)
                 continue;
@@ -195,7 +217,7 @@ class PartnerDetailLeadsForm extends Model
         {
             if($stat->type != PartnerPurseHistory::TYPE_EXPENSE)
                 continue;
-
+            $this->withdSum+=$stat->amount;
             $arResult []= $stat;
         }
 

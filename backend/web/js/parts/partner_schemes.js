@@ -33,8 +33,7 @@ jQuery(document).ready(function(){
             td4 = $(document.createElement('td')),
             inputMin = $(document.createElement('input')),
             inputMax = $(document.createElement('input')),
-            inputPercent = $(document.createElement('input')),
-            linkTrash = $(document.createElement('a'));
+            inputPercent = $(document.createElement('input'));
 
         inputMin.addClass('form-control');
         inputMax.addClass('form-control');

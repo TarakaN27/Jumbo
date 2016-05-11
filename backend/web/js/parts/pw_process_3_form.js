@@ -51,7 +51,6 @@ function fillConditionSelect(selector,options)
  */
 function PWFindCondition()
 {
-    console.log('ola');
         var
             bClear = true,
             payDate = $('#pay_date').val(),

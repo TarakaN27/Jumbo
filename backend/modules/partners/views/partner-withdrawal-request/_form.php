@@ -8,6 +8,15 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 /* @var $this yii\web\View */
 /* @var $model common\models\PartnerWithdrawalRequest */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerJsFile('@web/js/parts/partner-withdrawal-request.js',['depends' => [
+    'yii\web\JqueryAsset',
+    'yii\web\YiiAsset',
+    'yii\bootstrap\BootstrapPluginAsset',
+]]);
+$this->registerJs('
+var
+    URL_PARTNER_PURSE_A = "'.\yii\helpers\Url::to(['/ajax-service/partner-get-purse']).'";
+',\yii\web\View::POS_HEAD);
 ?>
 
 <div class="partner-withdrawal-request-form">
@@ -62,6 +71,9 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
             ]])
                 ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
         </div>
+        <div class="col-md-3 col-sm-3 col-xs-12">
+            <span id="partner-a-amount-purse"></span>
+        </div>    
     </div>
 
     <?= $form->field($model, 'date')->widget(DatePicker::className(),[

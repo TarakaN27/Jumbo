@@ -6,6 +6,50 @@
  * Time: 13.30
  */
 ?>
+<?php if(!empty($data['prev'])):?>
+<div class="row">
+    <div class="col-md-5">
+        <?=\yii\helpers\Html::tag('h4',Yii::t('app/users','Share statistic'))?>
+        <table class="table table-striped table-bordered">
+            <tbody>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th>
+                        <?=Yii::t('app/users','Begin period'); ?>
+                    </th>
+                    <th>
+                        <?=Yii::t('app/users','Current period'); ?>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <?=Yii::t('app/users','Incomming')?>
+                    </th>
+                    <td>
+                        <?=$data['prev']['incoming']?>
+                    </td>
+                    <td>
+                        <?=$data['curr']['incoming']?>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <?=Yii::t('app/users','Withdrawal')?>
+                    </th>
+                    <td>
+                        <?=$data['prev']['expense']?>
+                    </td>
+                    <td>
+                        <?=$data['curr']['expense']?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif;?>
 <?php if(!empty($data['incoming'])):?>
     <?=\yii\helpers\Html::tag('h4',Yii::t('app/users','Partner incoming amount'))?>
     <hr>
@@ -62,7 +106,8 @@
         ]),
         'columns' => [
             'amount:decimal',
-            'percent',
+            'expense_id',
+            'expense.pay_date:date',
             'created_at:datetime'
         ]
     ])?>
@@ -85,12 +130,19 @@
                 'attribute' => 'type',
                 'value' => 'typeStr'
             ],
+            'amount:decimal',
             'payment_id',
             'payment.pay_summ:decimal',
             'payment.currency.code',
+            [
+                'attribute' => 'payment.pay_date',
+                'format' => 'date',
+                'value' => function($model){
+                    return $model->type == \common\models\PartnerPurseHistory::TYPE_EXPENSE ? $model->expense->pay_date : $model->payment->pay_date;
+                }
+            ],
             'payment.pay_date:date',
             'expense_id',
-            'amount:decimal',
             'percent',
             'created_at:datetime'
         ]

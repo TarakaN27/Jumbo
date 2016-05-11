@@ -124,6 +124,7 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new PartnerWithdrawalRequest();
+        $model->setScenario(PartnerWithdrawalRequest::SCENARIO_CREATE_REQUEST);
         $model->date = Yii::$app->formatter->asDate(time());
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

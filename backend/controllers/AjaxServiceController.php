@@ -13,8 +13,10 @@ use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
 use common\models\CrmTask;
 use common\models\Dialogs;
+use common\models\ExchangeCurrencyHistory;
 use common\models\managers\ExchangeRatesManager;
 use common\models\Messages;
+use common\models\PartnerPurse;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -409,5 +411,28 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return ['type'=> 'form','body' => $this->renderPartial('update_comment',[
             'model' => $obMsg
         ])];
+    }
+
+    /**
+     * @return float
+     * @throws NotFoundHttpException
+     */
+    public function actionPartnerGetPurse()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $date = Yii::$app->request->post('date');
+        $currID = Yii::$app->request->post('currID');
+
+        if(empty($pk) || empty($date) || empty($currID))
+            throw new NotFoundHttpException();
+
+        $obPurse = PartnerPurse::getPurse($pk);
+        if(!$obPurse)
+            throw new NotFoundHttpException();
+
+        $amount = (float)$obPurse->getAvailableAmount();
+        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date),$currID);
+
+        return Yii::$app->formatter->asDecimal($amount/$curr);
     }
 } 

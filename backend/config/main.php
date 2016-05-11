@@ -49,7 +49,8 @@ return [
             'class' => 'backend\modules\partners\Module',
         ],
         'attachments' => [
-            'class' => nemmo\attachments\Module::className(),
+            //'class' => nemmo\attachments\Module::className(),
+            'class' => \common\components\customComponents\nemofileattachments\NemoModuleCustom::className(),
             'tempPath' => '@backend/uploads/temp',
             'storePath' => '@backend/uploads/store',
             'rules' => [ // Rules according to the FileValidator

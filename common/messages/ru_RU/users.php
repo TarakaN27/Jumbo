@@ -313,5 +313,11 @@ return [
     'Condition ID' => 'Условие',
     'Choose condition ID' => 'Выбрать условие',
     'Legal ID' => 'Юр. лицо',
-    'Request ID' => 'ID запроса'
+    'Request ID' => 'ID запроса',
+    'Share statistic' => 'Общая статистика',
+    'Incomming' => 'Приход',
+    'Withdrawal' => 'Расход',
+    'Begin period' => 'Состояние на начало',
+    'Current period' => 'Отчетный период',
+    'Amount can not be more than available amount' => 'Сумма не может быть больше доступной для партнера'
 ];

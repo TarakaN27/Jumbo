@@ -81,7 +81,7 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
     $subItems[] = ['label' => Yii::t('app/common', 'Bill docx template'), 'url' => ['/documents/bill-docx-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Acts template'), 'url' => ['/documents/acts-template/index']];
     //$subItems[] = ['label' => Yii::t('app/common', 'Acts numbers'), 'url' => ['/documents/act-numbers/index']];
-    $subItems[] = ['label' => Yii::t('app/common', 'Partner condition'), 'url' => ['/bookkeeping/partner-condition/index']];
+    //$subItems[] = ['label' => Yii::t('app/common', 'Partner condition'), 'url' => ['/bookkeeping/partner-condition/index']];
     $menuItems[] = [
         'label' => '<i class="glyphicon glyphicon-cog"></i> '.Yii::t('app/common','Settings'),
         'items' => $subItems,
@@ -280,11 +280,6 @@ $menuItems[] = [
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/acts/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_acts'); ?></a>
-                                            </li>
-                                            <li>
-                                                <a href = "<?= Url::to(['/bookkeeping/partner-withdrawal/index']); ?>">
-                                                    <?php echo Yii::t('app/book', 'BOOK_partner_withdrawal'); ?>
-                                                </a>
                                             </li>
                                         <?php endif;?>
                                     </ul>
