@@ -112,5 +112,6 @@ return [
     'Partner schemes serv group' => 'Группы партнерских схем',
     'Partner schemes' => 'Партнерские схемы',
     'Partners' => 'Партнерка',
-    'BOOK_partner_withdrawal_b_request' => 'Партнер. Запрос на вывод средств'
+    'BOOK_partner_withdrawal_b_request' => 'Партнер. Запрос на вывод средств',
+    'Partner. Withdrawal request' => 'Партнер. Запрос на вывод средств.'
 ];
