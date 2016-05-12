@@ -225,7 +225,13 @@ class BUser extends AbstractUser
     {
         $dependency = new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         return self::getDb()->cache(function ($db) {
-            return self::find()->select(['id','username'])->where(['role' => self::ROLE_MANAGER])->all($db);
+            return self::find()
+                ->select(['id','username'])
+                ->where([
+                    'role' => self::ROLE_MANAGER,
+                    'status' => self::STATUS_ACTIVE
+                ])
+                ->all($db);
         }, 3600*24, $dependency);
     }
 
@@ -249,7 +255,7 @@ class BUser extends AbstractUser
     {
         $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
         $models = self::getDb()->cache(function ($db) {
-            return BUser::find()->all($db);
+            return BUser::find()->where(['status' => self::STATUS_ACTIVE])->all($db);
         },86400,$dep);
 
         return $models;

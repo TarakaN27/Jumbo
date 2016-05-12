@@ -246,6 +246,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like','mname',$q])
 				->orWhere(['like','lname',$q])
 				->orWhere(['like','fname',$q])
+				->andWhere(['status' => BUser::STATUS_ACTIVE])
 				->limit(10)
 				->all()
 			;
