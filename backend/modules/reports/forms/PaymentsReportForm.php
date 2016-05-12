@@ -148,7 +148,7 @@ class PaymentsReportForm extends Model{
             PaymentCondition::tableName().'.name as pay_cond_name',
             PaymentCondition::tableName().'.corr_factor as pc_corr_factor' ,
             PaymentCondition::tableName().'.commission  as pc_commission'  ,
-            PaymentCondition::tableName().'.sale  as pc_sale ' ,
+            PaymentCondition::tableName().'.`sale`  AS pc_sale ' ,
             PaymentCondition::tableName().'.tax  as pc_tax' ,
             PaymentCondition::tableName().'.currency_id  as pc_currency_id',
             PaymentCondition::tableName().'.cond_currency  as cond_currency',
