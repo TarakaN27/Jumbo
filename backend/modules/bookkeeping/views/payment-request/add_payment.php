@@ -104,7 +104,10 @@ $this->registerJs('
             lPID = "'.$modelP->legal_id.'"
             contrID = "'.$modelP->cntr_id.'",
             amount = $("#" + lineID.replace(/-service/gi,"-summ")).val(),
-            condID = lineID.replace(/-service/gi,"-condid");
+            condID = lineID.replace(/-service/gi,"-condid"),
+            condContainer = $(".field-"+condID);
+            
+         
 
         if(serviceID == "" || amount == " " || amount == undefined || amount == "")
         {
@@ -113,7 +116,11 @@ $this->registerJs('
             addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You must set amount and choose service').'")
             return false;
         }
-
+        let
+            preloader = getPreloaderEntity(lineID+"preloader");
+            
+        condContainer.append(preloader);
+        condContainer.find("select").addClass("hide");    
         $.ajax({
             type: "POST",
             cache: false,
@@ -135,10 +142,14 @@ $this->registerJs('
                 $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
                 $("#"+lineIDCP).attr("disabled","disabled");
                 $("#"+lineIDCP).val("");
+                $("#"+lineID+"preloader").remove();
+                condContainer.find("select").removeClass("hide");
             },
             error: function(msg){
                 addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
                 $("#"+condID).val("");
+                $("#"+lineID+"preloader").remove();
+                condContainer.find("select").removeClass("hide");
                 return false;
             }
         });

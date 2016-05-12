@@ -27,6 +27,7 @@ class AppAsset extends AssetBundle
         'css/craftpip-jquery-confirm/css/jquery-confirm.css'
     ];
     public $js = [
+        'js/wm_app/app.js',
         'js/script.js',
         'js/gauge/gauge.min.js',
         'js/nicescroll/jquery.nicescroll.min.js',

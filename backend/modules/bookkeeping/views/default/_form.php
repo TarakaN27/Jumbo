@@ -44,14 +44,19 @@ function findCondition()
        amount = $("#payments-pay_summ").val(),
        iCurr = $("#payments-currency_id").val(),
        payDate = $("#payments-pay_date").val(),
-       iLP = $("#payments-legal_id").val();
+       iLP = $("#payments-legal_id").val(),
+       condContainer = $(".field-payments-condition_id");
 
     if(iServ == "" || iLP == "" || iCuser == "")
     {
         $("#payments-condition_id").val("");
         return false;
     }
-
+    
+    let
+            preloader = getPreloaderEntity("preloader");
+        condContainer.append(preloader);
+        condContainer.find("select").addClass("hide");   
     $.ajax({
         type: "POST",
         cache: false,
@@ -60,6 +65,8 @@ function findCondition()
         data: {iServID:iServ,iContrID:iCuser,lPID:iLP,amount:amount,iCurr:iCurr,payDate:payDate},
         success: function(msg){
                 showOptions(msg.visable,"#payments-condition_id");
+                $("#preloader").remove();
+                condContainer.find("select").removeClass("hide");
                 /*
                 if(msg.default != "" && msg.default  != null)
                 {
@@ -71,6 +78,8 @@ function findCondition()
         },
         error: function(msg){
             addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
+            $("#preloader").remove();
+            condContainer.find("select").removeClass("hide");
             return false;
         }
     });

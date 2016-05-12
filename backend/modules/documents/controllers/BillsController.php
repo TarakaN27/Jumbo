@@ -39,6 +39,7 @@ class BillsController extends AbstractBaseBackendController
                         'view',
                         'update',
                         'create',
+                        'get-bill',
                         'find-bill-template',
                         'get-bill-template-detail',
                         'bill-copy'
