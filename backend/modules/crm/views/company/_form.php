@@ -402,15 +402,7 @@ $('#cuser-partner').on('change',function(){
 		</div>
 	</section>
 	<section class="contactSite">
-		<?php echo $form->field($modelR,'site')->widget(\yii\widgets\MaskedInput::className(),[
-			'clientOptions' => [
-				'alias' =>  'url',
-			],
-			'options' => [
-				'placeholder'=>'http://site.com',
-				'class'=>'form-control'
-			]
-		]);
+		<?php echo $form->field($modelR,'site')->textInput();
 		?>
 	</section>
 

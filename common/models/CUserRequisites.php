@@ -253,7 +253,7 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             [
-                'site',
+               'site',
                 'url',
                 'pattern' => '/^{schemes}:\/\/(([а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)(\.[а-яеёА-ЯЕЁA-Z0-9][а-яеёА-ЯЕЁA-Z0-9_-]*)+)/i'
             ],
