@@ -402,7 +402,7 @@ $('#cuser-partner').on('change',function(){
 		</div>
 	</section>
 	<section class="contactSite">
-		<?php echo $form->field($modelR,'site')->textInput();
+		<?php echo $form->field($modelR,'site')->textInput(['placeholder' => 'https://webmart.by']);
 		?>
 	</section>
 
