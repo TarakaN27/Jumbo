@@ -34,7 +34,8 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "yiisoft/yii2-redis": "~2.0",
         "kartik-v/yii2-field-range": "*",
-        "nemmo/yii2-attachments": "~1.0@dev"
+        "nemmo/yii2-attachments": "~1.0@dev",
+        "rmrevin/yii2-minify-view": "~1.9"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
