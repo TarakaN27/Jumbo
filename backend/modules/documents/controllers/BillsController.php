@@ -16,7 +16,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
-
+use common\models\CUser;
 /**
  * BillsController implements the CRUD actions for Bills model.
  */
@@ -73,10 +73,12 @@ class BillsController extends AbstractBaseBackendController
         $searchModel = new BillsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $iTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
+        $cuserDesc = !empty($searchModel->cuser_id) ? CUser::getCuserInfoById($searchModel->cuser_id) : $searchModel->cuser_id;
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'iTotal' => $iTotal
+            'iTotal' => $iTotal,
+            'cuserDesc' => $cuserDesc
         ]);
     }
 
