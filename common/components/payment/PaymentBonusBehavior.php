@@ -112,16 +112,17 @@ class PaymentBonusBehavior extends Behavior
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$iCUserID]);	//сземы искллючения для пользователя
 
 		$obScheme = BonusScheme::find()  //получаем схему бонуса для пользователя.
-			->joinWith('cuserID')
-			->joinWith('usersID')
-			->joinWith('exceptCusers')
-			->where([BonusScheme::tableName().'.type' => BonusScheme::TYPE_UNITS])
-			->andWhere([BonusSchemeToBuser::tableName().'.buser_id' => $obManager->id]);
+			->alias('bs')
+			->joinWith('cuserID cid')
+			->joinWith('usersID uid')
+			->joinWith('exceptCusers excu')
+			->where(['bs.type' => BonusScheme::TYPE_UNITS])
+			->andWhere(['uid.buser_id' => $obManager->id]);
 
 			if($arExcept)
-				$obScheme->andWhere(['NOT IN',BonusScheme::tableName().'.id',$iCUserID]);
+				$obScheme->andWhere(['NOT IN','bs.id',$arExcept]);
 
-			$obScheme = $obScheme->orderBy(BonusSchemeToCuser::tableName().'.cuser_id IS NULL ASC , '.BonusScheme::tableName().'.updated_at DESC')
+			$obScheme = $obScheme->orderBy('`cid`.`cuser_id` IS NULL ASC , `bs`.`updated_at` DESC')
 			->one();
 
 		if(empty($obScheme))
