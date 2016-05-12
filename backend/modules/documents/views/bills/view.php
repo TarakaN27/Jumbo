@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]); ?>
                     <?= Html::a(Yii::t('app/documents','Create Bill'),['create'],['class'=>'btn btn-primary']);?>
                     <?= Html::a(Yii::t('app/documents', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                    <?php if(!Yii::$app->user->can('only_bookkeeper')):?>
                     <?= Html::a(Yii::t('app/documents', 'Delete'), ['delete', 'id' => $model->id], [
                         'class' => 'btn btn-danger',
                         'data' => [
@@ -35,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'method' => 'post',
                         ],
                     ]) ?>
+                    <?php endif;?>
                 </section>
                 <div class = "clearfix"></div>
             </div>

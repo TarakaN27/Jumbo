@@ -136,6 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'class' => 'yii\grid\ActionColumn',
+                        'visible' => !Yii::$app->user->can('only_bookkeeper'),
                         'template' => '{delete}'
                     ],
                 ],

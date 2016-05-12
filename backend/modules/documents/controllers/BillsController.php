@@ -34,6 +34,19 @@ class BillsController extends AbstractBaseBackendController
             'class' => AccessControl::className(),
             'rules' => [
                 [
+                    'actions' => [
+                        'index',
+                        'view',
+                        'update',
+                        'create',
+                        'find-bill-template',
+                        'get-bill-template-detail',
+                        'bill-copy'
+                    ],
+                    'allow' => true,
+                    'roles' => ['bookkeeper']
+                ],
+                [
                     'allow' => true,
                     'roles' => ['admin','moder']
                 ]

@@ -26,7 +26,7 @@ $menuItems[] = [
 ];
 unset($subItems);
 
-if(!Yii::$app->user->isGuest && (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights')))
+if(!Yii::$app->user->isGuest && (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')))
 {
     $subItems[] = ['label' => Yii::t('app/common', 'Add bill'), 'url' => ['/documents/bills/create']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill list'), 'url' => ['/documents/bills/index']];
