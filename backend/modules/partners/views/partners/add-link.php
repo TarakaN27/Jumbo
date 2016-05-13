@@ -9,57 +9,34 @@ use wbraganca\dynamicform\DynamicFormWidget;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\web\JsExpression;
+use yii\bootstrap\Modal;
 $this->registerCssFile('@web/css/select/select2.min.css');
-$this->registerJsFile('@web/js/select/select2.full.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
-$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
-$this->registerJsFile('@web/js/moment.min2.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset'],]);
+$this->registerJsFile('@web/js/select/select2.full.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJsFile('@web/js/moment.min2.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJsFile('@web/js/parts/partner_add_link.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $this->registerJs("
-function swInitSelect2(item)
-{
-    item.select2({
-            data : ".\yii\helpers\Json::encode($select2Data).",
-            ajax: {
-                url: '".\yii\helpers\Url::to(['/ajax-select/get-cmp'])."',
-                dataType: 'json',
-                delay: 250,
-                data: function(params) { return {q:params.term}; },
-                processResults: function (data, params) {return {results: data.results};},
-                cache: true
-            },
-            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-            minimumInputLength: 1,
-            templateResult: function(cmp_id) { return cmp_id.text; }, // omitted for brevity, see the source of this page
-            templateSelection: function (cmp_id) { return cmp_id.text; }, // omitted for brevity, see the source of this page
-        });
-}
-function initDatePicker(item)
-{
-    item.daterangepicker({
-        singleDatePicker: true,
-        calender_style: \"picker_2\",
-        locale :{
-            format: 'DD.MM.YYYY',
-        }
-    });
-}
-",\yii\web\View::POS_END);
-
-$this->registerJs("
-swInitSelect2($('.wm-select2'));
-initDatePicker($('.datePicker'));
-$('.dynamicform_wrapper').on('afterInsert', function(e, item) {
-    swInitSelect2($(item).find('.wm-select2'));
-    initDatePicker($(item).find('.datePicker'));
-});
-",\yii\web\View::POS_READY);
-
+var
+    pid = ".$pid.",
+    ajaxSelectGetCmpUrl = '".\yii\helpers\Url::to(['/ajax-select/get-cmp'])."',
+    ajaxMultiLinkFormUrl = '".\yii\helpers\Url::to(['get-multi-link-form'])."',
+    select2Data = ".\yii\helpers\Json::encode($select2Data).";
+",\yii\web\View::POS_HEAD);
 ?>
+<?php \common\components\customComponents\Modal\CustomModal::begin([
+    'id' => 'activity-modal',
+    'header' => '<h2>'.Yii::t('app/crm','Multiple link ').'</h2>',
+    'size' => Modal::SIZE_LARGE,
+]);?>
+
+<?php \common\components\customComponents\Modal\CustomModal::end(); ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
         <div class = "x_panel">
             <div class = "x_title">
                 <h2><?php echo Html::encode($this->title)?></h2>
                 <section class="pull-right">
+                    <?= Html::a(Yii::t('app/users', 'Multiple link'), NULL, ['class' => 'btn btn-info','id' => 'multipleLinkAdd']) ?>
                     <?= Html::a(Yii::t('app/services', 'To list'), ['link-lead','pid' => $pid], ['class' => 'btn btn-warning']) ?>
                 </section>
                 <div class = "clearfix"></div>
@@ -72,7 +49,7 @@ $('.dynamicform_wrapper').on('afterInsert', function(e, item) {
                             'widgetContainer' => 'dynamicform_wrapper', // required: only alphanumeric characters plus "_" [A-Za-z0-9_]
                             'widgetBody' => '.container-items', // required: css class selector
                             'widgetItem' => '.item', // required: css class
-                            'limit' => 4, // the maximum times, an element can be cloned (default 999)
+                            //'limit' => 4, // the maximum times, an element can be cloned (default 999)
                             'min' => 1, // 0 or 1 (default 1)
                             'insertButton' => '.add-item', // css class
                             'deleteButton' => '.remove-item', // css class
@@ -115,7 +92,8 @@ $('.dynamicform_wrapper').on('afterInsert', function(e, item) {
                                                 <?= $form->field($model, "[{$i}]service_id")->dropDownList(
                                                     $arServMap,
                                                     [
-                                                        'prompt' => Yii::t('app/users','Choose service')
+                                                        'prompt' => Yii::t('app/users','Choose service'),
+                                                        'class' => 'form-control service'
                                                     ]
                                                 ) ?>
                                             </div>

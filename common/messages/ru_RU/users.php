@@ -319,5 +319,6 @@ return [
     'Withdrawal' => 'Расход',
     'Begin period' => 'Состояние на начало',
     'Current period' => 'Отчетный период',
-    'Amount can not be more than available amount' => 'Сумма не может быть больше доступной для партнера'
+    'Amount can not be more than available amount' => 'Сумма не может быть больше доступной для партнера',
+    'Multiple link' => 'Мульти добавление связей'
 ];

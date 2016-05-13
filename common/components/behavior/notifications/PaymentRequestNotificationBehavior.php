@@ -111,7 +111,7 @@ class PaymentRequestNotificationBehavior extends Behavior
 
 		$body = Html::a(
 			Yii::t('app/crm','Payment request for {company}',[
-			'company' => $cmpName
+				'company' => $cmpName
 			]),
 			['/bookkeeping/payment-request/view','id' => $model->id],
 			[

@@ -12,6 +12,7 @@ namespace backend\modules\partners\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\modules\partners\models\PartnerAllowForm;
 use backend\modules\partners\models\PartnerDetailLeadsForm;
+use backend\modules\partners\models\PartnerMultiLInkForm;
 use backend\widgets\Alert;
 use common\models\AbstractActiveRecord;
 use common\models\CUser;
@@ -19,6 +20,7 @@ use common\models\PartnerAllowService;
 use common\models\PartnerCuserServ;
 
 use common\models\search\CUserSearch;
+use common\models\Services;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
@@ -266,6 +268,29 @@ class PartnersController extends AbstractBaseBackendController
         return $this->render('view-lead-detail',[
             'model' => $model,
             'data' => $data
+        ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionGetMultiLinkForm()
+    {
+        $pk = Yii::$app->request->post('pid');
+        $arAllowSerID = PartnerAllowService::find()->where(['cuser_id' => $pk])->all();
+        $arServices = [];
+        if($arAllowSerID)
+        {
+            $arASIds = ArrayHelper::getColumn($arAllowSerID,'service_id');
+            $arServObj = Services::find()->select(['id','name'])->where(['id' => $arASIds])->all();
+            $arServices = ArrayHelper::map($arServObj,'id','name');
+        }
+        $model = new PartnerMultiLInkForm();
+        $model->date = Yii::$app->formatter->asDate('NOW');
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->renderAjax('parts/_get_multi_link_form',[
+            'arServ' => $arServices,
+            'model' => $model
         ]);
     }
 
