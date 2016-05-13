@@ -44,6 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if($model->status == \common\models\EnrollmentRequest::STATUS_PROCESSED)
                                         return $tmp;
 
+                                    if(Yii::$app->user->can('only_bookkeeper'))
+                                    {
+                                        if($model->assigned_id == Yii::$app->user->id)
+                                            return Html::a($tmp,['process','id' => $model->id],['class' => 'link-upd']);
+                                        else
+                                            return $tmp;
+                                    }
                                     return Html::a($tmp,['process','id' => $model->id],['class' => 'link-upd']);
                                 },
                             'filter' => \kartik\select2\Select2::widget([
@@ -83,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'assigned_id',
-                            'visible' => Yii::$app->user->can('adminRights'),
+                            'visible' => Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'),
                             'value' => function($model){
                                     return is_object($obBuser = $model->assigned) ? $obBuser->getFio() : NULL;
                                 },

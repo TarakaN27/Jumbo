@@ -20,6 +20,7 @@ use common\models\EnrollmentRequest;
 use common\models\search\EnrollmentRequestSearch;
 use yii\base\InvalidParamException;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\web\Response;
@@ -59,7 +60,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $searchModel = new EnrollmentRequestSearch();
 
         $additionQuery = [];
-        if(!Yii::$app->user->can('adminRights'))    //показываем админам все запросы, другим только свои
+        if(!Yii::$app->user->can('adminRights') && !Yii::$app->user->can('only_bookkeeper'))    //показываем админам все запросы, другим только свои
             $additionQuery = ['assigned_id' => Yii::$app->user->id,EnrollmentRequest::tableName().'.status' => EnrollmentRequest::STATUS_NEW];
         else
             $additionQuery = [EnrollmentRequest::tableName().'.status' => EnrollmentRequest::STATUS_NEW];
@@ -180,14 +181,19 @@ class EnrollmentRequestController extends AbstractBaseBackendController
     public function actionProcess($id)
     {
         $model = $this->findModel($id);
-        if($model->status == EnrollmentRequest::STATUS_PROCESSED)
+        $model->callViewedEvent();              // call viewed event
+        if($model->status == EnrollmentRequest::STATUS_PROCESSED)       //check if request already processed
         {
             Yii::$app->session->setFlash('error',Yii::t('app/book','Request already processed'));
+            return $this->redirect(['index']);
         }
-        $model->callViewedEvent();
 
+        if(Yii::$app->user->can('only_bookkeeper') && $model->assigned_id != Yii::$app->user->id)   //if user is bookkeeper , check that he has rights for processed
+        {
+            throw new ForbiddenHttpException();
+        }
 
-        $obForm = new EnrollProcessForm();
+        $obForm = new EnrollProcessForm();          //create enroll form model
         $obForm->request = $model;
         $obForm->availableAmount = $model->amount;
 
