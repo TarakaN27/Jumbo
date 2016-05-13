@@ -20,6 +20,7 @@ use common\models\search\PaymentsSearch;
 
 use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -427,6 +428,4 @@ class DefaultController extends AbstractBaseBackendController
         $time = strtotime($date);
         return PaymentCondition::getConditionWithCurrency(date('Y-m-d',$time));
     }
-
-
 }

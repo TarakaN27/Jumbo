@@ -21,7 +21,6 @@ use yii\helpers\Html;
 
 class PaymentRequestNotificationBehavior extends Behavior
 {
-
 	/**
 	 * Назначаем событиям обработчики
 	 * @return array
@@ -32,8 +31,31 @@ class PaymentRequestNotificationBehavior extends Behavior
 			PaymentRequest::EVENT_PIN_MANAGER => 'pinManager',
 			PaymentRequest::EVENT_AFTER_INSERT => 'afterInsert',
 			PaymentRequest::EVENT_VIEWED => 'viewed',
-            PaymentRequest::EVENT_AFTER_DELETE => 'afterDelete'
+            PaymentRequest::EVENT_AFTER_DELETE => 'afterDelete',
+			PaymentRequest::EVENT_BEFORE_UPDATE => 'beforeUpdate',
+			PaymentRequest::EVENT_AFTER_UPDATE => 'afterUpdate'
 		];
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function beforeUpdate()
+	{
+		/** @var PaymentRequest $model */
+		$model = $this->owner;
+		$oldManager = $model->getOldAttribute('manager_id');
+		if($oldManager)
+			RedisNotification::removePaymentRequestFromListForUser(Yii::$app->user->id,$model->id);
+		return TRUE;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function afterUpdate()
+	{
+		return $this->afterInsert();
 	}
 
 	/**

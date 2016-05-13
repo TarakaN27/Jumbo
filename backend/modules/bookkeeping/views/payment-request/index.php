@@ -245,7 +245,7 @@ if(Yii::$app->user->can('adminRights'))
                             'template' => '{update}',
                             'buttons' => [
                                 'update' => function ($url, $model, $key) {
-                                        if($model->owner_id == Yii::$app->user->id && $model->status == PaymentRequest::STATUS_NEW)
+                                        if(Yii::$app->user->can('adminRights') || ($model->owner_id == Yii::$app->user->id && $model->status == PaymentRequest::STATUS_NEW))
                                             return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url);
                                         else
                                             return '';
