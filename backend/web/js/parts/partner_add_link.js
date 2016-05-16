@@ -4,13 +4,8 @@
 'use strict';
 function swInitSelect2(item,selectData)
 {
-    console.log('1----');
-    console.log(selectData);
-
     let
         select2DataItem = selectData == undefined || selectData == '' ? select2Data : selectData;
-
-    console.log(select2DataItem);
     item.select2({
         data : select2DataItem,
         ajax: {
