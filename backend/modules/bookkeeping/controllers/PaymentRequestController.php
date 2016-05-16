@@ -470,6 +470,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($model))
             throw new NotFoundHttpException('Payment request not found');
 
+        $model->updateNotifications = TRUE;
         if(!Yii::$app->user->can('adminRights') && $model->owner_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action.');
 

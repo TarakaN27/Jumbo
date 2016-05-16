@@ -13,6 +13,7 @@ namespace common\components\behavior\notifications;
 
 use common\components\notification\RedisNotification;
 use common\components\notification\TabledNotification;
+use PhpOffice\PhpWord\Tests\Style\ParagraphTest;
 use yii\base\Behavior;
 use common\models\PaymentRequest;
 use Yii;
@@ -44,9 +45,12 @@ class PaymentRequestNotificationBehavior extends Behavior
 	{
 		/** @var PaymentRequest $model */
 		$model = $this->owner;
-		$oldManager = $model->getOldAttribute('manager_id');
-		if($oldManager)
-			RedisNotification::removePaymentRequestFromListForUser(Yii::$app->user->id,$model->id);
+		if($model->updateNotifications)
+		{
+			$oldManager = $model->getOldAttribute('manager_id');
+			if($oldManager)
+				RedisNotification::removePaymentRequestFromListForUser(Yii::$app->user->id,$model->id);
+		}
 		return TRUE;
 	}
 
@@ -55,7 +59,9 @@ class PaymentRequestNotificationBehavior extends Behavior
 	 */
 	public function afterUpdate()
 	{
-		return $this->afterInsert();
+		/** @var PaymentRequest $model */
+		$model = $this->owner;
+		return $model->updateNotifications ? $this->afterInsert() : TRUE;
 	}
 
 	/**

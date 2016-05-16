@@ -4,8 +4,13 @@
 'use strict';
 function swInitSelect2(item,selectData)
 {
+    console.log('1----');
+    console.log(selectData);
+
     let
         select2DataItem = selectData == undefined || selectData == '' ? select2Data : selectData;
+
+    console.log(select2DataItem);
     item.select2({
         data : select2DataItem,
         ajax: {
@@ -85,31 +90,25 @@ function addLinksGroups()
 
         selectOptions.attr('value',cntr);
         selectOptions.html($('#partnermultilinkform-cntr option[value='+cntr+']').html());
-        //data = [{id:cntr,text:$('#partnermultilinkform-cntr option[value='+cntr+']').html()}];
 
     data[cntr] = $('#partnermultilinkform-cntr option[value='+cntr+']').html();
 
-    //console.log(selectOptions);
     var
-        rand = Math.floor((Math.random() * 100) + 1);
+        rand = Math.floor((Math.random() * 10000) + 1);
     servicesArr.each(function( index ) {
         $('#dynamic-form .add-item:first').trigger('click');
-        console.log(rand);
-        $('.dynamicform_wrapper .item:last .wm-select2').addClass(rand);
+        $('.dynamicform_wrapper .item:last .wm-select2').addClass('rand_'+rand);
         $('.dynamicform_wrapper .item:last .service').val($(this).val());
         $('.dynamicform_wrapper .item:last .datePicker').val(date);
     });
 
-    /**
-     *
-     $('.dynamicform_wrapper .item:last .wm-select2').append(selectOptions);
-     $('.dynamicform_wrapper .item:last .wm-select2').select2("destroy");
-     $('.dynamicform_wrapper .item:last .wm-select2').val(cntr);
-     $('.dynamicform_wrapper .item:last .wm-select2').trigger('change');
-     swInitSelect2($('.dynamicform_wrapper .item:last .wm-select2'),data);
-     */
+    $('.dynamicform_wrapper .item .rand_'+rand).select2("destroy");
+    $('.dynamicform_wrapper .item .rand_'+rand).append(selectOptions);
+    $('.dynamicform_wrapper .item .rand_'+rand).val(cntr);
+    $('.dynamicform_wrapper .item .rand_'+rand).trigger('change');
+    swInitSelect2($('.dynamicform_wrapper .item .rand_'+rand),data);
 
-
+    $('#activity-modal .modal-dialog button.close').click();
 }
 
 //document ready
@@ -123,6 +122,3 @@ $(function(){
     $('#multipleLinkAdd').on('click',initPartnerLinkModal);
     $('#activity-modal').on('click','#idAddLinks',addLinksGroups)
 });
-
-//$('#activity-modal').modal();
-//$('#activity-modal .modal-dialog button.close').click();

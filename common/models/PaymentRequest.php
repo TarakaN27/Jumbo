@@ -40,6 +40,9 @@ class PaymentRequest extends AbstractActiveRecord
     CONST
         EVENT_PIN_MANAGER = 'pin_manager';
 
+    public
+        $updateNotifications = FALSE;               //flag if need update notification at update action
+
     /**
      * @return array
      */
