@@ -43,6 +43,7 @@ use yii\web\UploadedFile;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $payment_request
+ * @property integer $repeat_task
  *
  * @property Dialogs $dialog
  * @property BUser $assigned
@@ -201,7 +202,7 @@ class CrmTask extends AbstractActiveRecord
                 'duration_fact', 'closed_by', 'closed_date',
                 'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
-                'minutesEstimate','payment_request'
+                'minutesEstimate','payment_request','repeat_task'
             ], 'integer'],
             ['minutesEstimate','integer','min' => 0,'max' => 59],
 
@@ -209,7 +210,8 @@ class CrmTask extends AbstractActiveRecord
             ['status','default','value'=>self::STATUS_OPENED],
             [['arrAcc','arrWatch'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
-            ['parent_id','validateParent']
+            ['parent_id','validateParent'],
+            ['repeat_task','default','value' => self::NO]
         ];
     }
 
@@ -244,7 +246,8 @@ class CrmTask extends AbstractActiveRecord
             'arrAcc' =>  Yii::t('app/crm', 'Accomplices'),
             'arrFiles' => Yii::t('app/crm', 'arrFiles'),
             'payment_request' => Yii::t('app/crm', 'Payment request'),
-            'arrWatch' => Yii::t('app/crm','Watchers')
+            'arrWatch' => Yii::t('app/crm','Watchers'),
+            'repeat_task' => Yii::t('app/crm','Repeat task'),
         ];
     }
 
@@ -401,6 +404,14 @@ class CrmTask extends AbstractActiveRecord
     public function getChildTask()
     {
         return $this->hasMany(self::className(),['parent_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRepeatTask()
+    {
+        return $this->hasOne(CrmTaskRepeat::className(),['task_id' => 'id']);
     }
 
     /**
