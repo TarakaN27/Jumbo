@@ -285,4 +285,9 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .daterangepicker{ z-index: 9999999999}
 .ppd-top-23{padding-top: 23px;}
 .wm-select-100percent .select2-container{width: 100% !important;}
+#crmtaskrepeat-type{display: block;}
+#crmtaskrepeat-type label{display: block;}
+.border-line-right{border-right: 1px solid #e3e3e3}
+.pdd-left-10{padding-left: 10px;}
+.label-margin-right-10 label,#crmtask-repeat_task label,#crmtaskrepeat-monthly_type label{margin-right: 10px;}
 

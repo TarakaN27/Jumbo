@@ -5,18 +5,14 @@ namespace common\models;
 use common\components\behavior\history\ModelHistoryBehavior;
 use common\components\behavior\notifications\TaskNotificationBehavior;
 use common\components\behavior\Task\TaskActionBehavior;
-use common\components\behavior\Task\TaskQuantityHoursBehavior;
 use common\components\helpers\CustomHelper;
 use common\components\managers\DialogManager;
 use common\components\notification\RedisNotification;
-use common\models\managers\CUserCrmRulesManager;
 use Yii;
 use backend\models\BUser;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\swiftmailer\Message;
-use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -44,6 +40,7 @@ use yii\web\UploadedFile;
  * @property integer $updated_at
  * @property integer $payment_request
  * @property integer $repeat_task
+ * @property integer $recurring_id
  *
  * @property Dialogs $dialog
  * @property BUser $assigned
@@ -202,7 +199,8 @@ class CrmTask extends AbstractActiveRecord
                 'duration_fact', 'closed_by', 'closed_date',
                 'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
-                'minutesEstimate','payment_request','repeat_task'
+                'minutesEstimate','payment_request','repeat_task',
+                'recurring_id'
             ], 'integer'],
             ['minutesEstimate','integer','min' => 0,'max' => 59],
 
@@ -248,6 +246,7 @@ class CrmTask extends AbstractActiveRecord
             'payment_request' => Yii::t('app/crm', 'Payment request'),
             'arrWatch' => Yii::t('app/crm','Watchers'),
             'repeat_task' => Yii::t('app/crm','Repeat task'),
+            'recurring_id' => Yii::t('app/crm','Recurring id'),
         ];
     }
 
@@ -565,11 +564,22 @@ class CrmTask extends AbstractActiveRecord
     public function createTask($iUserID)
     {
         $tr = Yii::$app->db->beginTransaction(); //транзакция так как испоьзуем несколько моделей
-
             $bNewRecord = $this->isNewRecord;   //если добавляем новую задачу
             if($this->save()) //сохраняем задачу
             {
+                if($this->repeat_task)
+                {
+                    $obRepeat = new CrmTaskRepeat();
+                    $obRepeat->task_id = $this->id;
+                    $obRepeat->useRepeatTask = TRUE;
+                    if($obRepeat->load(Yii::$app->request->post()) && $obRepeat->save())
+                    {
 
+                    }else{
+                        $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
+                        return FALSE;
+                    }
+                }
                 if($bNewRecord)
                     if($this->addFiles()) //добавляем файлы при создании задачи
                     {
@@ -616,9 +626,8 @@ class CrmTask extends AbstractActiveRecord
                     }
                 }
 
-
-
                 /** @var Dialogs $obDialog */
+                /*
                 $obDialog = new Dialogs();  //новый диалог
                 $obDialog->type = Dialogs::TYPE_TASK;
                 $obDialog->crm_task_id = $this->id;
@@ -626,15 +635,12 @@ class CrmTask extends AbstractActiveRecord
                 $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
                 $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
 
-
-
                 if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
                     $obDialog->crm_cmp_id = $this->cmp_id;
 
                 $obContact = NULL;
                 if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
                 {
-                    /** @var CrmCmpContacts $obContact */
                     $obContact = CrmCmpContacts::find()
                         ->select(['cmp_id'])
                         ->where(['id' => $this->contact_id])
@@ -647,7 +653,10 @@ class CrmTask extends AbstractActiveRecord
                     $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
                 }
 
-                if(!$obDialog->save())
+                */
+
+                $obDialog = $this->createDialogForTask($iUserID);
+                if(!$obDialog)
                 {
                     $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
                     return FALSE;
@@ -679,6 +688,42 @@ class CrmTask extends AbstractActiveRecord
 
         $tr->rollBack();
         return FALSE;
+    }
+
+    /**
+     * @param $iUserID
+     * @return Dialogs|null
+     */
+    protected function createDialogForTask($iUserID)
+    {
+        /** @var Dialogs $obDialog */
+        $obDialog = new Dialogs();  //новый диалог
+        $obDialog->type = Dialogs::TYPE_TASK;
+        $obDialog->crm_task_id = $this->id;
+        $obDialog->buser_id = $iUserID; //кто создал
+        $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
+        $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
+
+        if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
+            $obDialog->crm_cmp_id = $this->cmp_id;
+
+        $obContact = NULL;
+        if(!empty($this->contact_id))  //если выбран контакт, то привяжем диалог к контакту
+        {
+            /** @var CrmCmpContacts $obContact */
+            $obContact = CrmCmpContacts::find()
+                ->select(['cmp_id'])
+                ->where(['id' => $this->contact_id])
+                ->one();   //находим контакт
+
+            if($obContact && !empty($obContact->cmp_id))    //нашли контак, проверим не привязан ли контакт к компании
+            {
+                $obDialog->crm_cmp_id = $obContact->cmp_id; //привяжем диалог к компании контакта
+            }
+            $obDialog->crm_cmp_contact_id = $this->contact_id; //привяжем диалог к контакту
+        }
+
+        return $obDialog->save() ? $obDialog : NULL;
     }
 
     /**
@@ -831,5 +876,4 @@ class CrmTask extends AbstractActiveRecord
     {
         return self::updateAll(['updated_at' => time()],['id' => $id]);
     }
-
 }

@@ -50,7 +50,14 @@ class CrmTaskSearch extends CrmTask
     public function rules()
     {
         return [
-            [['id', 'priority', 'type', 'task_control', 'parent_id', 'assigned_id', 'created_by', 'time_estimate', 'date_start', 'duration_fact', 'closed_by', 'closed_date', 'cmp_id', 'contact_id', 'created_at', 'updated_at'], 'integer'],
+            [[
+                'id', 'priority', 'type',
+                'task_control', 'parent_id', 'assigned_id',
+                'created_by', 'time_estimate', 'date_start',
+                'duration_fact', 'closed_by',
+                'closed_date', 'cmp_id', 'contact_id',
+                'created_at', 'updated_at','repeat_task'
+            ], 'integer'],
             [['title', 'description','status',  'deadline'], 'safe'],
         ];
     }
@@ -139,6 +146,7 @@ class CrmTaskSearch extends CrmTask
             'contact_id' => $this->contact_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'repeat_task' => $this->repeat_task
         ]);
 
         if(!empty($this->deadline))

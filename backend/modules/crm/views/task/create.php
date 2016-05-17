@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'obFile' => $obFile,
                     'pTaskName' => $pTaskName,
                     'dataWatchers' => $dataWatchers,
+                    'obTaskRepeat' => $obTaskRepeat
                 ]) ?>
             </div>
         </div>

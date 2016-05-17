@@ -241,6 +241,11 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             ])
         ],
         [
+            'attribute' => 'repeat_task',
+            'format' => 'boolean',
+            'filter' => CrmTask::getYesNo()
+        ],
+        [
             'attribute' => 'assigned_id',
             'value' => function($model){
 
@@ -427,6 +432,11 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'multiple' => true
                 ],
             ])
+        ],
+        [
+            'attribute' => 'repeat_task',
+            'format' => 'boolean',
+            'filter' => CrmTask::getYesNo()
         ],
         [
             'class' => 'yii\grid\ActionColumn',

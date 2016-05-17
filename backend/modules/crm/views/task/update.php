@@ -30,7 +30,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/crm', 'Update');
                     'sAssName' => $sAssName,
                     'data' => $data,
                     'pTaskName' => $pTaskName,
-                    'dataWatchers' => $dataWatchers
+                    'dataWatchers' => $dataWatchers,
+                    'obTaskRepeat' => $obTaskRepeat
                 ]) ?>
             </div>
         </div>

@@ -31,11 +31,46 @@ use yii\helpers\ArrayHelper;
  * @property integer $end_date
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $week
+ * @property integer $monthly_type
+ * @property integer $monthly_days
  *
  * @property CrmTask $task
  */
 class CrmTaskRepeat extends AbstractActiveRecord
 {
+    CONST
+        TYPE_DAILY = 1,
+        TYPE_WEEKLY = 2,
+        TYPE_MONTHLY = 3;
+
+    CONST
+        MONTHLY_TYPE_ONE =1,
+        MONTHLY_TYPE_TWO = 2;
+
+    CONST
+        MONDAY = 1,
+        TUESDAY = 2,
+        WEDNESDAY = 3,
+        THURSDAY = 4,
+        FRIDAY = 5,
+        SATURDAY = 6,
+        SUNDAY = 7;
+
+    CONST
+        NUMBER_ITEM_FIRST = 1,
+        NUMBER_ITEM_SECOND = 2,
+        NUMBER_ITEM_THIRD = 3,
+        NUMBER_ITEM_FOURTH = 4;
+
+    CONST
+        END_TYPE_INFINITE = 1,
+        END_TYPE_COUNT_OCC = 2,
+        END_TYPE_DATE = 3;
+
+    public
+        $useRepeatTask = false;
+
     /**
      * @inheritdoc
      */
@@ -45,21 +80,97 @@ class CrmTaskRepeat extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public static function getTypeMap()
+    {
+        return [
+            self::TYPE_DAILY => Yii::t('app/crm','Daily'),
+            self::TYPE_WEEKLY => Yii::t('app/crm','Weekly'),
+            self::TYPE_MONTHLY => Yii::t('app/crm','Monthly')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMonthlyDays()
+    {
+        return [
+            self::MONDAY => Yii::t('app/crm','Monday'),
+            self::TUESDAY => Yii::t('app/crm','Tuesday'),
+            self::WEDNESDAY => Yii::t('app/crm','Wednesday'),
+            self::THURSDAY => Yii::t('app/crm','Thursday'),
+            self::FRIDAY => Yii::t('app/crm','Friday'),
+            self::SATURDAY => Yii::t('app/crm','Saturday'),
+            self::SUNDAY => Yii::t('app/crm','Sunday')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMonthlyTypeMap()
+    {
+        return [
+            self::MONTHLY_TYPE_ONE => Yii::t('app/crm','Monthly type one'),
+            self::MONTHLY_TYPE_TWO => Yii::t('app/crm','Monthly type two')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getNumberItemMap()
+    {
+        return [
+            self::NUMBER_ITEM_FIRST => Yii::t('app/crm','NUMBER_ITEM_FIRST'),
+            self::NUMBER_ITEM_SECOND => Yii::t('app/crm','NUMBER_ITEM_SECOND'),
+            self::NUMBER_ITEM_THIRD => Yii::t('app/crm','NUMBER_ITEM_THIRD'),
+            self::NUMBER_ITEM_FOURTH => Yii::t('app/crm','NUMBER_ITEM_FOURTH'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getEndTypeMap()
+    {
+        return [
+            self::END_TYPE_INFINITE => Yii::t('app/crm','End type infinite'),
+            self::END_TYPE_COUNT_OCC => Yii::t('app/crm','End type counting occurrences'),
+            self::END_TYPE_DATE => Yii::t('app/crm','End type date'),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
+            [['start_date','type'],'required',
+                'when' => function($model){
+                    return $this->useRepeatTask;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        useRepeat = $('input[name = \"CrmTask[repeat_task]\"]:checked').val();
+                    return useRepeat == 1;    
+                }"
+            ],
             [[
                 'task_id', 'type', 'everyday',
                 'everyday_custom', 'everyday_value', 'day',
                 'month', 'monday', 'tuesday',
                 'wednesday', 'thursday', 'friday',
                 'saturday', 'sunday', 'number_of_item',
-                'start_date', 'end_type', 'count_occurrences',
-                'end_date', 'created_at', 'updated_at'
+                'end_type', 'count_occurrences',
+                'end_date', 'created_at', 'updated_at',
+                'week','monthly_type','monthly_days'
             ], 'integer'],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => CrmTask::className(), 'targetAttribute' => ['task_id' => 'id']],
+            ['start_date','safe']
         ];
     }
 
@@ -91,7 +202,55 @@ class CrmTaskRepeat extends AbstractActiveRecord
             'end_date' => Yii::t('app/crm', 'End Date'),
             'created_at' => Yii::t('app/crm', 'Created At'),
             'updated_at' => Yii::t('app/crm', 'Updated At'),
+            'week' => Yii::t('app/crm', 'Week'),
+            'monthly_type' => Yii::t('app/crm', 'Monthly type'),
+            'monthly_days' => Yii::t('app/crm', 'Monthly days')
         ];
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getTypeStr()
+    {
+        $arTmp = self::getTypeMap();
+        return array_key_exists($this->type,$arTmp) ? $arTmp[$this->type] : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getMonthlyTypeStr()
+    {
+        $arTmp = self::getMonthlyTypeMap();
+        return array_key_exists($this->monthly_type,$arTmp) ? $arTmp[$this->monthly_type] : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getMonthlyDaysStr()
+    {
+        $arTmp = self::getMonthlyDays();
+        return array_key_exists($this->monthly_days,$arTmp) ? $arTmp[$this->monthly_days] : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getNumberItemStr()
+    {
+        $arTmp = self::getNumberItemMap();
+        return array_key_exists($this->number_of_item,$arTmp) ? $arTmp[$this->number_of_item] : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getEndTypeStr()
+    {
+        $arTmp = self::getEndTypeMap();
+        return array_key_exists($this->end_type,$arTmp) ? $arTmp[$this->end_type] : NULL;
     }
 
     /**
@@ -112,5 +271,17 @@ class CrmTaskRepeat extends AbstractActiveRecord
             [
                 TaskRepeatBehavior::className()             //поведение модели
             ]);
+    }
+
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(!is_numeric($this->start_date))
+            $this->start_date = strtotime($this->start_date);
+
+        return parent::beforeSave($insert);
     }
 }

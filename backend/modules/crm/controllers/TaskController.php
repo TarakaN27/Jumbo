@@ -10,6 +10,7 @@ use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CrmTaskAccomplices;
 use common\models\CrmTaskLogTime;
+use common\models\CrmTaskRepeat;
 use common\models\CrmTaskWatcher;
 use common\models\Dialogs;
 use common\models\managers\CUserCrmRulesManager;
@@ -44,12 +45,13 @@ class TaskController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['moder','bookkeeper','admin','user']
+                    'roles' => ['moder', 'bookkeeper', 'admin', 'user']
                 ]
             ]
         ];
         return $tmp;
     }
+
     /**
      * Lists all CrmTask models.
      * @return mixed
@@ -60,37 +62,34 @@ class TaskController extends AbstractBaseBackendController
 
         //сохраним выбор пользователя
         $query = Yii::$app->request->queryParams;
-        $key = 'task_search_'.Yii::$app->user->id;
-        if(
+        $key = 'task_search_' . Yii::$app->user->id;
+        if (
             empty($query) ||
             (!empty($query) && count($query) == 1 && isset($query['viewType'])) ||
             (!empty($query) && count($query) == 1 && isset($query['sort'])) ||
             (!empty($query) && count($query) == 1 && isset($query['page']))// ||
-        //    (!empty($query) && count($query) == 1 && isset($query['per-page']))
+            //    (!empty($query) && count($query) == 1 && isset($query['per-page']))
 
-        )
-        {
+        ) {
             $tmp = Yii::$app->session->get($key);
-            if(!empty($tmp))
+            if (!empty($tmp))
                 $query = $tmp;
-        }else{
-            Yii::$app->session->set($key,$query);
+        } else {
+            Yii::$app->session->set($key, $query);
         }
 
-        $key_view = 'task_vt_'.Yii::$app->user->id;
-        if(is_null($viewType))
-        {
+        $key_view = 'task_vt_' . Yii::$app->user->id;
+        if (is_null($viewType)) {
             $tmp = Yii::$app->session->get($key_view);
-            if(!empty($tmp))
+            if (!empty($tmp))
                 $viewType = $tmp;
             else
                 $viewType = CrmTaskSearch::VIEW_TYPE_ALL;
-        }else{
-            Yii::$app->session->set($key_view,$viewType);
+        } else {
+            Yii::$app->session->set($key_view, $viewType);
         }
 
-
-        $dataProvider = $searchModel->search($query,$viewType,NULL,[],TRUE);
+        $dataProvider = $searchModel->search($query, $viewType, NULL, [], TRUE);
 
         $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
 
@@ -115,13 +114,13 @@ class TaskController extends AbstractBaseBackendController
     {
         /** @var CrmTask $model */
         $model = CrmTask::find()
-                 ->with(
-				  'cmp','contact','parent',
-				  'busersAccomplices','busersWatchers',
-				  'taskFiles','cmp.quantityHour'
-			  )
+            ->with(
+                'cmp', 'contact', 'parent',
+                'busersAccomplices', 'busersWatchers',
+                'taskFiles', 'cmp.quantityHour'
+            )
             ->where(['id' => $id])->one();
-        if (!$model){
+        if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
@@ -139,7 +138,7 @@ class TaskController extends AbstractBaseBackendController
         $obWatcher = new CrmTaskWatcher(); //наблюдатели
         $obWatcher->task_id = (int)$id;
 
-        $obLogWork = new CrmTaskLogTime(['log_date' => date('d.m.Y',time()),'task_id' => $model->id]); //модель для добавления времени
+        $obLogWork = new CrmTaskLogTime(['log_date' => date('d.m.Y', time()), 'task_id' => $model->id]); //модель для добавления времени
         $obLogWork->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
 
         $obFile = new CrmCmpFile(); //модель для добавления файлов
@@ -165,9 +164,8 @@ class TaskController extends AbstractBaseBackendController
         $obLogBegin = NULL;
         $obLog = [];
         /** @var CrmTaskLogTime $time */
-        foreach($obTime as $time)
-        {
-            $timeSpend +=(int)$time->spend_time;
+        foreach ($obTime as $time) {
+            $timeSpend += (int)$time->spend_time;
             $obLog[] = $time;
         }
 
@@ -175,81 +173,71 @@ class TaskController extends AbstractBaseBackendController
          * Соисполнитель
          */
         $arAccomplIds = [];
-        foreach($arAccompl as $item)
+        foreach ($arAccompl as $item)
             $arAccomplIds[] = $item->id;
-        if($obAccmpl->load(Yii::$app->request->post()))
-        {
-            if(in_array($obAccmpl->buser_id,$arAccomplIds))
-            {
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','You are trying to add user, witch already accomplices'));
-                return $this->redirect(['view','id' => $id]);
+        if ($obAccmpl->load(Yii::$app->request->post())) {
+            if (in_array($obAccmpl->buser_id, $arAccomplIds)) {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already accomplices'));
+                return $this->redirect(['view', 'id' => $id]);
             }
 
-            if($obAccmpl->save())
-            {
+            if ($obAccmpl->save()) {
                 $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','Accomplice successfully added'));
-                return $this->redirect(['view','id' => $id]);
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Accomplice successfully added'));
+                return $this->redirect(['view', 'id' => $id]);
             }
 
-            Yii::$app->session->setFlash('error',Yii::t('app/crm','Can not add accomplice'));
-            return $this->redirect(['view','id' => $id]);
+            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add accomplice'));
+            return $this->redirect(['view', 'id' => $id]);
         }
         /**
          * Наблюдатели
          */
         $arWatchIDs = [];
-        foreach($arWatchers as $watch)
+        foreach ($arWatchers as $watch)
             $arWatchIDs[] = $watch->id;
-        if($obWatcher->load(Yii::$app->request->post()))
-        {
-            if(in_array($obWatcher->buser_id,$arWatchIDs))
-            {
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','You are trying to add user, witch already watching'));
-                return $this->redirect(['view','id' => $id]);
+        if ($obWatcher->load(Yii::$app->request->post())) {
+            if (in_array($obWatcher->buser_id, $arWatchIDs)) {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already watching'));
+                return $this->redirect(['view', 'id' => $id]);
             }
 
-            if($obWatcher->save())
-            {
+            if ($obWatcher->save()) {
                 $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                Yii::$app->session->setFlash('success',Yii::t('app/crm','Watcher successfully added'));
-                return $this->redirect(['view','id' => $id]);
+                Yii::$app->session->setFlash('success', Yii::t('app/crm', 'Watcher successfully added'));
+                return $this->redirect(['view', 'id' => $id]);
             }
 
-            Yii::$app->session->setFlash('error',Yii::t('app/crm','Can not add watcher'));
-            return $this->redirect(['view','id' => $id]);
+            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add watcher'));
+            return $this->redirect(['view', 'id' => $id]);
         }
 
         /**
          * Добавление файла
          */
-        if($obFile->load(Yii::$app->request->post()))
-        {
-            if($obFile->save())
-            {
+        if ($obFile->load(Yii::$app->request->post())) {
+            if ($obFile->save()) {
                 $model->updateUpdatedAt();
-                Yii::$app->session->setFlash('success',Yii::t('app/crm','File successfully added'));
-                return $this->redirect(['view','id' => $id]);
-            }else{
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add file'));
-                return $this->redirect(['view','id' => $id]);
+                Yii::$app->session->setFlash('success', Yii::t('app/crm', 'File successfully added'));
+                return $this->redirect(['view', 'id' => $id]);
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add file'));
+                return $this->redirect(['view', 'id' => $id]);
             }
         }
 
         /**
          * Добавление задачи
          */
-        if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
-        {
-            if($modelTask->createTask(Yii::$app->user->id))
-            {
-                Yii::$app->session->addFlash('success',Yii::t('app/crm','Sub task successfully added'));
-                return $this->redirect(['view', 'id' => $id,'#' => 'tab_content5']);
-            }else{
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
-                return $this->redirect(['view','id' => $id]);
+        if ($modelTask->load(Yii::$app->request->post()) && $modelTask->validate()) {
+            if ($modelTask->createTask(Yii::$app->user->id)) {
+                Yii::$app->session->addFlash('success', Yii::t('app/crm', 'Sub task successfully added'));
+                return $this->redirect(['view', 'id' => $id, '#' => 'tab_content5']);
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add new task'));
+                return $this->redirect(['view', 'id' => $id]);
             }
         }
 
@@ -276,8 +264,8 @@ class TaskController extends AbstractBaseBackendController
 
         $dataProviderChildtask = new ActiveDataProvider([
             'query' => $queryChild,
-            'sort'=> [
-                'defaultOrder' => ['status'=>SORT_ASC]
+            'sort' => [
+                'defaultOrder' => ['status' => SORT_ASC]
             ],
         ]);
         $dataWatchers = [];
@@ -298,7 +286,7 @@ class TaskController extends AbstractBaseBackendController
             'obCnt' => $obCnt,
             'obParent' => $obParent,
             'arChild' => $arChild,
-            'sAssName' =>$sAssName,
+            'sAssName' => $sAssName,
             'modelTask' => $modelTask,
             'dataProviderChildtask' => $dataProviderChildtask,
             'dataWatchers' => $dataWatchers,
@@ -315,21 +303,17 @@ class TaskController extends AbstractBaseBackendController
     {
         $model = $this->findModel($id);
 
-        if($model->load(Yii::$app->request->post()))
-        {
-            if($model->save())
-            {
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save()) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 $model->updateUpdatedAt();
                 $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
                 $obMan = $model->assigned;
-                if(!$obMan)
-                    return ['fio' => NULL,'role' => NULL];
+                if (!$obMan)
+                    return ['fio' => NULL, 'role' => NULL];
                 else
-                    return ['fio' => $obMan->getFio(),'role' => $obMan->getRoleStr()];
-                return is_object($obMan = $model->assigned) ? $obMan->getFio() : $model->assigned_id;
-
-            }else{
+                    return ['fio' => $obMan->getFio(), 'role' => $obMan->getRoleStr()];
+            } else {
                 throw new ServerErrorHttpException();
             }
         }
@@ -349,19 +333,19 @@ class TaskController extends AbstractBaseBackendController
             ->where(['parent_id' => $id])
             ->all();
 
-        if(empty($arTaskID))
-            return $this->renderPartial('part/_woked_time_area',[
+        if (empty($arTaskID))
+            return $this->renderPartial('part/_woked_time_area', [
                 'obLog' => [],
                 'showTaskID' => TRUE
             ]);
 
         $arIds = [];
-        foreach($arTaskID as $task)
+        foreach ($arTaskID as $task)
             $arIds[] = $task['id'];
 
         $arLogs = CrmTaskLogTime::find()->where(['task_id' => $arIds])->all();
 
-        return $this->renderPartial('part/_woked_time_area',[
+        return $this->renderPartial('part/_woked_time_area', [
             'obLog' => $arLogs,
             'showTaskID' => TRUE
         ]);
@@ -384,22 +368,21 @@ class TaskController extends AbstractBaseBackendController
      * @return array
      * @throws NotFoundHttpException
      */
-    protected function changeStatus($iStatus,$obTask = NULL)
+    protected function changeStatus($iStatus, $obTask = NULL)
     {
-        if(is_null($obTask))
-        {
+        if (is_null($obTask)) {
             $tID = Yii::$app->request->post('tID');
             $iUser = Yii::$app->user->id;
-            if(empty($tID) || empty($iUser))
+            if (empty($tID) || empty($iUser))
                 throw new InvalidParamException('Task id and user id is required');
             /** @var CrmTask $obTask */
             $obTask = CrmTask::findOne($tID);
-            if(!$obTask)
+            if (!$obTask)
                 throw new NotFoundHttpException();
         }
 
         $iNewStatus = $obTask->changeTaskStatus($iStatus);
-        if($iNewStatus)
+        if ($iNewStatus)
             $data = [
                 'code' => $obTask->status,
                 'text' => $obTask->getStatusStr()
@@ -432,14 +415,13 @@ class TaskController extends AbstractBaseBackendController
         $iTID = Yii::$app->request->post('tID');
         /** @var CrmTask $obTask */
         $obTask = CrmTask::findOne($iTID); //находим задачу
-        if(!$obTask)
+        if (!$obTask)
             throw new NotFoundHttpException('Task not found');
 
-        if($obTask->task_control == 1 && $obTask->created_by != Yii::$app->user->id)
-        {
-            $data = $this->changeStatus(CrmTask::STATUS_NEED_ACCEPT,$obTask);
-        }else{
-            $data = $this->changeStatus(CrmTask::STATUS_CLOSE,$obTask);
+        if ($obTask->task_control == 1 && $obTask->created_by != Yii::$app->user->id) {
+            $data = $this->changeStatus(CrmTask::STATUS_NEED_ACCEPT, $obTask);
+        } else {
+            $data = $this->changeStatus(CrmTask::STATUS_CLOSE, $obTask);
         }
 
         return $this->returnJsonHelper($data);
@@ -464,6 +446,7 @@ class TaskController extends AbstractBaseBackendController
     {
         $iUserID = Yii::$app->user->id;
         $model = new CrmTask();
+        $model->repeat_task = CrmTask::NO;      //set default value to NO
         //дефолтные состояния
         $model->created_by = $iUserID;  //кто создал задачу
         $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
@@ -471,58 +454,67 @@ class TaskController extends AbstractBaseBackendController
         $model->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
         $data = [];
         $obFile = new CrmCmpFile();
+        $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
+        $obTaskRepeat->start_date = Yii::$app->formatter->asDate('NOW');
+        $obTaskRepeat->end_type = CrmTaskRepeat::END_TYPE_INFINITE;
+        $obTaskRepeat->type = CrmTaskRepeat::TYPE_DAILY;
+        $obTaskRepeat->monthly_type = CrmTaskRepeat::MONTHLY_TYPE_ONE;
+
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
-            if($model->createTask($iUserID))
-            {
-                Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
+            $validRepeat = TRUE;
+            if ($model->repeat_task) {
+                if (!$obTaskRepeat->load(Yii::$app->request->post()) || ($obTaskRepeat->load(Yii::$app->request->post()) && !$obTaskRepeat->validate())) {
+                    $validRepeat = FALSE;
+                }
+            }
+            if ($validRepeat && $model->createTask($iUserID)) {
+                Yii::$app->session->addFlash('success', Yii::t('app/crm', 'Task successfully added'));
                 return $this->redirect(['view', 'id' => $model->id]);
-            }else{
-                Yii::$app->session->setFlash('error',Yii::t('app/crm','Error. Can not add new task'));
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add new task'));
             }
-        } else {
-
-            $sAssName = BUser::findOne($model->assigned_id)->getFio();
-            if(!empty($model->cmp_id))
-                $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
-            else
-                $cuserDesc = '';
-
-            if(!empty($model->contact_id))
-                $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
-            else
-                $contactDesc = '';
-
-            $pTaskName = '';
-            if(!empty($model->parent_id))
-            {
-                $obTask = CrmTask::findOne($model->parent_id);
-                if(!$obTask)
-                $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
-            }
-
-            $dataWatchers = [];
-            if(!empty($model->arrWatch))
-            {
-                $obWatchers = BUser::find()
-                    ->select(['id','fname','mname','lname'])
-                    ->where(['id' => $model->arrWatch])
-                    ->all();
-                $dataWatchers = ArrayHelper::map($obWatchers,'id','fio');
-            }
-
-
-            return $this->render('create', [
-                'model' => $model,
-                'sAssName' => $sAssName,
-                'cuserDesc' => $cuserDesc,
-                'contactDesc' => $contactDesc,
-                'data' => $data,
-                'dataWatchers' => $dataWatchers,
-                'obFile' => $obFile,
-                'pTaskName' => $pTaskName
-            ]);
         }
+
+        $sAssName = BUser::findOne($model->assigned_id)->getFio();
+        if (!empty($model->cmp_id))
+            $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
+        else
+            $cuserDesc = '';
+
+        if (!empty($model->contact_id))
+            $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
+        else
+            $contactDesc = '';
+
+        $pTaskName = '';
+        if (!empty($model->parent_id)) {
+            $obTask = CrmTask::findOne($model->parent_id);
+            if (!$obTask)
+                $pTaskName = $obTask->id . ' - ' . CustomHelper::cuttingString($obTask->title, 100);
+        }
+
+        $dataWatchers = [];
+        if (!empty($model->arrWatch)) {
+            $obWatchers = BUser::find()
+                ->select(['id', 'fname', 'mname', 'lname'])
+                ->where(['id' => $model->arrWatch])
+                ->all();
+            $dataWatchers = ArrayHelper::map($obWatchers, 'id', 'fio');
+        }
+
+
+        return $this->render('create', [
+            'model' => $model,
+            'sAssName' => $sAssName,
+            'cuserDesc' => $cuserDesc,
+            'contactDesc' => $contactDesc,
+            'data' => $data,
+            'dataWatchers' => $dataWatchers,
+            'obFile' => $obFile,
+            'pTaskName' => $pTaskName,
+            'obTaskRepeat' => $obTaskRepeat
+        ]);
     }
 
     /**
@@ -534,116 +526,154 @@ class TaskController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //редактировать задачу может только автор
+        if ($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //редактировать задачу может только автор
             throw new ForbiddenHttpException();
 
-        if(!empty($model->deadline))
+        if (!empty($model->deadline))
             $model->deadline = Yii::$app->formatter->asDatetime($model->deadline);
         $arAccOb = $model->busersAccomplices;
         $arWatchers = $model->busersWatchers;
-        if(!empty($arWatchers))
-            foreach($arWatchers as $watcher)
+        if (!empty($arWatchers))
+            foreach ($arWatchers as $watcher)
                 $model->arrWatch[] = $watcher->id;
-
 
         $arAccObOld = [];
         $data = [];
-        if($arAccOb)
-            foreach($arAccOb as $acc) {
+        if ($arAccOb)
+            foreach ($arAccOb as $acc) {
                 $model->arrAcc [] = $acc->id;
-                $arAccObOld [] =  $acc->id;
+                $arAccObOld [] = $acc->id;
                 $data[$acc->id] = $acc->getFio();
             }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->repeat_task) {
+            /** @var CrmTaskRepeat $obTaskRepeat */
+            $obTaskRepeat = $model->repeatTask;
+            if (!$obTaskRepeat)
+                throw new NotFoundHttpException('Repeat task params not found');
 
-            $model->unlinkAll('busersAccomplices',TRUE);
-            $arAccNew = [];
-            if(!empty($model->arrAcc))
-            {
-                //соисполнители.
-                foreach($model->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
-                    if($value == $model->assigned_id)
-                        unset($model->arrAcc[$key]);
-
-                if(!empty($model->arrAcc)) {
-                    $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
-                    if ($arAcc) {
-                        foreach ($arAcc as $obAcc)
-                        {
-                            $arAccNew[] = $obAcc->id;
-                            $model->link('busersAccomplices', $obAcc);
-                        }
-
-                    }
-                }
-            }
-            $model->unlinkAll('busersWatchers',TRUE);
-            //наблюдатели.
-            if(!empty($model->arrWatch))
-            {
-                foreach($model->arrWatch as $key => $value) //проверим, чтобы наблюдатель не был соисполнителем
-                    if($value == $model->assigned_id)
-                        unset($model->arrWatch[$key]);
-
-                if(!empty($model->arrWatch)) {
-                    $arWatch = BUser::find()->where(['id' =>$model->arrWatch])->all(); //находим всех соисполнитлей
-                    if ($arWatch ) {
-                        foreach ($arWatch  as $obWatch)
-                        {
-                            $model->link('busersWatchers', $obWatch);
-                        }
-                    }
-                }
-            }
-
-            //нужно у удаленных соисполнителелй удалить балуны
-            $arAccDiff = array_diff($arAccObOld,$arAccNew);
-            if(!empty($arAccDiff))
-                RedisNotification::removeNewTaskFromList($arAccDiff,$model->id);
-            $modelUpd = $this->findModel($model->id);
-            $modelUpd->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-            return $this->redirect(['view', 'id' => $model->id]);
+            $obTaskRepeat->start_date = Yii::$app->formatter->asDate($obTaskRepeat->start_date);
+            if (!empty($obTaskRepeat->end_date))
+                $obTaskRepeat->end_date = Yii::$app->formatter->asDate($obTaskRepeat->end_date);
         } else {
-
-            $sAssName = BUser::findOne($model->assigned_id)->getFio();
-            if(!empty($model->cmp_id))
-                $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
-            else
-                $cuserDesc = '';
-            if(!empty($model->contact_id))
-                $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
-            else
-                $contactDesc = '';
-
-            $pTaskName = '';
-            if(!empty($model->parent_id))
-            {
-                $obTask = CrmTask::findOne($model->parent_id);
-                if($obTask)
-                    $pTaskName = $obTask->id.' - '.CustomHelper::cuttingString($obTask->title,100);
-            }
-
-            $dataWatchers = [];
-            if(!empty($model->arrWatch))
-            {
-                $obWatchers = BUser::find()
-                    ->select(['id','fname','mname','lname'])
-                    ->where(['id' => $model->arrWatch])
-                    ->all();
-                $dataWatchers = ArrayHelper::map($obWatchers,'id','fio');
-            }
-
-            return $this->render('update', [
-                'model' => $model,
-                'cuserDesc' => $cuserDesc,
-                'contactDesc' => $contactDesc,
-                'sAssName' => $sAssName,
-                'data' => $data,
-                'pTaskName' => $pTaskName,
-                'dataWatchers' => $dataWatchers
-            ]);
+            $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
+            $obTaskRepeat->start_date = Yii::$app->formatter->asDate('NOW');
+            $obTaskRepeat->end_type = CrmTaskRepeat::END_TYPE_INFINITE;
+            $obTaskRepeat->type = CrmTaskRepeat::TYPE_DAILY;
+            $obTaskRepeat->monthly_type = CrmTaskRepeat::MONTHLY_TYPE_ONE;
         }
+
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            $validRepeat = TRUE;
+            if ($model->repeat_task) {
+                if (!$obTaskRepeat->load(Yii::$app->request->post()) || ($obTaskRepeat->load(Yii::$app->request->post()) && !$obTaskRepeat->validate())) {
+                    $validRepeat = FALSE;
+                }
+            }
+
+            $transaction = Yii::$app->db->beginTransaction();
+            if($model->isAttributeChanged('repeat_task') && $model->repeat_task != CrmTask::YES)
+            {
+                CrmTaskRepeat::deleteAll(['task_id' => $model->id]);
+            }
+
+            if($validRepeat && $model->save()) {
+                $saveRepeat = TRUE;
+                if($model->repeat_task)
+                {
+                    if($obTaskRepeat->isNewRecord)
+                        $obTaskRepeat->task_id = $model->id;
+                    $saveRepeat  = $obTaskRepeat->save();
+                }
+                if($saveRepeat) {
+                    $model->unlinkAll('busersAccomplices', TRUE);
+                    $arAccNew = [];
+                    if (!empty($model->arrAcc)) {
+                        //соисполнители.
+                        foreach ($model->arrAcc as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                            if ($value == $model->assigned_id)
+                                unset($model->arrAcc[$key]);
+
+                        if (!empty($model->arrAcc)) {
+                            $arAcc = BUser::find()->where(['id' => $model->arrAcc])->all(); //находим всех соисполнитлей
+                            if ($arAcc) {
+                                foreach ($arAcc as $obAcc) {
+                                    $arAccNew[] = $obAcc->id;
+                                    $model->link('busersAccomplices', $obAcc);
+                                }
+
+                            }
+                        }
+                    }
+                    $model->unlinkAll('busersWatchers', TRUE);
+                    //наблюдатели.
+                    if (!empty($model->arrWatch)) {
+                        foreach ($model->arrWatch as $key => $value) //проверим, чтобы наблюдатель не был соисполнителем
+                            if ($value == $model->assigned_id)
+                                unset($model->arrWatch[$key]);
+
+                        if (!empty($model->arrWatch)) {
+                            $arWatch = BUser::find()->where(['id' => $model->arrWatch])->all(); //находим всех соисполнитлей
+                            if ($arWatch) {
+                                foreach ($arWatch as $obWatch) {
+                                    $model->link('busersWatchers', $obWatch);
+                                }
+                            }
+                        }
+                    }
+
+                    //нужно у удаленных соисполнителелй удалить балуны
+                    $arAccDiff = array_diff($arAccObOld, $arAccNew);
+                    if (!empty($arAccDiff))
+                        RedisNotification::removeNewTaskFromList($arAccDiff, $model->id);
+                    $modelUpd = $this->findModel($model->id);
+                    $modelUpd->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            }
+            $transaction->rollBack();
+        }
+
+        $sAssName = BUser::findOne($model->assigned_id)->getFio();
+        if (!empty($model->cmp_id))
+            $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
+        else
+            $cuserDesc = '';
+        if (!empty($model->contact_id))
+            $contactDesc = \common\models\CrmCmpContacts::findOne($model->contact_id)->fio;
+        else
+            $contactDesc = '';
+
+        $pTaskName = '';
+        if (!empty($model->parent_id)) {
+            $obTask = CrmTask::findOne($model->parent_id);
+            if ($obTask)
+                $pTaskName = $obTask->id . ' - ' . CustomHelper::cuttingString($obTask->title, 100);
+        }
+
+        $dataWatchers = [];
+        if (!empty($model->arrWatch)) {
+            $obWatchers = BUser::find()
+                ->select(['id', 'fname', 'mname', 'lname'])
+                ->where(['id' => $model->arrWatch])
+                ->all();
+            $dataWatchers = ArrayHelper::map($obWatchers, 'id', 'fio');
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+            'cuserDesc' => $cuserDesc,
+            'contactDesc' => $contactDesc,
+            'sAssName' => $sAssName,
+            'data' => $data,
+            'pTaskName' => $pTaskName,
+            'dataWatchers' => $dataWatchers,
+            'obTaskRepeat' => $obTaskRepeat
+        ]);
+
     }
 
     /**
@@ -656,7 +686,7 @@ class TaskController extends AbstractBaseBackendController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        if($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //удалить задачу может только тот кто создал и админ
+        if ($model->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //удалить задачу может только тот кто создал и админ
             throw new ForbiddenHttpException();
 
         $model->delete();
@@ -698,8 +728,7 @@ class TaskController extends AbstractBaseBackendController
         $obLog->setScenario(CrmTaskLogTime::SCENARIO_LOG_TIME);
         $obLog->buser_id = Yii::$app->user->id;
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON; //указываем что возвращаем json
-        if($obLog->load(Yii::$app->request->post()) && $obLog->save())
-        {
+        if ($obLog->load(Yii::$app->request->post()) && $obLog->save()) {
             $obTimeArr = CrmTaskLogTime::find()->where([
                 'task_id' => $obLog->task_id,
             ])->all();
@@ -707,19 +736,18 @@ class TaskController extends AbstractBaseBackendController
             $timeSpend = 0;
 
             /** @var CrmTaskLogTime $time */
-            foreach($obTimeArr as $time)
-            {
-                $timeSpend +=(int)$time->spend_time;
+            foreach ($obTimeArr as $time) {
+                $timeSpend += (int)$time->spend_time;
             }
             return [
                 'error' => NULL,
                 'model' => $obLog,
-                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr,'disableHidden' => TRUE]),
+                'content' => $this->renderPartial('part/_woked_time_area', ['obLog' => $obTimeArr, 'disableHidden' => TRUE]),
                 'timeSpend' => \common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)
             ];
         }
 
-        return ['error' => $obLog->getErrors(),'model' => NULL,'content' => NULL,'timeSpend' => NULL];
+        return ['error' => $obLog->getErrors(), 'model' => NULL, 'content' => NULL, 'timeSpend' => NULL];
     }
 
     /**
@@ -729,19 +757,18 @@ class TaskController extends AbstractBaseBackendController
      */
     public function actionUpdateLogTime($id = NULL)
     {
-        if(is_null($id))
+        if (is_null($id))
             $id = Yii::$app->request->post('id');
         /** @var CrmTaskLogTime $model */
-        $model = CrmTaskLogTime::findOne(['id' => $id,'buser_id' => Yii::$app->user->id]);
-        if(!$model)
+        $model = CrmTaskLogTime::findOne(['id' => $id, 'buser_id' => Yii::$app->user->id]);
+        if (!$model)
             throw new NotFoundHttpException();
 
         $model->setScenario(CrmTaskLogTime::SCENARIO_UPDATE);
-        if(!empty($model->log_date))
+        if (!empty($model->log_date))
             $model->log_date = Yii::$app->formatter->asDate($model->log_date);
 
-        if($model->load(Yii::$app->request->post()) && $model->save())
-        {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $obTimeArr = CrmTaskLogTime::find()->where([
                 'task_id' => $model->task_id,
             ])->all();
@@ -749,20 +776,19 @@ class TaskController extends AbstractBaseBackendController
             $timeSpend = 0;
 
             /** @var CrmTaskLogTime $time */
-            foreach($obTimeArr as $time)
-            {
-                $timeSpend +=(int)$time->spend_time;
+            foreach ($obTimeArr as $time) {
+                $timeSpend += (int)$time->spend_time;
             }
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'error' => NULL,
                 'model' => $model,
-                'content' => $this->renderPartial('part/_woked_time_area',['obLog' => $obTimeArr]),
+                'content' => $this->renderPartial('part/_woked_time_area', ['obLog' => $obTimeArr]),
                 'timeSpend' => \common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)
             ];
         }
         $model->covertSecondsToTime();
-        return $this->renderAjax('part/log_time_form',[
+        return $this->renderAjax('part/log_time_form', [
             'model' => $model
         ]);
 
@@ -777,9 +803,9 @@ class TaskController extends AbstractBaseBackendController
     {
         /** @var CrmCmpFile $obFile */
         $obFile = CrmCmpFile::findOne(['id' => $id]);
-        if(!$obFile)
+        if (!$obFile)
             throw new NotFoundHttpException('File not found');
-        return Yii::$app->response->sendFile($obFile->getFilePath(),$obFile->name.'.'.$obFile->ext);
+        return Yii::$app->response->sendFile($obFile->getFilePath(), $obFile->name . '.' . $obFile->ext);
     }
 
     /**
@@ -790,7 +816,7 @@ class TaskController extends AbstractBaseBackendController
     {
         $pk = Yii::$app->request->post('pk');
         $obFile = CrmCmpFile::findOne($pk);
-        if(!$obFile)
+        if (!$obFile)
             throw new NotFoundHttpException('File not found');
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $obFile->delete();
@@ -807,10 +833,10 @@ class TaskController extends AbstractBaseBackendController
         $value = Yii::$app->request->post('value');
 
         $obTask = CrmTask::findOne($pk);
-        if(!$obTask)
+        if (!$obTask)
             throw new NotFoundHttpException('Task not found');
 
-        if(!$obTask->changeTaskStatus((int)$value))
+        if (!$obTask->changeTaskStatus((int)$value))
             throw new ServerErrorHttpException('Error');
 
         Yii::$app->end(200);

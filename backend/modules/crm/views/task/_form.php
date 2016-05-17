@@ -255,6 +255,14 @@ $this->registerJs('
                 ]
             ]);
     ?>
+    
+    <?php if(isset($obTaskRepeat)):?>
+        <?=$this->render('part/_form_repeat_task',[
+            'form' => $form,
+            'model' => $model,
+            'obTaskRepeat' => $obTaskRepeat
+        ]);?>
+    <?php endif;?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
