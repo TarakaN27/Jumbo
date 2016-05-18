@@ -11,6 +11,7 @@ use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
+use common\components\tasks\RecurringTask;
 use common\models\BuserInviteCode;
 use Gears\Pdf;
 use Yii;
@@ -109,6 +110,10 @@ class SiteController extends Controller
         $obCalc = new PartnerPercentCounting();
         $obCalc->countPercentByMonth('01-02-2016');
         */
+        //1466340220
+        $obRecurringTask = new RecurringTask(1465389820);
+        $obRecurringTask->run();
+
         die;
     }
 

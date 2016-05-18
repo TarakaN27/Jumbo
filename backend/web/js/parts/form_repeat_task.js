@@ -21,6 +21,7 @@ function allowAndDisallowCustomValue()
 }
 function allowAndDisallowMonthlyTypesSections()
 {
+    /*
     var
         mon1 = $('.mon1'),
         mon2 = $('.mon2'),
@@ -40,6 +41,7 @@ function allowAndDisallowMonthlyTypesSections()
             mon2.addClass('hide');
             break;
     }
+    */
 }
 function switchEndInput()
 {

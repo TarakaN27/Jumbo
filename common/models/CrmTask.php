@@ -41,6 +41,8 @@ use yii\web\UploadedFile;
  * @property integer $payment_request
  * @property integer $repeat_task
  * @property integer $recurring_id
+ * @property integer $recurring_last_upd
+
  *
  * @property Dialogs $dialog
  * @property BUser $assigned
@@ -200,7 +202,7 @@ class CrmTask extends AbstractActiveRecord
                 'cmp_id', 'contact_id',
                 'created_at', 'updated_at','hourEstimate',
                 'minutesEstimate','payment_request','repeat_task',
-                'recurring_id'
+                'recurring_id','recurring_last_upd'
             ], 'integer'],
             ['minutesEstimate','integer','min' => 0,'max' => 59],
 
@@ -247,6 +249,7 @@ class CrmTask extends AbstractActiveRecord
             'arrWatch' => Yii::t('app/crm','Watchers'),
             'repeat_task' => Yii::t('app/crm','Repeat task'),
             'recurring_id' => Yii::t('app/crm','Recurring id'),
+            'recurring_last_upd' => Yii::t('app/crm','Recurring last update'),
         ];
     }
 
@@ -702,7 +705,7 @@ class CrmTask extends AbstractActiveRecord
         $obDialog->crm_task_id = $this->id;
         $obDialog->buser_id = $iUserID; //кто создал
         $obDialog->status = Dialogs::PUBLISHED; //публикуем диалог
-        $obDialog->theme = Yii::t('app/crm','Task').' "'.Html::a($this->title,['/crm/task/view','id' => $this->id],['class' => 'dialog-title-link']).'"';
+        $obDialog->theme = Yii::t('app/crm','Task').$this->title;
 
         if(!empty($this->cmp_id))  //если выбрана компания, то привяжем диалог к компания
             $obDialog->crm_cmp_id = $this->cmp_id;
@@ -833,7 +836,7 @@ class CrmTask extends AbstractActiveRecord
                 if(!in_array($user,$arExist))
                     $arBUIDs []= $user;
             }
-
+            $arBUIDs = array_unique($arBUIDs);
             if(!empty($arBUIDs))
             {
                 $postModel = new BuserToDialogs(); //привязываем диалог к пользователям

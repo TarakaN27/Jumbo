@@ -7,12 +7,9 @@
  */
 
 namespace common\models\managers;
-
-
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use yii\base\Exception;
-use yii\jui\Dialog;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -25,12 +22,14 @@ class CrmTaskManager extends CrmTask
      * @throws NotFoundHttpException
      * @throws \yii\db\Exception
      */
-    public function cloneTask($taskID,$setRecurringID = FALSE)
+    public static function cloneTask($taskID,$setRecurringID = FALSE,$obTask = NULL)
     {
-        /** @var CrmTask $obTask */
-        $obTask = CrmTask::find()->where(['id' => $taskID])->one();
-        if(!$obTask)
-            throw new NotFoundHttpException();
+        if(is_null($obTask)) {
+            /** @var CrmTask $obTask */
+            $obTask = CrmTask::find()->where(['id' => $taskID])->one();
+            if (!$obTask)
+                throw new NotFoundHttpException();
+        }
 
         $arBUsersWatchers = $obTask->busersWatchers;
         $arTaskFiles = $obTask->taskFiles;
@@ -46,6 +45,7 @@ class CrmTaskManager extends CrmTask
             $obTask->status = CrmTask::STATUS_OPENED;
             $obTask->closed_by = '';
             $obTask->closed_date = '';
+            $obTask->recurring_last_upd = '';
             if($setRecurringID)
                 $obTask->recurring_id = $taskID;
             if(!$obTask->save())
@@ -57,7 +57,7 @@ class CrmTaskManager extends CrmTask
                 $obTask->link('busersAccomplices',$obBUA);
 
             foreach ($arBUsersWatchers as $obBUW)
-                $obTask->link('busersAccomplices',$obBUW);
+                $obTask->link('busersWatchers',$obBUW);
 
             /** @var CrmCmpFile $file */
             foreach ($arTaskFiles as $file)

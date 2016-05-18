@@ -94,12 +94,16 @@ $template2 = '{label}<div class="col-md-9 col-sm-9 col-xs-12">{input}</div><ul c
 
         <!--monthly-->
         <section class="blockMonthly">
-            <?=$form->field($obTaskRepeat,'monthly_type',[
+            <?php
+            /*
+            $form->field($obTaskRepeat,'monthly_type',[
                 'options' => [
                     'class' => 'form-group blockMonthly'
                 ],
                 'template' => $template2
-            ])->radioList(\common\models\CrmTaskRepeat::getMonthlyTypeMap(),['class' => 'monthlyType'])->label(false)?>
+            ])->radioList(\common\models\CrmTaskRepeat::getMonthlyTypeMap(),['class' => 'monthlyType'])->label(false)
+            */
+            ?>
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <?=$form->field($obTaskRepeat,'day',[
                     'options' => [
@@ -114,7 +118,9 @@ $template2 = '{label}<div class="col-md-9 col-sm-9 col-xs-12">{input}</div><ul c
                     ]
                 ])->textInput()?>
             </div>
-
+            <?php
+                /*
+            ?>
             <?=$form->field($obTaskRepeat,'number_of_item',[
                 'options' => [
                     'class' => 'form-group blockMonthly mon2'
@@ -130,6 +136,9 @@ $template2 = '{label}<div class="col-md-9 col-sm-9 col-xs-12">{input}</div><ul c
                     'class' => 'form-group blockMonthly mon2'
                 ]
             ])->textInput()?>
+                <?php
+                    */
+                ?>
         </section>
     </div>
     <div class="col-md-12 col-sm-12 col-xs-12">

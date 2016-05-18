@@ -36,11 +36,11 @@ class ModelHistoryBehavior extends Behavior
     public function afterInsert()
     {
         $msg = \Yii::t('app/crm','User {user} create new task',[
-                'user' => \Yii::$app->user->identity->getFio()
+                'user' => property_exists(\Yii::$app,'user') ? \Yii::$app->user->identity->getFio() : ''
             ]);
-
+        
          $obCrmLog = new CrmLogs();
-         $obCrmLog->changed_by = \Yii::$app->user->id;
+         $obCrmLog->changed_by = property_exists(\Yii::$app,'user') ? \Yii::$app->user->id : $this->owner->created_by;
          $obCrmLog->entity = BaseStringHelper::basename($this->owner->className());
          $obCrmLog->item_id = $this->owner->id;
          $obCrmLog->description = $msg;

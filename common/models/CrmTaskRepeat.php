@@ -34,6 +34,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $week
  * @property integer $monthly_type
  * @property integer $monthly_days
+ * @property integer $counter_repeat
  *
  * @property CrmTask $task
  */
@@ -167,10 +168,33 @@ class CrmTaskRepeat extends AbstractActiveRecord
                 'saturday', 'sunday', 'number_of_item',
                 'end_type', 'count_occurrences',
                 'end_date', 'created_at', 'updated_at',
-                'week','monthly_type','monthly_days'
+                'week','monthly_type','monthly_days','counter_repeat'
             ], 'integer'],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => CrmTask::className(), 'targetAttribute' => ['task_id' => 'id']],
-            ['start_date','safe']
+            ['start_date','safe'],
+            ['day','integer','max' => 31,'min' => 1],
+            [['day','month'],'required',
+                'when' => function($model){
+                    return $this->useRepeatTask && $this->type == self::TYPE_MONTHLY;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        typeRepeat = $('input[name= \"CrmTaskRepeat[type]\"]:checked').val(),
+                        useRepeat = $('input[name = \"CrmTask[repeat_task]\"]:checked').val();
+                    return useRepeat == 1 && typeRepeat == 3;    
+                }"
+            ],
+            [['week'],'required',
+                'when' => function($model){
+                    return $this->useRepeatTask && $this->type == self::TYPE_WEEKLY;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        typeRepeat = $('input[name= \"CrmTaskRepeat[type]\"]:checked').val(),
+                        useRepeat = $('input[name = \"CrmTask[repeat_task]\"]:checked').val();
+                    return useRepeat == 1 && typeRepeat == 2;    
+                }"
+            ]
         ];
     }
 
@@ -204,7 +228,8 @@ class CrmTaskRepeat extends AbstractActiveRecord
             'updated_at' => Yii::t('app/crm', 'Updated At'),
             'week' => Yii::t('app/crm', 'Week'),
             'monthly_type' => Yii::t('app/crm', 'Monthly type'),
-            'monthly_days' => Yii::t('app/crm', 'Monthly days')
+            'monthly_days' => Yii::t('app/crm', 'Monthly days'),
+            'counter_repeat' => Yii::t('app/crm','Repeat counter'),
         ];
     }
 
@@ -283,5 +308,37 @@ class CrmTaskRepeat extends AbstractActiveRecord
             $this->start_date = strtotime($this->start_date);
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * Get choosen week day
+     * @return int|null
+     */
+    public function getWeekDay()
+    {
+        if($this->monday)
+            return 1;
+        elseif($this->tuesday)
+            return 2;
+        elseif ($this->wednesday)
+            return 3;
+        elseif ($this->thursday)
+            return 4;
+        elseif ($this->friday)
+            return 5;
+        elseif ($this->saturday)
+            return 6;
+        elseif ($this->sunday)
+            return 0;
+        else
+            return NULL;
+    }
+
+    /**
+     * @return bool
+     */
+    public function updateCounter()
+    {
+        return $this->updateCounters(['counter_repeat' => 1]);
     }
 }
