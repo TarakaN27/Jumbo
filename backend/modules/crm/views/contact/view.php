@@ -208,6 +208,7 @@ $this->registerJs("
                                     'hideContact' => TRUE,
                                     'pTaskName' => '',
                                     'dataWatchers' => [],
+                                    'obTaskRepeat' => $obTaskRepeat
                                 ])?>
                             </div>
                         </div>

@@ -341,4 +341,15 @@ class CrmTaskRepeat extends AbstractActiveRecord
     {
         return $this->updateCounters(['counter_repeat' => 1]);
     }
+
+    /**
+     * 
+     */
+    public function initForCreate()
+    {
+        $this->start_date = Yii::$app->formatter->asDate('NOW');
+        $this->end_type = CrmTaskRepeat::END_TYPE_INFINITE;
+        $this->type = CrmTaskRepeat::TYPE_DAILY;
+        $this->monthly_type = CrmTaskRepeat::MONTHLY_TYPE_ONE;
+    }
 }

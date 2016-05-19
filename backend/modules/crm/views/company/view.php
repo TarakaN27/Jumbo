@@ -308,6 +308,7 @@ $this->registerJs("
 									'hideCuser' => TRUE,
 									'pTaskName' => '',
                                     'dataWatchers' => [],
+									'obTaskRepeat' => $obTaskRepeat
 								])?>
 							</div>
 						</div>

@@ -18,6 +18,7 @@ use common\models\BUserCrmRules;
 use common\models\CrmCmpContacts;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
+use common\models\CrmTaskRepeat;
 use common\models\CUser;
 use common\models\CUserGroups;
 use common\models\CuserServiceContract;
@@ -222,7 +223,11 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
 		$modelTask->cmp_id = $id;   //вешаем компанию
 		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
+		$modelTask->repeat_task = CrmTask::NO;
 		$data = [];
+
+		$obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
+		$obTaskRepeat->initForCreate();
 
 		//получаем группы к которой принадлежит компания
 		$arGroups = CUserGroups::find()
@@ -239,7 +244,14 @@ class CompanyController extends AbstractBaseBackendController
 		 */
 		if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
 		{
-			if($modelTask->createTask($iUserID))
+			$validRepeat = TRUE;
+			if ($modelTask->repeat_task) {
+				if (!$obTaskRepeat->load(Yii::$app->request->post()) || ($obTaskRepeat->load(Yii::$app->request->post()) && !$obTaskRepeat->validate())) {
+					$validRepeat = FALSE;
+				}
+			}
+
+			if($validRepeat && $modelTask->createTask($iUserID))
 			{
 				Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
 				return $this->redirect(['view', 'id' => $id,'#' => 'tab_content2']);
@@ -325,7 +337,8 @@ class CompanyController extends AbstractBaseBackendController
 			'sAssName' => $sAssName,
 			'data' => $data,
 			'obQHour' => $obQHour,
-			'arGroups' => $arGroups
+			'arGroups' => $arGroups,
+			'obTaskRepeat' => $obTaskRepeat
 		]);
 	}
 

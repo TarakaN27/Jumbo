@@ -7,6 +7,7 @@ use backend\widgets\Alert;
 use common\components\notification\RedisNotification;
 use common\models\CrmCmpFile;
 use common\models\CrmTask;
+use common\models\CrmTaskRepeat;
 use common\models\search\CrmTaskSearch;
 use Yii;
 use common\models\CrmCmpContacts;
@@ -121,15 +122,25 @@ class ContactController extends AbstractBaseBackendController
         $modelTask->contact_id = $id;
         $modelTask->cmp_id = $model->cmp_id;
         $modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
+        $modelTask->repeat_task = CrmTask::NO;
         $data = [];
         $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+
+        $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
+        $obTaskRepeat->initForCreate();
 
         /**
          * Добавление задачи
          */
         if($modelTask->load(Yii::$app->request->post()) && $modelTask->validate())
         {
-            if($modelTask->createTask($iUserID))
+            $validRepeat = TRUE;
+            if ($modelTask->repeat_task) {
+                if (!$obTaskRepeat->load(Yii::$app->request->post()) || ($obTaskRepeat->load(Yii::$app->request->post()) && !$obTaskRepeat->validate())) {
+                    $validRepeat = FALSE;
+                }
+            }
+            if($validRepeat && $modelTask->createTask($iUserID))
             {
                 Yii::$app->session->addFlash('success',Yii::t('app/crm','Task successfully added'));
                 return $this->redirect(['view', 'id' => $id,'#' => 'tab_content2']);
@@ -180,7 +191,8 @@ class ContactController extends AbstractBaseBackendController
             'dataProviderTask' => $dataProviderTask,
             'modelTask' => $modelTask,
             'sAssName' => $sAssName,
-            'data' => $data
+            'data' => $data,
+            'obTaskRepeat' => $obTaskRepeat
         ]);
     }
 

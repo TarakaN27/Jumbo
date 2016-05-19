@@ -1,6 +1,7 @@
 /**
  * Created by Yauheni Motuz on 21.12.15.
  */
+"use strict";
 var
     intervalID = 0;
 /**
@@ -213,9 +214,41 @@ function openTask()
             return false;
         }
     });
+}
 
 
+function loadRecurrentTaskList()
+{
+    var
+        btn = $('#idLoadMoreRecurrentTask'),
+        container = $('#recurrenctTableID tbody'),
+        link = btn.attr('data-link'),
+        pk = btn.attr('pk');
 
+    if(link == undefined || link == '' || pk == undefined || pk == '')
+    {
+        addErrorNotify('Получение повторяющихся задач','Не удалось выполнить операцию.');
+        return false;
+    }
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: link,
+        dataType: "json",
+        data: {pk:pk},
+        success: function(data){
+            container.append(data.content);
+            if(data.urlLink)
+            {
+                btn.attr('data-link',data.urlLink);
+            }else{
+                btn.remove();
+            }
+        },
+        error: function(msg){
+            addErrorNotify('Получение повторяющихся задач','Не удалось выполнить операцию.');
+        }
+    });
 }
 
 //вешаем обработчики на события
@@ -226,5 +259,13 @@ jQuery(document).ready(function(){
     jQuery('.company-time-control').on('click','.pause-task',pauseTask);
     jQuery('.company-time-control').on('click','.done-task',doneTask);
     jQuery('.company-time-control').on('click','.open-task',openTask);
+    $('#profile-tab6').on('click',function(){
+        if($(this).attr('data-loaded') == 0)
+        {
+            $(this).attr('data-loaded','1');
+            loadRecurrentTaskList();
+        }
+    });
+    $('#idLoadMoreRecurrentTask').on('click',loadRecurrentTaskList);
 });
 

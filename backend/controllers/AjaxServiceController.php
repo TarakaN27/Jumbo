@@ -19,6 +19,7 @@ use common\models\managers\ExchangeRatesManager;
 use common\models\Messages;
 use common\models\PartnerPurse;
 use yii\base\InvalidParamException;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -470,6 +471,37 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return [
             $obCuser->getAttributeLabel('manager_id') => is_object($obMan = $obCuser->manager) ? $obMan->getFio() : $obCuser->manager_id,
             $obCuser->getAttributeLabel('manager_crc_id') => is_object($obCpc = $obCuser->managerCrc) ? $obCpc->getFio() : $obCuser->manager_crc_id
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function actionGetRecurrentTasksList()
+    {
+        $pk = Yii::$app->request->post('pk');
+        if(empty($pk))
+            throw new InvalidParamException();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => CrmTask::find()->where(['recurring_id' => $pk]),
+            'pagination' => [
+                'pagesize' => 10,
+                'route' => '/ajax-service/get-recurrent-tasks-list'
+            ],
+        ]);
+        $models = $dataProvider->getModels();
+        $pag = $dataProvider->getPagination();
+        $pageLink = NULL;
+        if($pag->getPageCount() > $pag->getPage()+1)
+        {
+            $links = $pag->getLinks();
+            $pageLink = $links[\yii\data\Pagination::LINK_NEXT];
+        }
+
+        return [
+            'content' => $this->renderPartial('_part_recurrent_task',['models' => $models]),
+            'urlLink' => $pageLink
         ];
     }
 } 

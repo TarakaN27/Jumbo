@@ -145,6 +145,9 @@ class TaskController extends AbstractBaseBackendController
         $obFile->setScenario('insert');
         $obFile->task_id = $id;
 
+        $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
+        $obTaskRepeat->initForCreate();
+
         //Модель для задач
         $modelTask = new CrmTask();
         //дефолтные состояния
@@ -155,7 +158,8 @@ class TaskController extends AbstractBaseBackendController
         $modelTask->contact_id = $model->contact_id; //вешаем конаткт
         $modelTask->parent_id = $model->id;
         $modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
-
+        $modelTask->repeat_task = CrmTask::NO;
+        
         $obTime = CrmTaskLogTime::find()->where([ //занесенное время
             'task_id' => $model->id,
         ])->all();
@@ -232,7 +236,13 @@ class TaskController extends AbstractBaseBackendController
          * Добавление задачи
          */
         if ($modelTask->load(Yii::$app->request->post()) && $modelTask->validate()) {
-            if ($modelTask->createTask(Yii::$app->user->id)) {
+            $validRepeat = TRUE;
+            if ($modelTask->repeat_task) {
+                if (!$obTaskRepeat->load(Yii::$app->request->post()) || ($obTaskRepeat->load(Yii::$app->request->post()) && !$obTaskRepeat->validate())) {
+                    $validRepeat = FALSE;
+                }
+            }
+            if ($validRepeat && $modelTask->createTask(Yii::$app->user->id)) {
                 Yii::$app->session->addFlash('success', Yii::t('app/crm', 'Sub task successfully added'));
                 return $this->redirect(['view', 'id' => $id, '#' => 'tab_content5']);
             } else {
@@ -290,6 +300,7 @@ class TaskController extends AbstractBaseBackendController
             'modelTask' => $modelTask,
             'dataProviderChildtask' => $dataProviderChildtask,
             'dataWatchers' => $dataWatchers,
+            'obTaskRepeat' => $obTaskRepeat
         ]);
     }
 
@@ -455,10 +466,7 @@ class TaskController extends AbstractBaseBackendController
         $data = [];
         $obFile = new CrmCmpFile();
         $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
-        $obTaskRepeat->start_date = Yii::$app->formatter->asDate('NOW');
-        $obTaskRepeat->end_type = CrmTaskRepeat::END_TYPE_INFINITE;
-        $obTaskRepeat->type = CrmTaskRepeat::TYPE_DAILY;
-        $obTaskRepeat->monthly_type = CrmTaskRepeat::MONTHLY_TYPE_ONE;
+        $obTaskRepeat -> initForCreate();
 
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
@@ -557,10 +565,7 @@ class TaskController extends AbstractBaseBackendController
                 $obTaskRepeat->end_date = Yii::$app->formatter->asDate($obTaskRepeat->end_date);
         } else {
             $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
-            $obTaskRepeat->start_date = Yii::$app->formatter->asDate('NOW');
-            $obTaskRepeat->end_type = CrmTaskRepeat::END_TYPE_INFINITE;
-            $obTaskRepeat->type = CrmTaskRepeat::TYPE_DAILY;
-            $obTaskRepeat->monthly_type = CrmTaskRepeat::MONTHLY_TYPE_ONE;
+            $obTaskRepeat -> initForCreate();
         }
 
 

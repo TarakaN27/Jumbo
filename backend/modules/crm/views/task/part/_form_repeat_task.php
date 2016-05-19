@@ -3,6 +3,11 @@ $label1 = ['class' => 'control-label'];
 $template1 = '{label}{input}<ul class="parsley-errors-list" >{error}</ul>';
 $this->registerJsFile('@web/js/parts/form_repeat_task.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $template2 = '{label}<div class="col-md-9 col-sm-9 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>';
+
+$labelTemplate1 = ['class' => 'control-label col-md-6 col-sm-6 col-xs-12'];
+$template3 = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>';
+
+
 ?>
 <?=$form->field($model,'repeat_task')->radioList(\common\models\CrmTask::getYesNo());?>
 
@@ -108,14 +113,18 @@ $template2 = '{label}<div class="col-md-9 col-sm-9 col-xs-12">{input}</div><ul c
                 <?=$form->field($obTaskRepeat,'day',[
                     'options' => [
                         'class' => 'form-group blockMonthly mon1'
-                    ]
+                    ],
+                    'template' => $template3,
+                    'labelOptions' => $labelTemplate1
                 ])->textInput()?>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <?=$form->field($obTaskRepeat,'month',[
                     'options' => [
                         'class' => 'form-group blockMonthly mon1'
-                    ]
+                    ],
+                    'template' => $template3,
+                    'labelOptions' => $labelTemplate1
                 ])->textInput()?>
             </div>
             <?php

@@ -214,6 +214,12 @@ $this->registerJs("
                                         <th><?= Yii::t('app/crm','Updated at');?></th>
                                         <td><?=Yii::$app->formatter->asDatetime($model->updated_at);?></td>
                                     </tr>
+                                    <?php if($model->recurring_id):?>
+                                    <tr>
+                                        <th><?=Yii::t('app/crm','The main task of the chain')?></th>
+                                        <td><?=Html::a($model->recurring_id,['view','id' => $model->recurring_id])?></td>
+                                    </tr>
+                                    <?php endif;?>
                                 </table>
                             </div>
                         </div>
@@ -303,11 +309,20 @@ $this->registerJs("
                                     <?=Yii::t('app/crm','Spend time');?>
                                 </a>
                             </li>
+                            <?php if($model->repeat_task):?>
+                                <li role="presentation" class="">
+                                    <a href="#tab_content6" role="tab" id="profile-tab6" data-toggle="tab" aria-expanded="false" data-loaded ="0">
+                                        <?=Yii::t('app/crm','Recurring tasks');?>
+                                    </a>
+                                </li>
+                            <?php endif;?>
+
                             <li role="presentation" class="">
                                 <a href="#tab_content3" role="tab" id="profile-tab2" data-toggle="tab" aria-expanded="false">
                                     <?=Yii::t('app/crm','History');?>
                                 </a>
                             </li>
+
                             <?php if(empty($model->parent_id)):?>
                                 <li role="presentation" class="wm_right_tab">
                                         <a href="#tab_content4" role="tab" id="profile-tab4" data-toggle="tab" aria-expanded="false">
@@ -403,6 +418,33 @@ $this->registerJs("
                                     ])?>
                                 <?php endif;?>
                             </div>
+
+                            <?php if($model->repeat_task):?>
+                            <div role="tabpanel" class="tab-pane fade" id="tab_content6" aria-labelledby="profile-tab">
+                                <!-- повторяющиеся задачи -->
+                                <table id="recurrenctTableID" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <td>
+                                                <?=Yii::t('app/crm','ID')?>
+                                            </td>
+                                            <td>
+                                                <?=Yii::t('app/crm','Title')?>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                                <?=Html::button(Yii::t('app/crm',Yii::t('app/crm','Load more')),[
+                                    'id' => 'idLoadMoreRecurrentTask',
+                                    'data-link' => \yii\helpers\Url::to(['/ajax-service/get-recurrent-tasks-list']),
+                                    'pk' => $model->id
+                                ])?>
+                            </div>
+                            <?php endif; ?>
                             <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
                                 <!-- история -->
                                 <?=\common\components\widgets\crmLogWidget\CrmLogWidget::widget([
@@ -426,6 +468,7 @@ $this->registerJs("
                                         'hideParent' => TRUE,
                                         'hideContact' => TRUE,
                                         'dataWatchers' => $dataWatchers,
+                                        'obTaskRepeat' => $obTaskRepeat
                                     ])
                                 ?>
                             </div>
