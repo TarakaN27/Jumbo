@@ -279,7 +279,7 @@ return [
 	'End type date' => 'Дата окончания',
 	'Everyday' => 'Каждый день',
 	'Everyday Custom' => 'Каждый день. Ручная установка',
-	'Everyday Value' => 'Какой день',
+	'Everyday Value' => 'Каждый x день',
 	'Day' => 'Каждого х дня',
 	'Month' => 'Каждого х месяца',
 	'Week' => 'Каждую x неделю',
