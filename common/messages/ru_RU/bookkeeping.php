@@ -221,5 +221,6 @@ return [
     'Act date' => 'Дата акта',
     'Act number' => 'Номер акта',
     'Payments block' => 'Платежи',
-    'Full amount' => 'Сумма акта'
+    'Full amount' => 'Сумма акта',
+    'Act close' => 'Актировано'
 ];

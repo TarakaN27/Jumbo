@@ -7,39 +7,43 @@ function loadPayments()
     var
         container = $('#paymentsBlock'),
         iCUser = $('#actform-icuser').val(),
-        iLegalPerson = $('#actform-ilegalperson');
+        iLegalPerson = $('#actform-ilegalperson').val(),
+        checkBoxs = container.find('input[type="checkbox"]'),
+        preloadEntity = getPreloaderEntity('paymentPreloader');
 
-
-    var
-        checkBoxs = container.find(input[type="checkbox"]);
     if(checkBoxs.lenght > 0)
     {
         checkBoxs.prop('checked',false);
         checkBoxs.trigger('change');
     }
-
+    container.html(preloadEntity);                          //set preloader
+    console.log('ads');
     if(customEmpty(iCUser) || customEmpty(iLegalPerson))
     {
+        console.log('pnf');
         container.html('Платежи не найдены');
         return false;
     }
-
+    console.log('asda');
     $.ajax({
         type: "POST",
         cache: false,
         url:URL_LOAD_ACTS_PAYMENTS,
         dataType: "json",
-        data: {pid:pid},
-        success: function(msg){
-            modal.find('.modal-body').html(msg);
-            initDatePicker(modal.find('.datePicker'));
-            swInitSelect2(modal.find('#partnermultilinkform-cntr'));
+        data: {iCUser:iCUser,iLegalPerson:iLegalPerson},
+        success: function(data){
+            container.html(data.content);
         },
         error: function(msg){
-            addErrorNotify('Получение формы', 'Не удалось выполнить запрос!');
+            addErrorNotify('Получение платежей', 'Не удалось выполнить запрос!');
+            container.html('Платежи не найдены');
             return false;
         }
     });
 
     return true;
 }
+
+$(function(){
+    $('#actform-ilegalperson,#actform-icuser').on('change',loadPayments);
+});

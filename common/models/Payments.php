@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $prequest_id
  * @property string $payment_order
+ * @property integer $act_close
  *
  * @property ExchangeRates $currency
  * @property CUser $cuser
@@ -67,7 +68,8 @@ class Payments extends AbstractActiveRecord
                 'service_id', 'legal_id',
                 'created_at', 'updated_at',
                 'prequest_id','condition_id',
-                'updateWithNewCondition'
+                'updateWithNewCondition',
+                'act_close'
             ], 'integer'],
             [['pay_summ','customProd'], 'number'],
             [['description'], 'string'],
@@ -119,7 +121,8 @@ class Payments extends AbstractActiveRecord
             'updateWithNewCondition' => Yii::t('app/book', 'Update with new condition'),
             'payment_order' => Yii::t('app/book','Payment order'),
             'showAll' => Yii::t('app/book','Show all conditions'),
-            'customProd' => Yii::t('app/book','Custom amount production')
+            'customProd' => Yii::t('app/book','Custom amount production'),
+            'act_close' => Yii::t('app/book','Act close')
         ];
     }
 

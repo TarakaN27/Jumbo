@@ -132,4 +132,22 @@ class PaymentsManager extends Payments
 		return array_unique($arCuser);
 	}
 
+	/**
+	 * @param $iCUser
+	 * @param $iLegalPerson
+	 * @return mixed
+	 */
+	public static function getPaymentsForAct($iCUser,$iLegalPerson)
+	{
+		return Payments::find()
+			->select(['cuser_id','pay_date','pay_summ','currency_id','service_id','legal_id','id'])
+			->where([
+				'cuser_id' => $iCUser,
+				'legal_id' => $iLegalPerson,
+				'act_close' => self::NO
+			])
+			->with('currency','service')
+			->all();
+	}
+
 }

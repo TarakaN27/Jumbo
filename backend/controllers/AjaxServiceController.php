@@ -16,6 +16,7 @@ use common\models\CUser;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\ExchangeRatesManager;
+use common\models\managers\PaymentsManager;
 use common\models\Messages;
 use common\models\PartnerPurse;
 use yii\base\InvalidParamException;
@@ -504,9 +505,24 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'urlLink' => $pageLink
         ];
     }
-    
+
+    /**
+     * @return array
+     */
     public function actionFindPaymentsForActs()
     {
+        $iCUser = Yii::$app->request->post('iCUser');
+        $iLegalPerson = Yii::$app->request->post('iLegalPerson');
         
+        if(empty($iCUser) || empty($iLegalPerson))
+            throw new InvalidParamException();
+        
+        $arPayments = PaymentsManager::getPaymentsForAct($iCUser,$iLegalPerson);        //get payments
+
+        return [
+            'content' => $this->renderPartial('_part_payment_for_act',[
+                'arPayments' => $arPayments
+            ])
+        ];
     }
 } 
