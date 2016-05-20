@@ -216,5 +216,6 @@ return [
     'Files' => 'Файлы',
     'Attach files' => 'Прикрепить файлы',
     'Process partner withdrawal request' => 'Обработка запроса на вывод средств партнера',
-    'Total in BYR' => 'Итого в BYR'
+    'Total in BYR' => 'Итого в BYR',
+    'CUser' => 'Контрагент'
 ];

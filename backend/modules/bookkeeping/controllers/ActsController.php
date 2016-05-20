@@ -2,10 +2,11 @@
 
 namespace backend\modules\bookkeeping\controllers;
 
+use backend\modules\bookkeeping\form\ActForm;
+use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
 use common\models\CUser;
 use common\models\CuserExternalAccount;
-use common\models\CUserRequisites;
 use common\models\LegalPerson;
 use Yii;
 use common\models\Acts;
@@ -89,6 +90,7 @@ class ActsController extends AbstractBaseBackendController
      */
     public function actionCreate()
     {
+        /*
         $model = new Acts();
         $model->getEntityFields(); //доп поля
         $model->buser_id = Yii::$app->user->id;
@@ -100,6 +102,25 @@ class ActsController extends AbstractBaseBackendController
                 'model' => $model,
             ]);
         }
+        */
+
+        $model = new ActForm();
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            if($model->makeRequest())
+            {
+                Yii::$app->session->addFlash(Alert::TYPE_SUCCESS,Yii::t('app/book','Act successfully created'));
+            }
+        }
+
+        $contractorInitText = '';
+        if($model->iCUser)
+            $contractorInitText = CUser::getCuserInfoById($model->iCUser);
+        
+        return $this->render('create',[
+            'model' => $model,
+            'contractorInitText' => $contractorInitText
+        ]);
     }
 
     /**

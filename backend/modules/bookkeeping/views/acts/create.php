@@ -22,9 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="clearfix"></div>
             </div>
             <div class="x_content acts-create">
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+                <?= $this->render('_form_v2', [
+                    'model' => $model,
+                    'contractorInitText' => $contractorInitText
+                ]) ?>
             </div>
         </div>
     </div>
