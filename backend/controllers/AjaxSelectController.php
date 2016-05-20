@@ -151,6 +151,11 @@ class AjaxSelectController extends AbstractBaseBackendController
 		return $out;
 	}
 
+	/**
+	 * @param null $q
+	 * @param null $id
+	 * @return array
+	 */
 	public function actionGetContractor($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
@@ -440,4 +445,6 @@ class AjaxSelectController extends AbstractBaseBackendController
 
 		return PaymentCondition::find()->select(['id','name'])->where(['id'=>array_unique($obConditions)])->all();
 	}
+	
+	
 }

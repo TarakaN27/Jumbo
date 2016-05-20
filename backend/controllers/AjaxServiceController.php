@@ -504,4 +504,9 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'urlLink' => $pageLink
         ];
     }
+    
+    public function actionFindPaymentsForActs()
+    {
+        
+    }
 } 

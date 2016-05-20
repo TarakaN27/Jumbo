@@ -51,12 +51,18 @@ class ActForm extends Model
         ];
     }
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
             'iCUser' => Yii::t('app/book','CUser'),
             'iLegalPerson' => Yii::t('app/book','Legal person'),
-            'iActNumber' => Yii::t('app/book','Act number')
+            'iActNumber' => Yii::t('app/book','Act number'),
+            'actDate' => Yii::t('app/book','Act date'),
+            'iCurr' => Yii::t('app/book','Currency ID'),
+            'fAmount' => Yii::t('app/book','Full amount')
         ];
     }
 
