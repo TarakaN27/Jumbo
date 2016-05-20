@@ -11,6 +11,12 @@
         'allModels' => $arPayments
     ]),
     'columns' => [
+        [
+            'class' => 'yii\grid\CheckboxColumn',
+            'checkboxOptions' => function ($model, $key, $index, $column) {
+                return ['value' => $model->id];
+            }
+        ],
         'id',
         'pay_summ:decimal',
         'currency.code',
