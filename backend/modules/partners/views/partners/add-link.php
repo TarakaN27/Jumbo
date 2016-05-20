@@ -12,8 +12,8 @@ use yii\web\JsExpression;
 use yii\bootstrap\Modal;
 $this->registerCssFile('@web/css/select/select2.min.css');
 $this->registerJsFile('@web/js/select/select2.full.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJsFile('@web/js/moment.min.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
-$this->registerJsFile('@web/js/moment.min2.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $this->registerJsFile('@web/js/parts/partner_add_link.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $this->registerJs("
 var
