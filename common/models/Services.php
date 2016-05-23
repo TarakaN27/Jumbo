@@ -136,7 +136,7 @@ class Services extends AbstractActiveRecord
         $tmp = self::getAllServices();
         return ArrayHelper::map($tmp,'id','name');
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */

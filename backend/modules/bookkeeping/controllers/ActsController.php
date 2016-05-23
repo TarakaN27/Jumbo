@@ -105,6 +105,7 @@ class ActsController extends AbstractBaseBackendController
         */
 
         $model = new ActForm();
+        $model->actDate = Yii::$app->formatter->asDate('NOW');
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
             if($model->makeRequest())

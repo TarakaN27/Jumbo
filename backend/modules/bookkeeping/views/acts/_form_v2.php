@@ -6,25 +6,24 @@
  * Time: 12.29
  */
 use yii\web\JsExpression;
-$this->registerJsFile('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',[
-    'depends' => [
-        'yii\web\JqueryAsset',
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapPluginAsset',
-    ]
-],'html-sortable');
-$this->registerJsFile('@web/js/parts/act_form_v2.js',[
-    'depends' => [
-        'yii\web\JqueryAsset',
-        'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapPluginAsset',
-        'html-sortable'
-    ]
-]);
+use yii\helpers\Json;
+use common\models\LegalPerson;
+use yii\helpers\Url;
+use yii\web\View;
+use common\models\ExchangeRates;
+use common\components\helpers\CustomViewHelper;
+use common\models\Services;
+use yii\helpers\Html;
+CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',$this,[],'html-sortable');
+CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/array_diff.js',$this,[],'array_diff');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/act_form_v2.js',$this,['html-sortable','array_diff']);
 $this->registerJs("
 var
-    URL_LOAD_ACTS_PAYMENTS = '".\yii\helpers\Url::to(['/ajax-service/find-payments-for-acts'])."';
-",\yii\web\View::POS_HEAD);
+    arCurrency = ".Json::encode(ExchangeRates::getExchangeRates()).",
+    arServices = ".Json::encode(Services::getServicesMap()).",
+    URL_LOAD_CONTRACT_DETAIL = '".Url::to(['/ajax-service/find-contract-detail'])."';
+    URL_LOAD_ACTS_PAYMENTS = '".Url::to(['/ajax-service/find-payments-for-acts'])."';
+",View::POS_HEAD);
 ?>
 <div class="act-form-v2">
     <?php $form=\yii\bootstrap\ActiveForm::begin([
@@ -56,7 +55,7 @@ var
             ],
         ]);?>
 
-        <?=$form->field($model,'iLegalPerson')->dropDownList(\common\models\LegalPerson::getLegalPersonMap(),[
+        <?=$form->field($model,'iLegalPerson')->dropDownList(LegalPerson::getLegalPersonMap(),[
             'prompt' => Yii::t('app/book','Choose legal person')
         ])?>
 
@@ -64,15 +63,11 @@ var
 
         <?=$form->field($model,'actDate')->widget(\yii\jui\DatePicker::className(),[
             'language' => 'ru',
-            'dateFormat' => 'dd-MM-yyyy',
+            'dateFormat' => 'dd.MM.yyyy',
             'options' => [
                 'class' => 'form-control'
             ]
         ]);?>
-
-        <?=$form->field($model,'iCurr')->dropDownList(\common\models\ExchangeRates::getRatesCodes(),[
-            'prompt' => Yii::t('app/book','Choose exchange currency')
-        ])?>
 
         <?=$form->field($model,'fAmount')->textInput();?>
 
@@ -85,13 +80,16 @@ var
             </div>
         </div>
     </div>
-
+    <?=$form->field($model,'iCurr')->dropDownList([],[
+        'prompt' => Yii::t('app/book','Choose exchange currency')
+    ])?>
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Services');?></label>
         <div class="col-md-6 col-sm-6 col-xs-12" >
+            <div class="well">
+                <ul class="ul-sortable" id="servicesBlock">
 
-            <div class="well" id="servicesBlock">
-
+                </ul>
             </div>
         </div>
     </div>

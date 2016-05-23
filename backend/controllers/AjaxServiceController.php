@@ -13,6 +13,7 @@ use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
 use common\models\CrmTask;
 use common\models\CUser;
+use common\models\CuserServiceContract;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
 use common\models\managers\ExchangeRatesManager;
@@ -523,6 +524,24 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'content' => $this->renderPartial('_part_payment_for_act',[
                 'arPayments' => $arPayments
             ])
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function actionFindContractDetail()
+    {
+        //iCUser:iCUserId,iServId:serviceID
+        $iCUser = Yii::$app->request->post('iCUser');
+        $iServId = Yii::$app->request->post('iServId');
+        /** @var CuserServiceContract $obContract */
+        $obContract = CuserServiceContract::find()->where(['service_id' => $iServId,'cuser_id' => $iCUser])->one();
+        if(!$obContract)
+            throw new NotFoundHttpException;
+        return [
+            'contractDate' => empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date),
+            'contractNumber' => $obContract->cont_number,
         ];
     }
 } 
