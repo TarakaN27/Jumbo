@@ -521,6 +521,25 @@ class CustomHelper {
         }
         return $arResult;
     }
+
+    /**
+     * @param array $array
+     * @param $attribute
+     * @return array
+     */
+    public static function getMapArrayObjectByAttribute(array $array,$attribute)
+    {
+        if(count($array) === 0)
+            return [];
+
+        $arResult = [];
+        foreach ($array as $item)
+        {
+            $key = is_object($item) ? $item->$attribute : $item[$attribute];
+            $arResult[$key][] = $item;
+        }
+        return $arResult;
+    }
     
 
 

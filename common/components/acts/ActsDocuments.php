@@ -34,7 +34,6 @@ class ActsDocuments
 		$iLegPersID = NULL, // ID юр. лица
 		$amount = NULL;     // сумма акта
 
-
 	protected
         $fileName = NULL,
 		$data = [],
@@ -52,10 +51,8 @@ class ActsDocuments
             'contrSite' => ''
 		];
 
-
 	CONST
 		FOLDER_RIGHT = 0777; ///права на папку
-
 
     /**
      * @param $iActNum
@@ -82,8 +79,7 @@ class ActsDocuments
 		if(!CustomHelper::isDirExist(Acts::FILE_PATH))    //проверяем чтобы существовала директория(если нет, то пробуем создать)
 			throw new NotFoundHttpException('Folder for acts not exist!!');
 	}
-
-
+    
 	/**
 	 * @return string
 	 */

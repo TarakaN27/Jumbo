@@ -21,12 +21,9 @@ use yii\web\ServerErrorHttpException;
  * @property integer $id
  * @property integer $cuser_id
  * @property integer $buser_id
- * @property integer $service_id
- * @property integer $template_id
  * @property string $amount
  * @property string $act_date
  * @property integer $sent
- * @property integer $change
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $act_num
@@ -35,6 +32,7 @@ use yii\web\ServerErrorHttpException;
  * @property string $ask
  * @property string $contract_date
  * @property string $contract_num
+ * @property integer $currency_id
  *
  * @property ActsTemplate $template
  * @property BUser $buser
@@ -66,12 +64,12 @@ class Acts extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['act_num','cuser_id', 'buser_id','lp_id', 'service_id', 'template_id', 'amount'], 'required'],
+            [['act_num','cuser_id', 'buser_id','lp_id', 'amount'], 'required'],
             [[
                 'act_num','cuser_id','lp_id' ,
-                'buser_id', 'service_id', 'template_id',
-                'sent', 'change', 'created_at',
-                'updated_at','genFile'], 'integer'],
+                'buser_id',
+                'sent', 'created_at',
+                'updated_at','genFile','currency_id'], 'integer'],
             [['act_date','entityFields'], 'safe'],
             [['ask'],'unique'],
             //[['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
@@ -94,12 +92,9 @@ class Acts extends AbstractActiveRecord
             'id' => Yii::t('app/documents', 'ID'),
             'cuser_id' => Yii::t('app/documents', 'Cuser ID'),
             'buser_id' => Yii::t('app/documents', 'Buser ID'),
-            'service_id' => Yii::t('app/documents', 'Service ID'),
-            'template_id' => Yii::t('app/documents', 'Template ID'),
             'amount' => Yii::t('app/documents', 'Amount'),
             'act_date' => Yii::t('app/documents', 'Act Date'),
             'sent' => Yii::t('app/documents', 'Sent'),
-            'change' => Yii::t('app/documents', 'Change'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
             'act_num' => Yii::t('app/documents', 'Act number'),
@@ -108,17 +103,11 @@ class Acts extends AbstractActiveRecord
             'ask' => Yii::t('app/documents', 'Act secret key'),
             'genFile' => Yii::t('app/documents','Generate document'),
             'contract_num' => Yii::t('app/documents', 'Contract number'),
-            'contract_date' => Yii::t('app/documents', 'Contract date')
+            'contract_date' => Yii::t('app/documents', 'Contract date'),
+            'currency_id' => Yii::t('app/documents','Currency id')
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTemplate()
-    {
-        return $this->hasOne(ActsTemplate::className(), ['id' => 'template_id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -139,9 +128,9 @@ class Acts extends AbstractActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getService()
+    public function getServices()
     {
-        return $this->hasOne(Services::className(), ['id' => 'service_id']);
+        return $this->hasMany(ActServices::className(),['act_id' => 'id']);
     }
 
     /**
@@ -152,6 +141,14 @@ class Acts extends AbstractActiveRecord
         return $this->hasOne(LegalPerson::className(),['id' => 'lp_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(),['id' => 'currency_id']);
+    }
+    
     /**
      * @param bool $insert
      * @param array $changedAttributes
@@ -170,7 +167,9 @@ class Acts extends AbstractActiveRecord
     public function beforeSave($insert)
     {
         if($insert)
-            $this->ask = Yii::$app->security->generateRandomString(); //уникальный ключ для файла
+            $this->ask = Yii::$app->security->generateRandomString(); //generate unique key for act
+
+        /*
         if(!CustomHelper::isDirExist(self::FILE_PATH))
             throw new NotFoundHttpException('Folder for acts is not exist. Path: '.self::FILE_PATH);
 
@@ -202,6 +201,8 @@ class Acts extends AbstractActiveRecord
         }
 
         return FALSE;
+        */
+        return parent::beforeSave($insert);
     }
 
     /**
@@ -221,9 +222,6 @@ class Acts extends AbstractActiveRecord
             [
                 'class' => LogModelBehavior::className(),       //логирование актов
                 'ignored' => ['created_at','updated_at']
-            ],
-            [
-                'class' => PartnerProfitActBehavior::className()    //начисление прибыли партнерам
             ]
         ]);
     }
@@ -256,5 +254,15 @@ class Acts extends AbstractActiveRecord
     {
         @unlink(Yii::getAlias(self::FILE_PATH).'/'.$this->file_name); //удалим акт
         parent::afterDelete();
+    }
+
+    /**
+     * @param $legalPersonId
+     * @return int
+     */
+    public static function getNextActNumber($legalPersonId)
+    {
+        $lastNumber = (int)self::find()->where(['lp_id' => $legalPersonId])->select(['act_num'])->max('act_num');
+        return $lastNumber+1;
     }
 }

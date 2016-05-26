@@ -5,14 +5,16 @@ namespace backend\modules\bookkeeping\controllers;
 use backend\modules\bookkeeping\form\ActForm;
 use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
+use common\models\ActToPayments;
 use common\models\CUser;
 use common\models\CuserExternalAccount;
 use common\models\LegalPerson;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Yii;
 use common\models\Acts;
 use common\models\search\ActsSearch;
 use backend\components\AbstractBaseBackendController;
-use yii\helpers\Url;
+use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\base\InvalidParamException;
@@ -78,8 +80,18 @@ class ActsController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $dataProvider = new ActiveDataProvider([
+            'query' => ActToPayments::find()->where(['act_id' => $model->id]),
+            'pagination' => [
+                'defaultPageSize' => 20,
+                'pageSizeLimit' => [1,1000]
+            ],
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'dataProvider' => $dataProvider
         ]);
     }
 
@@ -111,6 +123,7 @@ class ActsController extends AbstractBaseBackendController
             if($model->makeRequest())
             {
                 Yii::$app->session->addFlash(Alert::TYPE_SUCCESS,Yii::t('app/book','Act successfully created'));
+                return $this->redirect(['index']);
             }
         }
 
@@ -288,6 +301,32 @@ class ActsController extends AbstractBaseBackendController
         }
         Yii::$app->response->format = Response::FORMAT_JSON;    //set answer format
         return TRUE;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionCheckActNumber()
+    {
+        $iLegalPersonId = Yii::$app->request->post('iLegalId');
+        $iNumber = Yii::$app->request->post('number');
+
+        if(empty($iLegalPersonId) || empty($iNumber))
+            throw new InvalidParamException();
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ['answer' => !Acts::find()->where(['act_num' => $iNumber,'lp_id' => $iLegalPersonId])->exists()];
+    }
+
+    /**
+     * @return int
+     */
+    public function actionGetNextActNumber()
+    {
+        $iLegalPerson = Yii::$app->request->post('iLegalPerson');
+        if(empty($iLegalPerson))
+            throw new InvalidParamException();
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return Acts::getNextActNumber($iLegalPerson);
     }
 
 }

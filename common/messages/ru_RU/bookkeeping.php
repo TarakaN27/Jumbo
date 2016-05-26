@@ -222,5 +222,15 @@ return [
     'Act number' => 'Номер акта',
     'Payments block' => 'Платежи',
     'Full amount' => 'Сумма акта',
-    'Act close' => 'Актировано'
+    'Act close' => 'Актировано',
+    'Custom act file' => 'Кастомный файл акта(Акт не будет сгенерирован автоматически)',
+    'Custom file act' => 'Файл кастомного акта',
+    'Act amount' => 'Сумма закрытая актами',
+    'Act to payments details' => 'Детализация актирования платежей',
+    'Preview' => 'Предпросмотр',
+    'Act Field Templates' => 'Акт. Шаблоны полей',
+    'Job Name' => 'Наименование работы (услуги)',
+    'Create Act Field Template' => 'Добавить шаблон',
+    'This template already exist' => 'Шаблон уже существует',
+    'Update act field template' => 'Обновить шаблон'
 ];

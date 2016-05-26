@@ -94,18 +94,21 @@ $('#sendActID').on('click',sendActs);
                             }
                         ],
                         [
+                            'attribute' => 'currency_id',
+                            'value' => 'currency.code',
+                            'filter' => \common\models\ExchangeRates::getRatesCodes()
+                        ],
+                        [
+                            'attribute' => 'lp_id',
+                            'value' => 'legalPerson.name',
+                            'filter' => \common\models\LegalPerson::getLegalPersonMap()
+                        ],
+                        [
                             'attribute' => 'cuser_id',
                             'value' => function($model){
                                 return is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : $model->cuser_id;
                             },
                             'filter' => \common\models\CUser::getContractorMap()
-                        ],
-                        [
-                            'attribute' => 'service_id',
-                            'value' => function($model){
-                                return is_object($obServ = $model->service) ? $obServ->name : $model->service_id;
-                            },
-                            'filter' => \common\models\Services::getServicesMap()
                         ],
                         [
                             'attribute' => 'act_date',
@@ -157,7 +160,7 @@ $('#sendActID').on('click',sendActs);
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{update}{view}'
+                            'template' => '{view}'
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',

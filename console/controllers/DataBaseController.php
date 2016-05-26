@@ -437,8 +437,6 @@ class DataBaseController extends AbstractConsoleController{
 		}
 
 		print_r($arData);
-
-
 		return self::EXIT_CODE_NORMAL;
 	}
 

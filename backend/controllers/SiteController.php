@@ -8,6 +8,7 @@ use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
 use common\components\crunchs\Payment\RecalcPayment;
 use common\components\crunchs\Payment\RecalcQuantityHours;
+use common\components\crunchs\task\ReportTaskUserStat;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
@@ -111,8 +112,12 @@ class SiteController extends Controller
         $obCalc->countPercentByMonth('01-02-2016');
         */
         //1466340220
+        /*
         $obRecurringTask = new RecurringTask(1465389820);
         $obRecurringTask->run();
+        */
+        $obTaskStat = new ReportTaskUserStat();
+        $obTaskStat->userInfoTaskLoadBalance();
 
         die;
     }

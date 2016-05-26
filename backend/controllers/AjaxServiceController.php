@@ -519,7 +519,7 @@ class AjaxServiceController extends AbstractBaseBackendController{
             throw new InvalidParamException();
         
         $arPayments = PaymentsManager::getPaymentsForAct($iCUser,$iLegalPerson);        //get payments
-
+        
         return [
             'content' => $this->renderPartial('_part_payment_for_act',[
                 'arPayments' => $arPayments

@@ -74,7 +74,8 @@ return [
     'Template field description' => 'Описание полей шаблона',
     'offer_contract' => 'Договор оферты',
     'Get bill' => 'Получить счет',
-    'Create Bill' => 'Добавить счет'
+    'Create Bill' => 'Добавить счет',
+    'Currency id' => 'Валюта'
 
 
 ];

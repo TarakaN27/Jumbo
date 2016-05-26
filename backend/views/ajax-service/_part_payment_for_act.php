@@ -17,15 +17,16 @@
                 return [
                     'value' => $model->id,
                     'class' => 'cbPayment',
-                    'data-sum' => $model->pay_summ,
+                    'data-sum' => (float)$model->pay_summ-(float)$model->actAmount,
                     'data-curr' => $model->currency_id,
-                    'data-date' => $model->pay_date,
-                    'data-serv_id' => $model->service_id
+                    'data-date' => Yii::$app->formatter->asDate($model->pay_date),
+                    'data-serv_id' => $model->service_id,
                 ];
             }
         ],
         'id',
         'pay_summ:decimal',
+        'actAmount:decimal',
         'currency.code',
         'pay_date:date',
         'service.name',

@@ -28,8 +28,8 @@ class ActsSearch extends Acts
         return [
             [[
                 'id', 'act_num' ,'cuser_id',
-                'buser_id', 'service_id', 'template_id',
-                'sent', 'change', 'created_at', 'updated_at'
+                'buser_id',
+                'sent', 'created_at', 'updated_at','currency_id','lp_id'
             ], 'integer'],
             [['amount', 'act_date','from_date','to_date'], 'safe'],
             [['from_date','to_date'],'date','format' => 'php:m.d.Y']
@@ -54,7 +54,7 @@ class ActsSearch extends Acts
      */
     public function search($params)
     {
-        $query = Acts::find();
+        $query = Acts::find()->with('legalPerson','currency');
         $query = $this->queryHelper($query,$params);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -87,13 +87,12 @@ class ActsSearch extends Acts
             'act_num' => $this->act_num,
             'cuser_id' => $this->cuser_id,
             'buser_id' => $this->buser_id,
-            'service_id' => $this->service_id,
-            'template_id' => $this->template_id,
             'act_date' => $this->act_date,
             'sent' => $this->sent,
-            'change' => $this->change,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'currency_id' => $this->currency_id,
+            'lp_id' => $this->lp_id
         ]);
 
         if(!empty($this->from_date))
@@ -108,8 +107,6 @@ class ActsSearch extends Acts
         if(
             !empty($this->cuser_id)||
             !empty($this->buser_id)||
-            !empty($this->service_id)||
-            !empty($this->template_id)||
             !empty($this->act_date)||
             !empty($this->sent)||
             !empty($this->from_date)||

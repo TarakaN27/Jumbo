@@ -12,6 +12,7 @@ namespace common\components\entityFields\widget;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use Yii;
 
 class EntityFieldsDisplayWidget extends Widget
 {
@@ -34,11 +35,15 @@ class EntityFieldsDisplayWidget extends Widget
 			$str.=Html::tag('h4',$this->title);
 
 		$this->data = $this->model->getDisplayEntityValues();
-		$str.= DetailView::widget([
-			'model' => $this->data,
-			'options' => $this->options,
-			'attributes' => $this->attributesForDetailView()
-		]);
+		if(!empty($this->data)) {
+			$str .= DetailView::widget([
+				'model' => $this->data,
+				'options' => $this->options,
+				'attributes' => $this->attributesForDetailView()
+			]);
+		}else{
+			$str.=Yii::t('app/common','No entity values');
+		}
 		return $str;
 	}
 

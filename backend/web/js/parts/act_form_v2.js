@@ -7,10 +7,10 @@ function loadPayments() {
         container = $('#paymentsBlock'),
         iCUser = $('#actform-icuser').val(),
         iLegalPerson = $('#actform-ilegalperson').val(),
-        checkBoxs = container.find('input[type="checkbox"]'),
+        checkBoxs = container.find('.cbPayment'),
         preloadEntity = getPreloaderEntity('paymentPreloader');
 
-    if (checkBoxs.lenght > 0) {
+    if (checkBoxs.length > 0) {
         checkBoxs.prop('checked', false);
         checkBoxs.trigger('change');
     }
@@ -27,6 +27,7 @@ function loadPayments() {
         data: {iCUser: iCUser, iLegalPerson: iLegalPerson},
         success: function (data) {
             container.html(data.content);
+            checkDate();
         },
         error: function (msg) {
             addErrorNotify('Получение платежей', 'Не удалось выполнить запрос!');
@@ -67,14 +68,14 @@ function checkboxPaymentProcessed() {
             processUnfillService(this);
             let
                 fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val() - parseFloat($(this).attr('data-sum'))));
+            fAmount.val(parseFloat(fAmount.val()) - parseFloat($(this).attr('data-sum')));
         }
     } else {
         if (currencyId == parseInt($(this).attr('data-curr'))) {
             processFillService(this);
             let
                 fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val() + parseFloat($(this).attr('data-sum'))));
+            fAmount.val(parseFloat(fAmount.val()) + parseFloat($(this).attr('data-sum')));
         }
     }
     return false;
@@ -232,6 +233,12 @@ function createEntityServicesBlock(serviceID, amount) {
             {name: 'type', value: 'text'},
             {name: 'class', value: 'form-control contractDate'}
         ]),
+        inputTemplateField = createElement('textarea', [
+            {name: 'name', value: 'ActForm[arTemplate][' + serviceID + ']'},
+            //{name: 'value', value: ''},
+            //{name: 'type', value: 'textarea'},
+            {name: 'class', value: 'form-control templateField'}
+        ]),
         li = createElement('li', [
             {name: 'class', value: 'block-sortable'},
             {name: 'id', value: 's' + serviceID}
@@ -241,10 +248,12 @@ function createEntityServicesBlock(serviceID, amount) {
         div2 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div3 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div4 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
+        div5 = createElement('div', [{name: 'class', value: 'form-group col-md-12 col-sm-12 col-xs-12'}]),
         label1 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label2 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label3 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label4 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label5 = createElement('label', [{name: 'class', value: 'control-label'}]),
         clearfix = createElement('div', [{name: 'class', value: 'clearfix'}])
         ;
     h4.html(arServices[serviceID]);
@@ -263,6 +272,9 @@ function createEntityServicesBlock(serviceID, amount) {
     div4.append(label4.html('Дата контракта'));
     div4.append(inputContractDate);
     li.append(div4);
+    div5.append(label4.html('Наименование работы (услуги)'));
+    div5.append(inputTemplateField);
+    li.append(div5);
     li.append(clearfix);
     return li;
 }
@@ -308,6 +320,234 @@ function createElement(tagName, attributes) {
     return element;
 }
 
+function checkDate()
+{
+    var 
+        actDate = $('#actform-actdate'),
+        container = $('#paymentsBlock .cbPayment');
+
+    $.each(container,function(index,value){
+        if(
+            actDate.val() == undefined ||
+            actDate.val() == '' ||
+            (
+                actDate.val() != undefined &&
+                actDate.val() != '' &&
+                strtotime(actDate.val()) < strtotime($(value).attr('data-date'))
+            )
+        )
+        {
+            if($(value).prop('checked'))
+            {
+                $(value).prop('checked',false);
+                $(value).trigger('change');
+            }
+
+            $(value).attr('disabled','disabled');
+        }else{
+            $(value).removeAttr('disabled');
+        }
+    });
+}
+
+function recalculateActFullActAmount()
+{
+    var
+        fAmount = 0,
+        services = $('#servicesBlock .serv-amount');
+
+    $.each(services,function(index,value){
+        fAmount+=parseFloat($(value).val());
+    });
+
+    $('#actform-famount').val(fAmount);
+}
+
+function customValidateForm()
+{
+    if($('#paymentsBlock .cbPayment:checked').length <= 0)                      //check if selected payments
+    {
+        addErrorNotify('Сохрание акта', 'Необходимо выбрать платежи!');
+        return false;
+    }
+
+    if($('#servicesBlock .serv-amount').length <= 0)                            //check if set services
+    {
+        addErrorNotify('Сохрание акта', 'Необходимо задать услуги!');
+        return false;
+    }
+
+    var                                                                         //check for correct amount
+        fAmount = 0,
+        services = $('#servicesBlock .serv-amount');
+
+    $.each(services,function(index,value){
+        fAmount+=parseFloat($(value).val());
+    });
+
+    if(parseFloat($('#actform-famount').val(fAmount)) < fAmount)
+    {
+        addErrorNotify('Сохрание акта', 'Сумма акта должна быть больше либо равна сумме по услугам!');
+        return false;
+    }
+
+    var
+        bContractValid = true,
+        arTemplate = $('#servicesBlock .templateField'),
+        arDates = $('#servicesBlock .contractDate'),
+        arNumbers = $('#servicesBlock .contractNumber');
+
+    if(arDates.length == 0 || arNumbers == 0)
+    {
+        addErrorNotify('Сохрание акта', 'Необходимо задать номер акта и дату акта!');
+        return false;
+    }
+
+    if(arDates.length == 1 && arNumbers.length == 1)
+    {
+        if(arDates.val() == '' || arNumbers == '')
+        {
+            addErrorNotify('Сохрание акта', 'Необходимо задать номер акта и дату акта!');
+            return false;
+        }
+    }
+
+    var
+        tmpDate = null;
+    $.each(arDates,function(index,value){
+        let
+           tmpD = $(value).val();
+        if(tmpD == undefined || tmpD == '')
+        {
+           bContractValid = false;
+        }
+
+        if(bContractValid && tmpDate)
+        {
+            if(tmpDate != tmpD)
+            {
+                bContractValid = false;
+            }
+        }else{
+            tmpDate = tmpD;
+        }
+    });
+
+    if(!bContractValid)
+    {
+        addErrorNotify('Сохрание акта', 'Дата актов заданы неверно!');
+        return false;
+    }
+
+    var
+        tmpNumber = null;
+
+    $.each(arNumbers,function(index,value){
+        let
+            tmpN = $(value).val();
+
+        if(tmpN == undefined || tmpN == '')
+        {
+            bContractValid = false;
+        }
+
+        if(bContractValid && tmpNumber)
+        {
+            if(tmpNumber != tmpN)
+            {
+                bContractValid = false;
+            }
+        }else{
+            tmpNumber = tmpN;
+        }
+    });
+    
+    if(!checkActNumber())
+    {
+        addErrorNotify('Сохрание акта', 'Неверно задан номер акта либо он уже занят!');
+        return false;
+    }
+
+    $.each(arTemplate,function(index,value){
+        let
+            tmpT = $(value).text();
+
+        if(tmpT == undefined || tmpT == '')
+        {
+            bContractValid = false;
+        }
+    });
+
+    if(!checkActNumber())
+    {
+        addErrorNotify('Сохрание акта', 'Необходимо хадать "Наименование работы (услуги)"');
+        return false;
+    }
+
+    return true;
+}
+
+function checkActNumber()
+{
+    var
+        number = $('#actform-iactnumber').val(),
+        legalId = $('#actform-ilegalperson').val();
+
+    if(customEmpty(number) || customEmpty(legalId))
+    {
+        addErrorNotify('Проверка номера акта', 'Необходимо задать номер акта и юр. лицо');
+        return false;
+    }
+
+    var
+        response = $.ajax({
+            url: URL_CHECK_ACT_NUMBER,
+            type: "POST",
+            async: false,
+            dataType: "json",
+            data: {number: number, iLegalId: legalId},
+            error: function (msg) {
+                addErrorNotify('Проверка номера акта', 'Не удалось выполнить запрос!');
+                return false;
+            }
+        }).responseText;
+
+    response = $.parseJSON(response);
+    if(response.answer != undefined && response.answer != '' && response.answer == true)
+    {
+        return true;
+    }
+    return false;
+}
+
+function getActsNumber()
+{
+    var
+        actNumber = $('#actform-iactnumber'),
+        iLegalPerson = $('#actform-ilegalperson').val();
+
+    if(customEmpty(iLegalPerson))
+    {
+        actNumber.val('');
+    }else{
+        $.ajax({
+            type: "POST",
+            cache: false,
+            url: URL_GET_NEXT_ACT_NUMBER,
+            dataType: "json",
+            data: {iLegalPerson: iLegalPerson},
+            success: function (data) {
+                actNumber.val(data);
+            },
+            error: function (msg) {
+                addErrorNotify('Получение номера акта', 'Не удалось выполнить запрос!');
+                actNumber.val('');
+                return false;
+            }
+        });
+    }
+}
+
 $(function () {
     $('#actform-ilegalperson,#actform-icuser').on('change', loadPayments);
     $('#paymentsBlock').on('change', '.cbPayment', checkboxPaymentProcessed);
@@ -318,4 +558,8 @@ $(function () {
         sortUpdateFunction(sortList);
     });
     $('#actform-icurr').on('change', changeCurrencyField);
+    $('#actform-actdate').on('change',checkDate);
+    sortList.on('change','.serv-amount',recalculateActFullActAmount);
+    $(document).on("submit", "form#act-form", customValidateForm);
+    $('#actform-ilegalperson').on('change',getActsNumber);
 });

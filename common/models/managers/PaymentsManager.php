@@ -10,11 +10,13 @@ namespace common\models\managers;
 
 
 use common\components\helpers\CustomHelper;
+use common\models\ActToPayments;
 use common\models\CuserToGroup;
 use common\models\PaymentRequest;
 use common\models\Payments;
 use common\models\PaymentsSale;
 use common\models\Services;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use Yii;
 
@@ -139,7 +141,7 @@ class PaymentsManager extends Payments
 	 */
 	public static function getPaymentsForAct($iCUser,$iLegalPerson)
 	{
-		return Payments::find()
+		$arPayments =  Payments::find()
 			->select(['cuser_id','pay_date','pay_summ','currency_id','service_id','legal_id','id'])
 			->where([
 				'cuser_id' => $iCUser,
@@ -148,6 +150,21 @@ class PaymentsManager extends Payments
 			])
 			->with('currency','service')
 			->all();
+		if(!$arPayments)
+			return [];
+
+		$arActPayment = ActToPayments::getRecordsByPaymentsId(ArrayHelper::getColumn($arPayments,'id'));
+		if($arPayments)
+			/** @var Payments $obPay */
+			foreach ($arPayments as &$obPay)
+			{
+				if(isset($arActPayment[$obPay->id]))
+				{
+					foreach ($arActPayment[$obPay->id] as $actPay)
+						$obPay->actAmount+=$actPay->amount;
+				}
+			}
+		return $arPayments;
 	}
 
 }

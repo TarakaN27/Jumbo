@@ -32,7 +32,11 @@ class PaymentsSearch extends Payments
     public function rules()
     {
         return [
-            [['id', 'cuser_id','currency_id', 'service_id', 'legal_id', 'created_at', 'updated_at','manager'], 'integer'],
+            [[
+                'id', 'cuser_id','currency_id',
+                'service_id', 'legal_id', 'created_at',
+                'updated_at','manager','act_close'
+            ], 'integer'],
             [['pay_summ'], 'number'],
             [[
                 'pay_date',
@@ -75,6 +79,7 @@ class PaymentsSearch extends Payments
                 'pay_date',
                 'payment_order',
                 'pay_summ',
+                'act_close',
                 CUser::tableName().'.requisites_id',
                 CUser::tableName().'.manager_id',
                 Services::tableName().'.name',
@@ -146,6 +151,7 @@ class PaymentsSearch extends Payments
             'legal_id' => $this->legal_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'act_close' => $this->act_close,
             CUser::tableName().'.manager_id' => $this->manager
         ]);
 
@@ -165,7 +171,8 @@ class PaymentsSearch extends Payments
             !empty($this->legal_id) ||
             !empty($this->currency_id) ||
             !empty($this->payment_order) ||
-            !empty($this->manager)
+            !empty($this->manager) ||
+            !empty($this->act_close)
         )
             $this->countTotal = TRUE;
 

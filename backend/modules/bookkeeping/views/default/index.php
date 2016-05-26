@@ -148,6 +148,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]),
                             ],
                             [
+                                'attribute' => 'act_close',
+                                'format' => 'boolean',
+                                'filter' => \common\models\Payments::getYesNo()
+                            ],
+                            [
                                 'class' => 'yii\grid\ActionColumn',
                                 'template' => $viewTpl
                             ],

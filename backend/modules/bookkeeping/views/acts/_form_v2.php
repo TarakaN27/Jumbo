@@ -16,17 +16,21 @@ use common\models\Services;
 use yii\helpers\Html;
 CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',$this,[],'html-sortable');
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/array_diff.js',$this,[],'array_diff');
-CustomViewHelper::registerJsFileWithDependency('@web/js/parts/act_form_v2.js',$this,['html-sortable','array_diff']);
+CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/strtotime.js',$this,[],'strTotime');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/act_form_v2.js',$this,['html-sortable','array_diff','strTotime']);
 $this->registerJs("
 var
     arCurrency = ".Json::encode(ExchangeRates::getExchangeRates()).",
     arServices = ".Json::encode(Services::getServicesMap()).",
+    URL_CHECK_ACT_NUMBER = '".Url::to(['check-act-number'])."',
+    URL_GET_NEXT_ACT_NUMBER = '".Url::to(['get-next-act-number'])."',
     URL_LOAD_CONTRACT_DETAIL = '".Url::to(['/ajax-service/find-contract-detail'])."';
     URL_LOAD_ACTS_PAYMENTS = '".Url::to(['/ajax-service/find-payments-for-acts'])."';
 ",View::POS_HEAD);
 ?>
 <div class="act-form-v2">
     <?php $form=\yii\bootstrap\ActiveForm::begin([
+        'id' => 'act-form',
         'options' => [
             'class' => 'form-horizontal form-label-left',
             'enctype' => 'multipart/form-data'
@@ -91,6 +95,18 @@ var
 
                 </ul>
             </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3 col-sm-offset-3" >
+            <?=$form->field($model,'bCustomAct')->checkbox();?>
+        </div>
+    </div>
+    <?=$form->field($model,'fCustomFileAct')->fileInput()?>
+
+    <div class="form-group">
+        <div class = "col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
+            <?= Html::submitButton(Yii::t('app/bonus', 'Create'), ['class' => 'btn btn-success']) ?>
         </div>
     </div>
 

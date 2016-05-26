@@ -2,7 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\helpers\ArrayHelper;
+use common\models\ActToPayments;
 /* @var $this yii\web\View */
 /* @var $model common\models\Acts */
 
@@ -18,13 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     <section class="pull-right">
                         <?=  Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
                         <?= Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']) ?>
-                        <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                         <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
-                        'class' => 'btn btn-danger',
-                        'data' => [
-                        'confirm' => Yii::t('app/book', 'Are you sure you want to delete this item?'),
-                        'method' => 'post',
-                        ],
+                            'class' => 'btn btn-danger',
+                            'data' => [
+                            'confirm' => Yii::t('app/book', 'Are you sure you want to delete this item?'),
+                            'method' => 'post',
+                            ],
                         ]) ?>
                     </section>
                     <div class = "clearfix"></div>
@@ -35,40 +35,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attributes' => [
                                 [
                                     'attribute' => 'cuser_id',
-                                    'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : $model->cuser_id
+                                    'value' => ArrayHelper::getValue($model,'cuser.infoWithSite')
                                 ],
                                 [
                                     'attribute' => 'buser_id',
-                                    'value' => is_object($obBuser = $model->buser) ? $obBuser->getFio() : $model->buser_id
-                                ],
-                                [
-                                    'attribute' => 'service_id',
-                                    'value' => is_object($obServ = $model->service) ? $obServ->name : $model->service_id
-                                ],
-                                [
-                                    'attribute' => 'template_id',
-                                    'value' => is_object($obTmpl = $model->template) ? $obTmpl->name : $model->template_id
+                                    'value' => ArrayHelper::getValue($model,'buser.fio')
                                 ],
                                 'amount',
                                 'act_date:date',
-                                [
-                                    'attribute' => 'sent',
-                                    'value' => $model->getYesNoStr($model->sent)
-                                ],
-                                [
-                                    'attribute' => 'change',
-                                    'value' => $model->getYesNoStr($model->change)
-                                ],
-                                [
-                                    'attribute' => 'created_at',
-                                    'format' => 'html',
-                                    'value' => Yii::$app->formatter->asDatetime($model->created_at)
-                                ],
-                                [
-                                    'attribute' => 'updated_at',
-                                    'format' => 'html',
-                                    'value' => Yii::$app->formatter->asDatetime($model->updated_at)
-                                ],
+                                'sent:boolean',
+                                'created_at:datetime',
+                                'updated_at:datetime',
                             ],
                         ]) ?>
 
@@ -76,6 +53,27 @@ $this->params['breadcrumbs'][] = $this->title;
                             'model' => $model,
                             'title' => 'Дополнительные поля'
                         ]);?>
+                        <?=Html::tag('h4',Yii::t('app/book','Act to payments details'));?>
+                        <?=\yii\grid\GridView::widget([
+                            'dataProvider' => $dataProvider,
+                            'columns' => [
+                                [
+                                    'attribute' => 'payment_id',
+                                    'format' => 'raw',
+                                    'value' => function(ActToPayments $model){
+                                        return Html::a(
+                                            $model->payment_id,
+                                            ['/bookkeeping/default/view','id' => $model->payment_id],
+                                            [
+                                                'target' => '_blank'
+                                            ]);
+                                    }
+                                ],
+                                'amount:decimal',
+                                'created_at:datetime'
+                            ]
+                        ]);?>
+                        
 
                     <!--
                         @todo вынести в oтдельный виджет

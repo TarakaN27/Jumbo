@@ -33,15 +33,17 @@ use yii\helpers\ArrayHelper;
  */
 class Payments extends AbstractActiveRecord
 {
+    CONST
+        SCENARIO_ACT_CLOSE = 'act_closes';
 
     public
+        $actAmount = 0,
         $isSale = false,
         $saleUser,
         $customProd,
         $showAll,
         $updateWithNewCondition,
         $condition_id;
-
 
     /**
      * @inheritdoc
@@ -62,7 +64,7 @@ class Payments extends AbstractActiveRecord
                 'pay_date', 'pay_summ',
                 'currency_id', 'service_id',
                 'legal_id','condition_id'
-            ], 'required'],
+            ], 'required', 'except' => [self::SCENARIO_ACT_CLOSE]],
             [[
                 'cuser_id', 'currency_id',
                 'service_id', 'legal_id',
@@ -71,7 +73,7 @@ class Payments extends AbstractActiveRecord
                 'updateWithNewCondition',
                 'act_close'
             ], 'integer'],
-            [['pay_summ','customProd'], 'number'],
+            [['pay_summ','customProd','actAmount'], 'number'],
             [['description'], 'string'],
             ['showAll','safe']
         ];
@@ -98,8 +100,7 @@ class Payments extends AbstractActiveRecord
             $this->pay_date = strtotime($this->pay_date);
         return parent::beforeSave($insert);
     }
-
-
+    
     /**
      * @inheritdoc
      */
@@ -122,7 +123,8 @@ class Payments extends AbstractActiveRecord
             'payment_order' => Yii::t('app/book','Payment order'),
             'showAll' => Yii::t('app/book','Show all conditions'),
             'customProd' => Yii::t('app/book','Custom amount production'),
-            'act_close' => Yii::t('app/book','Act close')
+            'act_close' => Yii::t('app/book','Act close'),
+            'actAmount' => Yii::t('app/book','Act amount')
         ];
     }
 

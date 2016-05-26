@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $act_tpl_id
  * @property integer $admin_expense
  * @property integer $partner_cntr
+ * @property string $address
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -53,7 +54,8 @@ class LegalPerson extends AbstractActiveRecord
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
             [['doc_site'],'url'],
-            [['doc_email'],'email']
+            [['doc_email'],'email'],
+            ['address','string']
         ];
     }
 
@@ -74,7 +76,8 @@ class LegalPerson extends AbstractActiveRecord
             'docx_id' => Yii::t('app/services', 'Docx ID'),
             'act_tpl_id' => Yii::t('app/services', 'Act template'),
             'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin'),
-            'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor')
+            'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor'),
+            'address' => Yii::t('app/services','Address')
         ];
     }
 
