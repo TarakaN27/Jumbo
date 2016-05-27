@@ -24,6 +24,7 @@ use Gears\Pdf;
 class ActsDocumentsV2
 {
     CONST
+        RUB_MODE = 0,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли
         PRECISION = 4;          //точность округления
 
     protected
@@ -171,11 +172,11 @@ class ActsDocumentsV2
                 'colNum' => (int)$key+1,
                 'jobName' => $serv->job_description,
                 'quantity' => $serv->quantity,
-                'price' => $price,
-                'amount' => $amount,
+                'price' => $this->iCurrencyId == 2 ? $price.'('.$this->getNewByr($price).')' : $price,
+                'amount' => $this->iCurrencyId == 2 ? $amount.'('.$this->getNewByr($amount).')' : $amount,
                 'vatRate' => $vatRate,
-                'vatAmount' => $vatAmount,
-                'amountWithVat' => $amountWithVat,
+                'vatAmount' => empty($vatAmount) ? '' : $this->iCurrencyId == 2 ? $vatAmount.'('.$this->getNewByr($vatAmount).')' : $vatAmount,
+                'amountWithVat' => $this->iCurrencyId == 2 ? $amountWithVat.'('.$this->getNewByr($amountWithVat).')' : $amountWithVat,
 
             ];
 
@@ -187,11 +188,23 @@ class ActsDocumentsV2
             $this->totalFiniteAmount+=$amountWithVat;
         }
 
+
+
+
         $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
         $this->vatInWords = $this->bUseVat ?
             ', в т.ч.: НДС - '.CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit) :
             '. Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
         return $this->arServices = $arResult;
+    }
+
+    /**
+     * @param $amount
+     * @return string
+     */
+    protected function getNewByr($amount)
+    {
+        return ((int)($amount/10000)).' руб. '.(round((float)('0.'.$amount%10000),2,PHP_ROUND_HALF_DOWN)*100).' коп.';
     }
 
     /**

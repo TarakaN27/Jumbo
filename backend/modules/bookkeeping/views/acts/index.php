@@ -46,20 +46,6 @@ function sendActs()
 
 
 ",\yii\web\View::POS_END);
-
-
-
-
-$this->registerJs("
-$('#sendActID').on('click',sendActs);
-",\yii\web\View::POS_READY);
-echo CustomHelper::num2str(1000.6456345,[ // Units
-    ['цент' ,'цента' ,'центов',	1],
-    ['доллар США'   ,'доллара США'   ,'долларов США'    ,0],
-    ['тысяча'  ,'тысячи'  ,'тысяч'     ,1],
-    ['миллион' ,'миллиона','миллионов' ,0],
-    ['миллиард','милиарда','миллиардов',0],
-]);
 ?>
 
 <div class = "row">
