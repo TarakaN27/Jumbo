@@ -5,6 +5,7 @@ namespace common\models;
 use backend\models\BUser;
 use common\components\acts\ActsDocuments;
 use common\components\acts\PartnerProfitActBehavior;
+use common\components\behavior\acts\ActsActionBehavior;
 use common\components\behavior\UploadBehavior;
 use common\components\entityFields\EntityFieldsTrait;
 use common\components\helpers\CustomHelper;
@@ -161,47 +162,16 @@ class Acts extends AbstractActiveRecord
     /**
      * @param bool $insert
      * @return bool
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\web\ServerErrorHttpException
+     * @throws NotFoundHttpException
      */
     public function beforeSave($insert)
     {
         if($insert)
             $this->ask = Yii::$app->security->generateRandomString(); //generate unique key for act
 
-        /*
         if(!CustomHelper::isDirExist(self::FILE_PATH))
             throw new NotFoundHttpException('Folder for acts is not exist. Path: '.self::FILE_PATH);
 
-        if(parent::beforeSave($insert))
-        {
-            if($this->genFile)
-            {
-                $obActs = new ActsDocuments(
-                    $this->act_num,
-                    $this->act_date,
-                    $this->template_id,
-                    $this->lp_id,
-                    $this->cuser_id,
-                    $this->service_id,
-                    $this->amount,
-                    $this->contract_num,
-                    $this->contract_date
-                );
-                $fileName = $obActs->generatePDF();
-                if(empty($fileName))
-                    throw new ServerErrorHttpException('Can not create document.');
-                $this->file_name = $fileName;
-            }
-
-            $this->act_date = date('Y-m-d',strtotime($this->act_date));
-            $this->contract_date = date('Y-m-d',strtotime($this->contract_date));
-
-            return TRUE;
-        }
-
-        return FALSE;
-        */
         return parent::beforeSave($insert);
     }
 
@@ -222,7 +192,8 @@ class Acts extends AbstractActiveRecord
             [
                 'class' => LogModelBehavior::className(),       //логирование актов
                 'ignored' => ['created_at','updated_at']
-            ]
+            ],
+            ActsActionBehavior::className()                     //действия по событиям
         ]);
     }
 
@@ -248,7 +219,7 @@ class Acts extends AbstractActiveRecord
     }
 
     /**
-     *
+     * 
      */
     public function afterDelete()
     {

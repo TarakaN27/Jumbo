@@ -80,5 +80,6 @@ return [
     'Show in widget' => 'Показывать в виджете',
     'SERVICES_expanse_cat_link' => 'Партнер. Связи категорий затрат',
     'Allow withdrawal partner percent only for contractor' => 'Разрешать вывод партнерских процентов только на контрагентов',
-    'Address' => 'Адрес для документов'
+    'Address' => 'Адрес для документов',
+    'Document number to words type' => 'Тип перевода валюты для документов'
 ];

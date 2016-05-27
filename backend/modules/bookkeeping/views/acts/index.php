@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\bootstrap\ActiveForm;
+use common\components\helpers\CustomHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ActsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -52,6 +53,13 @@ function sendActs()
 $this->registerJs("
 $('#sendActID').on('click',sendActs);
 ",\yii\web\View::POS_READY);
+echo CustomHelper::num2str(1000.6456345,[ // Units
+    ['цент' ,'цента' ,'центов',	1],
+    ['доллар США'   ,'доллара США'   ,'долларов США'    ,0],
+    ['тысяча'  ,'тысячи'  ,'тысяч'     ,1],
+    ['миллион' ,'миллиона','миллионов' ,0],
+    ['миллиард','милиарда','миллиардов',0],
+]);
 ?>
 
 <div class = "row">
@@ -83,14 +91,14 @@ $('#sendActID').on('click',sendActs);
                             'attribute' => 'act_num',
                             'format' => 'html',
                             'value' => function($model){
-                                return Html::a($model->act_num,['update','id' => $model->id],['class' => 'link-upd']);
+                                return $model->act_num;
                             }
                         ],
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
                             'value' => function($model){
-                                return Html::a($model->amount,['update','id' => $model->id],['class' => 'link-upd']);
+                                return $model->amount;
                             }
                         ],
                         [

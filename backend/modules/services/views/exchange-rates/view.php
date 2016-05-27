@@ -69,6 +69,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'value' => $model->getIsDefaultStr()
                                             ],
                                             [
+                                                'attribute' => 'doc_n2w_type',
+                                                'value' => $model->getN2MStr()
+                                            ],
+                                            [
                                                 'attribute' => 'need_upd',
                                                 'value' => $model->getNeedUpdateStr()
                                             ],

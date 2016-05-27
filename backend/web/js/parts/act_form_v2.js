@@ -113,7 +113,10 @@ function fillServices() {
 
     fAmount.val(valAmount);
 }
-
+/**
+ * Создаем услуги, если услуга новая, то для ней необходимо получить информацию по контракту и описание для услуги из шаблона
+ * @param value
+ */
 function processFillService(value) {
     let
         servID = $(value).attr('data-serv_id'),
@@ -131,6 +134,12 @@ function processFillService(value) {
         if (contractDetail.contractDate != undefined && contractDetail.contractNumber != undefined) {
             $('#servicesBlock #s' + servID + ' .contractDate').val(contractDetail.contractDate);
             $('#servicesBlock #s' + servID + ' .contractNumber').val(contractDetail.contractNumber);
+        }
+        if(!customEmpty(contractDetail.bTplFind) && contractDetail.bTplFind)
+        {
+            $('#servicesBlock #s' + servID + ' .templateField').val(contractDetail.job_description);
+        }else{
+            addErrorNotify('Получение шаблона полей для услуги', 'Шаблон не найден!');
         }
     }
 }
@@ -280,14 +289,16 @@ function createEntityServicesBlock(serviceID, amount) {
 }
 
 function getContractDateAndContractNumber(serviceID) {
+    console.log('call');
     var
+        legalPersonId = $('#actform-ilegalperson').val(),
         iCUserId = $('#actform-icuser').val();
     return $.ajax({
         url: URL_LOAD_CONTRACT_DETAIL,
         type: "POST",
         async: false,
         dataType: "json",
-        data: {iCUser: iCUserId, iServId: serviceID},
+        data: {iCUser: iCUserId, iServId: serviceID,iLegalPerson:legalPersonId},
         error: function (msg) {
             addErrorNotify('Получение номера и даты контракта', 'Не удалось выполнить запрос!');
             return false;

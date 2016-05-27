@@ -6,22 +6,33 @@
  * Time: 16.10
  * Вторая версия класса реализующего логику формирования документа акта
  */
-
 namespace common\components\acts;
 
-
+use common\components\helpers\CustomHelper;
+use common\models\ActServices;
 use common\models\ActsTemplate;
 use common\models\CUser;
+use common\models\ExchangeRates;
 use common\models\LegalPerson;
+use PhpOffice\PhpWord\TemplateProcessor;
 use yii\base\InvalidParamException;
-use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use common\models\Acts;
+use yii\base\Exception;
+use Gears\Pdf;
 
 class ActsDocumentsV2
 {
+    CONST
+        PRECISION = 4;          //точность округления
+
     protected
+        $fileName,
+        $iCurrencyId,
         $iLegalPerson,
         $iCUserId,
+        $iActId,
+        $n2wUnit = NULL,
         $obActTpl = NULL,
         $arServices = [],
         $legalPersonName,
@@ -35,12 +46,14 @@ class ActsDocumentsV2
         $cuserAddress,
         $cuserEmail,
         $cuserWebsite,
-        $totalAmount,
-        $totalTaxAmount,
-        $totalAmountWithTax,
-        $totalFiniteAmount,
+        $totalAmount=0,
+        $totalVatAmount,
+        $totalAmountWithVat=0,
+        $totalFiniteAmount=0,
         $amountInWords,
-        $taxInWords;
+        $vatInWords,
+        $bUseVat = FALSE,
+        $vatRate;
 
     /**
      * ActsDocumentsV2 constructor.
@@ -49,15 +62,31 @@ class ActsDocumentsV2
      * @param $actDate
      * @param $actNumber
      */
-    public function __construct($iLegalPerson,$iCUser,$actDate,$actNumber)
+    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId)
     {
-        if(empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber))
+        if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId))
             throw new InvalidParamException();
 
         $this->iLegalPerson = $iLegalPerson;
         $this->iCUserId = $iCUser;
         $this->actDate = $actDate;
         $this->actNumber = $actNumber;
+        $this->iActId = $iActId;
+        $this->iCurrencyId = $iCurrencyId;
+    }
+
+    /**
+     * @return null|string
+     * @throws NotFoundHttpException
+     */
+    public function generateDocument()
+    {
+        $this->getLegalPersonAndActTpl();
+        $this->getCUserDetail();
+        $this->getContractDetail();
+        $this->getCurrencyUnits();
+        $this->getServices();
+        return $this->generatePDF();
     }
 
     /**
@@ -69,7 +98,7 @@ class ActsDocumentsV2
     {
         /** @var LegalPerson $obLegalPerson */
         $obLegalPerson = LegalPerson::find()
-            ->select(['id','name','doc_requisites','use_vat','docx_id','act_tpl_id','address'])
+            ->select(['id','name','doc_requisites','use_vat','docx_id','act_tpl_id','address','use_vat'])
             ->where(['id' => $this->iLegalPerson ])
             ->one();
 
@@ -79,6 +108,8 @@ class ActsDocumentsV2
         $this->legalPersonName = $obLegalPerson->name;
         $this->legalPersonBankDetail = $obLegalPerson->doc_requisites;
         $this->legalPersonAddress = $obLegalPerson->address;
+        $this->bUseVat = $obLegalPerson->use_vat;
+        $this->vatRate = CustomHelper::getVat();
 
         if(empty($obLegalPerson->act_tpl_id))
             throw new NotFoundHttpException('template id not found');
@@ -97,8 +128,8 @@ class ActsDocumentsV2
      */
     protected function getCUserDetail()
     {
-        $obCuser = CUser::find()->with('requisites')->where(['id' => $this->iCUserId])->one();
-        if(!$obCuser)
+        $obCUser = CUser::find()->with('requisites')->where(['id' => $this->iCUserId])->one();
+        if(!$obCUser)
             throw new NotFoundHttpException();
 
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
@@ -109,27 +140,166 @@ class ActsDocumentsV2
             $this->cuserEmail = $obR->c_email;
             $this->cuserWebsite = $obR->site;
         }
-        return $obCuser;
+        return $obCUser;
     }
-    
-    
 
-
-
-    public function generateDocument()
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    protected function getServices()
     {
-        $this->getLegalPersonAndActTpl();
+        $arServices = ActServices::find()->where(['act_id' => $this->iActId])->all();
+        if(!$arServices)
+            throw new NotFoundHttpException();
 
+        $arResult = [];
+        /**
+         * @var integer $key
+         * @var ActServices $serv
+         */
+        foreach ($arServices as $key => $serv)
+        {
+            $amountWithVat = $serv->amount;
+            $vatRate = $this->bUseVat ? $this->vatRate : '';
+            $amount = $this->bUseVat ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
+            $price = $amount/$serv->quantity;
 
+            $vatAmount = $this->bUseVat ? $serv->amount-$amount: '';
+
+            $arResult[] = [
+                'colNum' => (int)$key+1,
+                'jobName' => $serv->job_description,
+                'quantity' => $serv->quantity,
+                'price' => $price,
+                'amount' => $amount,
+                'vatRate' => $vatRate,
+                'vatAmount' => $vatAmount,
+                'amountWithVat' => $amountWithVat,
+
+            ];
+
+            $this->totalAmount+= $amount;
+            if($this->bUseVat)
+                $this->totalVatAmount = (float)$this->totalVatAmount + $vatAmount;
+
+            $this->totalAmountWithVat+= $amountWithVat;
+            $this->totalFiniteAmount+=$amountWithVat;
+        }
+
+        $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+        $this->vatInWords = $this->bUseVat ?
+            ', в т.ч.: НДС - '.CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit) :
+            '. Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+        return $this->arServices = $arResult;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+	protected function generateRealPath($name)
+    {
+        return \Yii::getAlias(Acts::FILE_PATH).'/'.$name;
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateName()
+    {
+        return $this->fileName = 'act_'.$this->actDate;
+    }
+
+    protected function getDocument()
+    {
+        $fileName = $this->generateName();
+        $realPath = $this->generateRealPath($fileName.'.docx');
+        $arItems = [
+            'legalPersonName',
+            'legalPersonBankDetail',
+            'legalPersonAddress',
+            'actNumber',
+            'actDate',
+            'cuserName',
+            'cuserBankDetail',
+            'cuserContractDetail',
+            'cuserAddress',
+            'cuserEmail',
+            'cuserWebsite',
+            'totalAmount',
+            'totalVatAmount',
+            'totalAmountWithVat',
+            'totalFiniteAmount',
+            'amountInWords',
+            'vatInWords',
+        ];
+
+        try{
+            $obDoc =  new TemplateProcessor($this->obActTpl->getFilePath());
+            foreach ($arItems as $item)
+                $obDoc->setValue($item,$this->$item);
+
+            $obDoc->cloneRow('colNum',count($this->arServices));
+            $iCounter = 1;
+            foreach ($this->arServices as  $value)
+            {
+                foreach ($value as $keyItem => $val)
+                    $obDoc->setValue($keyItem.'#'.$iCounter,$val);
+            }
+            $obDoc->saveAs($realPath);
+        }catch (Exception $e)
+        {
+            return FALSE;
+        }
+        return file_exists($realPath) ? $fileName.'.docx' : NULL;
     }
 
 
+    /**
+     * @return null|string
+     */
+    protected function generatePDF()
+    {
+        if($docFile = $this->getDocument()) //генерируем .docx
+        {
+            $pdfTryPath = $this->generateRealPath($this->fileName.'.pdf'); //путь к pdf
+            $docTryPath = $this->generateRealPath($docFile);
+            Pdf::convert($docTryPath,$pdfTryPath); //конверитируем .docx => .pdf
+            if(file_exists($pdfTryPath))
+            {
+                return $this->fileName.'.pdf';
+            }
+            @unlink($docTryPath);
+        }
+        return NULL;
+    }
 
+    /**
+     * @throws NotFoundHttpException
+     */
+    protected function getCurrencyUnits()
+    {
+        /** @var ExchangeRates $obCurr */
+        $obCurr = ExchangeRates::find()->where(['id' => $this->iCurrencyId])->one();
+        if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
 
+        $this->n2wUnit = $obCurr->getUnitsForN2W();
+    }
 
+    /**
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    protected function getContractDetail()
+    {
+        /** @var Acts $obAct */
+        $obAct = Acts::findOne($this->iActId);
+        if(!$obAct)
+            throw new NotFoundHttpException();
 
-
-
-
+        return $this->cuserContractDetail = $obAct->act_num.' от '.$obAct->act_date;
+    }
 
 }

@@ -11,6 +11,7 @@ namespace backend\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use common\components\managers\DialogManager;
+use common\models\ActFieldTemplate;
 use common\models\CrmTask;
 use common\models\CUser;
 use common\models\CuserServiceContract;
@@ -529,19 +530,27 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
     /**
      * @return array
+     * @throws NotFoundHttpException
      */
     public function actionFindContractDetail()
     {
         //iCUser:iCUserId,iServId:serviceID
         $iCUser = Yii::$app->request->post('iCUser');
         $iServId = Yii::$app->request->post('iServId');
+        $iLegalPerson = Yii::$app->request->post('iLegalPerson');
+
         /** @var CuserServiceContract $obContract */
         $obContract = CuserServiceContract::find()->where(['service_id' => $iServId,'cuser_id' => $iCUser])->one();
         if(!$obContract)
             throw new NotFoundHttpException;
+        /** @var ActFieldTemplate $obActFieldTpl */
+        $obActFieldTpl = ActFieldTemplate::find()->where(['service_id' => $iServId,'legal_id' => $iLegalPerson])->one();
+
         return [
             'contractDate' => empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date),
             'contractNumber' => $obContract->cont_number,
+            'bTplFind' => !empty($obActFieldTpl),
+            'job_description' => $obActFieldTpl ? $obActFieldTpl->job_name : ''
         ];
     }
 } 

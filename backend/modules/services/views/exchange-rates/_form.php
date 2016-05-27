@@ -127,6 +127,8 @@ $('#exchangerates-use_exchanger').on('change',checkStateUseExchanger);
 
     <?= $form->field($model, 'is_default')->dropDownList(\common\models\ExchangeRates::getYesNo()) ?>
 
+    <?=$form->field($model,'doc_n2w_type')->dropDownList(\common\models\ExchangeRates::getN2WMap())?>
+
     <div>
         <div class="control-label col-md-3 col-sm-3 col-xs-12">
         </div>

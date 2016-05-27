@@ -5,6 +5,7 @@ namespace backend\modules\bookkeeping\controllers;
 use backend\modules\bookkeeping\form\ActForm;
 use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
+use common\components\helpers\CustomHelper;
 use common\models\ActToPayments;
 use common\models\CUser;
 use common\models\CuserExternalAccount;
@@ -14,6 +15,7 @@ use Yii;
 use common\models\Acts;
 use common\models\search\ActsSearch;
 use backend\components\AbstractBaseBackendController;
+use yii\base\Exception;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
@@ -49,8 +51,8 @@ class ActsController extends AbstractBaseBackendController
         $tmp['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                'find-contact-number' => ['post'],
-                'find-act-template' => ['post']
+                'check-act-number' => ['post'],
+                'get-next-act-number' => ['post']
             ],
         ];
         return $tmp;
@@ -102,20 +104,6 @@ class ActsController extends AbstractBaseBackendController
      */
     public function actionCreate()
     {
-        /*
-        $model = new Acts();
-        $model->getEntityFields(); //доп поля
-        $model->buser_id = Yii::$app->user->id;
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-        */
-
         $model = new ActForm();
         $model->actDate = Yii::$app->formatter->asDate('NOW');
         if($model->load(Yii::$app->request->post()) && $model->validate())
@@ -138,27 +126,6 @@ class ActsController extends AbstractBaseBackendController
     }
 
     /**
-     * Updates an existing Acts model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-        $model->setScenario('update');
-        $model->getEntityFields(); //доп поля
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
      * Deletes an existing Acts model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -166,7 +133,14 @@ class ActsController extends AbstractBaseBackendController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $transation = Yii::$app->db->beginTransaction();
+        try {
+            $this->findModel($id)->delete();
+            $transation->commit();
+        }catch (Exception $e)
+        {
+            $transation->rollBack();
+        }
 
         return $this->redirect(['index']);
     }
@@ -188,48 +162,6 @@ class ActsController extends AbstractBaseBackendController
     }
 
     /**
-     * @return array|null
-     */
-    public function actionFindContactNumber()
-    {
-        $iCID = Yii::$app->request->post('iCID');
-        $iServ = Yii::$app->request->post('iServ');
-        $iLP = Yii::$app->request->post('iLP');
-
-        if(!$iCID || !$iServ || !$iLP)
-            throw new InvalidParamException('contractor id and service id must be set');
-
-        Yii::$app->response->format = Response::FORMAT_JSON;    //указываем что отдаем json
-        /** @var CuserServiceContract $obCSC */
-        $obCSC = CuserServiceContract::findOne(['cuser_id' => $iCID,'service_id' => $iServ]);
-        if($obCSC && $obCSC->cont_number && $obCSC->cont_date)
-            return ['num' => $obCSC->cont_number, 'date' => $obCSC->cont_date];
-        /** @var ServiceDefaultContract $obDSC */
-        $obDSC = ServiceDefaultContract::findOne(['service_id' => $iServ,'lp_id' => $iLP]);
-        if(!$obDSC)
-            return NULL;
-
-        return ['num' => $obDSC->cont_number, 'date' => $obDSC->cont_date];
-
-    }
-
-    /**
-     * @return array
-     * @throws NotFoundHttpException
-     */
-    public function actionFindActTemplate()
-    {
-        $iLP = Yii::$app->request->post('iLP');
-
-        if(!$iLP)
-            throw new InvalidParamException('contractor id and service id must be set');
-        /** @var LegalPerson $obLP */
-        $obLP = LegalPerson::findOneByIDCached($iLP);
-        Yii::$app->response->format = Response::FORMAT_JSON;    //указываем что отдаем json
-        return ['tpl' => $obLP->act_tpl_id];
-    }
-
-    /**
      * @param $ask
      * @return $this
      * @throws NotFoundHttpException
@@ -240,7 +172,6 @@ class ActsController extends AbstractBaseBackendController
         $obAct = Acts::findOne(['ask' => $ask]);
         if(!$obAct)
             throw new NotFoundHttpException('Acts not found');
-
         return $obAct->getDocument();
     }
 
@@ -328,5 +259,4 @@ class ActsController extends AbstractBaseBackendController
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Acts::getNextActNumber($iLegalPerson);
     }
-
 }

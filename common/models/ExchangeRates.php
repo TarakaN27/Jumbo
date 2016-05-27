@@ -30,9 +30,14 @@ use yii\db\ActiveQuery;
  * @property string $factor
  * @property integer $use_rur_for_byr
  * @property integer $show_at_widget
+ * @property integer $doc_n2w_type
  */
 class ExchangeRates extends AbstractActiveRecord
 {
+    CONST
+        N_2_W_TYPE_BYR = 0,
+        N_2_W_TYPE_USD = 1,
+        N_2_W_TYPE_EURO = 2;
 
     protected
         $_oldModelAttribute;
@@ -43,6 +48,18 @@ class ExchangeRates extends AbstractActiveRecord
     public static function tableName()
     {
         return '{{%exchange_rates}}';
+    }
+
+    /**
+     * @return array
+     */
+    public static function getN2WMap()
+    {
+        return [
+            self::N_2_W_TYPE_BYR => Yii::t('app/services', 'BYR'),
+            self::N_2_W_TYPE_USD => Yii::t('app/services', 'USD'),
+            self::N_2_W_TYPE_EURO => Yii::t('app/services','EURO')
+        ];
     }
 
     /**
@@ -63,7 +80,7 @@ class ExchangeRates extends AbstractActiveRecord
                 'nbrb', 'cbr', 'created_at', 'updated_at',
                 'need_upd','is_default','use_base','base_id',
                 'use_exchanger','bank_id','use_rur_for_byr',
-                'show_at_widget'
+                'show_at_widget','doc_n2w_type'
             ],'integer'],
             [['nbrb_rate', 'cbr_rate','factor'], 'number'],
             [['name', 'code'], 'string', 'max' => 255],
@@ -112,7 +129,8 @@ class ExchangeRates extends AbstractActiveRecord
             'bank_id' => Yii::t('app/services', 'Bank ID'),
             'use_exchanger' => Yii::t('app/services', 'Use exchanger'),
             'use_rur_for_byr' => Yii::t('app/services', 'Use currency rur for count byr'),
-            'show_at_widget' => Yii::t('app/services','Show in widget')
+            'show_at_widget' => Yii::t('app/services','Show in widget'),
+            'doc_n2w_type' => Yii::t('app/services','Document number to words type')
         ];
     }
 
@@ -248,6 +266,56 @@ class ExchangeRates extends AbstractActiveRecord
         $obH->rate_cbr = $this->cbr_rate;
         //сохраняем историю
         return $obH->save();
+    }
+
+    /**
+     * @return array
+     */
+    public function getUnitsForN2W()
+    {
+        $arResult = [];
+        switch ($this->doc_n2w_type){
+            case self::N_2_W_TYPE_BYR:
+                $arResult = [ // Units
+                    ['копейка' ,'копейки' ,'копеек',	1],
+                    ['рубль'   ,'рубля'   ,'рублей'    ,0],
+                    ['тысяча'  ,'тысячи'  ,'тысяч'     ,1],
+                    ['миллион' ,'миллиона','миллионов' ,0],
+                    ['миллиард','милиарда','миллиардов',0],
+                ];
+                break;
+            case self::N_2_W_TYPE_USD:
+                $arResult = [ // Units
+                    ['цент' ,'цента' ,'центов',	1],
+                    ['доллар США'   ,'доллара США'   ,'долларов США'    ,0],
+                    ['тысяча'  ,'тысячи'  ,'тысяч'     ,1],
+                    ['миллион' ,'миллиона','миллионов' ,0],
+                    ['миллиард','милиарда','миллиардов',0],
+                ];
+                break;
+            case self::N_2_W_TYPE_EURO:
+                $arResult = [ // Units
+                    ['цент' ,'цента' ,'центов',	1],
+                    ['евро'   ,'евро'   ,'евро'    ,0],
+                    ['тысяча'  ,'тысячи'  ,'тысяч'     ,1],
+                    ['миллион' ,'миллиона','миллионов' ,0],
+                    ['миллиард','милиарда','миллиардов',0],
+                ];
+                break;
+            default:
+                break;
+        }
+
+        return $arResult;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getN2MStr()
+    {
+        $arTmp = self::getN2WMap();
+        return isset($arTmp[$this->doc_n2w_type]) ? $arTmp[$this->doc_n2w_type] : NULL;
     }
 }
 
