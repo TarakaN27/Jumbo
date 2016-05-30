@@ -188,13 +188,17 @@ class ActsDocumentsV2
             $this->totalFiniteAmount+=$amountWithVat;
         }
 
-
-
-
         $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
         $this->vatInWords = $this->bUseVat ?
             ', в т.ч.: НДС - '.CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit) :
             '. Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+
+        $this->totalAmount = $this->iCurrencyId == 2 ? $this->totalAmount.'('.$this->getNewByr($this->totalAmount).')' : $this->totalAmount;
+        $this->totalAmountWithVat = $this->iCurrencyId == 2 ? $this->totalAmountWithVat.'('.$this->getNewByr($this->totalAmountWithVat).')' : $this->totalAmountWithVat;
+        $this->totalFiniteAmount = $this->iCurrencyId == 2 ? $this->totalFiniteAmount.'('.$this->getNewByr($this->totalFiniteAmount).')' : $this->totalFiniteAmount;
+        if($this->bUseVat)
+            $this->totalVatAmount = $this->iCurrencyId == 2 ? $this->totalVatAmount.'('.$this->getNewByr($this->totalVatAmount).')' : $this->totalVatAmount;
+
         return $this->arServices = $arResult;
     }
 
