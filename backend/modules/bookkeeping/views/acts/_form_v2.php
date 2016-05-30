@@ -106,7 +106,7 @@ var
 
     <div class="form-group">
         <div class = "col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
-            <?= Html::submitButton(Yii::t('app/bonus', 'Create'), ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton(Yii::t('app/book', 'Create'), ['class' => 'btn btn-success']) ?>
         </div>
     </div>
 
