@@ -316,7 +316,7 @@ class DialogManager extends Component{
      */
     public function getDialogsForCompany($iCmpID)
     {
-        $query = Dialogs::find()->where(['crm_cmp_id' => $iCmpID])->with('owner');
+        $query = Dialogs::find()->where(['crm_cmp_id' => $iCmpID])->with('owner','tasks');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
