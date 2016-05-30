@@ -51,6 +51,19 @@ use yii\bootstrap\Modal;
 <!-- start recent activity -->
 <ul class="messages company-msg msgBoxList">
 	<?php if($obDialogs && $obModels = $obDialogs->getModels()):?>
+			<?php
+			/** @var \common\models\Dialogs $obModel */
+			foreach ($obModels as $obModel)
+			{
+				if($obModel->crm_task_id && ($obTask = $obModel->tasks))
+				{
+					$obModel->theme = Yii::t('app/crm','Task').' "'.Html::a($obTask->title,['/crm/task/view','id' => $obTask->id],[
+							'target' => '_blank',
+							'class' => 'dialog-title-link'
+						]).'"';
+				}
+			}
+			?>
 			<?= $this->render('_dialog_crm_msg', [
 			'models' => $obModels,
 			'pag' => $pagination,
