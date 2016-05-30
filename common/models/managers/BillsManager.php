@@ -119,7 +119,11 @@ class BillsManager extends Bills{
         if(!empty($lPerson))
         {
             $jPerson = $lPerson->name;
-            $jPersonDetail = $lPerson->doc_requisites;
+            $jPersonDetail = $lPerson->doc_requisites.
+                ',УНП:'.$lPerson->ynp.
+                '. Юр.адрес:'.$lPerson->address.
+                '. Почт. адрес:'.$lPerson->mailing_address.
+                '. тел.:'.$lPerson->telephone_number;
             $jPersonEmail = $lPerson->doc_email;
             $jPersonSite = $lPerson->doc_email;
         }

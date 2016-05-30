@@ -80,6 +80,8 @@ class ActToPayments extends AbstractActiveRecord
      */
     public static function getRecordsByPaymentsId(array $arPaymentsIds)
     {
+        if(empty($arPaymentsIds))
+            return [];
         $arTmp = self::find()->where(['payment_id' => $arPaymentsIds])->all();
         return $arTmp ? CustomHelper::getMapArrayObjectByAttribute($arTmp,'payment_id') : [];
     }

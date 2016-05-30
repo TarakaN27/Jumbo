@@ -26,6 +26,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $admin_expense
  * @property integer $partner_cntr
  * @property string $address
+ * @property string $telephone_number
+ * @property string $ynp
+ * @property string $mailing_address
  */
 class LegalPerson extends AbstractActiveRecord
 {
@@ -43,7 +46,7 @@ class LegalPerson extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['description','doc_requisites'], 'string'],
+            [['description','doc_requisites','ynp','mailing_address','telephone_number'], 'string'],
             [[
                 'status', 'created_at',
                 'updated_at','use_vat',
@@ -77,7 +80,12 @@ class LegalPerson extends AbstractActiveRecord
             'act_tpl_id' => Yii::t('app/services', 'Act template'),
             'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin'),
             'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor'),
-            'address' => Yii::t('app/services','Address')
+            'address' => Yii::t('app/services','Address'),
+            'ynp' => Yii::t('app/services','Ynp'),
+            'mailing_address' => Yii::t('app/services','Mailing address'),
+            'telephone_number' => Yii::t('app/services','Telephone number'),
+            'doc_site' => Yii::t('app/services','Document site'),
+            'doc_email' => Yii::t('app/services','Document email')
         ];
     }
 

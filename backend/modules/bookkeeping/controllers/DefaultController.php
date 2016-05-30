@@ -5,6 +5,8 @@ namespace backend\modules\bookkeeping\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use common\components\payment\PaymentOperations;
+use common\models\Acts;
+use common\models\ActToPayments;
 use common\models\CUser;
 
 use common\models\CuserPreferPayCond;
@@ -19,6 +21,7 @@ use common\models\Payments;
 use common\models\search\PaymentsSearch;
 
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -85,12 +88,24 @@ class DefaultController extends AbstractBaseBackendController
             $total = Yii::$app->formatter->asDecimal($total);
         }
 
+        $arPaymentsIds = ArrayHelper::getColumn($dataProvider->getModels(),'id');
+        $arActsTmp = ActToPayments::getRecordsByPaymentsId($arPaymentsIds);
+        $arActs = [];
+        foreach ($arActsTmp as $key => $actTmp)
+        {
+            if(isset($arActs[$key]))
+                $arActs[$key]+=(float)$actTmp->amount;
+            else
+                $arActs[$key]=(float)$actTmp->amount;
+        }
+        
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'cuserDesc' => $cuserDesc,
             'buserDesc' => $buserDesc,
-            'arTotal' => $arTotal
+            'arTotal' => $arTotal,
+            'arActs' => $arActs
         ]);
     }
 

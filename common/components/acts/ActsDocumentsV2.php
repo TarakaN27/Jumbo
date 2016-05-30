@@ -39,6 +39,11 @@ class ActsDocumentsV2
         $legalPersonName,
         $legalPersonBankDetail,
         $legalPersonAddress,
+        $legalPersonYnp,
+        $legalPersonMailingAddress,
+        $legalPersonTelephoneNumber,
+        $legalPersonEmail,
+        $legalPersonSite,
         $actNumber,
         $actDate,
         $cuserName,
@@ -47,6 +52,7 @@ class ActsDocumentsV2
         $cuserAddress,
         $cuserEmail,
         $cuserWebsite,
+        $cuserYnp,
         $totalAmount=0,
         $totalVatAmount,
         $totalAmountWithVat=0,
@@ -99,7 +105,13 @@ class ActsDocumentsV2
     {
         /** @var LegalPerson $obLegalPerson */
         $obLegalPerson = LegalPerson::find()
-            ->select(['id','name','doc_requisites','use_vat','docx_id','act_tpl_id','address','use_vat'])
+            ->select([
+                'id','name','doc_requisites',
+                'use_vat','docx_id','act_tpl_id',
+                'address','use_vat','ynp',
+                'mailing_address','telephone_number',
+                'doc_email','doc_site'
+            ])
             ->where(['id' => $this->iLegalPerson ])
             ->one();
 
@@ -109,6 +121,12 @@ class ActsDocumentsV2
         $this->legalPersonName = $obLegalPerson->name;
         $this->legalPersonBankDetail = $obLegalPerson->doc_requisites;
         $this->legalPersonAddress = $obLegalPerson->address;
+        $this->legalPersonYnp = $obLegalPerson->ynp;
+        $this->legalPersonMailingAddress = $obLegalPerson->mailing_address;
+        $this->legalPersonTelephoneNumber = $obLegalPerson->telephone_number;
+        $this->legalPersonEmail = $obLegalPerson->doc_email;
+        $this->legalPersonSite = $obLegalPerson->doc_site;
+
         $this->bUseVat = $obLegalPerson->use_vat;
         $this->vatRate = CustomHelper::getVat();
 
@@ -136,10 +154,11 @@ class ActsDocumentsV2
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
             $this->cuserName = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
-            $this->cuserBankDetail = $obR->ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' код '.$obR->b_code.', УНП:'.$obR->ynp;
+            $this->cuserBankDetail = $obR->ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' код '.$obR->b_code;
             $this->cuserAddress = $obR->j_address;
             $this->cuserEmail = $obR->c_email;
             $this->cuserWebsite = $obR->site;
+            $this->cuserYnp = $obR->ynp;
         }
         return $obCUser;
     }
@@ -150,7 +169,7 @@ class ActsDocumentsV2
      */
     protected function getServices()
     {
-        $arServices = ActServices::find()->where(['act_id' => $this->iActId])->all();
+        $arServices = ActServices::find()->where(['act_id' => $this->iActId])->orderBy(['ordering' => SORT_ASC])->all();
         if(!$arServices)
             throw new NotFoundHttpException();
 
@@ -172,11 +191,18 @@ class ActsDocumentsV2
                 'colNum' => (int)$key+1,
                 'jobName' => $serv->job_description,
                 'quantity' => $serv->quantity,
+                /*
                 'price' => $this->iCurrencyId == 2 ? $price.'('.$this->getNewByr($price).')' : $price,
                 'amount' => $this->iCurrencyId == 2 ? $amount.'('.$this->getNewByr($amount).')' : $amount,
                 'vatRate' => $vatRate,
                 'vatAmount' => empty($vatAmount) ? '' : $this->iCurrencyId == 2 ? $vatAmount.'('.$this->getNewByr($vatAmount).')' : $vatAmount,
                 'amountWithVat' => $this->iCurrencyId == 2 ? $amountWithVat.'('.$this->getNewByr($amountWithVat).')' : $amountWithVat,
+                */
+                'price' => round($price),
+                'amount' => round($amount),
+                'vatRate' => $vatRate,
+                'vatAmount' => empty($vatAmount) ? '' : round($vatAmount),
+                'amountWithVat' => round($amountWithVat),
 
             ];
 
@@ -188,17 +214,36 @@ class ActsDocumentsV2
             $this->totalFiniteAmount+=$amountWithVat;
         }
 
-        $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+        $this->totalAmountWithVat = round($this->totalAmountWithVat);
+        $this->totalFiniteAmount = round($this->totalFiniteAmount);
+        if($this->bUseVat)
+            $this->totalVatAmount = round($this->totalVatAmount);
+
+        $this->amountInWords =
+            $this->iCurrencyId == 2 ?
+                CustomHelper::numPropis($this->totalFiniteAmount).' белорусских '. CustomHelper::ciRub($this->totalFiniteAmount) :
+            CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+
+        $strVatAmount = '';
+        if($this->bUseVat)
+        {
+            $strVatAmount = $this->iCurrencyId == 2 ?
+                CustomHelper::numPropis($this->totalVatAmount).' белорусских '. CustomHelper::ciRub($this->totalVatAmount) :
+                CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
+        }
+
         $this->vatInWords = $this->bUseVat ?
-            ', в т.ч.: НДС - '.CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit) :
+            ', в т.ч.: НДС - '.$strVatAmount :
             '. Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
 
+        $this->totalAmount = round($this->totalAmount);
+        /*
         $this->totalAmount = $this->iCurrencyId == 2 ? $this->totalAmount.'('.$this->getNewByr($this->totalAmount).')' : $this->totalAmount;
         $this->totalAmountWithVat = $this->iCurrencyId == 2 ? $this->totalAmountWithVat.'('.$this->getNewByr($this->totalAmountWithVat).')' : $this->totalAmountWithVat;
         $this->totalFiniteAmount = $this->iCurrencyId == 2 ? $this->totalFiniteAmount.'('.$this->getNewByr($this->totalFiniteAmount).')' : $this->totalFiniteAmount;
         if($this->bUseVat)
             $this->totalVatAmount = $this->iCurrencyId == 2 ? $this->totalVatAmount.'('.$this->getNewByr($this->totalVatAmount).')' : $this->totalVatAmount;
-
+        */
         return $this->arServices = $arResult;
     }
 
@@ -236,6 +281,11 @@ class ActsDocumentsV2
             'legalPersonName',
             'legalPersonBankDetail',
             'legalPersonAddress',
+            'legalPersonYnp',
+            'legalPersonMailingAddress',
+            'legalPersonTelephoneNumber',
+            'legalPersonEmail',
+            'legalPersonSite',
             'actNumber',
             'actDate',
             'cuserName',
@@ -244,6 +294,7 @@ class ActsDocumentsV2
             'cuserAddress',
             'cuserEmail',
             'cuserWebsite',
+            'cuserYnp',
             'totalAmount',
             'totalVatAmount',
             'totalAmountWithVat',

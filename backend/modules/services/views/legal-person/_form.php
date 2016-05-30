@@ -26,11 +26,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'doc_requisites')->textarea(['row' => 6])?>
 
+    <?= $form->field($model, 'ynp')->textInput(['maxlength' => true])?>
+
     <?= $form->field($model,'address')->textarea(['row' => 6])?>
+
+    <?=$form->field($model,'mailing_address')->textarea(['row' => 6])?>
 
     <?= $form->field($model, 'doc_site')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'doc_email')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'telephone_number')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'use_vat')->dropDownList(\common\models\LegalPerson::getYesNo())?>
 

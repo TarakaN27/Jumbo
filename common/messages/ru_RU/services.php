@@ -51,7 +51,7 @@ return [
     'Use exchanger' => 'Использовать курс обменников',
     'This name has already been taken.' => 'Валюта с таким названием уже существует!',
     'This code has already been taken.' => 'Валюта с таким кодом уже существует!',
-    'Requisites for documents' => 'Реквизиты для документов',
+    'Requisites for documents' => 'Банковские реквизиты',
     'Doc Email' => 'Email для документов',
     'Doc Site' => 'Сайт для документов',
     'Use vat' => 'Использовать НДС',
@@ -80,6 +80,11 @@ return [
     'Show in widget' => 'Показывать в виджете',
     'SERVICES_expanse_cat_link' => 'Партнер. Связи категорий затрат',
     'Allow withdrawal partner percent only for contractor' => 'Разрешать вывод партнерских процентов только на контрагентов',
-    'Address' => 'Адрес для документов',
-    'Document number to words type' => 'Тип перевода валюты для документов'
+    'Address' => 'Юр. адрес',
+    'Document number to words type' => 'Тип перевода валюты для документов',
+    'Ynp' => 'Унп',
+    'Mailing address' => 'Почтовый адрес',
+    'Telephone number' => 'Телефонный номер',
+    'Document site' => 'Сайт для документов',
+    'Document email' => 'Емаил для документов'
 ];

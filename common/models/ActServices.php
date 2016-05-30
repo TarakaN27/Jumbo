@@ -17,6 +17,7 @@ use Yii;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $job_description
+ * @property integer $ordering
  *
  * @property Services $service
  * @property Acts $act
@@ -38,7 +39,11 @@ class ActServices extends AbstractActiveRecord
     {
         return [
             [['act_id', 'service_id'], 'required'],
-            [['act_id', 'service_id', 'quantity', 'contract_date', 'created_at', 'updated_at'], 'integer'],
+            [[
+                'act_id', 'service_id',
+                'quantity', 'contract_date',
+                'created_at', 'updated_at','ordering'
+            ], 'integer'],
             [['amount'], 'number'],
             [['contract_number'], 'string', 'max' => 255],
             [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id']],
@@ -62,7 +67,8 @@ class ActServices extends AbstractActiveRecord
             'contract_number' => Yii::t('app/book', 'Contract Number'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
-            'job_description' => Yii::t('app/book', 'Job description')
+            'job_description' => Yii::t('app/book', 'Job description'),
+            'ordering' => Yii::t('app/book', 'Ordering')
         ];
     }
 

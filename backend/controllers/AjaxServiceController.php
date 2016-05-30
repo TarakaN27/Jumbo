@@ -21,6 +21,7 @@ use common\models\managers\ExchangeRatesManager;
 use common\models\managers\PaymentsManager;
 use common\models\Messages;
 use common\models\PartnerPurse;
+use common\models\ServiceDefaultContract;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -541,14 +542,26 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
         /** @var CuserServiceContract $obContract */
         $obContract = CuserServiceContract::find()->where(['service_id' => $iServId,'cuser_id' => $iCUser])->one();
-        if(!$obContract)
-            throw new NotFoundHttpException;
+        if(!$obContract) {
+            /** @var ServiceDefaultContract $obDefaultContract */
+            $obDefaultContract = ServiceDefaultContract::find()->where(['service_id' => $iServId,'lp_id' => $iLegalPerson])->one();
+            if(!$obDefaultContract)
+                throw new NotFoundHttpException('Contract number and contract date not found');
+            else
+            {
+                $contractDate = empty($obDefaultContract->cont_date) ? '' : Yii::$app->formatter->asDate($obDefaultContract->cont_date);
+                $contractNumber = $obDefaultContract->cont_number;
+            }
+        }else{
+            $contractDate = empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date);
+            $contractNumber = $obContract->cont_number;
+        }
         /** @var ActFieldTemplate $obActFieldTpl */
         $obActFieldTpl = ActFieldTemplate::find()->where(['service_id' => $iServId,'legal_id' => $iLegalPerson])->one();
 
         return [
-            'contractDate' => empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date),
-            'contractNumber' => $obContract->cont_number,
+            'contractDate' => $contractDate,
+            'contractNumber' => $contractNumber,
             'bTplFind' => !empty($obActFieldTpl),
             'job_description' => $obActFieldTpl ? $obActFieldTpl->job_name : ''
         ];

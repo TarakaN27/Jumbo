@@ -292,7 +292,8 @@ class ActForm extends Model
                 !isset($this->arServQuantity[$iServId]) ||
                 !isset($this->sContractNumber[$iServId]) ||
                 !isset($this->contractDate[$iServId]) ||
-                !isset($this->arTemplate[$iServId])
+                !isset($this->arTemplate[$iServId]) ||
+                !isset($this->arServOrder[$iServId])
             )
             {
                 throw new InvalidParamException();
@@ -305,6 +306,7 @@ class ActForm extends Model
             $obActServ->contract_number = $this->sContractNumber[$iServId];
             $obActServ->contract_date = strtotime($this->contractDate[$iServId]);
             $obActServ->job_description = $this->arTemplate[$iServId];
+            $obActServ->ordering = (int)$this->arServOrder[$iServId];
             if(!$obActServ->save())
                 throw new ServerErrorHttpException();
         }

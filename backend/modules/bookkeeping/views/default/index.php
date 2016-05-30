@@ -123,6 +123,27 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format'=>['decimal',Yii::$app->params['decimalRound']]
                             ],
                             [
+                                'label' => Yii::t('app/book','Payments acts amount'),
+                                'format' => 'raw',
+                                'value' => function($model) use ($arActs){
+                                    if($model->act_close)
+                                        $amount = 0;
+                                    else {
+                                        $amount = isset($arActs[$model->id]) ?
+                                            ((float)$model->pay_summ - (float)$arActs[$model->id]) :
+                                            $model->pay_summ;
+                                    }
+
+                                    return Html::tag(
+                                        'span',
+                                        Yii::$app->formatter->asDecimal($amount),
+                                        [
+                                            'class' => $amount > 0 ? 'warning-attention' : 'green'
+                                        ]
+                                        );
+                                }
+                            ],
+                            [
                                 'attribute' => 'currency_id',
                                 'value' => function($model){
                                         return is_object($cur = $model->currency) ? $cur->code : 'N/A';
