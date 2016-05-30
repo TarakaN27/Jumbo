@@ -221,20 +221,20 @@ class ActsDocumentsV2
 
         $this->amountInWords =
             $this->iCurrencyId == 2 ?
-                CustomHelper::numPropis($this->totalFiniteAmount).' белорусских '. CustomHelper::ciRub($this->totalFiniteAmount) :
+                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalFiniteAmount)).' белорусских '. CustomHelper::ciRub($this->totalFiniteAmount) :
             CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
 
         $strVatAmount = '';
         if($this->bUseVat)
         {
             $strVatAmount = $this->iCurrencyId == 2 ?
-                CustomHelper::numPropis($this->totalVatAmount).' белорусских '. CustomHelper::ciRub($this->totalVatAmount) :
+                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalVatAmount)).' белорусских '. CustomHelper::ciRub($this->totalVatAmount) :
                 CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
         }
 
         $this->vatInWords = $this->bUseVat ?
-            ', в т.ч.: НДС - '.$strVatAmount :
-            '. Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+            ' в т.ч.: НДС - '.$strVatAmount :
+            ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
 
         $this->totalAmount = round($this->totalAmount);
         /*
@@ -270,7 +270,7 @@ class ActsDocumentsV2
      */
     protected function generateName()
     {
-        return $this->fileName = 'act_'.$this->actDate;
+        return $this->fileName = 'Act_'.$this->actNumber.$this->iLegalPerson.$this->iCUserId.$this->actDate;
     }
 
     protected function getDocument()
@@ -367,7 +367,7 @@ class ActsDocumentsV2
         if(!$obAct)
             throw new NotFoundHttpException();
 
-        return $this->cuserContractDetail = $obAct->act_num.' от '.$obAct->act_date;
+        return $this->cuserContractDetail = $obAct->act_num.' от '.\Yii::$app->formatter->asDate($obAct->act_date);
     }
 
 }
