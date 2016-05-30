@@ -281,7 +281,7 @@ function createEntityServicesBlock(serviceID, amount) {
     div4.append(label4.html('Дата контракта'));
     div4.append(inputContractDate);
     li.append(div4);
-    div5.append(label4.html('Наименование работы (услуги)'));
+    div5.append(label5.html('Наименование работы (услуги)'));
     div5.append(inputTemplateField);
     li.append(div5);
     li.append(clearfix);
