@@ -460,7 +460,7 @@ function customValidateForm()
     $.each(arDates,function(index,value){
         let
            tmpD = $(value).val();
-        if(tmpD == undefined || tmpD == '')
+        if(tmpD == undefined || tmpD == '' || tmpD == 0)
         {
            bContractValid = false;
         }
@@ -489,7 +489,7 @@ function customValidateForm()
         let
             tmpN = $(value).val();
 
-        if(tmpN == undefined || tmpN == '')
+        if(tmpN == undefined || tmpN == '' || tmpN == 0)
         {
             bContractValid = false;
         }
