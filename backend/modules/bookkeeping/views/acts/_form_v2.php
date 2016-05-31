@@ -18,10 +18,13 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortab
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/array_diff.js',$this,[],'array_diff');
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/strtotime.js',$this,[],'strTotime');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/act_form_v2.js',$this,['html-sortable','array_diff','strTotime']);
+$this->registerJsFile('@web/js/moment.min.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
 $this->registerJs("
 var
     arCurrency = ".Json::encode(ExchangeRates::getExchangeRates()).",
     arServices = ".Json::encode(Services::getServicesMap()).",
+    URL_CHECK_CONTRACTOR_FIELDS = '".Url::to(['check-contractor-fields'])."',
     URL_CHECK_ACT_NUMBER = '".Url::to(['check-act-number'])."',
     URL_GET_NEXT_ACT_NUMBER = '".Url::to(['get-next-act-number'])."',
     URL_LOAD_CONTRACT_DETAIL = '".Url::to(['/ajax-service/find-contract-detail'])."';

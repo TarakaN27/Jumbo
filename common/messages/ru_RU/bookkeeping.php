@@ -233,5 +233,14 @@ return [
     'Create Act Field Template' => 'Добавить шаблон',
     'This template already exist' => 'Шаблон уже существует',
     'Update act field template' => 'Обновить шаблон',
-    'Payments acts amount' => 'Остаток к акту'
+    'Payments acts amount' => 'Остаток к акту',
+    'Not filled Company name' => 'Не заполнено название компании',
+    'Not filled Company site' => 'Не заполнен сайт компании',
+    'Not filled Company ynp' => 'Не заполнено унп компании',
+    'Not filled Company Ch Account' => 'Не заполнен расчетный счет компании',
+    'Not filled Company bank name' => 'Не заполнено название банка',
+    'Not filled Company bank address' => 'Не заполнен адрес банка',
+    'Not filled Company bank code' => 'Не заполнен код банка',
+    'Not filled Company j address' => 'Не заполнен юр. адрес',
+    'Not filled Company p address' => 'Не заполнен почтовый адрес'
 ];

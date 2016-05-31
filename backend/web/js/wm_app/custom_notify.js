@@ -84,8 +84,7 @@ $(function () {
             cnt++;
             CustomTabs(options);
         }
-    }
-
+    };
     CustomTabs = function (options) {
         $('.tabbed_notifications > div').hide();
         $('.tabbed_notifications > div:first-of-type').show();
@@ -101,7 +100,7 @@ $(function () {
             $(tabbed_notifications).children('div').hide();
             $(target).show();
         });
-    }
+    };
 
     CustomTabs();
 
@@ -166,4 +165,23 @@ function addTabledNotificationWarning(title,body)
 function addTabledNotificationInfo(title,body)
 {
     abstractTabletnotification(title,body,'info');
+}
+/**
+ * @param title
+ * @param errorText
+ */
+function addErrornotificationStickly(title,errorText) {
+    new PNotify({
+        title: title,
+        text: errorText,
+        type: "error",
+        hide: false
+    });
+}
+/**
+ * 
+ */
+function removeAllNotifications()
+{
+    PNotify.removeAll();
 }
