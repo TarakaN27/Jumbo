@@ -138,7 +138,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'span',
                                         Yii::$app->formatter->asDecimal($amount),
                                         [
-                                            'class' => $amount > 0 ? 'warning-attention' : 'green'
+                                            'class' => $amount > 0 ? 'yellow' : 'green'
                                         ]
                                         );
                                 }

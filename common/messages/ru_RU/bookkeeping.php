@@ -233,5 +233,5 @@ return [
     'Create Act Field Template' => 'Добавить шаблон',
     'This template already exist' => 'Шаблон уже существует',
     'Update act field template' => 'Обновить шаблон',
-    'Payments acts amount' => 'Остаток актирования платежей'
+    'Payments acts amount' => 'Остаток к акту'
 ];
