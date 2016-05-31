@@ -259,4 +259,56 @@ class ActsController extends AbstractBaseBackendController
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Acts::getNextActNumber($iLegalPerson);
     }
+
+    public function actionCheckContractorFields()
+    {
+        $iCUserId = Yii::$app->request->post('iCUserId');
+        if(!$iCUserId)
+            throw new InvalidParamException();
+        /** @var CUser $obCUser */
+        $obCUser = CUser::find()->joinWith('requisites')->where([CUser::tableName().'.id' => $iCUserId])->one();
+        if(!$obCUser)
+            throw new NotFoundHttpException();
+        $error = '';
+        $obRequisites = $obCUser->requisites;
+        if(empty($obCUser->getInfo()))
+        {
+            $error.=Yii::t('app/book','Not filled Company name');
+            $error.='<br>';
+        }
+
+        $error = $this->checkForError('site',$obRequisites,'Not filled Company site',$error);
+        $error = $this->checkForError('ynp',$obRequisites,'Not filled Company ynp',$error);
+        $error = $this->checkForError('ch_account',$obRequisites,'Not filled Company Ch Account',$error);
+        $error = $this->checkForError('b_name',$obRequisites,'Not filled Company bank name',$error);
+        $error = $this->checkForError('bank_address',$obRequisites,'Not filled Company bank address',$error);
+        $error = $this->checkForError('b_code',$obRequisites,'Not filled Company bank code',$error);
+        $error = $this->checkForError('j_address',$obRequisites,'Not filled Company j address',$error);
+        $error = $this->checkForError('p_address',$obRequisites,'Not filled Company p address',$error);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return [
+            'hasError' => !empty($error),
+            'corpName' => $obCUser->getInfo(),
+            'error' => $error
+        ];
+
+    }
+
+    /**
+     * @param $attribute
+     * @param $obRequisites
+     * @param $errorTest
+     * @param $error
+     * @return string
+     */
+    protected function checkForError($attribute,$obRequisites,$errorTest,$error)
+    {
+        if(!is_object($obRequisites) || (is_object($obRequisites) && (empty($obRequisites->$attribute) || $obRequisites->$attribute == '.')))
+        {
+            $error.=Yii::t('app/book',$errorTest);
+            $error.='<br>';
+        }
+        return $error;
+    }
 }

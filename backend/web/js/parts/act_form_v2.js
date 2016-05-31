@@ -143,7 +143,10 @@ function processFillService(value) {
         }
     }
 }
-
+/**
+ *
+ * @param value
+ */
 function processUnfillService(value) {
     let
         servID = $(value).attr('data-serv_id'),
@@ -161,7 +164,10 @@ function processUnfillService(value) {
         }
     }
 }
-
+/**
+ *
+ * @param arCurrID
+ */
 function fillCurrencyOption(arCurrID) {
     var
         arrOptions = [],
@@ -194,7 +200,10 @@ function fillCurrencyOption(arCurrID) {
         }
     }
 }
-
+/**
+ *
+ * @param selector
+ */
 function sortUpdateFunction(selector) {
     let
         arSort = selector.sortable("toArray");
@@ -204,7 +213,12 @@ function sortUpdateFunction(selector) {
         $('#' + tmpID + ' .service-order').val(k);
     }
 }
-
+/**
+ *
+ * @param serviceID
+ * @param amount
+ * @returns {jQuery|HTMLElement}
+ */
 function createEntityServicesBlock(serviceID, amount) {
     var
         inputServices = createElement('input', [
@@ -279,6 +293,7 @@ function createEntityServicesBlock(serviceID, amount) {
     div3.append(inputContractNumber);
     li.append(div3);
     div4.append(label4.html('Дата контракта'));
+    initDatePicker(inputContractDate);
     div4.append(inputContractDate);
     li.append(div4);
     div5.append(label5.html('Наименование работы (услуги)'));
@@ -287,9 +302,12 @@ function createEntityServicesBlock(serviceID, amount) {
     li.append(clearfix);
     return li;
 }
-
+/**
+ *
+ * @param serviceID
+ * @returns {*|string}
+ */
 function getContractDateAndContractNumber(serviceID) {
-    console.log('call');
     var
         legalPersonId = $('#actform-ilegalperson').val(),
         iCUserId = $('#actform-icuser').val();
@@ -306,7 +324,10 @@ function getContractDateAndContractNumber(serviceID) {
     }).responseText;
 }
 
-
+/**
+ *
+ * @returns {number}
+ */
 function getMaxServOrder() {
     let
         maxOrder = 0;
@@ -319,7 +340,12 @@ function getMaxServOrder() {
     });
     return maxOrder;
 }
-
+/**
+ *
+ * @param tagName
+ * @param attributes
+ * @returns {jQuery|HTMLElement}
+ */
 function createElement(tagName, attributes) {
     let
         element = $(document.createElement(tagName));
@@ -330,7 +356,9 @@ function createElement(tagName, attributes) {
     }
     return element;
 }
-
+/**
+ *
+ */
 function checkDate()
 {
     var 
@@ -360,7 +388,9 @@ function checkDate()
         }
     });
 }
-
+/**
+ *
+ */
 function recalculateActFullActAmount()
 {
     var
@@ -373,7 +403,9 @@ function recalculateActFullActAmount()
 
     $('#actform-famount').val(fAmount);
 }
-
+/**
+ * @returns {boolean}
+ */
 function customValidateForm()
 {
     if($('#paymentsBlock .cbPayment:checked').length <= 0)                      //check if selected payments
@@ -497,7 +529,9 @@ function customValidateForm()
 
     return true;
 }
-
+/**
+ * @returns {boolean}
+ */
 function checkActNumber()
 {
     var
@@ -530,7 +564,9 @@ function checkActNumber()
     }
     return false;
 }
-
+/**
+ *
+ */
 function getActsNumber()
 {
     var
@@ -558,7 +594,49 @@ function getActsNumber()
         });
     }
 }
-
+/**
+ * @returns {boolean}
+ */
+function checkContactor()
+{
+    var 
+        iCUserId = $('#actform-icuser').val();
+    removeAllNotifications();
+    if(customEmpty(iCUserId))
+        return false;
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: URL_CHECK_CONTRACTOR_FIELDS,
+        dataType: "json",
+        data: {iCUserId: iCUserId},
+        success: function (data) {
+            if(!customEmpty(data) && data.hasError)
+            {
+                addErrornotificationStickly(data.corpName,data.error);
+            }
+        },
+        error: function (msg) {
+            addErrorNotify('Проверка полей контрагента', 'Не удалось выполнить запрос!');
+            return false;
+        }
+    });
+}
+/**
+ * @param item
+ */
+function initDatePicker(item)
+{
+    item.daterangepicker({
+        singleDatePicker: true,
+        calender_style: "picker_2",
+        startDate : moment().startOf('day'),
+        locale :{
+            format: 'DD.MM.YYYY',
+            separator: '.',
+        }
+    });
+}
 $(function () {
     $('#actform-ilegalperson,#actform-icuser').on('change', loadPayments);
     $('#paymentsBlock').on('change', '.cbPayment', checkboxPaymentProcessed);
@@ -573,4 +651,5 @@ $(function () {
     sortList.on('change','.serv-amount',recalculateActFullActAmount);
     $(document).on("submit", "form#act-form", customValidateForm);
     $('#actform-ilegalperson').on('change',getActsNumber);
+    $('#actform-icuser').on('change',checkContactor);
 });
