@@ -55,7 +55,10 @@ class ActFieldTemplate extends AbstractActiveRecord
             if(self::find()->where(['service_id' => $this->service_id,'legal_id' => $this->legal_id])->exists())
                 $this->addError($attribute,Yii::t('app/book','This template already exist'));
         }else{
-            if($this->isAttributeChanged('service_id') || $this->isAttributeChanged('legal_id'))
+            if(
+                $this->service_id != $this->getOldAttribute('service_id') ||
+                $this->legal_id != $this->getOldAttribute('legal_id')
+            )
                 if(self::find()->where(['service_id' => $this->service_id,'legal_id' => $this->legal_id])->exists())
                     $this->addError($attribute,Yii::t('app/book','This template already exist'));
         }
