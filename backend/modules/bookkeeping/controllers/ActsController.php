@@ -6,6 +6,7 @@ use backend\modules\bookkeeping\form\ActForm;
 use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
 use common\components\helpers\CustomHelper;
+use common\models\ActImplicitPayment;
 use common\models\ActToPayments;
 use common\models\CUser;
 use common\models\CuserExternalAccount;
@@ -84,16 +85,27 @@ class ActsController extends AbstractBaseBackendController
     {
         $model = $this->findModel($id);
         $dataProvider = new ActiveDataProvider([
-            'query' => ActToPayments::find()->where(['act_id' => $model->id]),
+            'query' => ActToPayments::find()->joinWith('payment')->where(['act_id' => $model->id]),
             'pagination' => [
-                'defaultPageSize' => 20,
+                'defaultPageSize' => 1000,
+                'pageSizeLimit' => [1,1000]
+            ],
+        ]);
+        $dataProviderImplicid = new ActiveDataProvider([
+            'query' =>ActImplicitPayment::find()
+            ->joinWith('service')
+            ->where(['act_id' => $model->id]),
+            'pagination' => [
+                'defaultPageSize' => 1000,
                 'pageSizeLimit' => [1,1000]
             ],
         ]);
 
+
         return $this->render('view', [
             'model' => $model,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'dataProviderImplicid' => $dataProviderImplicid
         ]);
     }
 

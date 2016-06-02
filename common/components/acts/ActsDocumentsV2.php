@@ -314,6 +314,7 @@ class ActsDocumentsV2
             {
                 foreach ($value as $keyItem => $val)
                     $obDoc->setValue($keyItem.'#'.$iCounter,$val);
+                $iCounter++;
             }
             $obDoc->saveAs($realPath);
         }catch (Exception $e)

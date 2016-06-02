@@ -12,6 +12,7 @@ namespace backend\modules\bookkeeping\form;
 use common\components\acts\ActsDocumentsV2;
 use common\components\behavior\UploadBehavior;
 use common\components\helpers\CustomHelper;
+use common\models\ActImplicitPayment;
 use common\models\Acts;
 use common\models\ActServices;
 use common\models\ActToPayments;
@@ -164,6 +165,10 @@ class ActForm extends Model
             if(!$this->saveActsServices($obAct->id))
                 throw new ServerErrorHttpException();
 
+            if(!empty($this->arHidePayments))
+                if(!$this->saveImplicitPayments($obAct->id))
+                    throw new ServerErrorHttpException();
+
             if(!$this->bCustomAct)
             {
                 $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr);
@@ -313,6 +318,36 @@ class ActForm extends Model
     }
 
     /**
+     * @param $iActId
+     * @return int
+     * @throws \yii\db\Exception
+     */
+    protected function saveImplicitPayments($iActId)
+    {
+        $rows = [];
+        foreach ($this->arHidePayments as $iPayId => $arServices)
+        {
+            foreach ($arServices as $iServId => $amount)
+            {
+                $rows[] = [
+                    '',
+                    $iActId,
+                    $iPayId,
+                    $iServId,
+                    $amount,
+                    time(),
+                    time(),
+                ];
+            }
+        }
+        $obImplicit = new ActImplicitPayment();
+        //групповое добавление
+        return Yii::$app->db->createCommand()
+            ->batchInsert(ActImplicitPayment::tableName(), $obImplicit->attributes(), $rows)
+            ->execute();
+    }
+
+    /**
      * @param $actId
      * @return bool
      * @throws NotFoundHttpException
@@ -325,7 +360,7 @@ class ActForm extends Model
             $this->_customErrors [] = 'Не заданы платежи';
             throw new InvalidParamException();
         }
-        
+
         $arPayments = Payments::find()
             ->where([
                 'id' => $arPaymentsId,
@@ -338,12 +373,68 @@ class ActForm extends Model
         if(!$arPayments)
             throw new NotFoundHttpException();
 
+        $arImplicit = Payments::find()
+            ->where([
+                'id' => $arPaymentsId,
+                'currency_id' => $this->iCurr,
+                'act_close' => Payments::NO,
+                'hide_act_payment' => Payments::YES
+            ])
+            ->all();
+        
         $arPayments = CustomHelper::getMapArrayObjectByAttribute($arPayments,'service_id');
         $arActPayment = ActToPayments::getRecordsByPaymentsId($arPaymentsId);
         $arAmount = $this->arServAmount;
+        $arImplicitPost = $this->arHidePayments;
         $arIdsForClose = [];
 
-        foreach ($this->arServices as $iServId)
+
+        if(count($arImplicit) != 0)             //если есть неявные платежи
+        {
+            /** @var Payments $obImplicid */
+            foreach ($arImplicit as $obImplicid)    //перебираем выбранные неявные плтаежи
+            {
+                if(!isset($arImplicitPost[$obImplicid->id]))        //смотрим чтобы в POST были параметры по неявному платежу
+                {
+                    throw new NotFoundHttpException();              //нет -- обшибка
+                }else{
+                    $tmpAmount = 0;                                             //проверяем, чтобы в POST была расписана вся сумма неявного платежа
+                    foreach ($arImplicitPost[$obImplicid->id] as $amountItem)
+                        $tmpAmount+=$amountItem;
+
+                    if($tmpAmount != $obImplicid->pay_summ)
+                        throw new ServerErrorHttpException();
+
+                    $arServices = $arImplicitPost[$obImplicid->id];     //гасим по услугам
+
+                        foreach ($arServices as $iServId => $amount)    //проходим по услугам и сохраняем актирование частями
+                        {
+                            if($amount == 0 || empty($amount))
+                                continue;
+
+                            if(!isset($arAmount[$iServId]))
+                                throw new InvalidParamException();
+
+                            $tmpAmount = (float)$arAmount[$iServId];    //получаем текущее значение суммы по услуге
+
+                            if($tmpAmount < $amount)                    //если не хватает суммы у услуги для актирвоания, выкинем ошибку
+                                throw new InvalidParamException();
+
+                            $obActPay = new ActToPayments();            //сохраняем историю актирвоания по частям
+                            $obActPay->act_id = $actId;
+                            $obActPay->amount = $amount;
+                            $obActPay->payment_id = $obImplicid->id;
+                            if(!$obActPay->save())
+                                throw new ServerErrorHttpException();
+
+                            $arAmount[$iServId]-=(float)$amount;        //уменьшаем сумму по услуге
+                        }
+                    $arIdsForClose [] = $obImplicid->id;                //добавим id платежа в массив с закрытыми актами
+                }
+            }
+        }
+
+        foreach ($this->arServices as $iServId)                         //сохраняем все остальное
         {
             if(isset($arPayments[$iServId]) && isset($arAmount[$iServId]))
             {

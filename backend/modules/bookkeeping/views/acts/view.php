@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'attribute' => 'buser_id',
                                     'value' => ArrayHelper::getValue($model,'buser.fio')
                                 ],
-                                'amount',
+                                'amount:decimal',
                                 'act_date:date',
                                 'sent:boolean',
                                 'created_at:datetime',
@@ -70,10 +70,24 @@ $this->params['breadcrumbs'][] = $this->title;
                                     }
                                 ],
                                 'amount:decimal',
-                                'created_at:datetime'
+                                'created_at:datetime',
+                                'payment.hide_act_payment:boolean'
                             ]
                         ]);?>
-                        
+
+                    <?=Html::tag('h4',Yii::t('app/book','Act implicit payment detail'));?>
+                    <?=\yii\grid\GridView::widget([
+                        'dataProvider' => $dataProviderImplicid,
+                        'columns' => [
+                            'payment_id',
+                            [
+                                'attribute' => 'service_id',
+                                'value' => 'service.name'
+                            ],
+                            'amount:decimal',
+                        ]
+                    ])?>
+
 
                     <!--
                         @todo вынести в oтдельный виджет

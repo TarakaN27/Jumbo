@@ -383,7 +383,8 @@ function createEntityServicesBlock(serviceID, amount) {
             {name: 'name', value: 'ActForm[arServAmount][' + serviceID + ']'},
             {name: 'value', value: amount},
             {name: 'type', value: 'text'},
-            {name: 'class', value: 'form-control serv-amount'}
+            {name: 'class', value: 'form-control serv-amount'},
+            {name: 'data-serv-id',value:serviceID}
         ]),
         inputContractNumber = createElement('input', [
             {name: 'name', value: 'ActForm[sContractNumber][' + serviceID + ']'},
@@ -757,7 +758,78 @@ function customValidateForm()
         return false;
     }
 
-    return true;
+    //Валидируем неявные платежи
+    var
+        currId = $('#actform-icurr').val(),
+        $arHidePayments = $('#paymentsBlock input[data-hide="1"]:checked');
+    var
+        checkHidePayment = true;
+    if($arHidePayments.length > 0)
+    {
+        //провермяем вся ли сумма неявных платежей израсходована
+        $.each($arHidePayments,function(index,value){
+            let
+                iPCurr = $(value).attr('data-curr'),
+                iAmount = parseFloat($(value).attr('data-sum')),
+                iPayId = $(value).val();
+
+            if(iPCurr == currId)
+            {
+                let
+                    shareAmount = 0,
+                    arHidePay = $('#hidePaymentBlock #pay-id-'+iPayId+' .inputHidePayment');
+
+                $.each(arHidePay,function(ind,val){
+                    shareAmount+=parseFloat($(val).val());
+                });
+
+                if(shareAmount != iAmount)
+                {
+                    addErrorNotify('Сохрание акта', 'Неявные платежи. Неизрасходована вся сумма платежей');
+                    checkHidePayment = false;
+                }
+            }
+        });
+
+        let
+            arServAmount = new Array(),
+            arHInputs = $('#hidePaymentBlock .inputHidePayment');           //получаем инпуты неявных платежей
+
+        $.each(arHInputs,function(indx,item){
+            let
+                servId = $(item).attr('data-service'),
+                tmpAmount = parseFloat($(item).val());
+            if(arServAmount[servId] == undefined)
+            {
+                arServAmount[servId] = tmpAmount;
+            }else
+            {
+                arServAmount[servId] += tmpAmount;
+            }
+
+        });
+        arServAmount.forEach(function(item, i, arr) {
+
+            console.log('#servicesBlock input[data-serv-id="'+i+'"]');
+            let 
+                sAmount = $('#servicesBlock input[data-serv-id="'+i+'"]').val();
+            
+            if(sAmount == undefined)
+            {
+                addErrorNotify('Сохрание акта', 'Неявные платежи. Не удалось получить сумму по услуге');
+                checkHidePayment = false;
+            }
+            
+            sAmount = parseFloat(sAmount);
+            if(sAmount < item)
+            {
+                addErrorNotify('Сохрание акта', 'Неявные платежи. Сумма по услуге меньше, чем сумма неявного платежа по услуге');
+                checkHidePayment = false;
+            }
+        });
+    }
+
+    return checkHidePayment;
 }
 /**
  * Проверка номера акта
