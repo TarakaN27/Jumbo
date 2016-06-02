@@ -93,10 +93,11 @@ class DefaultController extends AbstractBaseBackendController
         $arActs = [];
         foreach ($arActsTmp as $key => $actTmp)
         {
-            if(isset($arActs[$key]))
-                $arActs[$key]+=(float)$actTmp->amount;
-            else
-                $arActs[$key]=(float)$actTmp->amount;
+            foreach ($actTmp as $item)
+                if(isset($arActs[$key]))
+                    $arActs[$key]+=(float)$item->amount;
+                else
+                    $arActs[$key]=(float)$item->amount;
         }
         
         return $this->render('index', [
