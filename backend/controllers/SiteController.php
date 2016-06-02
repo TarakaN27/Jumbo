@@ -116,9 +116,10 @@ class SiteController extends Controller
         $obRecurringTask = new RecurringTask(1465389820);
         $obRecurringTask->run();
         */
+        /*
         $obTaskStat = new ReportTaskUserStat();
         $obTaskStat->userInfoTaskLoadBalance();
-
+*/
         die;
     }
 

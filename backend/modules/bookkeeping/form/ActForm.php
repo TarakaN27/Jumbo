@@ -43,7 +43,8 @@ class ActForm extends Model
         $bCustomAct,            //Bool flag кастомный акт, без генерации
         $fCustomFileAct,        //Файл кастомного акта
         $sContractNumber,       //Номер Контракта
-        $contractDate;          //Дата контракта
+        $contractDate,          //Дата контракта
+        $arHidePayments;        //Неявные платежи
 
     protected
         $_customErrors = [];    //кастомные ошибки
@@ -66,7 +67,7 @@ class ActForm extends Model
                 return $model->bCustomAct;
             }],
             ['fAmount','number'],
-            [['arServAmount','arServOrder','arServQuantity','arPayment','arTemplate'],'safe']
+            [['arServAmount','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments'],'safe']
         ];
     }
 
@@ -84,7 +85,8 @@ class ActForm extends Model
             'fAmount' => Yii::t('app/book','Full amount'),
             'bCustomAct' => Yii::t('app/book','Custom act file'),
             'fCustomFileAct' => Yii::t('app/book','Custom file act'),
-            'arTemplate' => Yii::t('app/book','Template act field')
+            'arTemplate' => Yii::t('app/book','Template act field'),
+            'arHidePayments' => Yii::t('app/book','Payment hide block')
         ];
     }
 
@@ -118,7 +120,6 @@ class ActForm extends Model
     {
         return TRUE;
     }
-
 
     /**
      * @return bool
@@ -187,8 +188,6 @@ class ActForm extends Model
             return FALSE;
         }
     }
-
-
 
     /**
      * @return null
@@ -410,9 +409,4 @@ class ActForm extends Model
     {
         $this->$name = $value;
     }
-
-
-    
-
-
 }

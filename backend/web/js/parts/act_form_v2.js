@@ -2,6 +2,10 @@
  * Created by zhenya on 20.5.16.
  */
 "use strict";
+/**
+ * загурзка платежей для актов
+ * @returns {boolean}
+ */
 function loadPayments() {
     var
         container = $('#paymentsBlock'),
@@ -37,7 +41,10 @@ function loadPayments() {
     });
     return true;
 }
-
+/**
+ * Действия по чекбоксу
+ * @returns {boolean}
+ */
 function checkboxPaymentProcessed() {
     var
         currency = $('#actform-icurr'),
@@ -61,26 +68,121 @@ function checkboxPaymentProcessed() {
     if (arDiff.length || checkedCurrency.length == 0) {
         fillCurrencyOption(checkedCurrency);
     }
-    var
-        currencyId = parseInt($('#actform-icurr').val());
-    if (!$(this).prop('checked')) {
-        if (currencyId == parseInt($(this).attr('data-curr'))) {
-            processUnfillService(this);
-            let
-                fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val()) - parseFloat($(this).attr('data-sum')));
-        }
-    } else {
-        if (currencyId == parseInt($(this).attr('data-curr'))) {
-            processFillService(this);
-            let
-                fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val()) + parseFloat($(this).attr('data-sum')));
-        }
+    if($(this).attr('data-hide') == 1)
+    {
+        hiddenPaymentCheck(this);
+    }else{
+        addServiceBlock(this);
     }
+
     return false;
 }
+/**
+ * helper
+ * Действия по check/uncheck неявным платежам 
+ * @param this1
+ */
+function hiddenPaymentCheck(this1)
+{
+    if($(this1).prop('checked'))
+    {
+        addHiddenPaymentBlock(this1);
+    }else{
+        $.each($('#pay-id-'+$(this1).val()+' input.inputHidePayment'),function(index,value){
+            $(value).val(0);
+            $(value).trigger('change');
+        });
+        $('#pay-id-'+$(this1).val()).remove();
+    }
+}
 
+/**
+ * Добвление блока неявного платежа
+ * @param this1
+ */
+function addHiddenPaymentBlock(this1)
+{
+    var
+        currencyId = parseInt($('#actform-icurr').val());
+        if (currencyId == parseInt($(this1).attr('data-curr'))) {
+            var
+                ent = createHidePaymentEntity(
+                    $(this1).val(),
+                    '<h4 class="mrg-left-10">Платеж: ' + $(this1).val() + '. Услуга: ' + arServices[$(this1).attr('data-serv_id')] +
+                    ' <span id="aAmount-' + $(this1).val() + '">' + $(this1).attr('data-sum') + '</span>' +
+                    '</h4>',
+                    $(this1).attr('data-sum')
+                );
+            $('#hidePaymentBlock').append(ent);
+            recountHidePaymentAvailableAmount($(this1).val());
+        }
+}
+
+/**
+ * Перерасчет доступной суммы для определенного неявного платежа
+ * @param paymentId
+ * @returns {boolean}
+ */
+function recountHidePaymentAvailableAmount(paymentId)
+{
+    var
+        aAmountContainer = $('#aAmount-'+paymentId),
+        apAmount = $('#pay-id-'+paymentId).attr('data-amount');
+
+    if(customEmpty(apAmount))
+    {
+        aAmountContainer.html('undefined');
+        return false;
+    }
+
+    apAmount = parseFloat(apAmount);
+    $.each($('#pay-id-'+paymentId+' input.inputHidePayment'),function(index,value){
+        let
+            tmpA = parseFloat($(value).val());
+        apAmount-=tmpA;
+    });
+
+    aAmountContainer.html(apAmount);
+
+    if(apAmount == 0)
+    {
+        aAmountContainer.removeClass('warning');
+        aAmountContainer.addClass('green')
+    }else{
+        aAmountContainer.removeClass('green');
+        aAmountContainer.addClass('warning');
+    }
+    return apAmount;
+}
+/**
+ * @param this1
+ * @returns {boolean}
+ */
+function addServiceBlock(this1)
+{
+    var
+        currencyId = parseInt($('#actform-icurr').val());
+
+    if (!$(this1).prop('checked')) {
+        if (currencyId == parseInt($(this1).attr('data-curr'))) {
+            processUnfillService(this1);
+            let
+                fAmount = $('#actform-famount');
+            fAmount.val(parseFloat(fAmount.val()) - parseFloat($(this1).attr('data-sum')));
+        }
+    } else {
+        if (currencyId == parseInt($(this1).attr('data-curr'))) {
+            processFillService(this1);
+            let
+                fAmount = $('#actform-famount');
+            fAmount.val(parseFloat(fAmount.val()) + parseFloat($(this1).attr('data-sum')));
+        }
+    }
+    return true;
+}
+/**
+ * Действия при изменении валюты
+ */
 function changeCurrencyField() {
     var
         id = $(this).val();
@@ -89,12 +191,17 @@ function changeCurrencyField() {
         fillServices();
     }
 }
-
+/**
+ * Очистка значений услуг и неявных платежей
+ */
 function unfillServices() {
     $('#servicesBlock').html('');
+    $('#hidePaymentBlock').html('');
     $('#actform-famount').val(0);
 }
-
+/**
+ * Заполнение услуг и неявных платежей
+ */
 function fillServices() {
     var
         fAmount = $('#actform-famount'),
@@ -106,8 +213,13 @@ function fillServices() {
         if (parseInt($(value).attr('data-curr')) != currencyId || $(value).attr('data-curr') == '' || currencyId == 0) {
             //todo ????
         } else {
-            valAmount += parseFloat($(value).attr('data-sum'));
-            processFillService(value);
+            if($(value).attr('data-hide') == 1)
+            {
+                addHiddenPaymentBlock(value);
+            }else{
+                processFillService(value);
+                valAmount += parseFloat($(value).attr('data-sum'));
+            }
         }
     });
 
@@ -131,6 +243,9 @@ function processFillService(value) {
             contractDetail = $.parseJSON(getContractDateAndContractNumber(servID)),
             servBlock = createEntityServicesBlock(servID, $(value).attr('data-sum'));
         $('#servicesBlock').append(servBlock);
+
+        addServiceToHiddenPayment(servID);          //add input to hidden payment
+
         if (contractDetail.contractDate != undefined && contractDetail.contractNumber != undefined) {
             $('#servicesBlock #s' + servID + ' .contractDate').val(contractDetail.contractDate);
             $('#servicesBlock #s' + servID + ' .contractNumber').val(contractDetail.contractNumber);
@@ -143,8 +258,20 @@ function processFillService(value) {
         }
     }
 }
+
 /**
- *
+ * Добавление инпута новой услуги в блок неявного платежа
+ * @param serviceId
+ */
+function addServiceToHiddenPayment(serviceId)
+{
+    $.each($('#hidePaymentBlock li'),function(index,value){
+        $(value).append(hiddePaymentServiceInputBlockHelper(serviceId,$(value).attr('data-payment-id')));
+    });
+}
+
+/**
+ * Из услуги убираем платеж
  * @param value
  */
 function processUnfillService(value) {
@@ -159,13 +286,26 @@ function processUnfillService(value) {
         if (currAmount > 0) {
             containter.find('.serv-amount').val(currAmount);
         } else {
+            removeServiceInputFromHiddenPayment(servID);    //remove service block from hidden payment and recalculate available amount
             containter.remove();
             sortUpdateFunction($('#servicesBlock'));                //if remove block, we need update order
         }
     }
 }
 /**
- *
+ * Удаляем блок услуга в неявных платежах
+ * @param serviceId
+ */
+function removeServiceInputFromHiddenPayment(serviceId)
+{
+    $.each($('#hidePaymentBlock li'),function(index,value){
+        $(value).find('div[data-service="'+serviceId+'"]').remove();
+        recountHidePaymentAvailableAmount($(value).attr('data-payment-id'));
+    });
+}
+
+/**
+ * Заполняем валюты
  * @param arCurrID
  */
 function fillCurrencyOption(arCurrID) {
@@ -201,7 +341,7 @@ function fillCurrencyOption(arCurrID) {
     }
 }
 /**
- *
+ * Обновление инпутов порядка по событию перетаскивания
  * @param selector
  */
 function sortUpdateFunction(selector) {
@@ -214,7 +354,7 @@ function sortUpdateFunction(selector) {
     }
 }
 /**
- *
+ * Создание блока инпутов по услуге
  * @param serviceID
  * @param amount
  * @returns {jQuery|HTMLElement}
@@ -224,7 +364,8 @@ function createEntityServicesBlock(serviceID, amount) {
         inputServices = createElement('input', [
             {name: 'name', value: 'ActForm[arServices][]'},
             {name: 'value', value: serviceID},
-            {name: 'type', value: 'hidden'}
+            {name: 'type', value: 'hidden'},
+            {name: 'class', value: 'arServClass'}
         ]),
         inputOrder = createElement('input', [
             {name: 'name', value: 'ActForm[arServOrder][' + serviceID + ']'},
@@ -302,8 +443,96 @@ function createEntityServicesBlock(serviceID, amount) {
     li.append(clearfix);
     return li;
 }
+
 /**
- *
+ * Добавление нового неявного блока
+ * @param paymentIds
+ * @param mainLabel
+ * @param amount
+ * @returns {jQuery|HTMLElement}
+ */
+function createHidePaymentEntity(paymentIds,mainLabel,amount)
+{
+    var
+        arServicesChecked = $('.arServClass'),
+        liEntity = $('<li></li>',{
+            class:'block-hide-payment',
+            id:'pay-id-'+paymentIds,
+            html: mainLabel
+        });
+        liEntity.attr('data-amount',amount);
+        liEntity.attr('data-avalable-amount',amount);
+        liEntity.attr('data-payment-id',paymentIds);
+    if(arServicesChecked.length > 0)
+    {
+        $.each(arServicesChecked,function(index,value){
+            let
+                div = hiddePaymentServiceInputBlockHelper($(value).val(),paymentIds);
+            div.appendTo(liEntity);
+        });
+    }
+    return liEntity;
+}
+/**
+ * Получение сущности блока с услугами для неявных платежей
+ * @param serviceId
+ * @param paymentIds
+ * @returns {*|jQuery|HTMLElement}
+ */
+function hiddePaymentServiceInputBlockHelper(serviceId,paymentIds)
+{
+    var
+        div = $('<div></div>',{class: 'form-group'});
+    div.attr('data-service',serviceId);
+    $('<label></label>',{html:arServices[serviceId],class:'control-label col-md-3 col-sm-3 col-xs-12'}).appendTo(div);
+    $('<div></div>',{class:'col-md-6 col-sm-6 col-xs-12'}).html(
+        $('<input/>',{
+            name:'ActForm[arHidePayments]['+paymentIds+']['+serviceId+']',
+            class:'form-control inputHidePayment',
+            value: 0
+        })
+            .attr('data-service',serviceId)
+            .attr('data-old-amount',0)
+            .attr('data-payment-id',paymentIds)
+    ).appendTo(div);
+
+    return div;
+}
+
+/**
+ * Действия при изменении суммы по неявным патежам
+ * @returns {Number}
+ */
+function hideAmountProcess() {
+    var
+        obj = $(this);
+
+    var
+        oldAmount = parseFloat(obj.attr('data-old-amount')),
+        newAmount = parseFloat(obj.val()),
+        serviceId = obj.attr('data-service');
+
+    var
+        serviceAmount = $('input[name="ActForm[arServAmount]['+serviceId+']"]');
+
+    var
+        currAmount = parseFloat(serviceAmount.val());
+
+    currAmount-=oldAmount;
+    currAmount+=newAmount;
+
+    if(currAmount < 0)
+        currAmount = 0;
+
+    serviceAmount.val(currAmount);
+    serviceAmount.trigger('change');
+    obj.attr('data-old-amount',newAmount);
+    recountHidePaymentAvailableAmount(obj.attr('data-payment-id'));
+    return currAmount;
+}
+
+/**
+ * Получение номера контракта и даты контракта
  * @param serviceID
  * @returns {*|string}
  */
@@ -325,7 +554,7 @@ function getContractDateAndContractNumber(serviceID) {
 }
 
 /**
- *
+ * Получение максимального порядка для услуг
  * @returns {number}
  */
 function getMaxServOrder() {
@@ -341,7 +570,7 @@ function getMaxServOrder() {
     return maxOrder;
 }
 /**
- *
+ * Шаблон создания элемента
  * @param tagName
  * @param attributes
  * @returns {jQuery|HTMLElement}
@@ -357,7 +586,7 @@ function createElement(tagName, attributes) {
     return element;
 }
 /**
- *
+ * Проверка плтажей по датам
  */
 function checkDate()
 {
@@ -389,7 +618,7 @@ function checkDate()
     });
 }
 /**
- *
+ * Переасчет полной суммы акта по услугам
  */
 function recalculateActFullActAmount()
 {
@@ -404,6 +633,7 @@ function recalculateActFullActAmount()
     $('#actform-famount').val(fAmount);
 }
 /**
+ * Валидация формы перед сохранением
  * @returns {boolean}
  */
 function customValidateForm()
@@ -530,6 +760,7 @@ function customValidateForm()
     return true;
 }
 /**
+ * Проверка номера акта
  * @returns {boolean}
  */
 function checkActNumber()
@@ -565,7 +796,7 @@ function checkActNumber()
     return false;
 }
 /**
- *
+ * Получение номера акта
  */
 function getActsNumber()
 {
@@ -595,6 +826,7 @@ function getActsNumber()
     }
 }
 /**
+ * Проверка контрагента на заполенность необходимых полей
  * @returns {boolean}
  */
 function checkContactor()
@@ -623,6 +855,7 @@ function checkContactor()
     });
 }
 /**
+ * Инициализация datepicker
  * @param item
  */
 function initDatePicker(item)
@@ -633,10 +866,13 @@ function initDatePicker(item)
         startDate : moment().startOf('day'),
         locale :{
             format: 'DD.MM.YYYY',
-            separator: '.',
+            separator: '.'
         }
     });
 }
+/**
+ * Вешаем обработчики событий в document.ready
+ */
 $(function () {
     $('#actform-ilegalperson,#actform-icuser').on('change', loadPayments);
     $('#paymentsBlock').on('change', '.cbPayment', checkboxPaymentProcessed);
@@ -652,4 +888,5 @@ $(function () {
     $(document).on("submit", "form#act-form", customValidateForm);
     $('#actform-ilegalperson').on('change',getActsNumber);
     $('#actform-icuser').on('change',checkContactor);
+    $('#hidePaymentBlock').on('change','.inputHidePayment',hideAmountProcess);      //действие при изменении суммы у неявных платежей
 });

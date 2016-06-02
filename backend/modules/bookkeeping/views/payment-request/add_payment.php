@@ -486,6 +486,15 @@ $this->registerJs('
                                             'class' => 'form-control cond-class'
                                         ]) ?>
                                         <div class="row">
+                                        <div class="col-md-offset-2 pdd-left-5">
+                                            <div class="col-md-6">
+                                                <?= $form->field($m,"[{$i}]hide_act_payment")->checkbox()?>
+                                            </div>
+                                            <div class="col-md-6">
+                                            </div>
+                                        </div>
+                                            </div>
+                                        <div class="row">
                                             <div class="col-md-offset-2 pdd-left-5">
                                                 <?php if(Yii::$app->user->can('adminRights')):?>
                                                 <div class="col-md-6">

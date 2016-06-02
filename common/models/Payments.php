@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $prequest_id
  * @property string $payment_order
  * @property integer $act_close
+ * @property integer $hide_act_payment
  *
  * @property ExchangeRates $currency
  * @property CUser $cuser
@@ -36,7 +37,14 @@ class Payments extends AbstractActiveRecord
     CONST
         SCENARIO_ACT_CLOSE = 'act_closes';
 
+    CONST
+        WITHOUT_ENROLL = 0,
+        ENROLL_NO = 1,
+        ENROLL_YES = 2,
+        ENROLL_PART = 3;
+
     public
+        $enrollStatus = 0,
         $actAmount = 0,
         $isSale = false,
         $saleUser,
@@ -51,6 +59,19 @@ class Payments extends AbstractActiveRecord
     public static function tableName()
     {
         return '{{%payments}}';
+    }
+
+    /**
+     * @return array
+     */
+    public static function getEnrollStatusMap()
+    {
+        return [
+            self::WITHOUT_ENROLL => '-',
+            self::ENROLL_YES => Yii::t('app/book','Enroll yes'),
+            self::ENROLL_NO => Yii::t('app/book','Enroll no'),
+            self::ENROLL_PART => Yii::t('app/book','Enroll part')
+        ];
     }
 
     /**
@@ -71,7 +92,7 @@ class Payments extends AbstractActiveRecord
                 'created_at', 'updated_at',
                 'prequest_id','condition_id',
                 'updateWithNewCondition',
-                'act_close'
+                'act_close','hide_act_payment'
             ], 'integer'],
             [['pay_summ','customProd','actAmount'], 'number'],
             [['description'], 'string'],
@@ -124,7 +145,9 @@ class Payments extends AbstractActiveRecord
             'showAll' => Yii::t('app/book','Show all conditions'),
             'customProd' => Yii::t('app/book','Custom amount production'),
             'act_close' => Yii::t('app/book','Act close'),
-            'actAmount' => Yii::t('app/book','Act amount')
+            'actAmount' => Yii::t('app/book','Act amount'),
+            'hide_act_payment' => Yii::t('app/book','Hide payment at act'),
+            'enrollStatus' => Yii::t('app/book','Enrollment status')
         ];
     }
 
@@ -232,7 +255,13 @@ class Payments extends AbstractActiveRecord
             ->all();
     }
 
-
-
-
+    /**
+     * @return mixed|null
+     */
+    public function getEnrollStatusStr()
+    {
+        $arTmp = self::getEnrollStatusMap();
+        return isset($arTmp[$this->enrollStatus]) ? $arTmp[$this->enrollStatus] : NULL;
+    }
+    
 }

@@ -18,8 +18,8 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortab
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/array_diff.js',$this,[],'array_diff');
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/strtotime.js',$this,[],'strTotime');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/act_form_v2.js',$this,['html-sortable','array_diff','strTotime']);
-$this->registerJsFile('@web/js/moment.min.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
-$this->registerJsFile('@web/js/datepicker/daterangepicker.js',['depends' => ['yii\web\YiiAsset', 'yii\bootstrap\BootstrapAsset']]);
+CustomViewHelper::registerJsFileWithDependency('@web/js/moment.min.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/datepicker/daterangepicker.js',$this);
 $this->registerJs("
 var
     arCurrency = ".Json::encode(ExchangeRates::getExchangeRates()).",
@@ -81,25 +81,35 @@ var
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Payments block');?></label>
         <div class="col-md-6 col-sm-6 col-xs-12" >
-
             <div class="well" id="paymentsBlock">
-
             </div>
         </div>
     </div>
+
     <?=$form->field($model,'iCurr')->dropDownList([],[
         'prompt' => Yii::t('app/book','Choose exchange currency')
     ])?>
+
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Services');?></label>
         <div class="col-md-6 col-sm-6 col-xs-12" >
             <div class="well">
                 <ul class="ul-sortable" id="servicesBlock">
-
                 </ul>
             </div>
         </div>
     </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Payment hide block');?></label>
+        <div class="col-md-6 col-sm-6 col-xs-12" >
+            <div class="well">
+                <ul class="" id="hidePaymentBlock">
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="form-group">
         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3 col-sm-offset-3" >
             <?=$form->field($model,'bCustomAct')->checkbox();?>
@@ -115,5 +125,3 @@ var
 
     <?php \yii\bootstrap\ActiveForm::end();?>
 </div>
-
-

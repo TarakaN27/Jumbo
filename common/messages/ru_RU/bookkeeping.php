@@ -223,7 +223,7 @@ return [
     'Payments block' => 'Платежи',
     'Full amount' => 'Сумма акта',
     'Act close' => 'Актировано',
-    'Custom act file' => 'Кастомный файл акта(Акт не будет сгенерирован автоматически)',
+    'Custom act file' => 'Кастомный файл акта (Акт не будет сгенерирован автоматически)',
     'Custom file act' => 'Файл кастомного акта',
     'Act amount' => 'Сумма закрытая актами',
     'Act to payments details' => 'Детализация актирования платежей',
@@ -242,5 +242,12 @@ return [
     'Not filled Company bank address' => 'Не заполнен адрес банка',
     'Not filled Company bank code' => 'Не заполнен код банка',
     'Not filled Company j address' => 'Не заполнен юр. адрес',
-    'Not filled Company p address' => 'Не заполнен почтовый адрес'
+    'Not filled Company p address' => 'Не заполнен почтовый адрес',
+    'Hide payment at act' => 'Неявный платеж для акта',
+    'Payment hide block' => 'Неявные платежи',
+    'Services' => 'Услуги',
+    'Enrollment status' => 'Статус зачисления',
+    'Enroll yes' => 'Зачислено',
+    'Enroll no' => 'Не зачислено',
+    'Enroll part' => 'Зачислено частично'
 ];

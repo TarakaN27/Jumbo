@@ -12,6 +12,7 @@ namespace common\models\managers;
 use common\components\helpers\CustomHelper;
 use common\models\ActToPayments;
 use common\models\CuserToGroup;
+use common\models\EnrollmentRequest;
 use common\models\PaymentRequest;
 use common\models\Payments;
 use common\models\PaymentsSale;
@@ -142,7 +143,7 @@ class PaymentsManager extends Payments
 	public static function getPaymentsForAct($iCUser,$iLegalPerson)
 	{
 		$arPayments =  Payments::find()
-			->select(['cuser_id','pay_date','pay_summ','currency_id','service_id','legal_id','id'])
+			->select(['cuser_id','pay_date','pay_summ','currency_id','service_id','legal_id','id','payment_order','hide_act_payment'])
 			->where([
 				'cuser_id' => $iCUser,
 				'legal_id' => $iLegalPerson,
@@ -164,6 +165,50 @@ class PaymentsManager extends Payments
 						$obPay->actAmount+=$actPay->amount;
 				}
 			}
+
+		$arServices = ArrayHelper::getColumn($arPayments,'service_id');				//service ids
+		$arEnrollServ = ArrayHelper::getColumn(
+			Services::find()->select(['id','allow_enrollment'])->where(['id' => $arServices,'allow_enrollment' => Services::YES])->all(),
+			'id'
+		);
+
+		$arPayNeedCheck = [];				//платежи для проверки
+		foreach ($arPayments as $obPayTmp)
+			if($arEnrollServ && in_array($obPayTmp->service_id,$arEnrollServ))
+				$arPayNeedCheck[] = $obPayTmp->id;
+		$arPayNeedCheck = array_unique($arPayNeedCheck);
+		$arUnEnroll = [];
+		if($arPayNeedCheck)
+		{
+			$arUnEnroll = EnrollmentRequest::find()						//не зачисленные платежи.
+				->select(['id','payment_id','parent_id','status','part_enroll'])
+				->where([
+					'payment_id' => $arPayNeedCheck,
+					'status' => EnrollmentRequest::STATUS_NEW
+				])
+				->all();
+
+			$arUnEnroll = CustomHelper::getMapObjectByAttribute($arUnEnroll,'payment_id');
+		}
+		
+		/** @var Payments $pay */
+		foreach ($arPayments as &$pay)
+		{
+			if(in_array($pay->id,$arPayNeedCheck))
+			{
+				if(isset($arUnEnroll[$pay->id]))
+				{
+					$tmpEnroll = $arUnEnroll[$pay->id];
+					if(!empty($tmpEnroll->parent_id))
+						$pay->enrollStatus = Payments::ENROLL_PART;
+					else
+						$pay->enrollStatus = Payments::ENROLL_NO;
+				}else{
+					$pay->enrollStatus = Payments::ENROLL_YES;
+				}
+			}
+		}
+
 		return $arPayments;
 	}
 

@@ -25,13 +25,14 @@ class AddPaymentForm extends AbstractModel{
         $comment,
         $service,
         $condID,
+        $hide_act_payment,
         $summ;
 
     public function rules()
     {
         return [
             [['summ','service','condID'],'required'],
-            [['service','condID','condType','isSale','saleUser'], 'integer'],
+            [['service','condID','condType','isSale','saleUser','hide_act_payment'], 'integer'],
             [['summ','fullSumm','customProduction'], 'number'],
             [['comment'], 'string'],
 
@@ -59,6 +60,7 @@ class AddPaymentForm extends AbstractModel{
             'condType' => Yii::t('app/book','Condition type'),
             'isSale' => Yii::t('app/book','Is sale'),
             'saleUser' => Yii::t('app/book','Sale user'),
+            'hide_act_payment' => Yii::t('app/book','Hide payment at act')
         ];
     }
 
