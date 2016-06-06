@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\CrmTask;
 use yii\web\JsExpression;
-
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\CrmTaskSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -136,10 +136,21 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         ],
         [
             'attribute' => 'cmp_id',
+            'format' => 'raw',
             'value' => function($model){
 
+                return Html::a(
+                    ArrayHelper::getValue($model,'cmp.infoWithSite'),
+                    ['/crm/company/view','id' => $model->cmp_id],
+                    [
+                        'target' => '_blank'
+                    ]
+                    );
+
+                /*
                 $obCmp = $model->cmp;
                 return $obCmp ? $obCmp->getInfoWithSite() : NULL;
+                */
             },
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
@@ -329,10 +340,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         ],
         [
             'attribute' => 'cmp_id',
+            'format' => 'raw',
             'value' => function($model){
-
+                return Html::a(
+                    ArrayHelper::getValue($model,'cmp.infoWithSite'),
+                    ['/crm/company/view','id' => $model->cmp_id],
+                    [
+                        'target' => '_blank'
+                    ]
+                );
+                /*
                 $obCmp = $model->cmp;
                 return $obCmp ? $obCmp->getInfoWithSite() : NULL;
+                */
             },
             'filter' => \kartik\select2\Select2::widget([
                 'model' => $searchModel,
