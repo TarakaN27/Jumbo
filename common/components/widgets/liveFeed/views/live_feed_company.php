@@ -18,6 +18,9 @@ $this->registerJsFile(
 $this->registerJs("
 function initCmptasks()
 {
+
+$('.fake-datetimepicker').datetimepicker('remove');
+
 $('.editable').editable({
     clear: false,
     source: ".\yii\helpers\Json::encode(CrmTask::getStatusArr()).",
@@ -93,7 +96,13 @@ $('.fake-datetimepicker').datetimepicker({
         maxView: 3,
     	minuteStep: 30,
     	weekStart:1
-    }).on('changeDate', function(ev){
+    });
+};
+
+",\yii\web\View::POS_HEAD);
+
+$this->registerJs("
+$('.messages').on('changeDate','.fake-datetimepicker',function(ev){
 		var 
 			TimeZoned = new Date(ev.date.setTime(ev.date.getTime() + (ev.date.getTimezoneOffset() * 60000)));
 			
@@ -116,10 +125,7 @@ $('.fake-datetimepicker').datetimepicker({
             }
         });
 });
-
-};
-
-",\yii\web\View::POS_HEAD);
+")
 
 ?>
 
