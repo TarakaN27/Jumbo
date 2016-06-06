@@ -69,8 +69,7 @@ class LiveFeedCompanyWidget extends Widget
 			    DIALOG_ERROR_ADD_MESSAGE = "'. Yii::t('app/common', 'DIALOG_ERROR_ADD_MESSAGE') .'",
 			    DIALOG_ERROR_ADD_DIALOG = "'.Yii::t('app/crm','DIALOG_ERROR_ADD_DIALOG').'";
 		',$view::POS_BEGIN);
-
-
+		
 		LifeFeedCompanyAssets::register($view);
 		//вешаем события
 		$view->registerJs("

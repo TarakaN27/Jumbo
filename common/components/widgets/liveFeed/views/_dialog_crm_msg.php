@@ -7,6 +7,13 @@
  */
 use yii\bootstrap\Html;
 use vova07\imperavi\Widget as ImperaviWidget;
+use yii\helpers\ArrayHelper;
+use common\models\CrmTask;
+use common\components\helpers\CustomViewHelper;
+
+$this->registerJs("
+initCmptasks();
+",\yii\web\View::POS_READY);
 ?>
 <?foreach($models as $model):?>
 <li id="dialogBlockId_<?php echo $model->id;?>" class="<?php if(in_array($model->id,$arRedisDialog)):?>dialog-not-viewed<?php endif;?>">
@@ -19,6 +26,32 @@ use vova07\imperavi\Widget as ImperaviWidget;
 		<h4 class="heading"><?=is_object($obUser = $model->owner) ? $obUser->getFio() : $model->buser_id;?></h4>
 		<blockquote class="message">
 			<?=$model->theme;?>
+
+			<?php if(!empty($model->crm_task_id) && isset($isCmpList)):
+				$deadline = ArrayHelper::getValue($model,'tasks.deadline');
+				?>
+				<footer>
+					<span class="cmp-task-status">Статус:
+						<?php
+							echo Html::a(ArrayHelper::getValue($model,'tasks.statusStr'),'#',[
+								'class' => 'editable',
+								'data-value' => ArrayHelper::getValue($model,'tasks.status'),
+								'data-type' => "select",
+								'data-pk' => $model->crm_task_id,
+								'data-created_by' => ArrayHelper::getValue($model,'tasks.created_by'),
+								// 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+								'data-url' => \yii\helpers\Url::to(['/crm/task/update-status']),
+								'data-title' => Yii::t('app/common','change status')
+							]);
+						?>;
+					</span>
+					<span class="cmp-task-deadline">Крайний срок:
+						<span class="fake-editable fake-datetimepicker" data-pk="<?=$model->crm_task_id?>" data-date="<?php echo empty($deadline) ? '' : Yii::$app->formatter->asDatetime($deadline) ?>">
+							<?php
+						echo empty($deadline) ? '' : Yii::$app->formatter->asDatetime($deadline);
+						?></span>
+				</footer>
+			<?php endif;?>
 		</blockquote>
 		<br />
 		<p class="url">

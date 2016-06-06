@@ -5,7 +5,7 @@ return [
     'sourceLanguage' => 'en_US',
     'version' => '1.0',
     'name' => 'Jumbo webmart',
-    'timeZone'=> 'Europe/Minsk',
+    'timeZone'=> 'UTC',
     'components' => [
         'config' => [
             'class' => 'common\components\config\Config'

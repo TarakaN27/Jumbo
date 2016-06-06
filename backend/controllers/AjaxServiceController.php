@@ -59,7 +59,7 @@ class AjaxServiceController extends AbstractBaseBackendController{
                         'add-dialog' => ['post'],
                         'add-new-dialog' => ['post'],
                         'flush-notification' => ['post'],
-                        'load-exchange-rates' => ['post']
+                        'load-exchange-rates' => ['post'],
                     ],
                 ],
             ]
@@ -245,7 +245,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
                 'models' => $obDialogs->getModels(),
                 'pag' => $obDialogs->getPagination(),
                 'uniqStr' => $uniqStr,
-                'arRedisDialog' => $arRedisDialog
+                'arRedisDialog' => $arRedisDialog,
+                'isCmpList' => TRUE
             ]),
             'uniqueStr' => $uniqStr
         ];
@@ -565,5 +566,29 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'bTplFind' => !empty($obActFieldTpl),
             'job_description' => $obActFieldTpl ? $obActFieldTpl->job_name : ''
         ];
+    }
+
+    /**
+     * @return array|mixed
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionTaskDeadline()
+    {
+        $date = Yii::$app->request->post('date');
+        $pk = Yii::$app->request->post('pk');
+
+        if(empty($date) || empty($pk))
+            throw new InvalidParamException;
+
+        $obTask = CrmTask::findOne($pk);
+        if(!$obTask)
+            throw new NotFoundHttpException();
+
+        $obTask->deadline = $date;
+        if(!$obTask->save())
+            throw new ServerErrorHttpException;
+
+        return $obTask->deadline;
     }
 } 

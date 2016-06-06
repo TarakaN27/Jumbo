@@ -115,5 +115,6 @@ return [
     'BOOK_partner_withdrawal_b_request' => 'Партнер. Запрос на вывод средств',
     'Partner. Withdrawal request' => 'Партнер. Запрос на вывод средств.',
     'No entity values' => 'Дополнительных полей не найдено',
-    'Act fields template' => 'Акты. Шаблоны полей'
+    'Act fields template' => 'Акты. Шаблоны полей',
+    'Update task status' => 'Изменить статус задачи'
 ];

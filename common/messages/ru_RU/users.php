@@ -320,5 +320,8 @@ return [
     'Begin period' => 'Состояние на начало',
     'Current period' => 'Отчетный период',
     'Amount can not be more than available amount' => 'Сумма не может быть больше доступной для партнера',
-    'Multiple link' => 'Мульти добавление связей'
+    'Multiple link' => 'Мульти добавление связей',
+    'Change task status' => 'Изменить статус задачи',
+    'Change task deadline' => 'Изменить крайний срок'
+
 ];

@@ -85,6 +85,7 @@ function loadMoreCmp()
                 $('.msgBoxList').append(msg.content);
                 $("."+msg.uniqueStr+" textarea").redactor();
                 $("."+msg.uniqueStr).fadeOut(100);
+                initCmptasks();
             }else{
                 addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_LOAD_DIALOG);
                 return false;

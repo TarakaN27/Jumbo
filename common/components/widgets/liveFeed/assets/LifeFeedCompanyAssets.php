@@ -18,7 +18,8 @@ class LifeFeedCompanyAssets extends AssetBundle
 			'css/life_feed_company.css',
 		],
 		$js = [
-			'js/life_feed_company.js'
+			'js/life_feed_company.js',
+			'js/quick _buttons.js'
 		],
 		$depends = [
 			'yii\web\JqueryAsset',

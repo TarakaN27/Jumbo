@@ -319,4 +319,10 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     background-color: #E6E9ED;
 }
 .mrg-left-10{margin-left: 10px;}
+.fake-editable{
+    text-decoration: none;
+    border-bottom: dashed 1px #0088cc;
+    cursor: pointer;
+    color: #23527c;
+}
 

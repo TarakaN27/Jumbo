@@ -558,6 +558,41 @@ class CrmTask extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public function getAvailableStatusArr()
+    {
+        $arResult = [];
+        switch ($this->status)
+        {
+            case self::STATUS_OPENED:
+                $arResult [] = self::STATUS_IN_PROGRESS;
+                break;
+            case self::STATUS_IN_PROGRESS:
+                $arResult [] = self::STATUS_OPENED;
+                $arResult [] = self::STATUS_CLOSE;
+                break;
+            case self::STATUS_CLOSE:
+                $arResult [] = self::STATUS_OPENED;
+                break;
+            case self::STATUS_NEED_ACCEPT:
+                if($this->created_by == Yii::$app->user->id)
+                {
+                    $arResult [] = self::STATUS_OPENED;
+                    $arResult [] = self::STATUS_CLOSE;
+                }else{
+                    $arResult [] = self::STATUS_OPENED;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return $arResult;
+    }
+
+
+    /**
      * Сохраняем задчу
      * @param $iUserID
      * @return bool
