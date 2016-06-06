@@ -78,7 +78,8 @@ class CrmTask extends AbstractActiveRecord
         TYPE_TASK = 1,
         TYPE_MEETING = 2,
         TYPE_CALL = 3,
-        TYPE_OTHER =4;
+        TYPE_OTHER = 4,
+        TYPE_SEND_LETTER = 5;
 
     CONST
         EVENT_UPDATE_DIALOG = 'upd_dialog';
@@ -107,6 +108,7 @@ class CrmTask extends AbstractActiveRecord
             self::TYPE_TASK => Yii::t('app/crm','Task'),
             self::TYPE_CALL => Yii::t('app/crm','Call'),
             self::TYPE_MEETING => Yii::t('app/crm','Meeting'),
+            self::TYPE_SEND_LETTER => Yii::t('app/crm','Send letter'),
             self::TYPE_OTHER => Yii::t('app/crm','Other')
         ];
     }

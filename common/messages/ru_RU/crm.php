@@ -293,5 +293,6 @@ return [
 	'Recurring id' => 'Главная задача цепочки',
 	'The main task of the chain' => 'Главная задача цепочки',
 	'Recurring tasks' => 'Повторяющиеся задачи',
-	'Load more' => 'Показать еще'
+	'Load more' => 'Показать еще',
+	'Send letter' => 'Отправка письма'
 ];

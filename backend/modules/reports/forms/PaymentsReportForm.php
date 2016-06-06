@@ -542,7 +542,7 @@ class PaymentsReportForm extends Model{
 
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
                 //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,);
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date + 86400));
+                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date));
                 $objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getNumberFormat()->setFormatCode('DD.MM.YYYY');
 
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
