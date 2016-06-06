@@ -92,6 +92,7 @@ $('.fake-datetimepicker').datetimepicker({
         autoclose:true,
         maxView: 3,
     	minuteStep: 30,
+    	weekStart:1
     }).on('changeDate', function(ev){
 		var 
 			TimeZoned = new Date(ev.date.setTime(ev.date.getTime() + (ev.date.getTimezoneOffset() * 60000)));
