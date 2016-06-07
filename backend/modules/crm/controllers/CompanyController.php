@@ -219,7 +219,7 @@ class CompanyController extends AbstractBaseBackendController
 		$modelTask = new CrmTask();
 		//дефолтные состояния
 		$modelTask->created_by = $iUserID;  //кто создал задачу
-		$modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
+		//$modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
 		$modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
 		$modelTask->cmp_id = $id;   //вешаем компанию
 		$modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
@@ -316,7 +316,7 @@ class CompanyController extends AbstractBaseBackendController
 			25
 			);
 
-		$sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+		$sAssName = empty($modelTask->assigned_id) ? '' : BUser::findOne($modelTask->assigned_id)->getFio();
 
 		if(!empty($modelTask->contact_id))
 			$contactDesc = \common\models\CrmCmpContacts::findOne($modelTask->contact_id)->fio;

@@ -31,32 +31,53 @@ $this->registerJs('
         ],
     ]); ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'description')->widget(Imperavi::className(),[
-
-    ]) ?>
-
     <?= $form->field($model, 'type')->dropDownList(CrmTask::getTypeArr()) ?>
 
-    <?= $form->field($model, 'priority')->dropDownList(
-        CrmTask::getPriorityArr(),[
-            'prompt' => Yii::t('app/crm','Choose priority')
-        ]
-    ) ?>
+    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'description')->widget(Imperavi::className(),[]) ?>
 
     <?php
-        if(!isset($hideParent))
-        echo $form->field($model,'parent_id')->widget(\kartik\select2\Select2::className(),[
-                'initValueText' => $pTaskName, // set the initial display text
+        if($model->isNewRecord)
+            echo $form->field($model,'arrFiles')->widget(\common\components\multipleInput\MultipleInput::className(),[
+                'limit' => 4,
+                'columns' => [
+                    [
+                        'name'  => 'title',
+                        'title' => Yii::t('app/crm','File name'),
+                        'options' => [
+                            'class' => 'hide'
+                        ]
+                    ],
+
+                    [
+                        'name'  => 'fileInput',
+                        'enableError' => true,
+                        'type' => 'fileInput',
+                        'title' => Yii::t('app/crm','Src file'),
+                        'options' => [
+                            'class' => 'wm_border_none'
+                        ]
+                    ],
+
+                ]
+            ]);
+    ?>
+
+    <?= $form->field($model, 'priority')->dropDownList(CrmTask::getPriorityArr(),['prompt' => Yii::t('app/crm','Choose priority')]) ?>
+
+    <?php
+        if(!isset($hideCuser) && !isset($hideContact))
+            echo $form->field($model, 'cmp_id')->widget(\kartik\select2\Select2::className(),[
+                'initValueText' => $cuserDesc, // set the initial display text
                 'options' => [
-                    'placeholder' => Yii::t('app/crm','Search for a task ...')
+                    'placeholder' => Yii::t('app/crm','Search for a company ...')
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
                     'minimumInputLength' => 2,
                     'ajax' => [
-                        'url' => \yii\helpers\Url::to(['/ajax-select/get-parent-crm-task']),
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
                         'dataType' => 'json',
                         'data' => new JsExpression('function(params) { return {q:params.term}; }')
                     ],
@@ -64,9 +85,75 @@ $this->registerJs('
                     'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
                     'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
                 ],
-            ]
-        )
+            ])
+    ?>
 
+    <?= $form->field($model, 'assigned_id')->widget(\kartik\select2\Select2::className(),[
+        'initValueText' => $sAssName, // set the initial display text
+        'options' => [
+            'placeholder' => Yii::t('app/crm','Search for a users ...')
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'minimumInputLength' => 2,
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                'dataType' => 'json',
+                'data' => new JsExpression('function(params) { return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+            'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+            'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+        ],
+    ])
+    ?>
+
+    <?= $form->field($model, 'task_control',['template' => $fieldCheckBoxTmpl])->checkbox() ?>
+
+    <?php
+        echo    $form->field($model, 'arrAcc')->widget(\kartik\select2\Select2::className(),[
+                'initValueText' => $sAssName, // set the initial display text
+                'data' => $data,
+                'options' => [
+                    'placeholder' => Yii::t('app/crm','Search for a users ...'),
+                    'multiple' => true
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'minimumInputLength' => 2,
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                ],
+            ]);
+    ?>
+
+    <?php
+        echo    $form->field($model, 'arrWatch')->widget(\kartik\select2\Select2::className(),[
+                'initValueText' => '', // set the initial display text
+                'data' => $dataWatchers,
+                'options' => [
+                    'placeholder' => Yii::t('app/crm','Search for a users ...'),
+                    'multiple' => true
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'minimumInputLength' => 2,
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
+                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
+                ],
+            ]);
     ?>
 
     <div class = "form-group">
@@ -92,42 +179,18 @@ $this->registerJs('
         ]
     ]) ?>
 
-    <?= $form->field($model, 'task_control',['template' => $fieldCheckBoxTmpl])->checkbox() ?>
-
-    <?= $form->field($model, 'assigned_id')->widget(\kartik\select2\Select2::className(),[
-        'initValueText' => $sAssName, // set the initial display text
-        'options' => [
-            'placeholder' => Yii::t('app/crm','Search for a users ...')
-        ],
-        'pluginOptions' => [
-            'allowClear' => true,
-            'minimumInputLength' => 2,
-            'ajax' => [
-                'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
-                'dataType' => 'json',
-                'data' => new JsExpression('function(params) { return {q:params.term}; }')
-            ],
-            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-            'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-            'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-        ],
-    ])
-    ?>
-
     <?php
-        echo
-            $form->field($model, 'arrAcc')->widget(\kartik\select2\Select2::className(),[
-                'initValueText' => $sAssName, // set the initial display text
-                'data' => $data,
+        if(!isset($hideParent))
+        echo $form->field($model,'parent_id')->widget(\kartik\select2\Select2::className(),[
+                'initValueText' => $pTaskName, // set the initial display text
                 'options' => [
-                    'placeholder' => Yii::t('app/crm','Search for a users ...'),
-                    'multiple' => true
+                    'placeholder' => Yii::t('app/crm','Search for a task ...')
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
                     'minimumInputLength' => 2,
                     'ajax' => [
-                        'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
+                        'url' => \yii\helpers\Url::to(['/ajax-select/get-parent-crm-task']),
                         'dataType' => 'json',
                         'data' => new JsExpression('function(params) { return {q:params.term}; }')
                     ],
@@ -135,53 +198,9 @@ $this->registerJs('
                     'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
                     'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
                 ],
-            ]);
-    ?>
+            ]
+        )
 
-    <?php
-    echo
-    $form->field($model, 'arrWatch')->widget(\kartik\select2\Select2::className(),[
-        'initValueText' => '', // set the initial display text
-        'data' => $dataWatchers,
-        'options' => [
-            'placeholder' => Yii::t('app/crm','Search for a users ...'),
-            'multiple' => true
-        ],
-        'pluginOptions' => [
-            'allowClear' => true,
-            'minimumInputLength' => 2,
-            'ajax' => [
-                'url' => \yii\helpers\Url::to(['/ajax-select/get-b-user']),
-                'dataType' => 'json',
-                'data' => new JsExpression('function(params) { return {q:params.term}; }')
-            ],
-            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-            'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-            'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-        ],
-    ]);
-    ?>
-
-    <?php
-    if(!isset($hideCuser) && !isset($hideContact))
-        echo $form->field($model, 'cmp_id')->widget(\kartik\select2\Select2::className(),[
-            'initValueText' => $cuserDesc, // set the initial display text
-            'options' => [
-                'placeholder' => Yii::t('app/crm','Search for a company ...')
-            ],
-            'pluginOptions' => [
-                'allowClear' => true,
-                'minimumInputLength' => 2,
-                'ajax' => [
-                    'url' => \yii\helpers\Url::to(['/ajax-select/get-cmp']),
-                    'dataType' => 'json',
-                    'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                ],
-                'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-                'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-            ],
-        ])
     ?>
     <?php
     if(!isset($hideCuser)  && !isset($hideContact))
@@ -228,33 +247,6 @@ $this->registerJs('
                 */
             ]) ?>
     <?php ?>
-
-    <?php
-        if($model->isNewRecord)
-            echo $form->field($model,'arrFiles')->widget(\common\components\multipleInput\MultipleInput::className(),[
-                'limit' => 4,
-                'columns' => [
-                    [
-                        'name'  => 'title',
-                        'title' => Yii::t('app/crm','File name'),
-                        'options' => [
-                            'class' => 'hide'
-                        ]
-                    ],
-
-                    [
-                        'name'  => 'fileInput',
-                        'enableError' => true,
-                        'type' => 'fileInput',
-                        'title' => Yii::t('app/crm','Src file'),
-                        'options' => [
-                            'class' => 'wm_border_none'
-                        ]
-                    ],
-
-                ]
-            ]);
-    ?>
     
     <?php if(isset($obTaskRepeat)):?>
         <?=$this->render('part/_form_repeat_task',[

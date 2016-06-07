@@ -117,14 +117,14 @@ class ContactController extends AbstractBaseBackendController
         $modelTask = new CrmTask();
         //дефолтные состояния
         $modelTask->created_by = $iUserID;  //кто создал задачу
-        $modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
+        //$modelTask->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
         $modelTask->contact_id = $id;
         $modelTask->cmp_id = $model->cmp_id;
         $modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
         $modelTask->repeat_task = CrmTask::NO;
         $data = [];
-        $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+        $sAssName = empty($modelTask->assigned_id) ? '' : BUser::findOne($modelTask->assigned_id)->getFio();
 
         $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
         $obTaskRepeat->initForCreate();

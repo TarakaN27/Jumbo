@@ -152,7 +152,7 @@ class TaskController extends AbstractBaseBackendController
         $modelTask = new CrmTask();
         //дефолтные состояния
         $modelTask->created_by = Yii::$app->user->id;  //кто создал задачу
-        $modelTask->assigned_id = Yii::$app->user->id; //по умолчанию вешаем сами на себя
+        //$modelTask->assigned_id = Yii::$app->user->id; //по умолчанию вешаем сами на себя
         $modelTask->status = CrmTask::STATUS_OPENED; //статус. По умолчанию открыта
         $modelTask->cmp_id = $model->cmp_id;   //вешаем компанию
         $modelTask->contact_id = $model->contact_id; //вешаем конаткт
@@ -253,7 +253,7 @@ class TaskController extends AbstractBaseBackendController
 
         $obParent = $model->parent;
         $arChild = $model->childTask;
-        $sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
+        $sAssName = empty($modelTask->assigned_id) ? '' : BUser::findOne($modelTask->assigned_id)->getFio();
 
         $queryChild = CrmTask::find()
             ->alias('t')
@@ -460,7 +460,7 @@ class TaskController extends AbstractBaseBackendController
         $model->repeat_task = CrmTask::NO;      //set default value to NO
         //дефолтные состояния
         $model->created_by = $iUserID;  //кто создал задачу
-        $model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
+        //$model->assigned_id = $iUserID; //по умолчанию вешаем сами на себя
         $model->status = CrmTask::STATUS_OPENED; //статус
         $model->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
         $data = [];
@@ -484,7 +484,7 @@ class TaskController extends AbstractBaseBackendController
             }
         }
 
-        $sAssName = BUser::findOne($model->assigned_id)->getFio();
+        $sAssName = empty($model->assigned_id) ? '' : BUser::findOne($model->assigned_id)->getFio();
         if (!empty($model->cmp_id))
             $cuserDesc = \common\models\CUser::findOne($model->cmp_id)->getInfo();
         else
