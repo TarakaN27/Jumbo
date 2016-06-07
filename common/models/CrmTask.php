@@ -213,7 +213,16 @@ class CrmTask extends AbstractActiveRecord
             [['arrAcc','arrWatch'], 'each', 'rule' => ['integer']],
             //[['arrFiles'], 'file', 'skipOnEmpty' => false],
             ['parent_id','validateParent'],
-            ['repeat_task','default','value' => self::NO]
+            ['repeat_task','default','value' => self::NO],
+            ['deadline','required',
+                'when' => function($model){
+                    return in_array($model->type,[self::TYPE_MEETING,self::TYPE_CALL,self::TYPE_SEND_LETTER]);
+                },
+                'whenClient' => "function (attribute, value) {
+                    return jQuery.inArray(parseInt($('#crmtask-type').val()),[".self::TYPE_MEETING.",".self::TYPE_CALL.",".self::TYPE_SEND_LETTER."]) != -1
+                }",
+                'except' => 'changeStatus'
+            ],
         ];
     }
 
