@@ -7,6 +7,8 @@
  */
 use yii\helpers\Html;
 use yii\helpers\Url;
+use backend\models\BUser;
+use yii\helpers\Json;
 ?>
 <div class="project_detail">
 	<p class="title"><?= $contact->getAttributeLabel('phone'); ?></p>
@@ -55,15 +57,6 @@ use yii\helpers\Url;
 	</p>
 	<p class="title"><?= $contact->getAttributeLabel('assigned_at'); ?></p>
 	<p>
-		<?php echo Html::a(is_object($obAss = $contact->assignedAt) ? $obAss->getFio() : $contact->assigned_at,'#',[
-			'class' => 'editable',
-			'data-type' => "select",
-			'data-value' => $contact->assigned_at,
-			'data-source' => \yii\helpers\Json::encode(\backend\models\BUser::getListManagers()),
-			'data-pk' => $contact->id,
-			'data-name' => 'assigned_at',
-			'data-url' => Url::to(['edit-contacts']),
-			'data-title' => $contact->getAttributeLabel('description')
-		]) ?>
+		<?php echo is_object($obAss = $contact->assignedAt) ? $obAss->getFio() : $contact->assigned_at;?>
 	</p>
 </div>

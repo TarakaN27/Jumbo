@@ -443,12 +443,19 @@ $this->registerJs("
 								foreach($arContacts as $contact)
 								{
 									$arItem [] = [
-										'label' => $contact->fio.'('.$contact->post.')',
+										'label' => $contact->fio.'('.$contact->post.') '.Html::a(
+												'<i class="fa fa-pencil"></i>',
+												['/crm/contact/update','id' => $contact->id],
+												[
+													'class' => 'pull-right',
+													'target' => '_blank'
+												]),
 										'content'=>$this->render('_part_collapse_contact',['contact' => $contact])
 									];
 								}
 							?>
 							<?php echo CollapseWidget::widget([
+									'encodeLabels' => false,
 									'items' => $arItem
 								]);
 							?>
