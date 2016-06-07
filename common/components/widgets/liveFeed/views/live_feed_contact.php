@@ -55,7 +55,7 @@ use yii\bootstrap\Modal;
 			'models' => $obModels,
 			'pag' => $pagination,
 			'uniqStr' => 'dummy_'.$iCmpID,
-			'arRedisDialog' => $arRedisDialog
+			'arRedisDialog' => $arRedisDialog,
 		]) ?>
 	<?php else:?>
 	<p class="emptyDialog"><?php echo Yii::t('app/crm','No dialogs at feed')?>

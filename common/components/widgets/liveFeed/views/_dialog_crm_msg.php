@@ -10,7 +10,7 @@ use vova07\imperavi\Widget as ImperaviWidget;
 use yii\helpers\ArrayHelper;
 use common\models\CrmTask;
 use common\components\helpers\CustomViewHelper;
-
+if(isset($isCmpList))
 $this->registerJs("
 initCmptasks();
 ",\yii\web\View::POS_READY);
