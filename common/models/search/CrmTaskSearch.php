@@ -78,14 +78,14 @@ class CrmTaskSearch extends CrmTask
      *
      * @return ActiveDataProvider
      */
-    public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [],$cachePageSize = FALSE)
+    public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [],$cachePageSize = FALSE,$pageSize = NULL)
     {
         $query = CrmTask::find()->with('cmp','cmp.requisites');
         $query = $this->getAdditionQuery($query,$viewType);
         if(!is_null($addQuery)) //дополнительное условие
             $query->andWhere($addQuery,$addParams);
 
-        $defaultPageSize = Yii::$app->params['defaultPageSize'];
+        $defaultPageSize = is_null($pageSize) ? Yii::$app->params['defaultPageSize'] : (int)$pageSize;
 
         if($cachePageSize)
         {

@@ -310,7 +310,10 @@ class CompanyController extends AbstractBaseBackendController
 		$dataProviderTask = $obCrmTaskSearch->search(
 			Yii::$app->request->queryParams,
 			CrmTaskSearch::VIEW_TYPE_FULL_TASK_AND_OWNER,
-			['cmp_id' => $model->id]
+			['cmp_id' => $model->id],
+			[],
+			FALSE,
+			25
 			);
 
 		$sAssName = BUser::findOne($modelTask->assigned_id)->getFio();
