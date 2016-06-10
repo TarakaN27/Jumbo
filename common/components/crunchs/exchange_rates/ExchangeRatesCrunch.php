@@ -69,6 +69,7 @@ class ExchangeRatesCrunch
 
         foreach ($arCurrency as $obCurr)
         {
+            sleep(2);
             if($obCurr->use_base || $obCurr->use_exchanger)
                 continue;
             if($obCurr->nbrb != 0) {
