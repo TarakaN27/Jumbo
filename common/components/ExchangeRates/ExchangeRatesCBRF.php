@@ -39,7 +39,7 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
             }
             foreach($sxml->Valute as $ar) {
                 if($ar->NumCode == $this->codeID)
-                    return  round($this->convertValue($ar->Value)/$ar->Nominal,4);
+                    return  round($this->convertValue($ar->Value)/$ar->Nominal,6);
             }
             return NULL;
         }catch (\Exception $e)

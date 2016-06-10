@@ -5,6 +5,7 @@ namespace common\models;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%exchange_currency_history}}".
@@ -128,4 +129,32 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
 
         return $returnValue;
     }
+
+    /**
+     * @param $beginDate
+     * @param $endDate
+     * @param array $arCurIds
+     * @return array
+     */
+    public static function getCurrencyInByrForPeriod($beginDate,$endDate,array $arCurIds)
+    {
+        $beginDate = date('Y-m-d',$beginDate);
+        $endDate = date('Y-m-d',$endDate);
+
+        $arItems = self::find()
+            ->select(['id','currency_id','date','rate_nbrb'])
+            ->where(['currency_id' => $arCurIds])
+            ->andWhere(['between', 'date', $beginDate, $endDate])
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+
+        $arItems = ArrayHelper::index($arItems,'date',['currency_id']);
+
+        foreach ($arItems as &$item)
+            foreach ($item as &$it)
+                $it = (float)$it->rate_nbrb;
+
+        return $arItems;
+    }
+
 }

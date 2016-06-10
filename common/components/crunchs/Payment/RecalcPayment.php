@@ -16,6 +16,10 @@ use common\models\ExchangeCurrencyHistory;
 use common\models\PaymentCondition;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
+use Faker\Provider\Payment;
+use yii\base\Exception;
+use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class RecalcPayment
@@ -296,6 +300,73 @@ class RecalcPayment
 
 		echo 'done';
 		return true;
+	}
 
+	/**
+	 * @return bool
+	 * @throws NotFoundHttpException
+	 * @throws ServerErrorHttpException
+	 */
+	public function recalculatePayments()
+	{
+		$beginDate = strtotime('2016-05-01 00:00:00');
+		$endDate = strtotime('2016-05-31 23:59:59');
+
+		$arPayments = Payments::find()
+			->where(['currency_id' => [1,3,11]])
+			->andWhere(['between', 'pay_date', $beginDate, $endDate])
+			->all();
+		
+		$arPayCalc = PaymentsCalculations::find()
+			->where(['id' => ArrayHelper::getColumn($arPayments,'id')])
+			->all();
+
+		$arConds = PaymentCondition::find()
+			->where(['id' => array_unique(ArrayHelper::getColumn($arPayCalc,'pay_cond_id'))])
+			->select(['type','id'])
+			->indexBy('id')
+			->column();
+
+		$arPayCalc = ArrayHelper::index($arPayCalc,'payment_id');
+
+		$arCurrHist = ExchangeCurrencyHistory::getCurrencyInByrForPeriod($beginDate,$endDate,[1,3,11]);
+		$tr = \Yii::$app->db->beginTransaction();
+		try {
+			foreach ($arPayments as $obPay) {
+				if (!isset($arPayCalc[$obPay->id]))
+					throw new NotFoundHttpException();
+				/** @var PaymentsCalculations $obCalc */
+				$obCalc = $arPayCalc[$obPay->id];
+
+				if (!isset($arCurrHist[$obPay->currency_id], $arCurrHist[$obPay->currency_id][date('Y-m-d', $obPay->pay_date)]))
+					throw new NotFoundHttpException();
+
+				if (!array_key_exists($obCalc->pay_cond_id,$arConds))
+					throw new NotFoundHttpException();
+
+				$iCurr = (float)$arCurrHist[$obPay->currency_id][date('Y-m-d', $obPay->pay_date)];
+
+				$amount = $iCurr * (float)$obPay->pay_summ;
+
+				$condType = $arConds[$obCalc->pay_cond_id];
+
+				$obOperations = new PaymentOperations($amount, $obCalc->cnd_tax, $obCalc->cnd_commission, $obCalc->cnd_corr_factor, $obCalc->cnd_sale, $condType, 0);
+				$obOperations = $obOperations->getFullCalculate();
+
+				$obCalc->tax = $obOperations['tax'];
+				$obCalc->profit = $obOperations['profit'];
+				$obCalc->production = $obOperations['production'];
+
+				if (!$obCalc->save())
+					throw new ServerErrorHttpException();
+
+			}
+			$tr->commit();
+		}catch (Exception $e)
+		{
+			$tr->rollBack();
+			return false;
+		}
+		return true;
 	}
 }

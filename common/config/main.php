@@ -5,7 +5,7 @@ return [
     'sourceLanguage' => 'en_US',
     'version' => '1.0',
     'name' => 'Jumbo webmart',
-    'timeZone'=> 'UTC',
+    'timeZone'=> 'Europe/Minsk',
     'components' => [
         'config' => [
             'class' => 'common\components\config\Config'
@@ -44,6 +44,8 @@ return [
             'datetimeFormat' => 'php:d.m.Y H:i',
             'thousandSeparator' => ' ',
             'decimalSeparator' => '.',
+            'timeZone' => 'Europe/Minsk',
+            'defaultTimeZone' => 'Europe/Minsk'
         ],
     ],
 ];

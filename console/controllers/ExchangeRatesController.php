@@ -14,6 +14,7 @@ use common\components\ExchangeRates\ExchangeRatesObmennikBY;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use console\components\AbstractConsoleController;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 class ExchangeRatesController extends AbstractConsoleController{
@@ -178,4 +179,52 @@ class ExchangeRatesController extends AbstractConsoleController{
 
         return self::EXIT_CODE_NORMAL;
     }
+
+    public function actionRecoveryExchangeRates()
+    {
+        $beginDate = '2016-01-01';                  //дата с которой начинаем восстановление
+        $endDate = '2016-06-08';                    //дата на которой заканчиваем восстановление
+        $arRowsForInsert = [];                      //массив с строками для вставки в базу данных
+
+        /** @var ExchangeRates $arCurrency */
+        $arCurrency = ExchangeRates::find()->where(['need_upd' => ExchangeRates::YES])->all();  //массив с валютами для обновления
+        if(empty($arCurrency))
+            return $this->log(TRUE);
+
+        $arCurrencyHistoryTmp = ExchangeCurrencyHistory::find()                        //история обновления валют
+            ->where(['currency_id' => ArrayHelper::getColumn($arCurrency,'id')])
+            ->andWhere(['between', 'date', $beginDate, $endDate])
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+
+        $arCurrHist = [];
+
+        foreach ($arCurrencyHistoryTmp as $currTmp)
+        {
+            $arCurrHist[$currTmp->date][] = $currTmp;
+        }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
 }

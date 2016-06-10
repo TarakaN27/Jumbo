@@ -6,14 +6,17 @@ use common\components\anubis\Anubis;
 use common\components\crunchs\bonus\ImportSale;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
+use common\components\crunchs\exchange_rates\ExchangeRatesCrunch;
 use common\components\crunchs\Payment\RecalcPayment;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\crunchs\task\ReportTaskUserStat;
+use common\components\ExchangeRates\ExchangeRatesNBRB;
 use common\components\helpers\CustomHelper;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
 use common\components\tasks\RecurringTask;
 use common\models\BuserInviteCode;
+use common\models\ExchangeCurrencyHistory;
 use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
@@ -119,7 +122,28 @@ class SiteController extends Controller
         /*
         $obTaskStat = new ReportTaskUserStat();
         $obTaskStat->userInfoTaskLoadBalance();
-*/
+        */
+
+        /*
+         * //восстановление курсов валют по датам
+        $ob = new ExchangeRatesCrunch();
+        $ob->RecoveryExchangeRates('2016-01-01','2016-06-10');
+        */
+
+        //$ob = new ExchangeCurrencyHistory();
+        //$ob->getCurrencyInByrForPeriod(strtotime('2016-01-01'),strtotime('2016-06-08'),[1,3]);
+
+
+        /*
+        $obCurr = new ExchangeRatesNBRB();
+        $obCurr->getCurrencyRateByPeriod(145,strtotime('2016-01-01'),strtotime('2016-06-08'));
+        */
+
+        /*
+        // перерасчет платежей по правильному курсу валют
+        $obPayRcl = new RecalcPayment();
+        $obPayRcl->recalculatePayments();
+        */
         die;
     }
 

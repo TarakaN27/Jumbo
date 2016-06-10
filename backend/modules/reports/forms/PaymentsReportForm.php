@@ -25,6 +25,8 @@ use yii\base\Model;
 use Yii;
 use common\models\PaymentsCalculations;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 class PaymentsReportForm extends Model{
 
@@ -218,12 +220,21 @@ class PaymentsReportForm extends Model{
         $totalGroupTax = [];
         $totalGroupProd = [];
 
+        // курсы обмена валют за период
+        $obECH = new ExchangeCurrencyHistory();
+        $arCurrIds = array_unique(ArrayHelper::getColumn($data,'currency_id'));
+        if(!empty($arCurrIds))
+            $arCurrInBur = $obECH->getCurrencyInByrForPeriod(strtotime($this->dateFrom),strtotime($this->dateTo),$arCurrIds);
+        else
+            $arCurrInBur = [];
+
         /** @var Payments $dt */
         foreach($data as $dt)
         {
             $date = date('Y-m-d',$dt->pay_date);
             $iCurr = 0;
 
+            /*
             if(isset($arCurr[$date]) && isset($arCurr[$date][$dt->currency_id]))
             {
                 $iCurr = $arCurr[$date][$dt->currency_id];
@@ -231,6 +242,13 @@ class PaymentsReportForm extends Model{
                 $iCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$dt->currency_id);
                 $arCurr[$date][$dt->currency_id] = $iCurr;
             }
+            */
+            if(!isset($arCurrInBur[$dt->currency_id],$arCurrInBur[$dt->currency_id][$date]))
+                throw new NotFoundHttpException('Exchange rate for currency '.$dt->currency_id.' at  '.$date.' not found.');
+
+            $iCurr = $arCurrInBur[$dt->currency_id][$date];
+
+
             $iCondCurr = 0;
             if(is_object($calc=$dt->calculate) && is_object($cond = $calc->payCond))
             {
@@ -542,7 +560,7 @@ class PaymentsReportForm extends Model{
 
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
                 //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,);
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date));
+                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date+86400));
                 $objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getNumberFormat()->setFormatCode('DD.MM.YYYY');
 
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
