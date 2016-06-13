@@ -9,7 +9,11 @@ use common\models\Payments;
 ?>
 <?=common\components\customComponents\gridView\CustomGridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'allModels' => $arPayments
+        'allModels' => $arPayments,
+        'pagination' => [
+            'defaultPageSize' => 1000,
+            'pageSizeLimit' => [1,1000]
+        ],
     ]),
     'addTrClass' => function(Payments $model){
         return $model->hide_act_payment ? 'act-hide-payment' : '';
