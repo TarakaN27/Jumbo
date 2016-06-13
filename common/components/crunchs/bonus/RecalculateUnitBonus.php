@@ -41,6 +41,9 @@ class RecalculateUnitBonus
 				->where(['r.id' => $model->prequest_id])
 				->one();
 
+			if($obManager->id != 50)
+				continue;
+
 			if(!$obManager || $obManager->allow_unit != AbstractActiveRecord::YES)  //проверяем нашли ли менеджера и разрешено ли менеджеру накапливать Units
 				continue;
 

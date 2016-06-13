@@ -99,10 +99,12 @@ class SiteController extends Controller
         */
 
         //перерасчет юнитов
-        /*
-        $obUnit = new RecalculateUnitBonus();
-        $obUnit->run();
-        */
+
+        //$obUnit = new RecalculateUnitBonus();
+        //$obUnit->run();
+
+        $obBonus = new RecalculateBonus();
+        $obBonus->run();
 
 
         //перерассчет бонусов

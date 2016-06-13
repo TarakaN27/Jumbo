@@ -305,6 +305,10 @@ class PaymentBonusBehavior extends Behavior
 			$saleUser = $model->saleUser;
 		}
 
+		if($saleUser != 50)
+			return true;
+
+
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);	//схемы искллючения для пользователя
 		if($paymentBase == BonusScheme::BASE_SALE)
 			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
@@ -456,7 +460,8 @@ class PaymentBonusBehavior extends Behavior
 			else
 				$saleUser = $obSale->buser_id;
 		}
-		
+		if($saleUser != 50)
+			return true;
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
 		if($paymentBase == BonusScheme::BASE_SALE)
 			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
