@@ -395,6 +395,7 @@ class CompanyController extends AbstractBaseBackendController
 		if(!$model)
 			throw new NotFoundHttpException();
 
+		$model->setScenario(CUser::SCENARIO_ARCHIVE);
 		$model->archive = $model->archive == CUser::ARCHIVE_YES ? CUser::ARCHIVE_NO : CUser::ARCHIVE_YES;
 		if($model->save()) {
 			$str = $model->archive == CUser::ARCHIVE_YES ?

@@ -60,6 +60,7 @@ class CUser extends AbstractUser
         IS_CLOSED = 0,
         RESIDENT_YES = 1,
         RESIDENT_NO = 0,
+        SCENARIO_ARCHIVE = 'archive',
         SCENARIO_REGISTER = 'register',
         SCENARIO_CHANGE_ASSIGNE = 'change_assigne';
 
@@ -230,7 +231,7 @@ class CUser extends AbstractUser
                         }
                         return true;
                     }",
-                'except' => self::SCENARIO_CHANGE_ASSIGNE
+                'except' => [self::SCENARIO_CHANGE_ASSIGNE,self::SCENARIO_ARCHIVE]
             ],
 
 
@@ -264,7 +265,7 @@ class CUser extends AbstractUser
                         }
                         return true;
                     }",
-                'except' => self::SCENARIO_CHANGE_ASSIGNE
+                'except' => [self::SCENARIO_CHANGE_ASSIGNE,self::SCENARIO_ARCHIVE]
             ],
 
             ['allow_expense','default','value' => AbstractActiveRecord::NO],
