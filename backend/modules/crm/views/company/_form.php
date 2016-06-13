@@ -76,6 +76,7 @@ function blockRequisitesTypes(){
             regPersonInfo.show();
             bankRequisites.show();
             pAddress.show();
+            jAddress.show();
             contactInfo.show();
             break;
         default:
