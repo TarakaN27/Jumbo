@@ -588,6 +588,10 @@ class PaymentBonusBehavior extends Behavior
 	 */
 	protected function addBonus($iUserID,$iPaymentID,$iSchemeID,$iServiceID,$iCuserID,$amount)
 	{
+		if(BUserBonus::find()->where(['buser_id' => $iUserID,'payment_id' => $iPaymentID])->exists())
+			return true;
+
+
 		$obBonus = new BUserBonus();
 		$obBonus->amount = $amount;
 		$obBonus->buser_id = $iUserID;
