@@ -12,6 +12,7 @@ use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\crunchs\task\ReportTaskUserStat;
 use common\components\ExchangeRates\ExchangeRatesNBRB;
 use common\components\helpers\CustomHelper;
+use common\components\infoHelpers\ManagersInfo;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
 use common\components\tasks\RecurringTask;

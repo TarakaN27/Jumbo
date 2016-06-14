@@ -288,7 +288,7 @@ class PartnerPercentCounting
     protected function countPercent($arLeads,$arPayments,$percent,$obScheme,$partner)
     {
         $cuserIDs =  array_unique(ArrayHelper::getColumn($arLeads,'cuser_id'));
-        $arCuserResident = ArrayHelper::map(Cuser::find()->select(['id','is_resident'])->where(['id' => $cuserIDs])->all(),'id','is_resident');
+        $arCuserResident = ArrayHelper::map(CUser::find()->select(['id','is_resident'])->where(['id' => $cuserIDs])->all(),'id','is_resident');
         $obPurse = PartnerPurse::find()->where(['cuser_id' => $partner->id])->one();
         if(empty($obPurse))
             $obPurse = new PartnerPurse(['cuser_id' => $partner->id]);
