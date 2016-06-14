@@ -41,6 +41,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'attribute' => 'currency_id',
                                     'value' => is_object($obCurr = $model->currency) ? $obCurr->code : NULL
                                 ],
+                                [
+                                    'attribute' => 'turnover_type',
+                                    'value' => $model->getTurnoverTypeStr()
+                                ],
+                                [
+                                    'attribute' => 'counting_base',
+                                    'value' => $model->getCountingBaseStr()
+                                ],
                                 'created_at:datetime',
                                 'updated_at:datetime',
                             ],

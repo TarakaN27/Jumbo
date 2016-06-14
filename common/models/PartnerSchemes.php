@@ -17,12 +17,22 @@ use yii\helpers\ArrayHelper;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $currency_id
+ * @property integer $turnover_type
+ * @property integer $counting_base
  *
  * @property CUser[] $cUsers
  * @property PartnerSchemesServices[] $partnerSchemesServices
  */
 class PartnerSchemes extends AbstractActiveRecord
 {
+    CONST
+        TURNOVER_TYPE_MONTH = 0,
+        TURNOVER_TYPE_YEAR = 1;
+
+    CONST
+        COUNTING_BASE_PAYMENT = 0,
+        COUNTING_BASE_ENROLL = 1;
+    
     /**
      * @inheritdoc
      */
@@ -32,13 +42,43 @@ class PartnerSchemes extends AbstractActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public static function getTurnoverTypeMap()
+    {
+        return [
+            self::TURNOVER_TYPE_MONTH => Yii::t('app/users', 'Turnover type month'),
+            self::TURNOVER_TYPE_YEAR => Yii::t('app/users','Turnover type year')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCountingBaseMap()
+    {
+        return [
+            self::COUNTING_BASE_PAYMENT => Yii::t('app/users','Counting base payment'),
+            self::COUNTING_BASE_ENROLL => Yii::t('app/users','Counting base enroll')
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
             [['name'], 'required'],
-            [['start_period', 'regular_period', 'created_at', 'updated_at','currency_id'], 'integer'],
+            [[
+                'start_period',
+                'regular_period',
+                'created_at',
+                'updated_at',
+                'currency_id',
+                'turnover_type',
+                'counting_base'
+            ], 'integer'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -55,8 +95,28 @@ class PartnerSchemes extends AbstractActiveRecord
             'regular_period' => Yii::t('app/users', 'Regular Period'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
-            'currency_id' => Yii::t('app/users','Scheme currency')
+            'currency_id' => Yii::t('app/users','Scheme currency'),
+            'turnover_type' => Yii::t('app/users','Turnover interval type'),
+            'counting_base' => Yii::t('app/users','Counting base')
         ];
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getTurnoverTypeStr()
+    {
+        $arTmp = self::getTurnoverTypeMap();
+        return array_key_exists($this->turnover_type,$arTmp) ? $arTmp[$this->turnover_type] : NULL;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getCountingBaseStr()
+    {
+        $arTmp = self::getCountingBaseMap();
+        return array_key_exists($this->counting_base,$arTmp) ? $arTmp[$this->counting_base] : NULL;
     }
 
     /**

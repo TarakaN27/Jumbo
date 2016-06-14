@@ -241,8 +241,8 @@ class ExchangeRates extends AbstractActiveRecord
         //получим старые значения аттрибутов
         $old_rate_nbrb = isset($this->_oldModelAttribute['nbrb_rate']) ? $this->_oldModelAttribute['nbrb_rate'] : 0;
         $old_rate_cbr = isset($this->_oldModelAttribute['cbr_rate']) ? $this->_oldModelAttribute['cbr_rate'] : 0;
-        if($old_rate_nbrb == $this->nbrb_rate && $old_rate_cbr == $this->cbr_rate)
-            return true;
+        //if($old_rate_nbrb == $this->nbrb_rate && $old_rate_cbr == $this->cbr_rate)
+        //    return true;
         //получим пользователя, который меняет. Если меняется из консоли, то userID = NULL
         $userID = NULL;
         $app = Yii::$app;

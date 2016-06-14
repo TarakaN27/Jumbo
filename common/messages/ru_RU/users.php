@@ -322,6 +322,12 @@ return [
     'Amount can not be more than available amount' => 'Сумма не может быть больше доступной для партнера',
     'Multiple link' => 'Мульти добавление связей',
     'Change task status' => 'Изменить статус задачи',
-    'Change task deadline' => 'Изменить крайний срок'
+    'Change task deadline' => 'Изменить крайний срок',
+    'Turnover interval type' => 'Интервал рассмотрения оборота',
+    'Turnover type month' => 'Месячный оборот',
+    'Turnover type year' => 'Годовой оборот',
+    'Counting base' => 'База расчета процента',
+    'Counting base payment' => 'Платежи',
+    'Counting base enroll' => 'Зачисления'
 
 ];

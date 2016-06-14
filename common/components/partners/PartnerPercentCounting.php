@@ -10,15 +10,20 @@ namespace common\components\partners;
 
 use common\components\helpers\CustomHelper;
 use common\models\CUser;
+use common\models\EnrollmentRequest;
+use common\models\Enrolls;
 use common\models\ExchangeCurrencyHistory;
 use common\models\PartnerCuserServ;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
 use common\models\PartnerSchemes;
 use common\models\Payments;
+use common\models\PaymentsCalculations;
+use common\models\Services;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use Yii;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class PartnerPercentCounting
@@ -30,9 +35,7 @@ class PartnerPercentCounting
     public function countPercentByMonth($beginTime = NULL)
     {
         $time = null === $beginTime ? time() : (is_numeric($beginTime) ? $beginTime : strtotime($beginTime));
-        $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
-        $beginMonth = CustomHelper::getBeginMonthTime($dateMonthAgo);   //Month end time (timestamp)
-        $endMonth = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+
         $arPartners = $this->getPartners();                             //Get partners  (array of objects)
         if(empty($arPartners))
             return TRUE;
@@ -42,29 +45,65 @@ class PartnerPercentCounting
         {
             if(!isset($arSchemes[$partner->partner_scheme]))
                 continue;
+            /** @var PartnerSchemes $obScheme */
             $obScheme = $arSchemes[$partner->partner_scheme];           //Scheme for partner
+
+            $arPayTime = $this->getBeginEndPayTime($time,$obScheme->turnover_type);     //begin and end time for payment period
+
+            if(is_null($arPayTime))
+                throw new NotFoundHttpException();
 
             $arLeads = $this->getPartnerLeads($partner->id);            //Get lead for current partner
             if(count($arLeads) === 0)
                 continue;
 
-            $arPayments = $this->getLeadPayments($arLeads,$beginMonth,$endMonth);       //Get lead payments
+            $arPayments = $this->getLeadPayments($arLeads,$arPayTime['begin'],$arPayTime['end']);       //Get lead payments
             if(count($arPayments) === 0)
                 continue;
 
-            $arPayments = $this->normalizePayments($arPayments);                        //Convert amount to BYR
+            $cuserIDs =  array_unique(ArrayHelper::getColumn($arLeads,'cuser_id'));
+            $arCuserResident = ArrayHelper::map(CUser::find()->select(['id','is_resident'])->where(['id' => $cuserIDs])->all(),'id','is_resident');
+
+            $arPayments = $this->normalizePayments($arPayments,$obScheme);                        //Convert amount to BYR
 
             $arPartnerServGroups = $this->getPartnerServiceGroups($obScheme);           //Get partner service group for each service
-            $fullAmountByGroup = $this->getPaymentAmount($arPayments,$obScheme->currency_id,$arPartnerServGroups);  //Get full amount at scheme currency
+            $fullAmountByGroup = $this->getPaymentAmount($arPayments,$obScheme->currency_id,$arPartnerServGroups,$arCuserResident,$obScheme);  //Get full amount at scheme currency
 
             $percent = $this->getPercent($fullAmountByGroup,$obScheme);        //Get scheme parameters for services(percent and legal params)
             if(count($percent) === 0)
                 continue;
 
-            $this->countPercent($arLeads,$arPayments,$percent,$obScheme,$partner);  //Counting percents for partners
+            $this->countPercent($arLeads,$arPayments,$percent,$obScheme,$partner,$arCuserResident);  //Counting percents for partners
         }
 
         return TRUE;
+    }
+
+    /**
+     * @param $time
+     * @param $turnOverType
+     * @return null
+     */
+    protected function getBeginEndPayTime($time,$turnOverType)
+    {
+        $arResult = NULL;
+        switch ($turnOverType)
+        {
+            case PartnerSchemes::TURNOVER_TYPE_MONTH:
+                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
+                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateMonthAgo);   //Month end time (timestamp)
+                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+                break;
+            case PartnerSchemes::TURNOVER_TYPE_YEAR:
+                $dateYearAgo = CustomHelper::getDateMinusNumYear($time,1);      //1  year ago
+                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
+                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateYearAgo);   //Month end time (timestamp)
+                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+                break;
+            default:
+                break;
+        }
+        return $arResult;
     }
 
     /**
@@ -172,37 +211,202 @@ class PartnerPercentCounting
 
     /**
      * @param $arPayments
+     * @param PartnerSchemes $obScheme
      * @return mixed
      */
-    protected function normalizePayments($arPayments)
+    protected function normalizePayments($arPayments,PartnerSchemes $obScheme)
     {
-        foreach ($arPayments as &$payment)
-        {
-            $date = date('Y-m-d',$payment['pay_date']);
-            $currency = $payment['currency_id'];
-            if(isset($this->exchangeCurrency[$currency]) && isset($this->exchangeCurrency[$currency][$date]))
-            {
-                $exchRate = $this->exchangeCurrency[$currency][$date];
-            }else{
-                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
+        $arResult = [];
 
-                $this->exchangeCurrency[$currency][$date] = $exchRate;
-            }
+        switch ($obScheme->counting_base){
+            case PartnerSchemes::COUNTING_BASE_PAYMENT:
+                foreach ($arPayments as &$payment)
+                {
+                    $date = date('Y-m-d',$payment['pay_date']);
+                    $currency = $payment['currency_id'];
+                    if(isset($this->exchangeCurrency[$currency]) && isset($this->exchangeCurrency[$currency][$date]))
+                    {
+                        $exchRate = $this->exchangeCurrency[$currency][$date];
+                    }else{
+                        $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
 
-            $payment['pay_summ'] = $payment['pay_summ']*$exchRate;
+                        $this->exchangeCurrency[$currency][$date] = $exchRate;
+                    }
+
+                    $payment['pay_summ'] = $payment['pay_summ']*$exchRate;
+                }
+                $arResult = $arPayments;
+                break;
+            case PartnerSchemes::COUNTING_BASE_ENROLL:
+                $arEnrollServ = $this->getServiceWithEnroll($arPayments);       //get service id , witch allow enrollment
+                $arTmpPay = [];
+
+                foreach ($arPayments as $payment)
+                {
+                    if(!in_array($payment['service_id'],$arEnrollServ))
+                    {
+                        $date = date('Y-m-d',$payment['pay_date']);
+                        $currency = $payment['currency_id'];
+                        if(isset($this->exchangeCurrency[$currency]) && isset($this->exchangeCurrency[$currency][$date]))
+                        {
+                            $exchRate = $this->exchangeCurrency[$currency][$date];
+                        }else{
+                            $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
+
+                            $this->exchangeCurrency[$currency][$date] = $exchRate;
+                        }
+
+                        $payment['pay_summ'] = $payment['pay_summ']*$exchRate;
+
+                        $arResult[] = $payment;
+                    }else{
+                        $arTmpPay[] = $payment;
+                    }
+                }
+
+                if(!empty($arTmpPay))
+                {
+                    $arPayEnroll = $this->getEnrollPayment($arTmpPay);
+                    foreach ($arPayEnroll as $enroll)
+                        $arResult [] = $enroll;
+
+                }
+                break;
+            default:
+                break;
         }
 
-        return $arPayments;
+
+        return $arResult;
     }
 
+    /**
+     * @param array $arPayment
+     * @return array
+     */
+    protected function getEnrollPayment(array $arPayment)
+    {
+        $arPayIds = ArrayHelper::getColumn($arPayment,'id');
+        $arPayCondLink = $this->getCondByPayId($arPayIds);
+        $arPayDate = ArrayHelper::map($arPayment,'id','pay_date');
+        $arCondCurr = $this->getConditionsForPayments(array_unique($arPayCondLink));
+        $arPayByAnrollAmount = $this->getEnrollAmountForPayment($arPayIds,$arCondCurr,$arPayDate);
+
+        $arResult = [];
+        foreach ($arPayment as $pay)
+        {
+            if(isset($arPayByAnrollAmount[$pay['id']]))
+            {
+                $pay['pay_summ'] = $arPayByAnrollAmount[$pay['id']];
+                $arResult[] = $pay;
+            }
+        }
+
+        return $arResult;
+    }
+
+    /**
+     * @param array $arPayIds
+     * @param $arCondCurr
+     * @param $arPayDate
+     * @return array
+     */
+    protected function getEnrollAmountForPayment(array $arPayIds,$arCondCurr,$arPayDate)
+    {
+        $arEnroll = Enrolls::find()
+            ->joinWith('enrReq')
+            ->where([
+                EnrollmentRequest::tableName().'.payment_id' => $arPayIds
+            ])
+            ->all();
+
+        $arResult = [];
+
+        /** @var Enrolls $obEnroll */
+        foreach ($arEnroll as $obEnroll)
+        {
+            $date = $arPayDate[$obEnroll->enrReq->payment_id];
+            $iCurr = $arCondCurr[$obEnroll->enrReq->payment_id];
+
+            if(isset($this->exchangeCurrency[$iCurr]) && isset($this->exchangeCurrency[$iCurr][$date]))
+            {
+                $exchRate = $this->exchangeCurrency[$iCurr][$date];
+            }else{
+                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$iCurr);
+
+                $this->exchangeCurrency[$iCurr][$date] = $exchRate;
+            }
+
+
+            if(isset($arResult[$obEnroll->enrReq->payment_id]))
+            {
+                $arResult[$obEnroll->enrReq->payment_id]+=$exchRate*$obEnroll->amount;
+            }else{
+                $arResult[$obEnroll->enrReq->payment_id]=$exchRate*$obEnroll->amount;
+            }
+        }
+
+        return $arResult;
+    }
+
+
+    /**
+     * @param $arCondIds
+     * @return mixed
+     */
+    protected function getConditionsForPayments($arCondIds)
+    {
+        return Payments::find()
+            ->select(['cond_currency','id'])
+            ->where(['id' => $arCondIds])
+            ->indexBy('id')
+            ->column();
+    }
+
+    /**
+     * @param array $arPayIds
+     * @return mixed
+     */
+    protected function getCondByPayId(array $arPayIds)
+    {
+        return PaymentsCalculations::find()
+            ->select(['pay_cond_id','payment_id'])
+            ->where(['payment_id' => $arPayIds])
+            ->indexBy('payment_id')
+            ->column();
+    }
+
+    /**
+     * @param array $arPayments
+     * @return array
+     */
+    protected function getServiceWithEnroll(array $arPayments)
+    {
+        $arService = Services::find()
+            ->where([
+                'id' => array_unique(ArrayHelper::getColumn($arPayments,'service_id')),
+                'allow_enrollment' => Services::YES
+                ])
+            ->all();
+        return $arService ? ArrayHelper::getColumn($arService,'id') : [];
+    }
 
     /**
      * @param $arPayments
      * @param $currency
      * @return float|int
      */
-    protected function getPaymentAmount($arPayments,$currency,$arPartnerServGroups)
+    protected function getPaymentAmount($arPayments,$currency,$arPartnerServGroups,$arCuserResident,$obScheme)
     {
+        $arServices = $obScheme->partnerSchemesServices;
+        $arServParams = [];
+        foreach ($arServices as $serv)
+        {
+            $arServParams[$serv->service_id] = [
+                'legal' => is_array($serv->legal) ? $serv->legal : NULL
+            ];
+        }
+
         $amount = [];
 
         foreach ($arPayments as $payment)
@@ -220,11 +424,15 @@ class PartnerPercentCounting
                 $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
                 $this->exchangeCurrency[$currency][$date] = $exchRate;
             }
+            if(isset($arServParams[$payment['service_id']]) && isset($arCuserResident[$payment['cuser_id']]))
+                $numAmount = $this->getAmountHelper($arServParams[$payment['service_id']],$payment['pay_summ'],$payment['legal_id'],$arCuserResident[$payment['cuser_id']]);
+            else
+                $numAmount = $payment['pay_summ'];
 
             if(isset($amount[$group]))
-                $amount[$group]+= $payment['pay_summ']/$exchRate;
+                $amount[$group]+= $numAmount/$exchRate;
             else
-                $amount[$group] = $payment['pay_summ']/$exchRate;
+                $amount[$group] = $numAmount/$exchRate;
         }
 
         return $amount;
@@ -285,10 +493,9 @@ class PartnerPercentCounting
      * @throws ServerErrorHttpException
      * @throws \yii\db\Exception
      */
-    protected function countPercent($arLeads,$arPayments,$percent,$obScheme,$partner)
+    protected function countPercent($arLeads,$arPayments,$percent,$obScheme,$partner,$arCuserResident)
     {
-        $cuserIDs =  array_unique(ArrayHelper::getColumn($arLeads,'cuser_id'));
-        $arCuserResident = ArrayHelper::map(Cuser::find()->select(['id','is_resident'])->where(['id' => $cuserIDs])->all(),'id','is_resident');
+
         $obPurse = PartnerPurse::find()->where(['cuser_id' => $partner->id])->one();
         if(empty($obPurse))
             $obPurse = new PartnerPurse(['cuser_id' => $partner->id]);
@@ -351,6 +558,19 @@ class PartnerPercentCounting
      */
     protected function getAmount($params,$amount,$legalID,$isResident)
     {
+        $amount = $this->getAmountHelper($params,$amount,$legalID,$isResident);
+        return $amount*($params['percent']/100);
+    }
+
+    /**
+     * @param $params
+     * @param $amount
+     * @param $legalID
+     * @param $isResident
+     * @return float
+     */
+    protected function getAmountHelper($params,$amount,$legalID,$isResident)
+    {
         if(is_array($params['legal']) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
             isset($params['legal'][$legalID]) &&
             isset($params['legal'][$legalID]['deduct']) &&
@@ -364,8 +584,9 @@ class PartnerPercentCounting
                 $amount = CustomHelper::getVatMountByAmount($amount, $tax); //отнимем от суммы платежа налог
             }
         }
-        return $amount*($params['percent']/100);
+        return $amount;
     }
+
 
     /**
      * @param $obScheme

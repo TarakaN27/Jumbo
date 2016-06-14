@@ -563,6 +563,20 @@ class CustomHelper {
     }
 
     /**
+     * @param $time
+     * @param $numYear
+     * @param string $sign
+     * @return int
+     */
+    public static function getDateMinusNumYear($time,$numYear,$sign = '-')
+    {
+        $obDate = new \DateTime();
+        $obDate->setTimestamp($time);
+        $obDate->modify($sign.$numYear.' years');
+        return $obDate->getTimestamp();
+    }
+
+    /**
      * Получет массив, собирает массив где ключи переменная массива, а значение - само занчение массива
      * @param array $array
      * @param $attribute

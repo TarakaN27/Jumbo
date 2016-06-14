@@ -35,6 +35,10 @@ $this->registerJsFile('@web/js/parts/partner_schemes.js',[
 
     <?= $form->field($model, 'regular_period')->textInput() ?>
 
+    <?= $form->field($model,'turnover_type')->dropDownList(\common\models\PartnerSchemes::getTurnoverTypeMap())?>
+
+    <?= $form->field($model,'counting_base')->dropDownList(\common\models\PartnerSchemes::getCountingBaseMap())?>
+
     <?= $form->field($model,'currency_id')->dropDownList(\common\models\ExchangeRates::getRatesCodes())?>
     
 
