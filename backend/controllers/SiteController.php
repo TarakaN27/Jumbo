@@ -114,8 +114,8 @@ class SiteController extends Controller
         */
         /*
         $obCalc = new PartnerPercentCounting();
-        $obCalc->countPercentByMonth('01-02-2016');
-        */
+        $obCalc->countPercentByMonth('01-06-2016');
+*/
         //1466340220
         /*
         $obRecurringTask = new RecurringTask(1465389820);

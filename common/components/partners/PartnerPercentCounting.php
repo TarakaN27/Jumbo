@@ -17,6 +17,7 @@ use common\models\PartnerCuserServ;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
 use common\models\PartnerSchemes;
+use common\models\PaymentCondition;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
 use common\models\Services;
@@ -73,11 +74,38 @@ class PartnerPercentCounting
             if(count($percent) === 0)
                 continue;
 
+            if($obScheme->turnover_type == PartnerSchemes::TURNOVER_TYPE_YEAR)              //unset excess payment, leave payments only for last month
+            {
+                $arPayments = $this->normalizePaymentsForYearTurnover($arPayments,$time);
+            }
+
             $this->countPercent($arLeads,$arPayments,$percent,$obScheme,$partner,$arCuserResident);  //Counting percents for partners
         }
 
         return TRUE;
     }
+
+    /**
+     * Из всех платежей за год оставляем только за прошлый месяц, чтобы начислить проыенты
+     * @param $arPayments
+     * @param $time
+     * @return array
+     */
+    protected function normalizePaymentsForYearTurnover($arPayments,$time)
+    {
+        $arResult = [];
+        $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
+        $beginTime = CustomHelper::getBeginMonthTime($dateMonthAgo);   //Month end time (timestamp)
+        $endTime = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+
+        foreach ($arPayments as $payment)
+        {
+            if($payment['pay_date'] >= $beginTime && $payment['pay_date']<=$endTime)
+                $arResult[] = $payment;
+        }
+        return $arResult;
+    }
+
 
     /**
      * @param $time
@@ -90,15 +118,15 @@ class PartnerPercentCounting
         switch ($turnOverType)
         {
             case PartnerSchemes::TURNOVER_TYPE_MONTH:
-                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
-                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateMonthAgo);   //Month end time (timestamp)
-                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);           //1 month ago (timestamp)
+                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateMonthAgo);    //Month end time (timestamp)
+                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);        //Month begin time (timestamp)
                 break;
             case PartnerSchemes::TURNOVER_TYPE_YEAR:
-                $dateYearAgo = CustomHelper::getDateMinusNumYear($time,1);      //1  year ago
-                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);   //1 month ago (timestamp)
-                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateYearAgo);   //Month end time (timestamp)
-                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);       //Month begin time (timestamp)
+                $dateYearAgo = CustomHelper::getDateMinusNumYear($time,1);              //1  year ago
+                $dateMonthAgo = CustomHelper::getDateMinusNumMonth($time, 1);           //1 month ago (timestamp)
+                $arResult['begin'] = CustomHelper::getBeginMonthTime($dateYearAgo);     //Month end time (timestamp)
+                $arResult['end'] = CustomHelper::getEndMonthTime($dateMonthAgo);        //Month begin time (timestamp)
                 break;
             default:
                 break;
@@ -182,7 +210,7 @@ class PartnerPercentCounting
         if(count($arLeads) === 0)
             return [];
 
-        $arLeads = array_chunk($arLeads,10);
+        $arLeads = array_chunk($arLeads,10);                        //divide for few query
         $arResult = [];
         foreach ($arLeads as $leads) {
             $queryMain = NULL;
@@ -210,6 +238,7 @@ class PartnerPercentCounting
     }
 
     /**
+     * Counting payment amount in BUR currency
      * @param $arPayments
      * @param PartnerSchemes $obScheme
      * @return mixed
@@ -290,7 +319,7 @@ class PartnerPercentCounting
         $arPayCondLink = $this->getCondByPayId($arPayIds);
         $arPayDate = ArrayHelper::map($arPayment,'id','pay_date');
         $arCondCurr = $this->getConditionsForPayments(array_unique($arPayCondLink));
-        $arPayByAnrollAmount = $this->getEnrollAmountForPayment($arPayIds,$arCondCurr,$arPayDate);
+        $arPayByAnrollAmount = $this->getEnrollAmountForPayment($arPayIds,$arCondCurr,$arPayDate,$arPayCondLink);
 
         $arResult = [];
         foreach ($arPayment as $pay)
@@ -311,22 +340,23 @@ class PartnerPercentCounting
      * @param $arPayDate
      * @return array
      */
-    protected function getEnrollAmountForPayment(array $arPayIds,$arCondCurr,$arPayDate)
+    protected function getEnrollAmountForPayment(array $arPayIds,$arCondCurr,$arPayDate,$arPayCondLink)
     {
-        $arEnroll = Enrolls::find()
-            ->joinWith('enrReq')
+        $arEnroll = EnrollmentRequest::find()                                       //Get enrolls request for payment
             ->where([
-                EnrollmentRequest::tableName().'.payment_id' => $arPayIds
+                'payment_id' => $arPayIds
             ])
+            ->andWhere('parent_id IS NULL OR parent_id = 0')
             ->all();
 
         $arResult = [];
 
-        /** @var Enrolls $obEnroll */
+        /** @var EnrollmentRequest $obEnroll */
         foreach ($arEnroll as $obEnroll)
         {
-            $date = $arPayDate[$obEnroll->enrReq->payment_id];
-            $iCurr = $arCondCurr[$obEnroll->enrReq->payment_id];
+            $date = $arPayDate[$obEnroll->payment_id];
+            $iPayCond = $arPayCondLink[$obEnroll->payment_id];
+            $iCurr = $arCondCurr[$iPayCond];
 
             if(isset($this->exchangeCurrency[$iCurr]) && isset($this->exchangeCurrency[$iCurr][$date]))
             {
@@ -337,12 +367,11 @@ class PartnerPercentCounting
                 $this->exchangeCurrency[$iCurr][$date] = $exchRate;
             }
 
-
-            if(isset($arResult[$obEnroll->enrReq->payment_id]))
+            if(isset($arResult[$obEnroll->payment_id]))
             {
-                $arResult[$obEnroll->enrReq->payment_id]+=$exchRate*$obEnroll->amount;
+                $arResult[$obEnroll->payment_id]+=$exchRate*$obEnroll->amount;
             }else{
-                $arResult[$obEnroll->enrReq->payment_id]=$exchRate*$obEnroll->amount;
+                $arResult[$obEnroll->payment_id]=$exchRate*$obEnroll->amount;
             }
         }
 
@@ -356,7 +385,7 @@ class PartnerPercentCounting
      */
     protected function getConditionsForPayments($arCondIds)
     {
-        return Payments::find()
+        return PaymentCondition::find()
             ->select(['cond_currency','id'])
             ->where(['id' => $arCondIds])
             ->indexBy('id')
@@ -424,7 +453,11 @@ class PartnerPercentCounting
                 $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$currency);
                 $this->exchangeCurrency[$currency][$date] = $exchRate;
             }
-            if(isset($arServParams[$payment['service_id']]) && isset($arCuserResident[$payment['cuser_id']]))
+
+            $servId = $payment['service_id'];
+            $cuerID = $payment['cuser_id'];
+
+            if(isset($arServParams[$servId]) && array_key_exists($cuerID,$arCuserResident))
                 $numAmount = $this->getAmountHelper($arServParams[$payment['service_id']],$payment['pay_summ'],$payment['legal_id'],$arCuserResident[$payment['cuser_id']]);
             else
                 $numAmount = $payment['pay_summ'];
@@ -524,7 +557,7 @@ class PartnerPercentCounting
             $fullAmount+=$amount;
         }
         $transaction = \Yii::$app->db->beginTransaction();
-        $historyModel = new PartnerPurseHistory();    //пишем историю
+        $historyModel = new PartnerPurseHistory();                                          //wrote history, make batch insert query
         if(count($rows) > 0)
             if(!Yii::$app->db->createCommand()
                 ->batchInsert(PartnerPurseHistory::tableName(), $historyModel->attributes(), $rows)
@@ -575,15 +608,14 @@ class PartnerPercentCounting
             isset($params['legal'][$legalID]) &&
             isset($params['legal'][$legalID]['deduct']) &&
             isset($params['legal'][$legalID]['deduct']) == 1) {
-            $key = $isResident ? 'res' : 'not_res';
-            if (isset($params['legal'][$legalID][$key])) {
-                $tax = NULL;
-                if (isset($params['legal'][$legalID][$key . '_tax']) && is_numeric($params['legal'][$legalID][$key . '_tax']))
-                    $tax = $params['legal'][$legalID][$key . '_tax'];
-
-                $amount = CustomHelper::getVatMountByAmount($amount, $tax); //отнимем от суммы платежа налог
+                $key = $isResident ? 'res' : 'not_res';
+                if (isset($params['legal'][$legalID][$key])) {
+                    $tax = NULL;
+                    if (isset($params['legal'][$legalID][$key . '_tax']) && is_numeric($params['legal'][$legalID][$key . '_tax']))
+                        $tax = $params['legal'][$legalID][$key . '_tax'];
+                    $amount = CustomHelper::getVatMountByAmount($amount, $tax); //отнимем от суммы платежа налог
+                }
             }
-        }
         return $amount;
     }
 
