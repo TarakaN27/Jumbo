@@ -2,6 +2,7 @@
 
 namespace backend\modules\documents\controllers;
 
+use backend\modules\documents\form\BillForm;
 use backend\widgets\Alert;
 use common\models\BillTemplate;
 use common\models\CuserServiceContract;
@@ -102,6 +103,7 @@ class BillsController extends AbstractBaseBackendController
      */
     public function actionCreate()
     {
+        /*
         $model = new Bills();
 
         //if(Yii::$app->user->can('only_manager'))
@@ -116,6 +118,24 @@ class BillsController extends AbstractBaseBackendController
                 'model' => $model,
             ]);
         }
+        */
+
+        $model = new BillForm();
+        if($model->load(Yii::$app->request->post()))
+        {
+
+        }
+
+        $cuserDesc = '';
+        if($model->iCuserId)
+            $cuserDesc = CUser::getCuserInfoById($model->iCuserId);
+        
+        return $this->render('create',[
+            'model' => $model,
+            'cuserDesc' => $cuserDesc
+        ]);
+
+
     }
 
     /**

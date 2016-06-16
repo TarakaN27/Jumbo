@@ -75,7 +75,9 @@ return [
     'offer_contract' => 'Договор оферты',
     'Get bill' => 'Получить счет',
     'Create Bill' => 'Добавить счет',
-    'Currency id' => 'Валюта'
+    'Currency id' => 'Валюта',
+    'Save' => 'Сохранить',
+    'Add services' => 'Добавление услуг'
 
 
 ];
