@@ -94,13 +94,19 @@ class PaymentsReportForm extends Model{
      */
     public static function getGroupByMap()
     {
-        return [
+        $arGroup = [
             self::GROUP_BY_DATE => Yii::t('app/reports','Group by date'),
             self::GROUP_BY_MANAGER => Yii::t('app/reports','Group by manager'),
             self::GROUP_BY_SERVICE => Yii::t('app/reports','Group by service'),
             self::GROUP_BY_CONTRACTOR => Yii::t('app/reports','Group by contractor')
         ];
+
+        if(!Yii::$app->user->can('adminRights'))
+            unset($arGroup[self::GROUP_BY_MANAGER]);
+
+        return $arGroup;
     }
+
 
     /**
      * @return string

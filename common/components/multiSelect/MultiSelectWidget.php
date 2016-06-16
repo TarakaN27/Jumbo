@@ -36,6 +36,7 @@ class MultiSelectWidget extends InputWidget{
     {
         if(!array_key_exists('multiple',$this->options)) //так как плагин для мультиселекта, то добавляем
             $this->options['multiple'] = 'multiple';
+        echo '&nbsp;';
         echo Html::a(\Yii::t('app/common','Select all'),'#',['id'=>'select-all-'.$this->options['id']]);
         echo ' / ';
         echo Html::a(\Yii::t('app/common','Deselect all'),'#',['id' => 'deselect-all-'.$this->options['id']]);

@@ -6,6 +6,7 @@
  * Date: 03.08.15
  */
 use yii\helpers\Html;
+use backend\modules\reports\forms\PaymentsReportForm;
 $this->title = Yii::t('app/reports','Payments reports');
 ?>
     <div class="row">
@@ -40,22 +41,24 @@ $this->title = Yii::t('app/reports','Payments reports');
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                              <?=$form->field($model,'contractor')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
-                                 'data' => \common\models\CUser::getContractorMap(),
+                                 'data' => $arContractorMap,
                                  'clientOptions' => [
                                      //'selectableHeader' => Yii::t('app/reports','Contractors'),
                                      //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
                                  ]
                              ])?>
                         </div>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                            <?=$form->field($model,'managers')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
-                                'data' => \backend\models\BUser::getAllMembersMap(),
-                                'clientOptions' => [
-                                    //'selectableHeader' => Yii::t('app/reports','Contractors'),
-                                    //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
-                                ]
-                            ])?>
-                        </div>
+                        <?php if(Yii::$app->user->can('adminRights')):?>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <?=$form->field($model,'managers')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                                    'data' => \backend\models\BUser::getAllMembersMap(),
+                                    'clientOptions' => [
+                                        //'selectableHeader' => Yii::t('app/reports','Contractors'),
+                                        //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
+                                    ]
+                                ])?>
+                            </div>
+                        <?php endif;?>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-md-6 col-sm-6 col-xs-12">
@@ -86,13 +89,15 @@ $this->title = Yii::t('app/reports','Payments reports');
                             <div class="row">
 
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <?=$form->field($model,'groupType')->radioList(\backend\modules\reports\forms\PaymentsReportForm::getGroupByMap())?>
+                                    <?=$form->field($model,'groupType')->radioList(PaymentsReportForm::getGroupByMap())?>
                                 </div>
+                                <?php if(Yii::$app->user->can('adminRights')):?>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <?=$form->field($model,'generateExcel')->checkbox();?>
                                     <?=$form->field($model,'generateExtendExcel')->checkbox();?>
                                     <?=$form->field($model,'generateDocx')->checkbox();?>
                                 </div>
+                                <?php endif;?>
                             </div>
                         </div>
                     </div>

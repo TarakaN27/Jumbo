@@ -48,6 +48,31 @@ $('#sort-type').on('change',function(){
 
 
 ",\yii\web\View::POS_READY);
+
+$arSort = [];
+$isAdmin = Yii::$app->user->can('adminRights');
+
+if(Yii::$app->user->can('adminRights'))
+{
+    $arSort = [
+        'date-false' =>  Yii::t('app/reports','Default'),
+        'summ-true' =>  Yii::t('app/reports','Summ total A-Z'),
+        'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
+        'profit-true' =>  Yii::t('app/reports','Profit total A-Z'),
+        'profit-false' =>  Yii::t('app/reports','Profit total Z-A'),
+        'prod-true' =>  Yii::t('app/reports','Prod total A-Z'),
+        'prod-false' =>  Yii::t('app/reports','Prod total Z-A'),
+        'tax-true' =>  Yii::t('app/reports','Tax total A-Z'),
+        'tax-false' =>  Yii::t('app/reports','Tax total Z-A'),
+    ];
+}else{
+    $arSort = [
+        'date-false' =>  Yii::t('app/reports','Default'),
+        'summ-true' =>  Yii::t('app/reports','Summ total A-Z'),
+        'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
+    ];
+}
+
 ?>
 <div class="row">
 <h3><?=Yii::t('app/reports','Total info')?></h3>
@@ -55,10 +80,12 @@ $('#sort-type').on('change',function(){
     <thead>
         <tr>
             <th><?=Yii::t('app/reports','iSumTotal')?></th>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <th><?=Yii::t('app/reports','iProfitTotal')?></th>
             <th><?=Yii::t('app/reports','iTaxTotal')?></th>
             <th><?=Yii::t('app/reports','iProdTotal')?></th>
             <th><?=Yii::t('app/reports','controllSumm')?></th>
+            <?php endif;?>
         </tr>
     </thead>
     <tbody>
@@ -66,6 +93,7 @@ $('#sort-type').on('change',function(){
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iSumTotal']);?>
             </td>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iProfitTotal']);?>
             </td>
@@ -78,6 +106,7 @@ $('#sort-type').on('change',function(){
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['summControll']);?>
             </td>
+            <?php endif;?>
         </tr>
     </tbody>
 </table>
@@ -87,17 +116,7 @@ $('#sort-type').on('change',function(){
         <h3><?=Yii::t('app/reports','Detail info')?></h3>
     </div>
     <div class="col-md-6">
-        <?=\yii\helpers\Html::dropDownList('Sorting',null,[
-            'date-false' =>  Yii::t('app/reports','Default'),
-            'summ-true' =>  Yii::t('app/reports','Summ total A-Z'),
-            'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
-            'profit-true' =>  Yii::t('app/reports','Profit total A-Z'),
-            'profit-false' =>  Yii::t('app/reports','Profit total Z-A'),
-            'prod-true' =>  Yii::t('app/reports','Prod total A-Z'),
-            'prod-false' =>  Yii::t('app/reports','Prod total Z-A'),
-            'tax-true' =>  Yii::t('app/reports','Tax total A-Z'),
-            'tax-false' =>  Yii::t('app/reports','Tax total Z-A'),
-        ],
+        <?=\yii\helpers\Html::dropDownList('Sorting',null,$arSort,
         [
             'id' => 'sort-type',
             'class' => 'pull-right form-control width-30-percent'
@@ -130,9 +149,11 @@ $('#sort-type').on('change',function(){
             <th><?=Yii::t('app/reports','Payment sum')?></th>
             <th><?=Yii::t('app/reports','Payment currency')?></th>
             <th><?=Yii::t('app/reports','Exchange currency')?></th>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <th><?=Yii::t('app/reports','Profit BYR')?></th>
             <th><?=Yii::t('app/reports','Production BYR')?></th>
             <th><?=Yii::t('app/reports','Tax BYR')?></th>
+            <?php endif;?>
             <th><?=Yii::t('app/reports','Payment calc condition')?></th>
             <th><?=Yii::t('app/reports','Condition currency')?></th>
         </tr>
@@ -145,6 +166,7 @@ $('#sort-type').on('change',function(){
                  data-profit = "<?=isset($model['totalGroupProfit'][$key]) ? $model['totalGroupProfit'][$key] : 0;?>"
                  data-tax = "<?=isset($model['totalGroupTax'][$key]) ? $model['totalGroupTax'][$key] : 0;?>"
                  data-prod = "<?=isset($model['totalGroupProd'][$key]) ? $model['totalGroupProd'][$key] : 0;?>"
+               style="width: 100%;"
             >
         <tr style="background-color:#f9f9f9">
             <td colspan="13">
@@ -188,15 +210,17 @@ $('#sort-type').on('change',function(){
             <?php endif;?>
             <th class="width-8-percent"><?=Yii::t('app/reports','Legal person')?></th>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_SERVICE):?>
-                <th class="width-8-percent"><?=Yii::t('app/reports','Service')?></th>
+                <th class="<?php if($isAdmin):?>width-8-percent<?php else:?>width-12-percent <?php endif;?>"><?=Yii::t('app/reports','Service')?></th>
             <?php endif;?>
             <th class="width-8-percent"><?=Yii::t('app/reports','Payment sum')?></th>
             <th class="width-4-percent"><?=Yii::t('app/reports','Payment currency')?></th>
-            <th class="width-4-percent"><?=Yii::t('app/reports','Exchange currency')?></th>
+            <th class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>"><?=Yii::t('app/reports','Exchange currency')?></th>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <th class="width-8-percent"><?=Yii::t('app/reports','Profit BYR')?></th>
             <th class="width-8-percent"><?=Yii::t('app/reports','Production BYR')?></th>
             <th class="width-8-percent"><?=Yii::t('app/reports','Tax BYR')?></th>
-            <th class="width-12-percent"><?=Yii::t('app/reports','Payment calc condition')?></th>
+            <?php endif;?>
+            <th class="<?php if($isAdmin):?>width-12-percent<?php else:?>width-16-percent <?php endif;?>"><?=Yii::t('app/reports','Payment calc condition')?></th>
             <th class="width-4-percent"><?=Yii::t('app/reports','Condition currency')?></th>
         </tr>
         <?php
@@ -235,7 +259,7 @@ $('#sort-type').on('change',function(){
                      <?=is_object($lp=$dt->legal) ? $lp->name : 'N/A';?>
             </td>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_SERVICE):?>
-            <td class="width-8-percent">
+            <td class="<?php if($isAdmin):?>width-8-percent<?php else:?>width-12-percent <?php endif;?>">
                      <?=is_object($serv=$dt->service) ? $serv->name : 'N/A';?>
             </td>
             <?php endif;?>
@@ -246,9 +270,10 @@ $('#sort-type').on('change',function(){
                         );?>
             </td>
             <td class="width-4-percent">    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
-            <td class="width-4-percent">
+            <td class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>">
                     <?=isset($model['currency'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt->id]) : 'N/A'?>
             </td>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <td class="width-8-percent">
                     <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->profit) : 'N/A';?>
             </td>
@@ -258,7 +283,8 @@ $('#sort-type').on('change',function(){
             <td class="width-8-percent">
                     <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A';?>
             </td>
-            <td class="width-12-percent">
+            <?php endif;?>
+            <td class="<?php if($isAdmin):?>width-12-percent<?php else:?>width-16-percent <?php endif;?>">
                     <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
             </td>
             <td class="width-4-percent">
@@ -276,6 +302,7 @@ $('#sort-type').on('change',function(){
             <td colspan="2">
 
             </td>
+            <?php if(Yii::$app->user->can('adminRights')):?>
             <td>
                 <?=isset($model['totalGroupProfit'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupProfit'][$key]) : '-';?>
             </td>
@@ -285,6 +312,7 @@ $('#sort-type').on('change',function(){
             <td>
                 <?=isset($model['totalGroupTax'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupTax'][$key]) : '-';?>
             </td>
+            <?php endif;?>
             <td colspan="2">
 
             </td>

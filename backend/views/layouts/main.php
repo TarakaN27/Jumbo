@@ -297,7 +297,7 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/reports/bonus-report/index']); ?>"><?php echo Yii::t('app/common', 'Bonus report'); ?></a>
                                         </li>
-                                        <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                             </li>
