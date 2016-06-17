@@ -26,6 +26,9 @@ class BillForm extends Model
         $sOfferContract = '',
         $arServices = [],
         $arServAmount = [],
+        $arServTitle = [],
+        $arServDesc = [],
+        $arServContract = [],
         $fAmount = 0,
         $arServTpl = [];
     

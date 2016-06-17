@@ -17,12 +17,21 @@ use yii\helpers\Json;
 use yii\bootstrap\Modal;
 use common\models\Services;
 use yii\helpers\Html;
+use yii\helpers\Url;
+
 CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',$this,[],'html-sortable');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/bill_refactoring.js',$this,['html-sortable']);
 $this->registerJs('
 var
     arServTplOptions = '.Json::encode(BillTemplate::getBillTemplateMap()).',
-    arServMap = '.Json::encode(Services::getServicesMap()).';
+    arServMap = '.Json::encode(Services::getServicesMap()).',
+    urlFindDocxTpl = "'.Url::to(['find-docx-tpl']).'",
+    urlFindServiceTpl = "'.Url::to(['find-service-tpl']).'"
+    ;
+    
+    
+    
+    
 ',\yii\web\View::POS_HEAD);
 ?>
 <?php Modal::begin([
@@ -83,8 +92,6 @@ var
 
     <?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
 
-    <?= $form->field($model, 'sDescription')->textarea(['rows' => 6]) ?>
-
     <?= $form->field($model, 'sBayTarget')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
@@ -99,6 +106,10 @@ var
             </div>
         </div>
     </div>
+
+    <?= $form->field($model, 'sDescription')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model,'sOfferContract')->textInput();?>
     
     <?php ActiveForm::end();?>
 </div>
