@@ -9,8 +9,14 @@
 namespace backend\modules\documents\form;
 
 
+use common\models\AbstractActiveRecord;
+use common\models\Bills;
+use common\models\BillServices;
+use yii\base\InvalidParamException;
 use yii\base\Model;
 use Yii;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 class BillForm extends Model
 {
@@ -29,17 +35,34 @@ class BillForm extends Model
         $arServTitle = [],
         $arServDesc = [],
         $arServContract = [],
+        $arServOrder = [],
         $fAmount = 0,
         $arServTpl = [];
-    
-    
+
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
-            
+            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sDescription','sOfferContract','fAmount'],'required'],
+            [['bUseTax'],'integer'],
+            [['bTaxRate'],'required',
+                'when' => function(){
+                    return $this->bUseTax == 1;
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#billform-busetax').val() == ".AbstractActiveRecord::YES.";
+                }"
+            ],
+            [['arServices','arServAmount','arServTitle','arServDesc','arServContract','arServTpl','arServOrder'],'safe'],
+            [['fAmount'],'number','min' => 1]
         ];
     }
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -56,14 +79,161 @@ class BillForm extends Model
         ];
     }
 
-
+    /**
+     * @return bool
+     * @throws ServerErrorHttpException
+     * @throws \yii\db\Exception
+     */
     public function makeRequest()
     {
-        
-        
-        
-        
-        
-        
+        $tr  = Yii::$app->db->beginTransaction();
+
+        $obBill = new Bills();
+        $obBill->cuser_id = $this->iCuserId;
+        $obBill->l_person_id = $this->iLegalPerson;
+        $obBill->manager_id = Yii::$app->user->id;
+        $obBill->docx_tmpl_id = $this->iDocxTpl;
+        $obBill->amount = $this->fAmount;
+        $obBill->description = $this->sDescription;
+        $obBill->buy_target = $this->sBayTarget;
+        $obBill->offer_contract = $this->sOfferContract;
+        $obBill->use_vat = $this->bUseTax;
+        $obBill->vat_rate = $this->bTaxRate;
+        if(!$obBill->save()) {
+            $tr->rollBack();
+            return FALSE;
+        }
+
+        $rows = [];
+        foreach ($this->arServices as $serv)
+        {
+            if(!isset(
+                $this->arServAmount[$serv],
+                $this->arServTpl[$serv],
+                $this->arServTitle[$serv],
+                $this->arServDesc[$serv],
+                $this->arServContract[$serv],
+                $this->arServOrder[$serv]
+            ))
+                {
+                    $tr->rollBack();
+                    throw new InvalidParamException;
+                }
+
+            $amount = $this->arServAmount[$serv];
+            $tpl = $this->arServTpl[$serv];
+            $title = $this->arServTitle[$serv];
+            $description = $this->arServDesc[$serv];
+            $offer = $this->arServContract[$serv];
+            $order = $this->arServOrder[$serv];
+
+            $rows []= [
+                '',
+                $obBill->id,
+                $serv,
+                $tpl,
+                $amount,
+                $title,
+                $description,
+                $offer,
+                time(),
+                time(),
+                $order
+            ];
+        }
+
+        if(count($rows) === 0) {
+            $tr->rollBack();
+            return false;
+        }
+
+        $model = new BillServices();    //пишем историю
+        if(!Yii::$app->db->createCommand()
+            ->batchInsert(BillServices::tableName(), $model->attributes(), $rows)
+            ->execute())
+        {
+            $tr->rollBack();
+            throw new ServerErrorHttpException;
+        }
+
+        $tr->commit();
+        return TRUE;
+    }
+    
+    
+    public function update($model)
+    {
+        $tr  = Yii::$app->db->beginTransaction();
+
+        $obBill = new Bills();
+        $obBill->cuser_id = $this->iCuserId;
+        $obBill->l_person_id = $this->iLegalPerson;
+        $obBill->manager_id = Yii::$app->user->id;
+        $obBill->docx_tmpl_id = $this->iDocxTpl;
+        $obBill->amount = $this->fAmount;
+        $obBill->description = $this->sDescription;
+        $obBill->buy_target = $this->sBayTarget;
+        $obBill->offer_contract = $this->sOfferContract;
+        $obBill->use_vat = $this->bUseTax;
+        $obBill->vat_rate = $this->bTaxRate;
+        if(!$obBill->save()) {
+            $tr->rollBack();
+            return FALSE;
+        }
+
+        $rows = [];
+        foreach ($this->arServices as $serv)
+        {
+            if(!isset(
+                $this->arServAmount[$serv],
+                $this->arServTpl[$serv],
+                $this->arServTitle[$serv],
+                $this->arServDesc[$serv],
+                $this->arServContract[$serv],
+                $this->arServOrder[$serv]
+            ))
+            {
+                $tr->rollBack();
+                throw new InvalidParamException;
+            }
+
+            $amount = $this->arServAmount[$serv];
+            $tpl = $this->arServTpl[$serv];
+            $title = $this->arServTitle[$serv];
+            $description = $this->arServDesc[$serv];
+            $offer = $this->arServContract[$serv];
+            $order = $this->arServOrder[$serv];
+
+            $rows []= [
+                '',
+                $obBill->id,
+                $serv,
+                $tpl,
+                $amount,
+                $title,
+                $description,
+                $offer,
+                time(),
+                time(),
+                $order
+            ];
+        }
+
+        if(count($rows) === 0) {
+            $tr->rollBack();
+            return false;
+        }
+
+        $model = new BillServices();    //пишем историю
+        if(!Yii::$app->db->createCommand()
+            ->batchInsert(BillServices::tableName(), $model->attributes(), $rows)
+            ->execute())
+        {
+            $tr->rollBack();
+            throw new ServerErrorHttpException;
+        }
+
+        $tr->commit();
+        return TRUE;
     }
 }

@@ -28,6 +28,7 @@ use yii\db\Query;
  * @property integer $updated_at
  * @property integer $external
  * @property string $bsk
+ * @property string $offer_contract
  *
  * @property Services $service
  * @property BillDocxTemplate $docxTmpl
@@ -56,16 +57,17 @@ class Bills extends AbstractActiveRecord
     {
         return [
             [[
-                 'manager_id', 'cuser_id', 'l_person_id',
-                 'service_id', 'docx_tmpl_id', 'amount',
-                 'object_text', 'buy_target','offer_contract'
+                'manager_id', 'cuser_id', 'l_person_id',
+                'docx_tmpl_id', 'amount',
+                'buy_target','offer_contract'
              ], 'required'],
             [[
                  'manager_id', 'cuser_id', 'l_person_id',
-                 'service_id', 'docx_tmpl_id', 'amount',
+                 'service_id', 'docx_tmpl_id',
                  'bill_number', 'bill_template', 'use_vat',
                  'created_at', 'updated_at','external'
              ], 'integer'],
+            ['amount','number','min' => 1],
             ['bsk','unique'],
             [['bill_date'], 'safe'],
             [['vat_rate'], 'number'],

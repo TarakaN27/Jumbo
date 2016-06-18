@@ -64,8 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'amount',
                             'value' => $model->amount.' ( '.
-                                CustomHelper::numPropis($model->amount).' '.
-                                CustomHelper::ciRub($model->amount).' )'
+                                CustomHelper::numPropis((int)$model->amount).' '.
+                                CustomHelper::ciRub((int)$model->amount).' )'
                         ],
                         'bill_number',
                         'bill_date:date',

@@ -65,6 +65,7 @@ class BillsSearch extends Bills
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> ['defaultOrder' => ['updated_at'=>SORT_DESC]]
         ]);
 
         if (!$this->validate()) {

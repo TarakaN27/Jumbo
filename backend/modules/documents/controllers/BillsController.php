@@ -5,6 +5,7 @@ namespace backend\modules\documents\controllers;
 use backend\modules\documents\form\BillForm;
 use backend\widgets\Alert;
 use common\components\helpers\CustomHelper;
+use common\models\BillServices;
 use common\models\BillTemplate;
 use common\models\CuserServiceContract;
 use common\models\LegalPerson;
@@ -47,7 +48,9 @@ class BillsController extends AbstractBaseBackendController
                         'find-bill-template',
                         'get-bill-template-detail',
                         'bill-copy',
-                        'find-docx-tpl'
+                        'find-docx-tpl',
+                        'get-tpl-by-id',
+                        'find-service-tpl'
                     ],
                     'allow' => true,
                     'roles' => ['bookkeeper']
@@ -64,7 +67,9 @@ class BillsController extends AbstractBaseBackendController
                 'delete' =>                     ['post'],
                 'find-bill-template' =>         ['post'],
                 'get-bill-template-detail' =>   ['post'],
-                'find-docx-tpl' => ['post']
+                'find-docx-tpl' => ['post'],
+                'get-tpl-by-id' => ['post'],
+                'find-service-tpl' => ['post']
             ],
         ];
 
@@ -108,30 +113,16 @@ class BillsController extends AbstractBaseBackendController
      */
     public function actionCreate()
     {
-        /*
-        $model = new Bills();
-
-        //if(Yii::$app->user->can('only_manager'))
-       $model->manager_id = Yii::$app->user->id;
-
-        $model->buy_target = Yii::t('app/documents','DefaultBuytarget');
-        $model->external = Bills::NO;
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-        */
-
         $model = new BillForm();
         $model->sBayTarget = Yii::t('app/documents','DefaultBuytarget');
         if($model->load(Yii::$app->request->post()))
         {
-
+            if($model->makeRequest())
+            {
+                return $this->redirect(['index']);
+            }
         }
-
+        
         $cuserDesc = '';
         if($model->iCuserId)
             $cuserDesc = CUser::getCuserInfoById($model->iCuserId);
@@ -140,8 +131,6 @@ class BillsController extends AbstractBaseBackendController
             'model' => $model,
             'cuserDesc' => $cuserDesc
         ]);
-
-
     }
 
     /**
@@ -153,13 +142,51 @@ class BillsController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        
+        if($model->service_id)
+        {
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                    'view_form' => '_form',
+                    'cuserDesc' => '',
+                    'arServices' => []
+                ]);
+            }
+        }else{
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            $modelForm = new BillForm();
+            
+            $modelForm->iCuserId = $model->cuser_id;
+            $modelForm->iLegalPerson = $model->l_person_id;
+            $modelForm->iDocxTpl = $model->docx_tmpl_id;
+            $modelForm->fAmount = $model->amount;
+            $modelForm->bUseTax = $model->use_vat;
+            $modelForm->bTaxRate = $model->vat_rate;
+            $modelForm->sBayTarget = $model->buy_target;
+            $modelForm->sOfferContract = $model->offer_contract;
+            $modelForm->sDescription = $model->description;
+
+            $arServices = BillServices::find()->where(['bill_id' => $model->id])->with('service')->all();
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+
+                $cuserDesc = '';
+                if($modelForm->iCuserId)
+                    $cuserDesc = CUser::getCuserInfoById($modelForm->iCuserId);
+                
+                return $this->render('update', [
+                    'billModel' => $model,
+                    'model' => $modelForm,
+                    'view_form' => '_form_refactoring',
+                    'cuserDesc' => $cuserDesc,
+                    'arServices' => $arServices
+                ]);
+            }
         }
     }
 
@@ -322,31 +349,25 @@ class BillsController extends AbstractBaseBackendController
         ];
     }
 
+    /**
+     * @return array|string
+     */
     public function actionFindServiceTpl()
     {
         $iLegalId = Yii::$app->request->post('iLegalId');
         $iCtrId = Yii::$app->request->post('iCtrId');
         $arServices = Yii::$app->request->post('arServ');
 
-        if(!$iLegalId || !$iCtrId || !CustomHelper::isValidJSON($arServices))
+        if(!$iLegalId || !$iCtrId || empty($arServices))
         {
             throw new InvalidParamException;
         }
-
-        $arServices = Json::decode($arServices);
 
         /** @var BillTemplate $model */
         $models = BillTemplate::find()->where([ 'l_person_id' => $iLegalId,'service_id' => $arServices])->all();
         $models = ArrayHelper::index($models,'service_id');
         if(!empty($models))
         {
-            /** @var CuserServiceContract $obServ */
-            /*
-            $obServ = CuserServiceContract::findOne(['cuser_id' => $iCntr,'service_id' => $iServID]);
-            if($obServ)
-                $model->offer_contract = '№'.$obServ->cont_number.' от '.$obServ->cont_date;
-            */
-
             $obServices = CuserServiceContract::find()->where(['cuser_id' => $iCtrId,'service_id' => $arServices])->all();
             $obServices = ArrayHelper::index($obServices,'service_id');
 
@@ -358,18 +379,14 @@ class BillsController extends AbstractBaseBackendController
                     $value->offer_contract = '№'.$obTmp->cont_number.' от '.$obTmp->cont_date;
                 }
             }
-
-
         }
-
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return empty($model) ? '' : $model;
+        return empty($models) ? '' : $models;
+    }
 
+    public function actionGetTplById()
+    {
 
-
-        
-        
-        
     }
 
     /*

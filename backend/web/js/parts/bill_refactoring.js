@@ -10,7 +10,7 @@ function  createElement(serviceId,serviceName,iOrder) {
         });
 
     li.append($('<h4></h4>',{               //create tittle
-            html:serviceName+'<a href="#nogo" data-toggle="tooltip" data-placement="top" data-original-title="Выбрать описание и договор" class="pull-right red  marg-l-10"><i class="fa fa-minus" data-serv="'+serviceId+'"></i></a><a href="#nogo" data-toggle="tooltip" data-placement="top" data-original-title="Выбрать описание и договор" class="pull-right red"><i class="fa fa-check"></i></a>'
+            html:serviceName+'<a href="#nogo" data-toggle="tooltip" data-placement="top" data-original-title="Удалить услугу" class="pull-right red  marg-l-10"><i class="fa fa-minus" data-serv="'+serviceId+'"></i></a><a href="#nogo" data-id="'+serviceId+'" data-choose="0" data-toggle="tooltip" data-placement="top" data-original-title="Выбрать описание и договор" class="pull-right red chooseService"><i class="fa fa-check"></i></a>'
         }));
     li.append($('<input />',{               //input hidden array of services
             value:serviceId,
@@ -37,7 +37,7 @@ function  createElement(serviceId,serviceName,iOrder) {
                     type: 'text',
                     value: 0,
                     class: 'form-control serv-amount'
-                }).attr('data-serv-id',serviceId)
+                }).attr('data-serv-id',serviceId).attr('old-amount',0)
             )
         );
 
@@ -48,7 +48,7 @@ function  createElement(serviceId,serviceName,iOrder) {
                 text:'Шаблон услуги',
                 class:'control-label'
             })
-            ).append(getDropDownList('BillForm[arServTpl]['+serviceId+']', 's'+serviceId, arServTplOptions))
+            ).append(getDropDownList('BillForm[arServTpl]['+serviceId+']', 'sel'+serviceId, arServTplOptions,serviceId))
         );
 
     li.append($('<div></div>',{             //add input block
@@ -111,16 +111,6 @@ function  createElement(serviceId,serviceName,iOrder) {
 }
 
 /**
- *
- *
- * $arServTitle = [],
- $arServDesc = [],
- $arServContract = [],
- *
- */
-
-
-/**
  * @returns {number}
  */
 function getMaxServOrder() {
@@ -143,9 +133,9 @@ function getMaxServOrder() {
  * @param optionList
  * @returns {*|jQuery}
  */
-function getDropDownList(name, id, optionList) {
+function getDropDownList(name, id, optionList,serviceId) {
     var
-        combo = $("<select></select>",{id:id, name:name,class:'form-control'});
+        combo = $("<select></select>",{id:id, name:name,class:'form-control tpl'}).attr('data-serv-id',serviceId);
     $.each(optionList, function (i, el) {
         combo.append($('<option></option>',{value:i, text:el}));
     });
@@ -159,8 +149,6 @@ function addService()
     var 
         addedServ = $('#servicesBlock .arServClass');
     $.each(addedServ,function(index,value){
-
-        console.log($(value).val());
         let
             check = $('#activity-modal input[value="'+$(value).val()+'"]');
         check.attr('disabled','disabled');
@@ -174,21 +162,25 @@ function addServClickAction()
 {
     var
         arServ = $('#activity-modal input:checked');
-
-    console.log(arServ);
     var
         order = parseInt(getMaxServOrder());
-
+    var
+        arServicesId = [];
     $.each(arServ,function(ind,val){
         let
             servId = $(val).val();
         $('#servicesBlock').append(createElement(servId,arServMap[servId],order));
         order++;
+        arServicesId.push(servId);
     });
 
     $('#servicesBlock').sortable('reload');
     $('#activity-modal .close').trigger('click');
     $('#activity-modal input').prop('checked',false);
+    if( arServicesId.length > 0)
+    {
+        getServbiceTplParams( arServicesId);
+    }
 }
 
 
@@ -201,7 +193,6 @@ function sortUpdateFunction() {
         arSort = $('#servicesBlock').sortable("toArray");
     var
         arList = arSort.find('li');
-    console.log(arList);
     for (let k = 0; k < arList.length; k++) {
         let
             tmpID = $(arList[k]).attr('id');
@@ -219,17 +210,30 @@ function removeService()
         fullAmount = $('#billform-famount');                            //get full amount input
     var
         currAmount = parseFloat(fullAmount.val());                      //current amount
+    if(amount < 0 || customEmpty(amount))
+    {
+        amount = 0;
+    }
+
     currAmount-=amount;
-    if(currAmount <0)
+    if(currAmount < 0 || customEmpty(currAmount))
     {
         currAmount = 0;
     }
     fullAmount.val(currAmount);                                         //set new amount
 
+    if($('.chooseService[data-id="'+servId+'"]').attr('data-choose') == 1)
+    {
+        $('#billform-sdescription').text('');
+        $('#billform-soffercontract').val('');
+    }
+
     $('#s'+servId).remove();                                            //remove service block
     sortUpdateFunction();
 }
-
+/**
+ * @returns {boolean}
+ */
 function getBillTpl() {
     var
         iLegalId = $('#billform-ilegalperson').val();
@@ -240,7 +244,8 @@ function getBillTpl() {
         $('#billform-btaxrate').val('');
         return false;
     }
-
+    $('.servPreloader').removeClass('hide');
+    $('#servicesBlock').addClass('hide');
     $.ajax({
         type: "POST",
         cache: false,
@@ -255,17 +260,24 @@ function getBillTpl() {
             } else {
                 $('#billform-btaxrate').val('');
             }
+            $('.servPreloader').addClass('hide');
+            $('#servicesBlock').removeClass('hide');
         },
         error: function (msg) {
             addErrorNotify('Получение параметров юр. лица', 'Не удалось выполнить запрос!');
+            $('.servPreloader').addClass('hide');
+            $('#servicesBlock').removeClass('hide');
             return false;
         }
     });
 }
-
+/**
+ * @param serviceIds
+ * @returns {boolean}
+ */
 function getServbiceTplParams(serviceIds)
 {
-    if(customEmpty(serviceIds) || serviceIds.length == 0)
+    if(serviceIds.length == 0)
     {
         addErrorNotify('Получение параметров шаблона услуги', 'Не заданы услуги!');
         return false;
@@ -280,30 +292,180 @@ function getServbiceTplParams(serviceIds)
         addErrorNotify('Получение параметров шаблона услуги', 'Необходимо задать контрагента и юр. лицо!');
         return false;
     }
-
     $.ajax({
         type: "POST",
         cache: false,
         url: urlFindServiceTpl,
         dataType: "json",
-        data: {iLegalId: iLegalId,iCtrId:iCtrId,arServ:$.toJSON(serviceIds)},
+        data: {iLegalId: iLegalId,iCtrId:iCtrId,arServ:serviceIds},
         success: function (data) {
-                    
-
-
-
+            $.each(data,function(ind,value){
+                $('#sel'+value.service_id).val(value.id);
+                $('#s'+value.service_id+' .serv-title').val(value.object_text);
+                $('#s'+value.service_id+' .serv-desc').val(value.description);
+                $('#s'+value.service_id+' .serv-contract').val(value.offer_contract);
+            });
         },
         error: function (msg) {
             addErrorNotify('Получение параметров юр. лица', 'Не удалось выполнить запрос!');
             return false;
         }
     });
+}
+
+/**
+ *
+ * @returns {boolean}
+ */
+function chooseService()
+{
+    var
+        serviId = parseInt($(this).attr('data-id'));
+
+    if(customEmpty(serviId))
+    {
+        addErrorNotify('Выбор параметров услуги', 'Не удалось получить id услуги!');
+        return false;
+    }
+
+    var
+        description = $('#s'+serviId+' .serv-desc').val(),
+        contract = $('#s'+serviId+' .serv-contract').val();
+
+    $('#billform-sdescription').text(description);
+    $('#billform-soffercontract').val(contract);
+
+    $('.chooseService').removeClass('green').addClass('red').attr('data-choose',0);
+    $(this).removeClass('red').addClass('green').attr('data-choose',1);
+}
+/**
+ *
+ */
+function changeServiceAmount(){
+
+    var
+        oldAmount = parseFloat($(this).attr('old-amount')),
+        newAmount = parseFloat($(this).val()),
+        fullAMountContainer = $('#billform-famount'),
+        fullAmount = parseFloat(fullAMountContainer.val());
+
+    if(newAmount < 0 || customEmpty(newAmount))
+    {
+        newAmount = 0;
+        $(this).val(0);
+    }
+
+    if(fullAmount < 0 || customEmpty(fullAmount))
+    {
+        fullAmount = 0;
+        fullAMountContainer.val(0);
+    }
+
+    fullAmount = fullAmount+newAmount - oldAmount;
+    if(fullAmount < 0)
+        fullAmount = 0;
+
+    fullAMountContainer.val(fullAmount);
+    $(this).attr('old-amount',newAmount);
+}
+/**
+ *
+ */
+function changeServiceTpl()
+{
+    var
+        iCtrId = $('#billform-icuserid').val(),
+        iServId = $(this).attr('data-serv-id'),
+        tplId = $(this).val();
+    $('.servPreloader').removeClass('hide');
+    $('#servicesBlock').addClass('hide');
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: urlGetTplById,
+        dataType: "json",
+        data: {iBTpl:tplId,iCntr:iCtrId},
+        success: function (data) {
+            $('#s'+iServId+' .serv-title').val(data.object_text);
+            $('#s'+iServId+' .serv-desc').val(data.description);
+            $('#s'+iServId+' .serv-contract').val(data.offer_contract);
+
+            if($('.chooseService[data-id="'+iServId+'"]').attr('data-choose') == 1)
+            {
+                $('#billform-sdescription').text(data.description);
+                $('#billform-soffercontract').val(data.offer_contract);
+            }
+
+            $('.servPreloader').addClass('hide');
+            $('#servicesBlock').removeClass('hide');
+        },
+        error: function (msg) {
+            $('.servPreloader').addClass('hide');
+            $('#servicesBlock').removeClass('hide');
+            addErrorNotify('Получение параметров шаблона', 'Не удалось выполнить запрос!');
+            return false;
+        }
+    });
+}
+/**
+ * @returns {boolean}
+ */
+function validateFormBefore()
+{
+    //проверим, заполнены ли услуги
+    var
+        arServices = $('.arServClass');
+
+    if(arServices.length <= 0)
+    {
+        addErrorNotify('Сохранение счета', 'Необходимо указать услуги!');
+        return false;
+    }
+
+    var
+        bError = false,
+        fullAmount = parseFloat($('#billform-famount').val()),
+        tmpAmount = 0,
+        sOffertaContract = $.trim($('#billform-soffercontract').val());
+
+    $.each(arServices,function(ind,val){
+        let
+            servId = $(val).val();
+
+        let
+            contract = $('.serv-contract[data-serv-id="'+servId+'"]').val(),
+            amount = parseFloat($('.serv-amount[data-serv-id="'+servId+'"]').val());
+
+        tmpAmount+=amount;
+
+        if(customEmpty(amount) || amount <= 0)
+        {
+            addErrorNotify('Сохранение счета', 'В услуге "'+arServMap[servId]+'" неверно задана сумма!');
+            bError = true;
+        }
+        if($.trim(contract) != sOffertaContract)
+        {
+            addErrorNotify('Сохранение счета', 'В услуге "'+arServMap[servId]+'" неверно задан договор оферты!');
+            bError = true;
+        }
+    });
+
+    if(tmpAmount != fullAmount)
+    {
+        addErrorNotify('Сохранение счета', 'Сумма сумм по услугам не равна общей сумме!');
+        bError = true;
+    }
+
+    return !bError;
+}
 
 
-
-
-
-
+/**
+ *
+ */
+function removeContractOrLegalPerson()
+{
+    $('#servicesBlock .fa-minus').trigger('click');
 }
 
 //document ready
@@ -319,4 +481,9 @@ $(function(){
     $('#servicesBlock').on('click','.fa-minus',removeService);
     $('#billform-ilegalperson').on('change',getBillTpl);
     getBillTpl();
+    $('#servicesBlock').on('click','.chooseService',chooseService);
+    $('#servicesBlock').on('change','.serv-amount',changeServiceAmount);
+    $('#servicesBlock').on('change','.tpl',changeServiceTpl);
+    $('#billform-icuserid, #billform-ilegalperson').on('change',removeContractOrLegalPerson);
+    $(document).on("submit", "form#form-bill", validateFormBefore);
 });
