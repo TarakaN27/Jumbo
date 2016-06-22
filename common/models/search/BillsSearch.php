@@ -142,7 +142,8 @@ class BillsSearch extends Bills
             !empty($this->bill_template)||
             !empty($this->created_at)||
             !empty($this->from_date)||
-            !empty($this->to_date)
+            !empty($this->to_date)||
+            !empty($this->bill_services)
         )
             $this->bCountTotal = TRUE;
 
