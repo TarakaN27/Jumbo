@@ -52,10 +52,10 @@ $arServiceMap = Services::getServicesMap();
     <?php $form = ActiveForm::begin([
         'id' => 'form-bill',
         'options' => [
-            'class' => 'form-horizontal form-label-left'
+            'class' => 'form-horizontal form-label-left custom-form'
         ],
         'fieldConfig' => [
-            'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+            'template' => '<div class="form-group">{label}<div class="col-md-8 col-sm-8 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
             'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
         ],
     ]); ?>
@@ -95,7 +95,7 @@ $arServiceMap = Services::getServicesMap();
 
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Services');?></label>
-        <div class="col-md-6 col-sm-6 col-xs-12" >
+        <div class="col-md-8 col-sm-8 col-xs-12" >
             <div class="text-center">
                 <?=\yii\helpers\Html::button('<i class="fa fa-plus-square"></i>',['class' => 'btn btn-info btn-xs','id' => 'addServId'])?>
             </div>

@@ -178,7 +178,7 @@ class BillsManager extends Bills{
 
                     $arFields [] = [
                         'colNum' => $keyCounter,
-                        'billSubject' => $service->serv_title.' '.$service->offer,
+                        'billSubject' => $service->serv_title,
                         'billPrice' => $price,
                         'billSumm' => $price,
                         'billVatSumm' => $vatAmount,
@@ -198,7 +198,7 @@ class BillsManager extends Bills{
                 {
                     $arFields [] = [
                         'colNum' => $keyCounter,
-                        'billSubject' => $service->serv_title.' '.$service->offer,
+                        'billSubject' => $service->serv_title,
                         'billPrice' => round($service->amount),
                         'billSumm' => round($service->amount),
                         'billVatSumm' => '',
@@ -218,7 +218,7 @@ class BillsManager extends Bills{
                 $billTotalSumVat = $this->amount;
                 $arFields [] = [
                     'colNum' => 1,
-                    'billSubject' => $this->object_text.' '.$this->offer_contract,
+                    'billSubject' => $this->object_text,
                     'billPrice' => round($this->amount/(1+CustomHelper::getVat()/100)),
                     'billSumm' => round($this->amount/(1+CustomHelper::getVat()/100)),
                     'billVatSumm' => $this->amount - round($this->amount/(1+CustomHelper::getVat()/100)),
@@ -236,7 +236,7 @@ class BillsManager extends Bills{
                 $totalSumm = round($this->amount);
                 $arFields [] = [
                     'colNum' => 1,
-                    'billSubject' => $this->object_text.' '.$this->offer_contract,
+                    'billSubject' => $this->object_text,
                     'billPrice' => round($this->amount),
                     'billSumm' => round($this->amount),
                     'billVatSumm' => '',
@@ -287,8 +287,9 @@ class BillsManager extends Bills{
             $doc->setValue('totalSummInWords',$totalSummInWords);
             $doc->setValue('description',$this->description);
             $doc->setValue('billTotalVat',$billTotalVat);
-
-
+            if(!empty($this->offer_contract))
+                $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
+            
             $doc->saveAs($tryPath);
 
             if(file_exists($tryPath))

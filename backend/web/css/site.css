@@ -326,4 +326,6 @@ tr.admin-line{background-color: #CEF6E3 !important;}
     color: #23527c;
 }
 .ul-sortable .sortable-placeholder{min-height: 100px;}
+.custom-form #servicesBlock .form-group{margin-bottom: 1px;}
+.custom-form #servicesBlock .form-group textarea{line-height: 20px;}
 
