@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\web\JsExpression;
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\BillsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -79,10 +80,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         'filter' => \common\models\LegalPerson::getLegalPersonMap()
                     ],
                     [
-                        'attribute' => 'service_id',
+                        'attribute' => 'bill_services',
+                        'format' => 'raw',
+                        'label' => Yii::t('app/documents', 'Service ID'),
                         'value' => function($model){
-                                return is_object($obServ = $model->service) ? $obServ->name : 'N/A';
-                            },
+                            if(empty($model->service_id))
+                            {
+                                $arServTmp = ArrayHelper::getColumn($model->billServices,'service.name');
+                                return empty($arServTmp) ? NULL : implode('<br>',$arServTmp);
+                            }else{
+                                return ArrayHelper::getValue($model,'service.name');
+                            }
+                        },
                         'filter' => \common\models\Services::getServicesMap()
                     ],
                     [
