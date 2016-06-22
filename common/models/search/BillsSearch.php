@@ -97,30 +97,30 @@ class BillsSearch extends Bills
         $this->load($params);
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'manager_id' => $this->manager_id,
-            'cuser_id' => $this->cuser_id,
-            'l_person_id' => $this->l_person_id,
-            'service_id' => $this->service_id,
-            'docx_tmpl_id' => $this->docx_tmpl_id,
-            'amount' => $this->amount,
-            'bill_number' => $this->bill_number,
+            self::tableName().'.id' => $this->id,
+            self::tableName().'.manager_id' => $this->manager_id,
+            self::tableName().'.cuser_id' => $this->cuser_id,
+            self::tableName().'.l_person_id' => $this->l_person_id,
+            self::tableName().'.service_id' => $this->service_id,
+            self::tableName().'.docx_tmpl_id' => $this->docx_tmpl_id,
+            self::tableName().'.amount' => $this->amount,
+            self::tableName().'.bill_number' => $this->bill_number,
             //'bill_date' => $this->bill_date,
-            'bill_template' => $this->bill_template,
-            'use_vat' => $this->use_vat,
-            'vat_rate' => $this->vat_rate,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            self::tableName().'.bill_template' => $this->bill_template,
+            self::tableName().'.use_vat' => $this->use_vat,
+            self::tableName().'.vat_rate' => $this->vat_rate,
+            self::tableName().'.created_at' => $this->created_at,
+            self::tableName().'.updated_at' => $this->updated_at,
         ]);
 
         if(!empty($this->bill_date))
             $query->andFilterWhere([
-                'bill_date' => date('Y-m-d',strtotime($this->bill_date))
+                self::tableName().'.bill_date' => date('Y-m-d',strtotime($this->bill_date))
             ]);
         
-        $query->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'object_text', $this->object_text])
-            ->andFilterWhere(['like', 'buy_target', $this->buy_target]);
+        $query->andFilterWhere(['like', self::tableName().'.description', $this->description])
+            ->andFilterWhere(['like', self::tableName().'.object_text', $this->object_text])
+            ->andFilterWhere(['like', self::tableName().'.buy_target', $this->buy_target]);
 
         if(!empty($this->from_date))
             $query->andWhere(self::tableName().'.bill_date >= :dateFrom',[':dateFrom' => date('Y-m-d',strtotime($this->from_date))]);
@@ -157,7 +157,7 @@ class BillsSearch extends Bills
      */
     public function countTotal($params)
     {
-        $query = Bills::find()->select(['amount']);
+        $query = Bills::find()->select([self::tableName().'.amount']);
         $query = $this->queryHelper($query,$params);
         if(!$this->bCountTotal)
             return NULL;
