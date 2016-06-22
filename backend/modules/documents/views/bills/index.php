@@ -147,7 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{view}{plus}',
+                        'template' => '{view}',
                         'buttons' => [
                             'plus' => function($url, $model, $key){
                                     return Html::a('<i class="fa fa-copy"></i>',['bill-copy','id'=>$model->id]);
