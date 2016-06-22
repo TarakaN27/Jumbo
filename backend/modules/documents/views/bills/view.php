@@ -92,6 +92,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                     ],
                 ]) ?>
+
+                <?php
+                    $arService = $model->billServices;
+                    echo \yii\grid\GridView::widget([
+                        'dataProvider' => $dataProvider,
+                        'filterModel' => $searchModel,
+                    ]);
+
+                ?>
+
+
             </div>
         </div>
     </div>

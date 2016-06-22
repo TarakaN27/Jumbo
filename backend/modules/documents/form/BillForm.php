@@ -236,4 +236,80 @@ class BillForm extends Model
         $tr->commit();
         return TRUE;
     }
+    
+    public function makeUpdate(Bills $obBill)
+    {
+        $tr  = Yii::$app->db->beginTransaction();
+        $obBill->cuser_id = $this->iCuserId;
+        $obBill->l_person_id = $this->iLegalPerson;
+        $obBill->manager_id = Yii::$app->user->id;
+        $obBill->docx_tmpl_id = $this->iDocxTpl;
+        $obBill->amount = $this->fAmount;
+        $obBill->description = $this->sDescription;
+        $obBill->buy_target = $this->sBayTarget;
+        $obBill->offer_contract = $this->sOfferContract;
+        $obBill->use_vat = $this->bUseTax;
+        $obBill->vat_rate = $this->bTaxRate;
+        if(!$obBill->save()) {
+            $tr->rollBack();
+            return FALSE;
+        }
+
+        BillServices::deleteAll(['bill_id' => $obBill->id]);
+
+        $rows = [];
+        foreach ($this->arServices as $serv)
+        {
+            if(!isset(
+                $this->arServAmount[$serv],
+                $this->arServTpl[$serv],
+                $this->arServTitle[$serv],
+                $this->arServDesc[$serv],
+                $this->arServContract[$serv],
+                $this->arServOrder[$serv]
+            ))
+            {
+                $tr->rollBack();
+                throw new InvalidParamException;
+            }
+
+            $amount = $this->arServAmount[$serv];
+            $tpl = $this->arServTpl[$serv];
+            $title = $this->arServTitle[$serv];
+            $description = $this->arServDesc[$serv];
+            $offer = $this->arServContract[$serv];
+            $order = $this->arServOrder[$serv];
+
+            $rows []= [
+                '',
+                $obBill->id,
+                $serv,
+                $tpl,
+                $amount,
+                $title,
+                $description,
+                $offer,
+                time(),
+                time(),
+                $order
+            ];
+        }
+
+        if(count($rows) === 0) {
+            $tr->rollBack();
+            return false;
+        }
+
+        $model = new BillServices();    //пишем историю
+        if(!Yii::$app->db->createCommand()
+            ->batchInsert(BillServices::tableName(), $model->attributes(), $rows)
+            ->execute())
+        {
+            $tr->rollBack();
+            throw new ServerErrorHttpException;
+        }
+
+        $tr->commit();
+        return TRUE;
+    }
 }

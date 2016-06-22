@@ -170,11 +170,24 @@ class BillsController extends AbstractBaseBackendController
             $modelForm->sDescription = $model->description;
 
             $arServices = BillServices::find()->where(['bill_id' => $model->id])->with('service')->all();
-
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-
+            /** @var BillServices $service */
+            foreach ($arServices as $key=>$service)
+            {
+                $modelForm->arServices [] = $service->service_id;
+                $modelForm->arServAmount[$service->service_id] = $service->amount;
+                $modelForm->arServDesc[$service->service_id] = $service->description;
+                $modelForm->arServContract[$service->service_id] = $service->offer;
+                $modelForm->arServOrder[$service->service_id] = $key;
+                $modelForm->arServTitle[$service->service_id] = $service->serv_title;
+                $modelForm->arServTpl[$service->service_id] = $service->serv_tpl_id;
+            }
+            
+            if ($modelForm->load(Yii::$app->request->post())) {
+                if ($modelForm->makeUpdate($model))
+                {
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            }
                 $cuserDesc = '';
                 if($modelForm->iCuserId)
                     $cuserDesc = CUser::getCuserInfoById($modelForm->iCuserId);
@@ -186,7 +199,7 @@ class BillsController extends AbstractBaseBackendController
                     'cuserDesc' => $cuserDesc,
                     'arServices' => $arServices
                 ]);
-            }
+
         }
     }
 

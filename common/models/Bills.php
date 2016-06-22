@@ -154,6 +154,14 @@ class Bills extends AbstractActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBillServices()
+    {
+        return $this->hasMany(BillServices::className(),['service_id' => 'id']);
+    }
+
+    /**
      * @param bool $insert
      * @return bool
      */
