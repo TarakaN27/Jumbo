@@ -158,7 +158,7 @@ class Bills extends AbstractActiveRecord
      */
     public function getBillServices()
     {
-        return $this->hasMany(BillServices::className(),['service_id' => 'id']);
+        return $this->hasMany(BillServices::className(),['bill_id' => 'id']);
     }
 
     /**

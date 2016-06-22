@@ -94,15 +94,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]) ?>
 
                 <?php
-                    $arService = $model->billServices;
                     echo \yii\grid\GridView::widget([
-                        'dataProvider' => $dataProvider,
-                        'filterModel' => $searchModel,
+                        'dataProvider' => new \yii\data\ActiveDataProvider([
+                            'query' => $model->getBillServices(),
+                            'pagination' => [
+                                'defaultPageSize' => 1000,
+                                'pageSizeLimit' => [1,1000]
+                            ],
+                        ]),
+                        'columns' => [
+                            'id',
+                            [
+                                'attribute' => 'service_id',
+                                'value' => 'service.name'
+                            ],
+                            'amount:decimal',
+                            'serv_title:ntext',
+                            'description:ntext',
+                            'offer',
+                            'ordering'
+                        ]
                     ]);
-
                 ?>
-
-
             </div>
         </div>
     </div>

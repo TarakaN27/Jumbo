@@ -77,7 +77,8 @@ return [
     'Create Bill' => 'Добавить счет',
     'Currency id' => 'Валюта',
     'Save' => 'Сохранить',
-    'Add services' => 'Добавление услуг'
-
-
+    'Add services' => 'Добавление услуг',
+    'Serv Title' => 'Предмет счета',
+    'Offer' => 'Контракт',
+    'Ordering' => 'Порядок'
 ];
