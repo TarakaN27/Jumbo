@@ -64,8 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'amount',
                             'value' => $model->amount.' ( '.
-                                CustomHelper::numPropis($model->amount).' '.
-                                CustomHelper::ciRub($model->amount).' )'
+                                CustomHelper::numPropis((int)$model->amount).' '.
+                                CustomHelper::ciRub((int)$model->amount).' )'
                         ],
                         'bill_number',
                         'bill_date:date',
@@ -92,6 +92,30 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                     ],
                 ]) ?>
+
+                <?php
+                    echo \yii\grid\GridView::widget([
+                        'dataProvider' => new \yii\data\ActiveDataProvider([
+                            'query' => $model->getBillServices(),
+                            'pagination' => [
+                                'defaultPageSize' => 1000,
+                                'pageSizeLimit' => [1,1000]
+                            ],
+                        ]),
+                        'columns' => [
+                            'id',
+                            [
+                                'attribute' => 'service_id',
+                                'value' => 'service.name'
+                            ],
+                            'amount:decimal',
+                            'serv_title:ntext',
+                            'description:ntext',
+                            'offer',
+                            'ordering'
+                        ]
+                    ]);
+                ?>
             </div>
         </div>
     </div>

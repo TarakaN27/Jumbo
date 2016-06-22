@@ -72,10 +72,13 @@ return [
     'Buser ID' => 'Добавил акт',
     'Current file' => 'Текущий файл',
     'Template field description' => 'Описание полей шаблона',
-    'offer_contract' => 'Договор оферты',
+    'offer_contract' => 'Договор',
     'Get bill' => 'Получить счет',
     'Create Bill' => 'Добавить счет',
-    'Currency id' => 'Валюта'
-
-
+    'Currency id' => 'Валюта',
+    'Save' => 'Сохранить',
+    'Add services' => 'Добавление услуг',
+    'Serv Title' => 'Предмет счета',
+    'Offer' => 'Контракт',
+    'Ordering' => 'Порядок'
 ];

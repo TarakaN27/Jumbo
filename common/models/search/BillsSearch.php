@@ -2,11 +2,13 @@
 
 namespace common\models\search;
 
+use common\models\BillServices;
 use common\models\CUser;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Bills;
+use yii\helpers\ArrayHelper;
 
 /**
  * BillsSearch represents the model behind the search form about `common\models\Bills`.
@@ -14,6 +16,7 @@ use common\models\Bills;
 class BillsSearch extends Bills
 {
     public
+        $bill_services,
         $from_date,
         $to_date;
 
@@ -30,7 +33,7 @@ class BillsSearch extends Bills
                 'id', 'manager_id', 'cuser_id',
                 'l_person_id', 'service_id', 'docx_tmpl_id',
                 'amount', 'bill_number', 'bill_template',
-                'use_vat', 'created_at', 'updated_at'
+                'use_vat', 'created_at', 'updated_at','bill_services'
             ], 'integer'],
             [['bill_date', 'description', 'object_text', 'buy_target','from_date','to_date'], 'safe'],
             [['vat_rate'], 'number'],
@@ -65,6 +68,7 @@ class BillsSearch extends Bills
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> ['defaultOrder' => ['updated_at'=>SORT_DESC]]
         ]);
 
         if (!$this->validate()) {
@@ -89,39 +93,45 @@ class BillsSearch extends Bills
             $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
         }
 
+        $query->joinWith('billServices');
         $this->load($params);
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'manager_id' => $this->manager_id,
-            'cuser_id' => $this->cuser_id,
-            'l_person_id' => $this->l_person_id,
-            'service_id' => $this->service_id,
-            'docx_tmpl_id' => $this->docx_tmpl_id,
-            'amount' => $this->amount,
-            'bill_number' => $this->bill_number,
+            self::tableName().'.id' => $this->id,
+            self::tableName().'.manager_id' => $this->manager_id,
+            self::tableName().'.cuser_id' => $this->cuser_id,
+            self::tableName().'.l_person_id' => $this->l_person_id,
+            self::tableName().'.service_id' => $this->service_id,
+            self::tableName().'.docx_tmpl_id' => $this->docx_tmpl_id,
+            self::tableName().'.amount' => $this->amount,
+            self::tableName().'.bill_number' => $this->bill_number,
             //'bill_date' => $this->bill_date,
-            'bill_template' => $this->bill_template,
-            'use_vat' => $this->use_vat,
-            'vat_rate' => $this->vat_rate,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            self::tableName().'.bill_template' => $this->bill_template,
+            self::tableName().'.use_vat' => $this->use_vat,
+            self::tableName().'.vat_rate' => $this->vat_rate,
+            self::tableName().'.created_at' => $this->created_at,
+            self::tableName().'.updated_at' => $this->updated_at,
         ]);
 
         if(!empty($this->bill_date))
             $query->andFilterWhere([
-                'bill_date' => date('Y-m-d',strtotime($this->bill_date))
+                self::tableName().'.bill_date' => date('Y-m-d',strtotime($this->bill_date))
             ]);
         
-        $query->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'object_text', $this->object_text])
-            ->andFilterWhere(['like', 'buy_target', $this->buy_target]);
+        $query->andFilterWhere(['like', self::tableName().'.description', $this->description])
+            ->andFilterWhere(['like', self::tableName().'.object_text', $this->object_text])
+            ->andFilterWhere(['like', self::tableName().'.buy_target', $this->buy_target]);
 
         if(!empty($this->from_date))
             $query->andWhere(self::tableName().'.bill_date >= :dateFrom',[':dateFrom' => date('Y-m-d',strtotime($this->from_date))]);
 
         if(!empty($this->to_date))
             $query->andWhere(self::tableName().'.bill_date <= :dateTo',[':dateTo' => date('Y-m-d',strtotime($this->to_date))]);
+
+        if(!empty($this->bill_services))
+        {
+            $query->andWhere(self::tableName().'.service_id = :service OR '.BillServices::tableName().'.service_id = :service',[':service' => $this->bill_services]);
+        }
 
         if(
             !empty($this->manager_id)||
@@ -132,7 +142,8 @@ class BillsSearch extends Bills
             !empty($this->bill_template)||
             !empty($this->created_at)||
             !empty($this->from_date)||
-            !empty($this->to_date)
+            !empty($this->to_date)||
+            !empty($this->bill_services)
         )
             $this->bCountTotal = TRUE;
 
@@ -147,7 +158,7 @@ class BillsSearch extends Bills
      */
     public function countTotal($params)
     {
-        $query = Bills::find()->select(['amount']);
+        $query = Bills::find()->select([self::tableName().'.amount']);
         $query = $this->queryHelper($query,$params);
         if(!$this->bCountTotal)
             return NULL;
@@ -161,5 +172,16 @@ class BillsSearch extends Bills
             $iRes+=$bill->amount;
 
         return $iRes;
+    }
+
+    /**
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        $arLabels =  parent::attributeLabels(); // TODO: Change the autogenerated stub
+        return ArrayHelper::merge($arLabels,[
+            'bill_services' => Yii::t('app/documents','Service')
+        ]);
     }
 }

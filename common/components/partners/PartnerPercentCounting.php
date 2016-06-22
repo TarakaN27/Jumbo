@@ -528,7 +528,6 @@ class PartnerPercentCounting
      */
     protected function countPercent($arLeads,$arPayments,$percent,$obScheme,$partner,$arCuserResident)
     {
-
         $obPurse = PartnerPurse::find()->where(['cuser_id' => $partner->id])->one();
         if(empty($obPurse))
             $obPurse = new PartnerPurse(['cuser_id' => $partner->id]);

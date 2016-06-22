@@ -12,6 +12,7 @@ use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\crunchs\task\ReportTaskUserStat;
 use common\components\ExchangeRates\ExchangeRatesNBRB;
 use common\components\helpers\CustomHelper;
+use common\components\infoHelpers\ManagersInfo;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
 use common\components\tasks\RecurringTask;
@@ -126,11 +127,11 @@ class SiteController extends Controller
         $obTaskStat->userInfoTaskLoadBalance();
         */
 
-        /*
-         * //восстановление курсов валют по датам
+
+        //восстановление курсов валют по датам
         $ob = new ExchangeRatesCrunch();
-        $ob->RecoveryExchangeRates('2016-01-01','2016-06-10');
-        */
+        $ob->RecoveryExchangeRates('2016-06-10','2016-06-16');
+
 
         //$ob = new ExchangeCurrencyHistory();
         //$ob->getCurrencyInByrForPeriod(strtotime('2016-01-01'),strtotime('2016-06-08'),[1,3]);

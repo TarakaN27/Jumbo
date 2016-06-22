@@ -40,8 +40,8 @@ class ExchangeRatesCrunch
 
     public function RecoveryExchangeRates($beginDate,$endDate)
     {
-        $beginDate = '2016-01-01';                  //дата с которой начинаем восстановление
-        $endDate = '2016-06-10';                    //дата на которой заканчиваем восстановление
+        $beginDate = '2016-06-10';                  //дата с которой начинаем восстановление
+        $endDate = '2016-06-15';                    //дата на которой заканчиваем восстановление
         $arRowsForInsert = [];                      //массив с строками для вставки в базу данных
 
         /** @var array $arCurrency */
@@ -59,14 +59,10 @@ class ExchangeRatesCrunch
             ->all();
 
         $arCurrHist = [];
-
-
+        
         $arCurrHist = ArrayHelper::index($arCurrencyHistoryTmp,'date',['currency_id']);         //групируем по дате и делаем ключамии id валюты
 
-
-
         /** @var ExchangeRates $obCurr */
-
         foreach ($arCurrency as $obCurr)
         {
             sleep(5);

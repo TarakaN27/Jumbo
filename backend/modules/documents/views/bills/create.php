@@ -20,8 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
                </section>
                <div class="clearfix"></div>
            </div>
-            <?= $this->render('_form', [
+            <?= $this->render('_form_refactoring', [
                 'model' => $model,
+                'cuserDesc' => $cuserDesc
             ]) ?>
         </div>
    </div>

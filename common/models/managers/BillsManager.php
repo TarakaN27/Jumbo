@@ -12,6 +12,7 @@ namespace common\models\managers;
 use common\components\helpers\CustomHelper;
 use common\models\BillDocxTemplate;
 use common\models\Bills;
+use common\models\BillServices;
 use common\models\BillTemplate;
 use common\models\CuserServiceContract;
 use Yii;
@@ -153,32 +154,106 @@ class BillsManager extends Bills{
         }
 
 
+        $arFields = [];
         $billVatRate  =  "Без НДС";
         $billVatSumm  =  "Без НДС";
+        $billTotalSumVat = 0;
         $billTotalVat = '';
+        $totalSummVat = 0;
+        $totalSumm = 0;
+        if(empty($this->service_id))
+        {
+            $arServices = BillServices::find()->where(['bill_id' => $this->id])->orderBy(['ordering' => SORT_ASC])->all();
+            if(!$arServices)
+                throw new NotFoundHttpException();
+            $keyCounter = 1;
+            if($this->use_vat)
+            {
+                $billTotalVat = 0;
+                /** @var BillServices $service */
+                foreach ($arServices as $service)
+                {
+                    $price = round((float)$service->amount/(1+CustomHelper::getVat()/100));
+                    $vatAmount = (float)$service->amount - $price;
+
+                    $arFields [] = [
+                        'colNum' => $keyCounter,
+                        'billSubject' => $service->serv_title,
+                        'billPrice' => $price,
+                        'billSumm' => $price,
+                        'billVatSumm' => $vatAmount,
+                        'totalSummVat' => $service->amount,
+                        'billVatRate' => CustomHelper::getVat(),
+                        'billTotalSumVat' => round($service->amount)
+                    ];
+
+                    $billTotalVat+= $vatAmount;
+                    $totalSummVat+=$service->amount;
+                    $totalSumm+=$price;
+                    $billTotalSumVat+=$service->amount;
+                    $keyCounter++;
+                }
+            }else{
+                foreach ($arServices as $service)
+                {
+                    $arFields [] = [
+                        'colNum' => $keyCounter,
+                        'billSubject' => $service->serv_title,
+                        'billPrice' => round($service->amount),
+                        'billSumm' => round($service->amount),
+                        'billVatSumm' => '',
+                        'totalSummVat' => round($service->amount),
+                        'billVatRate' => '',
+                        'billTotalSumVat' => round($service->amount)
+                    ];
+                    $totalSummVat+=$service->amount;
+                    $totalSumm+=$service->amount;
+                    $billTotalSumVat+=$service->amount;
+                    $keyCounter++;
+                }
+            }
+        }else{
+            if($this->use_vat)
+            {
+                $billTotalSumVat = $this->amount;
+                $arFields [] = [
+                    'colNum' => 1,
+                    'billSubject' => $this->object_text,
+                    'billPrice' => round($this->amount/(1+CustomHelper::getVat()/100)),
+                    'billSumm' => round($this->amount/(1+CustomHelper::getVat()/100)),
+                    'billVatSumm' => $this->amount - round($this->amount/(1+CustomHelper::getVat()/100)),
+                    'totalSummVat' => round($this->amount),
+                    'billVatRate' => CustomHelper::getVat(),
+                    'billTotalSumVat' => round($this->amount)
+                ];
+                $totalSumm=round($this->amount/(1+CustomHelper::getVat()/100));
+                $billTotalVat = $this->amount - round($this->amount/(1+CustomHelper::getVat()/100));
+                $totalSummVat = round($this->amount);
+                $billTotalSumVat = round($this->amount);
+            }else{
+                $billTotalSumVat = round($this->amount);
+                $totalSummVat = round($this->amount);
+                $totalSumm = round($this->amount);
+                $arFields [] = [
+                    'colNum' => 1,
+                    'billSubject' => $this->object_text,
+                    'billPrice' => round($this->amount),
+                    'billSumm' => round($this->amount),
+                    'billVatSumm' => '',
+                    'totalSummVat' => round($this->amount),
+                    'billVatRate' => '',
+                    'billTotalSumVat' => round($this->amount)
+                ];
+            }
+        }
+
         if($this->use_vat)
         {
-
-            $billVatRate = round($this->vat_rate,1);
-            $billPrice = round($this->amount/(1+CustomHelper::getVat()/100));
-            $billVatSumm = $this->amount - $billPrice;
-            $billTotalVat = $billVatSumm;
-            $billSumm = $billPrice;
-            $billTotalSumVat = $this->amount;
-            $totalSummVat = $this->amount;
-            $totalSumm = $billPrice;
-
-            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
-                CustomHelper::ciRub($billTotalSumVat) .' c НДС ' ;
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis((int)$billTotalSumVat)).'белорусских '.
+                CustomHelper::ciRub((int)$billTotalSumVat) .' c НДС ' ;
         }else{
-            $billSumm = $this->amount;
-            $billPrice = $this->amount;
-            $billTotalSumVat = $this->amount;
-            $totalSummVat = $this->amount;
-            $totalSumm = $this->amount;
-
-            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis($billTotalSumVat)).'белорусских '.
-                CustomHelper::ciRub($billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
+            $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis((int)$billTotalSumVat)).'белорусских '.
+                CustomHelper::ciRub((int)$billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
 
         try{
@@ -196,19 +271,25 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
-            $doc->setValue('billSubject',$this->object_text.' '.$this->offer_contract);
-            $doc->setValue('billPrice',$billPrice);
-            $doc->setValue('billSumm',$billSumm);
-            $doc->setValue('billVatRate',$billVatRate);
-            $doc->setValue('billVatSumm',$billVatSumm);
-            $doc->setValue('billTotalSumVat',$billTotalSumVat);
-            $doc->setValue('totalSumm',$totalSumm);
-            $doc->setValue('totalSummVat',$totalSummVat);
+
+            $doc->cloneRow('colNum',count($arFields));
+            $iCounter = 1;
+            foreach ($arFields as  $value)
+            {
+                foreach ($value as $keyItem => $val)
+                    $doc->setValue($keyItem.'#'.$iCounter,$val);
+
+                $iCounter++;
+            }
+
+            $doc->setValue('totalSumm',round($totalSumm));
+            $doc->setValue('totalSummVat',round($totalSummVat));
             $doc->setValue('totalSummInWords',$totalSummInWords);
             $doc->setValue('description',$this->description);
             $doc->setValue('billTotalVat',$billTotalVat);
-
-
+            if(!empty($this->offer_contract))
+                $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
+            
             $doc->saveAs($tryPath);
 
             if(file_exists($tryPath))
