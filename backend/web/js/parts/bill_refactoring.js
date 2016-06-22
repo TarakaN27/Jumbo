@@ -89,7 +89,7 @@ function  createElement(serviceId,serviceName,iOrder) {
             class:'form-group col-md-6 col-sm-6 col-xs-12'
         }).append(
         $('<label></label>',{
-            text:'Договор оферты',
+            text:'Договор',
             class:'control-label'
         })
         ).append(
@@ -182,7 +182,63 @@ function addServClickAction()
         getServbiceTplParams( arServicesId);
     }
 }
+/**
+ *
+ * @returns {boolean}
+ */
+function chooseDescriptionAndContract()
+{
+    var
+        arContracts = $('#servicesBlock .serv-contract'),
+        arDescription = $('#servicesBlock .serv-desc');
 
+    var
+        bUseContract = true,
+        bUseDesc = true,
+        description = '',
+        contract = '';
+
+    $.each(arContracts,function (ind,value) {
+        if(contract == '')
+        {
+            contract = $.trim($(value).val());
+        }else{
+            if(contract != $.trim($(value).val()))
+            {
+                bUseContract = false;
+            }
+        }
+    });
+
+    $.each(arDescription,function(key,item)
+    {
+        if(description == '')
+        {
+            description = $.trim($(item).val());
+        }else{
+            if(description != $.trim($(item).val()))
+            {
+                bUseDesc = false;
+            }
+        }
+    });
+
+    if(bUseDesc)
+    {
+        $('#billform-sdescription').val(description);
+    }else{
+        $('#billform-sdescription').val('')
+    }
+
+    if(bUseContract)
+    {
+        $('#billform-soffercontract').val(contract);
+    }else{
+        $('#billform-soffercontract').val('');
+    }
+
+    return false;
+}
 
 /**
  * Обновление инпутов порядка по событию перетаскивания
@@ -304,6 +360,7 @@ function getServbiceTplParams(serviceIds)
                 $('#s'+value.service_id+' .serv-title').val(value.object_text);
                 $('#s'+value.service_id+' .serv-desc').val(value.description);
                 $('#s'+value.service_id+' .serv-contract').val(value.offer_contract);
+                chooseDescriptionAndContract();
             });
         },
         error: function (msg) {
@@ -332,7 +389,7 @@ function chooseService()
         description = $('#s'+serviId+' .serv-desc').val(),
         contract = $('#s'+serviId+' .serv-contract').val();
 
-    $('#billform-sdescription').text(description);
+    $('#billform-sdescription').val(description);
     $('#billform-soffercontract').val(contract);
 
     $('.chooseService').removeClass('green').addClass('red').attr('data-choose',0);
