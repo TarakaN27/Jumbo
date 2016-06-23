@@ -15,6 +15,7 @@ use common\components\helpers\CustomHelper;
 use common\components\infoHelpers\ManagersInfo;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
+use common\components\partners\PartnerPercentRecounting;
 use common\components\tasks\RecurringTask;
 use common\models\BuserInviteCode;
 use common\models\ExchangeCurrencyHistory;
@@ -113,10 +114,10 @@ class SiteController extends Controller
         $obBonus = new RecalculateBonus();
         $obBonus->recalculatePartnerBonus();
         */
-        /*
+
         $obCalc = new PartnerPercentCounting();
         $obCalc->countPercentByMonth('01-06-2016');
-*/
+
         //1466340220
         /*
         $obRecurringTask = new RecurringTask(1465389820);
@@ -129,9 +130,10 @@ class SiteController extends Controller
 
 
         //восстановление курсов валют по датам
+        /*
         $ob = new ExchangeRatesCrunch();
         $ob->RecoveryExchangeRates('2016-06-10','2016-06-16');
-
+        */
 
         //$ob = new ExchangeCurrencyHistory();
         //$ob->getCurrencyInByrForPeriod(strtotime('2016-01-01'),strtotime('2016-06-08'),[1,3]);
@@ -146,6 +148,10 @@ class SiteController extends Controller
         // перерасчет платежей по правильному курсу валют
         $obPayRcl = new RecalcPayment();
         $obPayRcl->recalculatePayments();
+        */
+        /*
+        $obRecalPer = new PartnerPercentRecounting();
+        $obRecalPer->dailyRecounting();
         */
         die;
     }

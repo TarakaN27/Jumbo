@@ -62,4 +62,15 @@ class CustomDateHelper
         $obDate->modify($sign.$num.' '.$entity);
         return $obDate->getTimestamp();
     }
+
+    /**
+     * Is current month
+     * @param $time
+     * @return bool
+     */
+    public static function isCurrentMonth($time)
+    {
+        $beginMonth = CustomHelper::getBeginMonthTime(time());
+        return $beginMonth <= $time;
+    }
 }

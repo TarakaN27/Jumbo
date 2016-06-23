@@ -8,6 +8,7 @@
 
 namespace common\components\partners;
 
+use common\components\helpers\CustomDateHelper;
 use common\components\helpers\CustomHelper;
 use common\models\CUser;
 use common\models\EnrollmentRequest;
@@ -17,6 +18,7 @@ use common\models\PartnerCuserServ;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
 use common\models\PartnerSchemes;
+use common\models\PartnerSchemesServicesHistory;
 use common\models\PaymentCondition;
 use common\models\Payments;
 use common\models\PaymentsCalculations;
@@ -31,7 +33,17 @@ class PartnerPercentCounting
 {
 
     protected
+        $arPartnerIDs = [], 
         $exchangeCurrency = [];             //array for exchange currency history
+
+    /**
+     * PartnerPercentCounting constructor.
+     * @param array $arPartnerIds
+     */
+    public function __construct(array $arPartnerIds = [])
+    {
+        $this->arPartnerIDs = $arPartnerIds;
+    }
 
     /**
      * @param null $beginTime
@@ -76,7 +88,7 @@ class PartnerPercentCounting
             $arPartnerServGroups = $this->getPartnerServiceGroups($obScheme);           //Get partner service group for each service
             $fullAmountByGroup = $this->getPaymentAmount($arPayments,$obScheme->currency_id,$arPartnerServGroups,$arCuserResident,$obScheme);  //Get full amount at scheme currency
 
-            $percent = $this->getPercent($fullAmountByGroup,$obScheme);        //Get scheme parameters for services(percent and legal params)
+            $percent = $this->getPercent($fullAmountByGroup,$obScheme,$time);        //Get scheme parameters for services(percent and legal params)
             if(count($percent) === 0)
                 continue;
 
@@ -146,7 +158,7 @@ class PartnerPercentCounting
      */
     protected function getPartners()
     {
-        return CUser::find()
+        $query = CUser::find()
             ->select([
                 'id',
                 'partner_scheme',
@@ -154,8 +166,14 @@ class PartnerPercentCounting
                 'partner'
             ])
             ->where('archive = 0 OR archive is NULL')
-            ->partner()
-            ->all();
+            ->partner();
+        
+        if(!empty($this->arPartnerIDs))
+        {
+            $query->andWhere(['id' => $this->arPartnerIDs]);
+        }
+        
+        return $query->all();
     }
 
     /**
@@ -478,13 +496,34 @@ class PartnerPercentCounting
     }
 
     /**
+     * Get percent rates for service and groups
      * @param $fullAmount
      * @param $obScheme
      * @return array
      */
-    protected function getPercent($fullAmountByGroup,$obScheme)
+    protected function getPercent($fullAmountByGroup,$obScheme,$time)
     {
-        $arServices = $obScheme->partnerSchemesServices;                //todo дописать поулчение процентов из истории
+        $arServices = NULL;
+        if(!CustomDateHelper::isCurrentMonth($time))
+        {
+            $selectFlag = PartnerSchemesServicesHistory::find()
+                ->select(['id','created_at','scheme_id'])
+                ->where('created_at >= :date',['date' => CustomHelper::getBeginMonthTime($time)])
+                ->andWhere(['scheme_id' => $obScheme->id])
+                ->orderBy(['created_at' => SORT_ASC])
+                ->one();
+            if($selectFlag)
+            {
+                $arServices = PartnerSchemesServicesHistory::find()
+                    ->where(['scheme_id' => $obScheme->id,'created_at' => $selectFlag->created_at])
+                    ->orderBy(['created_at' => SORT_ASC])
+                    ->all();
+            }
+            unset($selectFlag);
+        }
+        if(!$arServices)
+            $arServices = $obScheme->partnerSchemesServices;
+
         if(empty($arServices))
             return [];
 
