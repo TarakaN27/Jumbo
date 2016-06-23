@@ -12,6 +12,7 @@ namespace common\components\behavior\partners;
 use common\models\PartnerCuserServ;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
+use common\models\RecalculatePartner;
 use yii\base\Behavior;
 use yii\web\ServerErrorHttpException;
 
@@ -22,7 +23,8 @@ class PartnerCuserServActionBehavior extends Behavior
     {
         return [
             PartnerCuserServ::EVENT_AFTER_ARCHIVE => 'afterArchive',
-            PartnerCuserServ::EVENT_AFTER_DELETE => 'afterDelete'
+            PartnerCuserServ::EVENT_AFTER_DELETE => 'afterDelete',
+            PartnerCuserServ::EVENT_AFTER_INSERT => 'afterInsert'
         ];
     }
 
@@ -112,8 +114,22 @@ class PartnerCuserServActionBehavior extends Behavior
         return TRUE;
     }
 
+    /**
+     * @return bool
+     * @throws ServerErrorHttpException
+     */
+    public function afterInsert()
+    {
+        /** @var PartnerCuserServ $model */
+        $model = $this->owner;
 
+        $obRecal = new RecalculatePartner();
+        $obRecal->cuser_id = $model->partner_id;
+        $obRecal->service_id = $model->service_id;
+        $obRecal->begin_date = $model->connect;
+        if(!$obRecal->save())
+            throw new ServerErrorHttpException();
 
-
-
+        return TRUE;
+    }
 }

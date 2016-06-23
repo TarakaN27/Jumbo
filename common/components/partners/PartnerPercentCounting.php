@@ -31,8 +31,14 @@ class PartnerPercentCounting
 {
 
     protected
-        $exchangeCurrency = [];
+        $exchangeCurrency = [];             //array for exchange currency history
 
+    /**
+     * @param null $beginTime
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
     public function countPercentByMonth($beginTime = NULL)
     {
         $time = null === $beginTime ? time() : (is_numeric($beginTime) ? $beginTime : strtotime($beginTime));
@@ -478,7 +484,7 @@ class PartnerPercentCounting
      */
     protected function getPercent($fullAmountByGroup,$obScheme)
     {
-        $arServices = $obScheme->partnerSchemesServices;
+        $arServices = $obScheme->partnerSchemesServices;                //todo дописать поулчение процентов из истории
         if(empty($arServices))
             return [];
 

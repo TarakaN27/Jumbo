@@ -6,6 +6,7 @@ use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PaymentBonusBehavior;
 use common\components\payment\PaymentEnrollmentBehavior;
 use common\components\payment\PaymentQuantityHoursBehavior;
+use common\components\payment\PaymentRecalculatePartnerPercentBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -172,10 +173,13 @@ class Payments extends AbstractActiveRecord
                 ],
                 */
                 [
-                    'class' => PaymentQuantityHoursBehavior::className()    //начисление норма часов
+                    'class' => PaymentQuantityHoursBehavior::className()            //начисление норма часов
                 ],
                 [
-                    'class' => PaymentEnrollmentBehavior::className()   //запрос на зачисление
+                    'class' => PaymentEnrollmentBehavior::className()               //запрос на зачисление
+                ],
+                [
+                    'class' => PaymentRecalculatePartnerPercentBehavior::className()    //перерасчет партнерских бонусов(добавление флагов в таблицу для пересчета)
                 ]
             ]);
     }
