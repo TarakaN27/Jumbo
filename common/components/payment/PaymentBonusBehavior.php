@@ -588,7 +588,17 @@ class PaymentBonusBehavior extends Behavior
 	 */
 	protected function addBonus($iUserID,$iPaymentID,$iSchemeID,$iServiceID,$iCuserID,$amount)
 	{
-		if(BUserBonus::find()->where(['buser_id' => $iUserID,'payment_id' => $iPaymentID,'service_id' => $iServiceID])->exists())
+		$bExistBonus = BUserBonus::find()
+			->joinWith('scheme')
+			->where([
+				BUserBonus::tableName().'.buser_id' => $iUserID,
+				BUserBonus::tableName().'.payment_id' => $iPaymentID,
+				BUserBonus::tableName().'.service_id' => $iServiceID
+			])
+			->andWhere(['!=',BonusScheme::tableName().'.type',BonusScheme::TYPE_UNITS])		//исключаем юниты из проверки
+			->exists();
+		
+		if($bExistBonus)
 			return true;
 
 		$obBonus = new BUserBonus();
