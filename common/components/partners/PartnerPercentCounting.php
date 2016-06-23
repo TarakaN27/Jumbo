@@ -33,6 +33,7 @@ class PartnerPercentCounting
 {
 
     protected
+        $time = NULL,
         $arPartnerIDs = [], 
         $exchangeCurrency = [];             //array for exchange currency history
 
@@ -53,7 +54,7 @@ class PartnerPercentCounting
      */
     public function countPercentByMonth($beginTime = NULL)
     {
-        $time = null === $beginTime ? time() : (is_numeric($beginTime) ? $beginTime : strtotime($beginTime));
+        $this->time = $time = null === $beginTime ? time() : (is_numeric($beginTime) ? $beginTime : strtotime($beginTime));
 
         $arPartners = $this->getPartners();                             //Get partners  (array of objects)
         if(empty($arPartners))
@@ -88,7 +89,7 @@ class PartnerPercentCounting
             $arPartnerServGroups = $this->getPartnerServiceGroups($obScheme);           //Get partner service group for each service
             $fullAmountByGroup = $this->getPaymentAmount($arPayments,$obScheme->currency_id,$arPartnerServGroups,$arCuserResident,$obScheme);  //Get full amount at scheme currency
 
-            $percent = $this->getPercent($fullAmountByGroup,$obScheme,$time);        //Get scheme parameters for services(percent and legal params)
+            $percent = $this->getPercent($fullAmountByGroup,$obScheme);        //Get scheme parameters for services(percent and legal params)
             if(count($percent) === 0)
                 continue;
 
@@ -238,23 +239,23 @@ class PartnerPercentCounting
         $arResult = [];
         foreach ($arLeads as $leads) {
             $queryMain = NULL;
-            foreach ($leads as $lead) {
+            foreach ($leads as $key => $lead) {
                 $query = (new Query())
                     ->from(Payments::tableName())
                     ->select(['id', 'pay_date', 'pay_summ', 'service_id','currency_id','legal_id','cuser_id'])
                     ->where(['cuser_id' => $lead->cuser_id, 'service_id' => $lead->service_id])
-                    ->andWhere('pay_date >= :beginMonth AND pay_date <=:endMonth AND pay_date >= :connect')
+                    ->andWhere('pay_date >= :beginMonth'.$key.' AND pay_date <=:endMonth'.$key.' AND pay_date >= :connect'.$key)
                     ->params([
-                        ':beginMonth' => $beginMonth,
-                        ':endMonth' => $endMonth,
-                        ':connect' => strtotime($lead->connect . ' 00:00:00')
+                        ':beginMonth'.$key => $beginMonth,
+                        ':endMonth'.$key => $endMonth,
+                        ':connect'.$key => strtotime($lead->connect)
                     ]);
                 if (null == $queryMain)
                     $queryMain = $query;
                 else
                     $queryMain->union($query);
             }
-
+            $t = $queryMain->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
             $arResultTmp = $queryMain->all();
             $arResult = ArrayHelper::merge($arResult, $arResultTmp);
         }
@@ -451,7 +452,7 @@ class PartnerPercentCounting
      */
     protected function getPaymentAmount($arPayments,$currency,$arPartnerServGroups,$arCuserResident,$obScheme)
     {
-        $arServices = $obScheme->partnerSchemesServices;
+        $arServices = $this->getSchemeServices($obScheme);
         $arServParams = [];
         foreach ($arServices as $serv)
         {
@@ -496,19 +497,18 @@ class PartnerPercentCounting
     }
 
     /**
-     * Get percent rates for service and groups
-     * @param $fullAmount
      * @param $obScheme
-     * @return array
+     * @param $time
+     * @return null
      */
-    protected function getPercent($fullAmountByGroup,$obScheme,$time)
+    protected function getSchemeServices($obScheme)
     {
         $arServices = NULL;
-        if(!CustomDateHelper::isCurrentMonth($time))
+        if(!CustomDateHelper::isCurrentMonth($this->time))
         {
             $selectFlag = PartnerSchemesServicesHistory::find()
                 ->select(['id','created_at','scheme_id'])
-                ->where('created_at >= :date',['date' => CustomHelper::getBeginMonthTime($time)])
+                ->where('created_at >= :date',['date' => CustomHelper::getBeginMonthTime($this->time)])
                 ->andWhere(['scheme_id' => $obScheme->id])
                 ->orderBy(['created_at' => SORT_ASC])
                 ->one();
@@ -523,6 +523,20 @@ class PartnerPercentCounting
         }
         if(!$arServices)
             $arServices = $obScheme->partnerSchemesServices;
+
+        return $arServices;
+    }
+
+
+    /**
+     * Get percent rates for service and groups
+     * @param $fullAmount
+     * @param $obScheme
+     * @return array
+     */
+    protected function getPercent($fullAmountByGroup,$obScheme)
+    {
+        $arServices = $this->getSchemeServices($obScheme);
 
         if(empty($arServices))
             return [];
@@ -670,7 +684,7 @@ class PartnerPercentCounting
      */
     protected function getPartnerServiceGroups($obScheme)
     {
-        $arServices = $obScheme->partnerSchemesServices;
+        $arServices =$this->getSchemeServices($obScheme);
         if(empty($arServices))
             return [];
 

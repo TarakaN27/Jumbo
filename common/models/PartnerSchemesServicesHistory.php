@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%partner_schemes_services_history}}".
@@ -82,5 +83,19 @@ class PartnerSchemesServicesHistory extends AbstractActiveRecord
     public function getGroup()
     {
         return $this->hasOne(PartnerSchemesServicesGroup::className(),['id' => 'group_id']);
+    }
+
+    /**
+     *
+     */
+    public function afterFind()
+    {
+        if(!is_array($this->ranges) && !empty($this->ranges))
+            $this->ranges = Json::decode($this->ranges);
+
+        if(!is_array($this->legal) && !empty($this->legal))
+            $this->legal = Json::decode($this->legal);
+
+        return parent::afterFind();
     }
 }
