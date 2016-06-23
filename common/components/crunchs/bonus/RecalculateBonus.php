@@ -23,6 +23,7 @@ use common\models\ExchangeCurrencyHistory;
 use common\models\managers\PaymentsManager;
 use common\models\PaymentCondition;
 use common\models\PaymentsCalculations;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ServerErrorHttpException;
 use Yii;
@@ -35,7 +36,10 @@ class RecalculateBonus
 	 */
 	public function run()
 	{
-		$arPaymentsTmp = Payments::find()->all();
+		$arPaymentsTmp = Payments::find()->where(['>=','pay_date','1464792594'])->all();
+
+		BUserBonus::deleteAll(['id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),'scheme_id' => [2,3,4,5,6,7]]);
+
 		$arPayments = [];
 		foreach ($arPaymentsTmp as $payment)
 			$arPayments[$payment->id] = $payment;

@@ -117,9 +117,9 @@ class BillsController extends AbstractBaseBackendController
         $model->sBayTarget = Yii::t('app/documents','DefaultBuytarget');
         if($model->load(Yii::$app->request->post()))
         {
-            if($model->makeRequest())
+            if($billId = $model->makeRequest())
             {
-                return $this->redirect(['index']);
+                return $this->redirect(['view','id' => $billId]);
             }
         }
         

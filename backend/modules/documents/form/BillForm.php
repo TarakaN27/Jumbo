@@ -157,7 +157,7 @@ class BillForm extends Model
         }
 
         $tr->commit();
-        return TRUE;
+        return $obBill->id;
     }
     
     
