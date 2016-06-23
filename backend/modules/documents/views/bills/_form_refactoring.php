@@ -85,8 +85,6 @@ $arServiceMap = Services::getServicesMap();
 
     <?= $form->field($model, 'iDocxTpl')->dropDownList(BillDocxTemplate::getBillDocxMap()) ; ?>
 
-    <?= $form->field($model,'fAmount')->textInput(['maxlength' => true])?>
-
     <?= $form->field($model,'bUseTax')->dropDownList(Bills::getYesNo())?>
 
     <?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
@@ -159,6 +157,8 @@ $arServiceMap = Services::getServicesMap();
             </div>
         </div>
     </div>
+
+    <?= $form->field($model,'fAmount')->textInput(['maxlength' => true])?>
 
     <?= $form->field($model, 'sDescription')->textarea(['rows' => 6]) ?>
 
