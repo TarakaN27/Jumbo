@@ -3,7 +3,7 @@
 namespace common\models;
 
 use Yii;
-
+use common\components\helpers\CustomHelperMoney;
 /**
  * This is the model class for table "{{%expense}}".
  *
@@ -50,7 +50,7 @@ class Expense extends AbstractActiveRecord
                 'cat_id', 'created_at',
                 'updated_at','pw_request_id'
             ], 'integer'],
-            [['pay_summ'], 'number'],
+            [['pay_summ'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['description'], 'string'],
             [['cuser_id'],'required','when' => function(){
                 $obCat = $this->cat;
@@ -153,5 +153,21 @@ class Expense extends AbstractActiveRecord
     public function getPartnerWithdrawalRequest()
     {
         return $this->hasOne(PartnerWithdrawalRequest::className(),['id' => 'pw_request_id']);
+    }
+
+    /**
+     *
+     */
+    public function convertToValidAmount()
+    {
+        $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ);
+    }
+
+    /**
+     *
+     */
+    public function convertToInavlidAmount()
+    {
+        $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ);
     }
 }
