@@ -25,6 +25,7 @@ use Gears\Pdf;
 class BillsManager extends Bills{
 
     CONST
+        RUBLE_MODE = 2,             //1- миллионы /2 - рубли после деноминации
         BILLS_PATH = '@common/upload/docx_bills';
 
     protected
@@ -179,17 +180,17 @@ class BillsManager extends Bills{
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
-                        'billPrice' => $price,
-                        'billSumm' => $price,
-                        'billVatSumm' => $vatAmount,
-                        'totalSummVat' => $service->amount,
+                        'billPrice' => $this->amountHelperFormat($price),
+                        'billSumm' => $this->amountHelperFormat($price),
+                        'billVatSumm' => $this->amountHelperFormat($vatAmount),
+                        'totalSummVat' => $this->amountHelperFormat($service->amount),
                         'billVatRate' => CustomHelper::getVat(),
-                        'billTotalSumVat' => round($service->amount)
+                        'billTotalSumVat' => $this->amountHelperFormat($service->amount)
                     ];
 
-                    $billTotalVat+= $vatAmount;
+                    $billTotalVat+= self::RUBLE_MODE == 2 ? round($vatAmount/10000,2) : $vatAmount;
                     $totalSummVat+=$service->amount;
-                    $totalSumm+=$price;
+                    $totalSumm+=self::RUBLE_MODE == 2 ? round($price/10000,2) : $price  ;
                     $billTotalSumVat+=$service->amount;
                     $keyCounter++;
                 }
@@ -199,15 +200,15 @@ class BillsManager extends Bills{
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
-                        'billPrice' => round($service->amount),
-                        'billSumm' => round($service->amount),
+                        'billPrice' => $this->amountHelperFormat($service->amount),
+                        'billSumm' => $this->amountHelperFormat($service->amount),
                         'billVatSumm' => '',
-                        'totalSummVat' => round($service->amount),
+                        'totalSummVat' => $this->amountHelperFormat($service->amount),
                         'billVatRate' => '',
-                        'billTotalSumVat' => round($service->amount)
+                        'billTotalSumVat' => $this->amountHelperFormat($service->amount)
                     ];
                     $totalSummVat+=$service->amount;
-                    $totalSumm+=$service->amount;
+                    $totalSumm+=self::RUBLE_MODE == 2 ? round($service->amount/10000,2) : $service->amount;
                     $billTotalSumVat+=$service->amount;
                     $keyCounter++;
                 }
@@ -219,34 +220,36 @@ class BillsManager extends Bills{
                 $arFields [] = [
                     'colNum' => 1,
                     'billSubject' => $this->object_text,
-                    'billPrice' => round($this->amount/(1+CustomHelper::getVat()/100)),
-                    'billSumm' => round($this->amount/(1+CustomHelper::getVat()/100)),
-                    'billVatSumm' => $this->amount - round($this->amount/(1+CustomHelper::getVat()/100)),
-                    'totalSummVat' => round($this->amount),
+                    'billPrice' => $this->amountHelperFormat($this->amount/(1+CustomHelper::getVat()/100)),
+                    'billSumm' => $this->amountHelperFormat($this->amount/(1+CustomHelper::getVat()/100)),
+                    'billVatSumm' => $this->amountHelperFormat($this->amount - round($this->amount/(1+CustomHelper::getVat()/100))),
+                    'totalSummVat' => $this->amountHelperFormat($this->amount),
                     'billVatRate' => CustomHelper::getVat(),
-                    'billTotalSumVat' => round($this->amount)
+                    'billTotalSumVat' => $this->amountHelperFormat($this->amount)
                 ];
-                $totalSumm=round($this->amount/(1+CustomHelper::getVat()/100));
-                $billTotalVat = $this->amount - round($this->amount/(1+CustomHelper::getVat()/100));
+                $price = round($this->amount/(1+CustomHelper::getVat()/100));
+                $vatAmount = $this->amount - round($this->amount/(1+CustomHelper::getVat()/100));
+                $totalSumm=self::RUBLE_MODE == 2 ? round($price/10000,2) : $price  ;
+                $billTotalVat = self::RUBLE_MODE == 2 ? round($vatAmount/10000,2) : $vatAmount ;
                 $totalSummVat = round($this->amount);
                 $billTotalSumVat = round($this->amount);
             }else{
                 $billTotalSumVat = round($this->amount);
                 $totalSummVat = round($this->amount);
-                $totalSumm = round($this->amount);
+                $totalSumm = self::RUBLE_MODE == 2 ? round($this->amount/10000,2) : $this->amount;
                 $arFields [] = [
                     'colNum' => 1,
                     'billSubject' => $this->object_text,
-                    'billPrice' => round($this->amount),
-                    'billSumm' => round($this->amount),
+                    'billPrice' => $this->amountHelperFormat($this->amount),
+                    'billSumm' => $this->amountHelperFormat($this->amount),
                     'billVatSumm' => '',
-                    'totalSummVat' => round($this->amount),
+                    'totalSummVat' => $this->amountHelperFormat($this->amount),
                     'billVatRate' => '',
-                    'billTotalSumVat' => round($this->amount)
+                    'billTotalSumVat' => $this->amountHelperFormat($this->amount)
                 ];
             }
         }
-
+        /*
         if($this->use_vat)
         {
             $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis((int)$billTotalSumVat)).'белорусских '.
@@ -255,6 +258,13 @@ class BillsManager extends Bills{
             $totalSummInWords = CustomHelper::my_ucfirst(CustomHelper::numPropis((int)$billTotalSumVat)).'белорусских '.
                 CustomHelper::ciRub((int)$billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
+        */
+
+        $totalSummInWords = self::RUBLE_MODE == 2 ?
+            CustomHelper::num2str($billTotalSumVat/10000):
+            CustomHelper::my_ucfirst(CustomHelper::numPropis((int)$billTotalSumVat)).'белорусских '. CustomHelper::ciRub((int)$billTotalSumVat);
+
+        $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
 
         try{
 
@@ -272,9 +282,9 @@ class BillsManager extends Bills{
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
 
-            $doc->cloneRow('colNum',count($arFields));
+            $doc->cloneRow('colNum',count($arFields));                  //размножаем таблицу
             $iCounter = 1;
-            foreach ($arFields as  $value)
+            foreach ($arFields as  $value)                              //пишем строки в таблицу
             {
                 foreach ($value as $keyItem => $val)
                     $doc->setValue($keyItem.'#'.$iCounter,$val);
@@ -282,11 +292,11 @@ class BillsManager extends Bills{
                 $iCounter++;
             }
 
-            $doc->setValue('totalSumm',round($totalSumm));
-            $doc->setValue('totalSummVat',round($totalSummVat));
+            $doc->setValue('totalSumm',$this->formatterHelper($totalSumm));
+            $doc->setValue('totalSummVat',$this->amountHelperFormat($totalSummVat));
             $doc->setValue('totalSummInWords',$totalSummInWords);
             $doc->setValue('description',$this->description);
-            $doc->setValue('billTotalVat',$billTotalVat);
+            $doc->setValue('billTotalVat',empty($billTotalVat) ? '' : $this->formatterHelper($billTotalVat));
             if(!empty($this->offer_contract))
                 $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
             
@@ -305,6 +315,36 @@ class BillsManager extends Bills{
             $this->_manError [] = 'Ошибка формирования .docx файла';
             return FALSE;
         }
+    }
+
+    /**
+     * @param $amount
+     * @return string
+     */
+    protected function amountHelperFormat($amount)
+    {
+        return self::RUBLE_MODE == 2 ? $this->getNewByr($amount) : $this->formatterHelper($amount);
+    }
+
+    /**
+     * @param $amount
+     * @return string
+     */
+    protected function formatterHelper($amount)
+    {
+        $precision = self::RUBLE_MODE == 1 ? 0 : 2;
+        return \Yii::$app->formatter->asDecimal($amount,$precision);
+    }
+
+    /**
+     * @param $amount
+     * @return string
+     */
+    protected function getNewByr($amount)
+    {
+        //return ((int)($amount/10000)).' руб. '.(round((float)('0.'.$amount%10000),2,PHP_ROUND_HALF_DOWN)*100).' коп.';
+        \Yii::$app->formatter->decimalSeparator = ',';
+        return \Yii::$app->formatter->asDecimal($amount/10000,2);
     }
 
     /**

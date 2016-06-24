@@ -5,6 +5,9 @@
  * Date: 26.5.16
  * Time: 16.10
  * Вторая версия класса реализующего логику формирования документа акта
+ * В формировании акта используется костыль, для указания деноминированной валюты в двух видах
+ * после 1.01.2017 года костыль нужно удалить, так как в документах останеться только один формат для указаная бел. валюты.
+ *
  */
 namespace common\components\acts;
 
@@ -24,7 +27,8 @@ use Gears\Pdf;
 class ActsDocumentsV2
 {
     CONST
-        RUB_MODE = 0,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли
+        RUB_MODE = 2,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
+        BEL_RUBLE_ID = 2,       //костыль указываем id бел рубля
         PRECISION = 4;          //точность округления
 
     protected
@@ -186,26 +190,7 @@ class ActsDocumentsV2
             $price = $amount/$serv->quantity;
 
             $vatAmount = $this->bUseVat ? $serv->amount-$amount: '';
-
-            $arResult[] = [
-                'colNum' => (int)$key+1,
-                'jobName' => $serv->job_description,
-                'quantity' => $serv->quantity,
-                /*
-                'price' => $this->iCurrencyId == 2 ? $price.'('.$this->getNewByr($price).')' : $price,
-                'amount' => $this->iCurrencyId == 2 ? $amount.'('.$this->getNewByr($amount).')' : $amount,
-                'vatRate' => $vatRate,
-                'vatAmount' => empty($vatAmount) ? '' : $this->iCurrencyId == 2 ? $vatAmount.'('.$this->getNewByr($vatAmount).')' : $vatAmount,
-                'amountWithVat' => $this->iCurrencyId == 2 ? $amountWithVat.'('.$this->getNewByr($amountWithVat).')' : $amountWithVat,
-                */
-                'price' => round($price),
-                'amount' => round($amount),
-                'vatRate' => $vatRate,
-                'vatAmount' => empty($vatAmount) ? '' : round($vatAmount),
-                'amountWithVat' => round($amountWithVat),
-
-            ];
-
+            $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat);
             $this->totalAmount+= $amount;
             if($this->bUseVat)
                 $this->totalVatAmount = (float)$this->totalVatAmount + $vatAmount;
@@ -214,37 +199,166 @@ class ActsDocumentsV2
             $this->totalFiniteAmount+=$amountWithVat;
         }
 
-        $this->totalAmountWithVat = round($this->totalAmountWithVat);
-        $this->totalFiniteAmount = round($this->totalFiniteAmount);
-        if($this->bUseVat)
-            $this->totalVatAmount = round($this->totalVatAmount);
+        $this->amountInWordsMode();
+        return $this->arServices = $arResult;
+    }
 
-        $this->amountInWords =
-            $this->iCurrencyId == 2 ?
-                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalFiniteAmount)).' белорусских '. CustomHelper::ciRub($this->totalFiniteAmount) :
-            CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+    /**
+     *
+     */
+    protected function amountInWordsMode()
+    {
+        if($this->iCurrencyId == self::BEL_RUBLE_ID)
+            switch (self::RUB_MODE)
+            {
+                case 0:
+                    $this->amountInWords =
+                        CustomHelper::my_ucfirst(CustomHelper::numPropis(round($this->totalFiniteAmount))).' белорусских '. CustomHelper::ciRub(round($this->totalFiniteAmount));
+                        $strVatAmount = '';
+                        if($this->bUseVat)
+                        {
+                            $strVatAmount =
+                                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalVatAmount)).' белорусских '. CustomHelper::ciRub($this->totalVatAmount);
+                        }
 
-        $strVatAmount = '';
-        if($this->bUseVat)
+                        $this->vatInWords = $this->bUseVat ?
+                            ' в т.ч.: НДС - '.$strVatAmount :
+                            ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+                        $this->totalAmount = round($this->totalAmount);
+                        $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
+                        if($this->bUseVat)
+                            $this->totalVatAmount = $this->formatterHelper($this->totalVatAmount);
+
+                        $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat);
+                    break;
+                case 1:
+                $this->amountInWords = CustomHelper::num2str(($this->totalFiniteAmount/10000),$this->n2wUnit);
+                $strVatAmount = '';
+                if($this->bUseVat)
+                {
+                    $strVatAmount = CustomHelper::num2str($this->totalVatAmount/10000,$this->n2wUnit);
+                }
+
+                $this->vatInWords = $this->bUseVat ?
+                    ' в т.ч.: НДС - '.$strVatAmount :
+                    ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+
+                $this->totalAmount = $this->formatterHelper($this->totalAmount).'  ('.$this->getNewByr($this->totalAmount).')';
+                $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount).'  ('.$this->getNewByr($this->totalFiniteAmount).')';
+                if($this->bUseVat)
+                    $this->totalVatAmount = $this->formatterHelper($this->totalVatAmount).'  ('.$this->getNewByr($this->totalVatAmount).')';
+
+                $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat).'  ('.$this->getNewByr($this->totalAmountWithVat).')';
+                    break;
+                case 2:
+                    $this->amountInWords = CustomHelper::num2str(($this->totalFiniteAmount/10000),$this->n2wUnit);
+                    $strVatAmount = '';
+                    if($this->bUseVat)
+                    {
+                        $strVatAmount = CustomHelper::num2str($this->totalVatAmount/10000,$this->n2wUnit);
+                    }
+
+                    $this->vatInWords = $this->bUseVat ?
+                        ' в т.ч.: НДС - '.$strVatAmount :
+                        ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+
+                    $this->totalAmount = $this->getNewByr($this->totalAmount);
+                    $this->totalFiniteAmount = $this->getNewByr($this->totalFiniteAmount);
+                    if($this->bUseVat)
+                        $this->totalVatAmount = $this->getNewByr($this->totalVatAmount);
+
+                    $this->totalAmountWithVat = $this->getNewByr($this->totalAmountWithVat);
+                    break;
+                default:
+                    break;
+            }
+        else{
+            $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+            $strVatAmount = '';
+            if($this->bUseVat)
+            {
+                $strVatAmount = CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
+            }
+
+            $this->vatInWords = $this->bUseVat ?
+                ' в т.ч.: НДС - '.$strVatAmount :
+                ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+
+            $this->totalAmount = $this->formatterHelper($this->totalAmount);
+
+            $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
+            if($this->bUseVat)
+                $this->totalVatAmount = $this->formatterHelper($this->totalVatAmount);
+
+            $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat);
+        }
+    }
+
+    /**
+     * @param $colNum
+     * @param $serv
+     * @param $price
+     * @param $amount
+     * @param $vatRate
+     * @param $vatAmount
+     * @param $amountWithVat
+     * @return array
+     */
+    protected function rubleModeCounting($colNum,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat)
+    {
+        $arResult = [
+            'colNum' => $colNum,
+            'jobName' => $serv->job_description,
+            'quantity' => $serv->quantity
+        ];
+
+        switch (self::RUB_MODE)
         {
-            $strVatAmount = $this->iCurrencyId == 2 ?
-                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalVatAmount)).' белорусских '. CustomHelper::ciRub($this->totalVatAmount) :
-                CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
+            case 0:
+                $arResult['price'] = $this->formatterHelper($price);
+                $arResult['amount'] = $this->formatterHelper($amount);
+                $arResult['vatRate'] = $vatRate;
+                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->formatterHelper($vatAmount);
+                $arResult['amountWithVat'] =  $this->formatterHelper($amountWithVat);
+                break;
+            case 1:
+
+                if($this->iCurrencyId == self::BEL_RUBLE_ID)
+                {
+                    $price = round($price,0);
+                    $amount =round($amount,0);
+                    $vatAmount = empty($vatAmount) ? $vatAmount : round($vatAmount);
+                    $amountWithVat = round($amountWithVat,0);
+                }
+
+                $arResult['price'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($price).'  ('.$this->getNewByr($price).') ' :  $this->formatterHelper($price);
+                $arResult['amount'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($amount).'  ('.$this->getNewByr($amount).') ' :  $this->formatterHelper($amount);
+                $arResult['vatRate'] = $vatRate;
+                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->iCurrencyId == 2 ?  $this->formatterHelper($vatAmount).'  ('.$this->getNewByr($vatAmount).') ' :  $this->formatterHelper($vatAmount);
+                $arResult['amountWithVat'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($amountWithVat).'  ('.$this->getNewByr($amountWithVat).') ' :  $this->formatterHelper($amountWithVat);
+                break;
+            case 2:
+                $arResult['price'] = $this->iCurrencyId == 2 ? $this->getNewByr($price) :  $this->formatterHelper($price);
+                $arResult['amount'] = $this->iCurrencyId == 2 ? $this->getNewByr($amount) :  $this->formatterHelper($amount);
+                $arResult['vatRate'] = $vatRate;
+                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->iCurrencyId == 2 ? $this->getNewByr($vatAmount) :  $this->formatterHelper($vatAmount);
+                $arResult['amountWithVat'] = $this->iCurrencyId == 2 ? $this->getNewByr($amountWithVat) :  $this->formatterHelper($amountWithVat);
+                break;
+            default:
+                break;
         }
 
-        $this->vatInWords = $this->bUseVat ?
-            ' в т.ч.: НДС - '.$strVatAmount :
-            ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+        return $arResult;
+    }
 
-        $this->totalAmount = round($this->totalAmount);
-        /*
-        $this->totalAmount = $this->iCurrencyId == 2 ? $this->totalAmount.'('.$this->getNewByr($this->totalAmount).')' : $this->totalAmount;
-        $this->totalAmountWithVat = $this->iCurrencyId == 2 ? $this->totalAmountWithVat.'('.$this->getNewByr($this->totalAmountWithVat).')' : $this->totalAmountWithVat;
-        $this->totalFiniteAmount = $this->iCurrencyId == 2 ? $this->totalFiniteAmount.'('.$this->getNewByr($this->totalFiniteAmount).')' : $this->totalFiniteAmount;
-        if($this->bUseVat)
-            $this->totalVatAmount = $this->iCurrencyId == 2 ? $this->totalVatAmount.'('.$this->getNewByr($this->totalVatAmount).')' : $this->totalVatAmount;
-        */
-        return $this->arServices = $arResult;
+    /**
+     * @param $amount
+     * @return string
+     */
+    protected function formatterHelper($amount)
+    {
+        $precision = $this->iCurrencyId == self::BEL_RUBLE_ID ? 0 : 2;
+        return \Yii::$app->formatter->asDecimal($amount,$precision);
     }
 
     /**
@@ -253,7 +367,9 @@ class ActsDocumentsV2
      */
     protected function getNewByr($amount)
     {
-        return ((int)($amount/10000)).' руб. '.(round((float)('0.'.$amount%10000),2,PHP_ROUND_HALF_DOWN)*100).' коп.';
+        //return ((int)($amount/10000)).' руб. '.(round((float)('0.'.$amount%10000),2,PHP_ROUND_HALF_DOWN)*100).' коп.';
+        \Yii::$app->formatter->decimalSeparator = ',';
+        return \Yii::$app->formatter->asDecimal($amount/10000,2);
     }
 
     /**

@@ -43,8 +43,6 @@ function sendActs()
                 }
             });
 }
-
-
 ",\yii\web\View::POS_END);
 ?>
 
@@ -80,6 +78,8 @@ function sendActs()
                                 return $model->act_num;
                             }
                         ],
+                        'amount:decimal',
+                        /*
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
@@ -87,6 +87,7 @@ function sendActs()
                                 return $model->amount;
                             }
                         ],
+                        */
                         [
                             'attribute' => 'currency_id',
                             'value' => 'currency.code',
