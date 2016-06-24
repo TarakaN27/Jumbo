@@ -36,9 +36,13 @@ class RecalculateBonus
 	 */
 	public function run()
 	{
-		$arPaymentsTmp = Payments::find()->all();
+		$arPaymentsTmp = Payments::find()->where(['>=','pay_date','1464739200'])->all();
 
-		//BUserBonus::deleteAll(['id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),'scheme_id' => [2,3,4,5,6,7]]);
+		BUserBonus::deleteAll([
+			'payment_id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),
+			'scheme_id' => [2,3,4,5,6,7],
+			//'buser_id' => 44
+		]);
 
 		$arPayments = [];
 		foreach ($arPaymentsTmp as $payment)
@@ -47,6 +51,8 @@ class RecalculateBonus
 		$arSales = PaymentsSale::find()->all();
 
 		$obCount = new PaymentBonusBehavior();
+
+		//$obCount->setOnlyForIdUser(44);
 
 		/** @var PaymentsSale $sale */
 		foreach($arSales as $key => $sale)

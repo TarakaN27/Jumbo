@@ -42,7 +42,16 @@ use Yii;
 class PaymentBonusBehavior extends Behavior
 {
 	protected
+		$onlyForId = NULL, 				//id пользователя для бонусов(если нужно сделать перерасчет для определенного пользователя, то указываем его id)
 		$lastPayment = NULL;
+
+	/**
+	 * @param $iUserId
+	 */
+	public function setOnlyForIdUser($iUserId)
+	{
+		$this->onlyForId = $iUserId;
+	}
 
 	/**
 	 * @return array
@@ -305,6 +314,9 @@ class PaymentBonusBehavior extends Behavior
 			$saleUser = $model->saleUser;
 		}
 
+		if(!is_null($this->onlyForId) && $this->onlyForId != $saleUser)
+			return false;
+
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);	//схемы искллючения для пользователя
 		if($paymentBase == BonusScheme::BASE_SALE)
 			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
@@ -456,6 +468,10 @@ class PaymentBonusBehavior extends Behavior
 			else
 				$saleUser = $obSale->buser_id;
 		}
+
+		if(!is_null($this->onlyForId) && $this->onlyForId != $saleUser)
+			return false;
+
 		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser($arCuserGroup);	//сземы искллючения для пользователя
 		if($paymentBase == BonusScheme::BASE_SALE)
 			$paymentBase = [BonusScheme::BASE_SALE,BonusScheme::BASE_PAYMENT];
