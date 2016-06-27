@@ -287,6 +287,11 @@ use yii\widgets\DetailView;
 									'value' => CustomHelper::highlight('dummy',$modelR->c_fax)
 									],
 									[
+										'attribute' => 'j_address',
+										'format' => 'html',
+										'value' => CustomHelper::highlight('dummy',$modelR->j_address)
+									],
+									[
 									'attribute' => 'p_address',
 									'format' => 'html',
 									'value' => CustomHelper::highlight('dummy',$modelR->p_address)

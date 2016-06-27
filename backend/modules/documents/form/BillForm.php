@@ -45,8 +45,9 @@ class BillForm extends Model
     public function rules()
     {
         return [
-            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sDescription','sOfferContract','fAmount'],'required'],
+            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sOfferContract','fAmount'],'required'],
             [['bUseTax'],'integer'],
+            ['sDescription','trim'],
             [['bTaxRate'],'required',
                 'when' => function(){
                     return $this->bUseTax == 1;

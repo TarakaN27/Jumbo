@@ -483,6 +483,7 @@ function validateFormBefore()
         bError = false,
         fullAmount = parseFloat($('#billform-famount').val()),
         tmpAmount = 0,
+        sDescription = $.trim($('#billform-sdescription').val()),
         sOffertaContract = $.trim($('#billform-soffercontract').val());
 
     $.each(arServices,function(ind,val){
@@ -491,6 +492,7 @@ function validateFormBefore()
 
         let
             contract = $('.serv-contract[data-serv-id="'+servId+'"]').val(),
+            servDescription = $('.serv-desc[data-serv-id="'+servId+'"]').val(),
             amount = parseFloat($('.serv-amount[data-serv-id="'+servId+'"]').val());
 
         tmpAmount+=amount;
@@ -503,6 +505,12 @@ function validateFormBefore()
         if($.trim(contract) != sOffertaContract)
         {
             addErrorNotify('Сохранение счета', 'В услуге "'+arServMap[servId]+'" неверно задан договор оферты!');
+            bError = true;
+        }
+
+        if(sDescription != '' && sDescription != servDescription)
+        {
+            addErrorNotify('Сохранение счета', 'В услуге "'+arServMap[servId]+'" неверно задано описание!');
             bError = true;
         }
     });
