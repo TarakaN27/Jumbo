@@ -8,9 +8,8 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 $parse = parse_url(Url::home(true));
-$actLink = $parse['scheme'].'://'.$parse['host'].'/site/get-act-pdf?ask='.$act->ask;
 ?>
 Добрый день.
 В клиентской системе Вебмарт Групп был сгенерирован новый акт.
-Для скачивания акта пройдите по ссылке <?= Html::a(Html::encode($actLink), $actLink) ?>
+Файл акта прикреплен к письму.
 

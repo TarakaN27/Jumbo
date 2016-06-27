@@ -25,6 +25,7 @@ use common\models\ServiceDefaultContract;
 use common\models\CuserServiceContract;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\web\ServerErrorHttpException;
 
 /**
  * ActsController implements the CRUD actions for Acts model.
@@ -188,7 +189,7 @@ class ActsController extends AbstractBaseBackendController
     }
 
     /**
-     * @todo возможно нужно будет применять очередь сообщений. Например RabbitMQ
+     * @todo Нужно будет применять очередь сообщений. Например RabbitMQ
      * @return bool
      * @throws NotFoundHttpException
      */
@@ -198,7 +199,7 @@ class ActsController extends AbstractBaseBackendController
         if(!$arSelected)
             throw new InvalidParamException('Acts not set');
 
-        $arActs = Acts::find()->where(['id' => $arSelected])->all();
+        $arActs = Acts::find()->where(['id' => $arSelected])->andWhere('sent is NULL OR sent = 0')->all();
         if(!$arActs)
             throw new NotFoundHttpException('Acts not found');
 
@@ -209,13 +210,14 @@ class ActsController extends AbstractBaseBackendController
                 $arCUser [] = $act->cuser_id;
 
         $arCUserEmail = CUser::getCUserEmails($arCUser); //получаем емаил пользователя
-        $arSKUsers = CuserExternalAccount::getSKByCUserIDs($arCUser,CuserExternalAccount::TYPE_CSDA); // получаем внешние аккаунты
+        //$arSKUsers = CuserExternalAccount::getSKByCUserIDs($arCUser,CuserExternalAccount::TYPE_CSDA); // получаем внешние аккаунты
         if(!$arCUserEmail)
             throw new NotFoundHttpException('Contractor not found');
-
+        $arUpdActs = [];
+        /** @var Acts $act */
         foreach($arActs as $act)
         {
-            if(isset($arCUserEmail[$act->cuser_id]))
+            if(isset($arCUserEmail[$act->cuser_id]) && !empty($arCUserEmail[$act->cuser_id]))
             {
                 if(\Yii::$app->mailer->compose( // отправялем уведомление по ссылке
                     [
@@ -223,25 +225,32 @@ class ActsController extends AbstractBaseBackendController
                         'text' => 'actNotification-text'
                     ],
                     [
-                        'act' => $act]
+                        'act' => $act
+                    ]
                     )
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                    ->setTo($arCUserEmail[$act->cuser_id])
+                    //->setTo($arCUserEmail[$act->cuser_id])
+                    ->setTo('motuzdev@gmail.com')
                     ->setSubject('Act notification ' . \Yii::$app->name)
+                    ->attach($act->getDocumentPath())
                     ->send()) {
 
-                        if(isset($arSKUsers[$act->cuser_id])) //отпарвляем уведомление на внешний аккаунт
-                        {
-                            $obCSDA = new CSDAUser();
-                            $obCSDA->sentNotificationNewAct($act,$arSKUsers[$act->cuser_id]);
-                        }
-
-                        $act->sent = Acts::YES;
-                        $act->save();
+                        //if(isset($arSKUsers[$act->cuser_id])) //отпарвляем уведомление на внешний аккаунт
+                        //{
+                        //    $obCSDA = new CSDAUser();
+                        //    $obCSDA->sentNotificationNewAct($act,$arSKUsers[$act->cuser_id]);
+                        //}
+                    $arUpdActs [] = $act->id;
+                    //    $act->sent = Acts::YES;
+                    //    $act->save();
                 }
             }
 
         }
+
+        if($arUpdActs)
+            Acts::updateAll(['sent' => Acts::YES],['id' => $arUpdActs]);
+
         Yii::$app->response->format = Response::FORMAT_JSON;    //set answer format
         return TRUE;
     }
@@ -322,5 +331,31 @@ class ActsController extends AbstractBaseBackendController
             $error.='<br>';
         }
         return $error;
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \yii\base\ExitException
+     */
+    public function actionUpdateCuserEmail()
+    {
+        $pk = Yii::$app->request->post('pk');
+        $value = Yii::$app->request->post('value');
+
+        if(empty($pk) || empty($value))
+            throw new InvalidParamException();
+
+        $obCuser = CUser::find()->where([CUser::tableName().'.id' => $pk])->joinWith('requisites')->one();
+        if(!$obCuser || !$obCuser->requisites)
+            throw new NotFoundHttpException();
+
+        $obRequisites = $obCuser->requisites;
+
+        $obRequisites->c_email = $value;
+        if(!$obRequisites->save())
+            throw new ServerErrorHttpException();
+
+        return Yii::$app->end(200);
     }
 }
