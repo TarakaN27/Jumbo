@@ -229,8 +229,8 @@ class ActsController extends AbstractBaseBackendController
                     ]
                     )
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                    //->setTo($arCUserEmail[$act->cuser_id])
-                    ->setTo('motuzdev@gmail.com')
+                    ->setTo($arCUserEmail[$act->cuser_id])
+                    //->setTo('motuzdev@gmail.com')
                     ->setSubject('Act notification ' . \Yii::$app->name)
                     ->attach($act->getDocumentPath())
                     ->send()) {
