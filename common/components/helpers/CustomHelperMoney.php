@@ -36,6 +36,5 @@ class CustomHelperMoney
         return $amount/self::BYN_BUR_FACTOR;
     }
 
-
-
+    
 }
