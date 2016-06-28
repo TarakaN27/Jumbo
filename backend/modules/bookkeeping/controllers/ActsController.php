@@ -6,6 +6,7 @@ use backend\modules\bookkeeping\form\ActForm;
 use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
 use common\components\helpers\CustomHelper;
+use common\components\rabbitmq\Rabbit;
 use common\models\ActImplicitPayment;
 use common\models\ActToPayments;
 use common\models\CUser;
@@ -214,45 +215,33 @@ class ActsController extends AbstractBaseBackendController
         if(!$arCUserEmail)
             throw new NotFoundHttpException('Contractor not found');
         $arUpdActs = [];
+        $arReturnStatus = [
+            'error' => [],
+            'success' => []
+        ];           //массив со статусами отправки сообщений по актам
         /** @var Acts $act */
         foreach($arActs as $act)
         {
-            if(isset($arCUserEmail[$act->cuser_id]) && !empty($arCUserEmail[$act->cuser_id]))
+            if(file_exists($act->getDocumentPath()) && isset($arCUserEmail[$act->cuser_id]) && !empty($arCUserEmail[$act->cuser_id]))
             {
-                if(\Yii::$app->mailer->compose( // отправялем уведомление по ссылке
-                    [
-                        'html' => 'actNotification-html',
-                        'text' => 'actNotification-text'
-                    ],
-                    [
-                        'act' => $act
-                    ]
-                    )
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                    ->setTo($arCUserEmail[$act->cuser_id])
-                    //->setTo('motuzdev@gmail.com')
-                    ->setSubject('Act notification ' . \Yii::$app->name)
-                    ->attach($act->getDocumentPath())
-                    ->send()) {
-
-                        //if(isset($arSKUsers[$act->cuser_id])) //отпарвляем уведомление на внешний аккаунт
-                        //{
-                        //    $obCSDA = new CSDAUser();
-                        //    $obCSDA->sentNotificationNewAct($act,$arSKUsers[$act->cuser_id]);
-                        //}
-                    $arUpdActs [] = $act->id;
-                    //    $act->sent = Acts::YES;
-                    //    $act->save();
+                $arMsg = [
+                    'iActId' => $act->id,
+                    'toEmail' => $arCUserEmail[$act->cuser_id],
+                    'iBUserId' => Yii::$app->user->id
+                ];
+                if(Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,$arMsg))
+                {
+                    $arReturnStatus['success'][] = $act->id;
+                }else{
+                    $arReturnStatus['error'][] = $act->id;
                 }
+            }else{
+                $arReturnStatus['error'][] = $act->id;
             }
-
         }
 
-        if($arUpdActs)
-            Acts::updateAll(['sent' => Acts::YES],['id' => $arUpdActs]);
-
         Yii::$app->response->format = Response::FORMAT_JSON;    //set answer format
-        return TRUE;
+        return $arReturnStatus;
     }
 
     /**

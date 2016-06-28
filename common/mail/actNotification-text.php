@@ -7,7 +7,6 @@
  */
 use yii\helpers\Html;
 use yii\helpers\Url;
-$parse = parse_url(Url::home(true));
 ?>
 Добрый день.
 В клиентской системе Вебмарт Групп был сгенерирован новый акт.

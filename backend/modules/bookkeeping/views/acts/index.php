@@ -55,18 +55,24 @@ var
                             'class' => 'yii\grid\CheckboxColumn',
                             'checkboxOptions' =>  function($model, $key, $index, $widget){
                                 return [
-                                    'class' => 'selectedActs',
+                                    'class' => 'selectedActs'.($model->sent ? ' hide' : ''),
                                     'value' => $model->id
                                 ];
                             }
                         ],
                         [
+                            'attribute' => 'id'
+                        ],
+                        [
                             'attribute' => 'act_num',
                             'format' => 'html',
+                            'visible' => function($model){
+                                return false;
+                            },
                             'value' => function($model){
                                 return $model->act_num;
-                            }
-                        ],
+                            },
+                                                    ],
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
@@ -125,8 +131,9 @@ var
                         ],
                         [
                             'attribute' => 'sent',
+                            'format' => 'raw',
                             'value' => function($model){
-                                return $model->getYesNoStr($model->sent);
+                                return Html::tag('span',$model->getYesNoStr($model->sent),['id' => 'sSent_'.$model->id]);
                             },
                             'filter' => \common\models\Acts::getYesNo()
                         ],

@@ -45,7 +45,8 @@ class LogModelBehavior extends Behavior{
      */
     protected function getUserID()
     {
-        if(\Yii::$app->user->isGuest)
+
+        if(!property_exists(\Yii::$app,'user') || \Yii::$app->user->isGuest)
             return 'is_guest';
         else
             return \Yii::$app->user->id;
@@ -59,16 +60,28 @@ class LogModelBehavior extends Behavior{
         $this->setOldAttribute($this->owner->getAttributes());
     }
 
+    /**
+     * @param $value
+     */
     public function setOldAttribute($value)
     {
         $this->_oldAttributes = $value;
     }
 
+    /**
+     * @return array
+     */
     public function getOldAttribute()
     {
         return $this->_oldAttributes;
     }
 
+    /**
+     * @param $action
+     * @param array|null $value
+     * @param array|null $old_value
+     * @return bool
+     */
     public function leaveTrail($action, array $value = null, array $old_value = null)
     {
         if ($this->active) {
@@ -84,25 +97,36 @@ class LogModelBehavior extends Behavior{
         return true;
     }
 
+    /**
+     * @return mixed
+     */
     protected function getNormalizedPk()
     {
         $pk = $this->owner->getPrimaryKey();
         return is_array($pk) ? json_encode($pk) : $pk;
     }
 
+    /**
+     * @return bool
+     */
     public function afterInsert()
     {
         $arAttr = $this->getValues();
         return $this->leaveTrail('INSERT',$arAttr);
     }
 
+    /**
+     * @return bool
+     */
     public function afterDelete()
     {
         $arAttr = $this->getValues();
         return $this->leaveTrail('DELETE',$arAttr);
     }
 
-
+    /**
+     * @return bool
+     */
     public function afterUpdate()
     {
         $arAttr = $this->getValues();
@@ -115,7 +139,11 @@ class LogModelBehavior extends Behavior{
         return TRUE;
     }
 
-
+    /**
+     * @param array $arAttr
+     * @param array $arOldAttr
+     * @return array
+     */
     protected function compareValue(array $arAttr,array $arOldAttr)
     {
         $arResult = [];
@@ -130,6 +158,9 @@ class LogModelBehavior extends Behavior{
         return $arResult;
     }
 
+    /**
+     * @return mixed
+     */
     protected function getValues()
     {
         $attributes = $this->owner->getAttributes();

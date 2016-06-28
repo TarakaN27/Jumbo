@@ -16,6 +16,8 @@ use common\components\infoHelpers\ManagersInfo;
 use common\components\notification\TabledNotification;
 use common\components\partners\PartnerPercentCounting;
 use common\components\partners\PartnerPercentRecounting;
+use common\components\rabbitmq\Rabbit;
+use common\components\rabbitmq\workers\ActsLetterRabbitHandler;
 use common\components\tasks\RecurringTask;
 use common\models\BuserInviteCode;
 use common\models\ExchangeCurrencyHistory;
@@ -87,6 +89,9 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
+
+        \Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
+
         /*
         $recalc = new RecalcPayment();
         $recalc->recalculateWithSetConditions();
@@ -104,11 +109,10 @@ class SiteController extends Controller
 
         //$obUnit = new RecalculateUnitBonus();
         //$obUnit->run();
-
+        /*
         $obBonus = new RecalculateBonus();
         $obBonus->run();
-
-
+        */
         //перерассчет бонусов
         /*
         $obBonus = new RecalculateBonus();
@@ -127,23 +131,17 @@ class SiteController extends Controller
         $obTaskStat = new ReportTaskUserStat();
         $obTaskStat->userInfoTaskLoadBalance();
         */
-
-
         //восстановление курсов валют по датам
         /*
         $ob = new ExchangeRatesCrunch();
         $ob->RecoveryExchangeRates('2016-06-10','2016-06-16');
         */
-
         //$ob = new ExchangeCurrencyHistory();
         //$ob->getCurrencyInByrForPeriod(strtotime('2016-01-01'),strtotime('2016-06-08'),[1,3]);
-
-
         /*
         $obCurr = new ExchangeRatesNBRB();
         $obCurr->getCurrencyRateByPeriod(145,strtotime('2016-01-01'),strtotime('2016-06-08'));
         */
-
         /*
         // перерасчет платежей по правильному курсу валют
         $obPayRcl = new RecalcPayment();
