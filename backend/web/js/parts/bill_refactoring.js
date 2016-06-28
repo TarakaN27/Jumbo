@@ -358,8 +358,8 @@ function getServbiceTplParams(serviceIds)
             $.each(data,function(ind,value){
                 $('#sel'+value.service_id).val(value.id);
                 $('#s'+value.service_id+' .serv-title').val(value.object_text);
-                $('#s'+value.service_id+' .serv-desc').val(value.description);
-                $('#s'+value.service_id+' .serv-contract').val(value.offer_contract);
+                $('#s'+value.service_id+' .serv-desc').val($.trim(value.description));
+                $('#s'+value.service_id+' .serv-contract').val($.trim(value.offer_contract));
                 chooseDescriptionAndContract();
             });
         },
@@ -389,8 +389,8 @@ function chooseService()
         description = $('#s'+serviId+' .serv-desc').val(),
         contract = $('#s'+serviId+' .serv-contract').val();
 
-    $('#billform-sdescription').val(description);
-    $('#billform-soffercontract').val(contract);
+    $('#billform-sdescription').val($.trim(description));
+    $('#billform-soffercontract').val($.trim(contract));
 
     $('.chooseService').removeClass('green').addClass('red').attr('data-choose',0);
     $(this).removeClass('red').addClass('green').attr('data-choose',1);
@@ -492,7 +492,7 @@ function validateFormBefore()
 
         let
             contract = $('.serv-contract[data-serv-id="'+servId+'"]').val(),
-            servDescription = $('.serv-desc[data-serv-id="'+servId+'"]').val(),
+            servDescription = $.trim($('.serv-desc[data-serv-id="'+servId+'"]').val()),
             amount = parseFloat($('.serv-amount[data-serv-id="'+servId+'"]').val());
 
         tmpAmount+=amount;

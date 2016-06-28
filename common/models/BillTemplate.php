@@ -41,6 +41,7 @@ class BillTemplate extends AbstractActiveRecord
     {
         return [
             [['name', 'l_person_id', 'service_id', 'object_text','offer_contract'], 'required'],
+            [['object_text', 'description','name','offer_contract'],'trim'],
             [['l_person_id', 'service_id',  'created_at', 'updated_at'], 'integer'],
             [['object_text', 'description'], 'string'],
             [['name','offer_contract'], 'string', 'max' => 255],
