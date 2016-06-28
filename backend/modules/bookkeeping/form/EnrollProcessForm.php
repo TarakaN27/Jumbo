@@ -11,6 +11,7 @@ namespace backend\modules\bookkeeping\form;
 
 
 use backend\widgets\Alert;
+use common\models\CuserToGroup;
 use common\models\EnrollmentRequest;
 use common\models\Enrolls;
 use common\models\PromisedPayment;
@@ -110,7 +111,7 @@ class EnrollProcessForm extends Model{
             if ($this->repay > 0 && $this->isPayment)    //гасим обещанные платежи платежи
             {
                 $rAmount = $this->repay;
-                $arUserID  = [$this->request->cuser_id];
+                $arUserGroup = $arUserID  = CuserToGroup::getAllUserIdsAtGroupByUserId((int)$this->request->cuser_id);
                 $orderType = SORT_ASC;
                 if(!empty($this->cuserOP)) {
                     $arUserID [] = $this->cuserOP;
@@ -125,10 +126,17 @@ class EnrollProcessForm extends Model{
                         'cuser_id' => $arUserID,
                         'service_id' => $this->request->service_id
                     ])
-                    ->andWhere('(paid is NULL OR paid = 0)')
-                    ->orderBy(['cuser_id' => $orderType])
+                    ->andWhere('(paid is NULL OR paid = 0)');
+
+                if(!empty($arGroupUsers))
+                {
+                    $arPromised->orderBy(['FIELD(cuser_id,'.implode(',',$arGroupUsers).')' => SORT_DESC]);      //вначе идут ОП контрагента и его группы, затем чужие
+                }else{
+                    $arPromised->orderBy(['cuser_id' => $orderType]);                   //нет группы
+                }
+                    //->orderBy(['cuser_id' => $orderType])
                     //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
-                    ->all();
+                $arPromised = $arPromised->all();
 
                 $arPIds = [];
                 foreach($arPromised as $pr)

@@ -8,70 +8,20 @@
  */
 use yii\helpers\Html;
 use yii\web\JsExpression;
+use common\components\helpers\CustomViewHelper;
+use yii\web\View;
+use yii\helpers\Url;
 $this->title = Yii::t('app/book','Process enrollment request');
-
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/enroll_request_process.js',$this);
 $this->registerJs("
-
-function countDelta()
-{
-    var
-            delta = 0,
-            amount =  $('#enrollprocessform-availableamount').val(),
-            repay = $('#enrollprocessform-repay').val(),
-            enroll = $('#enrollprocessform-enroll');
-
-        delta = amount-repay;
-        if(delta < 0)
-            {
-                enroll.val(0);
-            }else{
-                enroll.val(delta);
-            }
-}
-
-$('#enrollprocessform-repay').on('change',countDelta);
-$('#enrollprocessform-cuserop').on('change',function(){
-        var
-            this1 = $(this),
-            value = this1.val();
-
-        $.ajax({
-            type: 'POST',
-            url: '".\yii\helpers\Url::to(['get-promised-payment'])."',
-            data: { cuserID: ".$model->cuser_id.", cuserOP: value,servID: ".$model->service_id." },
-            success: function(data){
-                $('#promised-payment-table').html(data.grid);
-                var ppAmount = parseFloat(data.amount);
-                if(ppAmount > 0)
-                {
-                    var
-                        amount =  parseFloat($('#enrollprocessform-availableamount').val()),
-                        repay = $('#enrollprocessform-repay');
-                    repay.removeAttr('disabled');
-
-                    if(amount > ppAmount)
-                    {
-                        repay.val(ppAmount);
-                    }else{
-                        repay.val(amount);
-                    }
-                    countDelta();
-                }
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                addErrorNotify('".Yii::t('app/reports','Promised payment')."','".Yii::t('app/reports','Can not load promised payments')."');
-                this1.val('');
-                var
-                    repay = $('#enrollprocessform-repay');
-
-                repay.val(0);
-                repay.attr('disabled','disabled');
-                countDelta();
-            }
-        });
-});
-",\yii\web\View::POS_READY);
-
+var
+    urlGetPromisedPayment = '".Url::to(['get-promised-payment'])."',
+    erp_cuserID = ".$model->cuser_id.",
+    erp_servID = ".$model->service_id.",
+    erp_errorTitle = '".Yii::t('app/reports','Promised payment')."',
+    erp_errorText = '".Yii::t('app/reports','Can not load promised payments')."'
+    ;
+",View::POS_HEAD);
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -188,17 +138,16 @@ $('#enrollprocessform-cuserop').on('change',function(){
                 <div class="row">
                         <?=Html::tag('h3',Yii::t('app/book','Enroll request proccess'))?>
                         <?php
-                        $form = \yii\bootstrap\ActiveForm::begin([
-                            'options' => [
-                                'class' => 'form-horizontal form-label-left'
-                            ],
-                            'fieldConfig' => [
-                                'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
-                                'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
-                            ],
-                        ]);
-                        echo Html::activeHiddenInput($obForm,'availableAmount');
-
+                            $form = \yii\bootstrap\ActiveForm::begin([
+                                'options' => [
+                                    'class' => 'form-horizontal form-label-left'
+                                ],
+                                'fieldConfig' => [
+                                    'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+                                    'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
+                                ],
+                            ]);
+                            echo Html::activeHiddenInput($obForm,'availableAmount');
                         ?>
 
                         <?php

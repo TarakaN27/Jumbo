@@ -7,6 +7,7 @@ use backend\models\BUser;
 use backend\modules\bookkeeping\form\EnrollProcessForm;
 use backend\widgets\Alert;
 use common\models\CUser;
+use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\PaymentCondition;
@@ -221,6 +222,10 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
             /** @var PaymentCondition $obCond */
             $obCond = is_object($obCalc) ? $obCalc->payCond : NULL;
+            
+            
+            $arUserGroup = CuserToGroup::getAllUserIdsAtGroupByUserId($model->cuser_id);
+            
             $arPromised = PromisedPayment::find()
                 ->select([
                     PromisedPayment::tableName().'.id',
@@ -237,7 +242,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                 ->joinWith('addedBy')
                 ->joinWith('service')
                 ->where([
-                    'cuser_id' => $model->cuser_id,
+                    'cuser_id' => $arUserGroup,
                     'service_id' => $model->service_id
                 ])
                 ->andWhere('(paid is NULL OR paid = 0)')
@@ -313,6 +318,9 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
     }
 
+    /**
+     * @return array
+     */
     public function actionGetPromisedPayment()
     {
         $cID = Yii::$app->request->post('cuserID');
@@ -323,8 +331,11 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             throw new InvalidParamException();
 
         $arUserID = [];
-        if(!empty($cID))
-            $arUserID [] = (int)$cID;
+        $arGroupUsers = [];
+        if(!empty($cID)) {
+            //$arUserID [] = (int)$cID;
+            $arGroupUsers = $arUserID = CuserToGroup::getAllUserIdsAtGroupByUserId((int)$cID);
+        }
 
         $orderType = SORT_ASC;
         if(!empty($cIPOP))
@@ -357,10 +368,16 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                 'cuser_id' => $arUserID,
                 'service_id' => $servID
             ])
-            ->andWhere('(paid is NULL OR paid = 0)')
-            ->orderBy(['cuser_id' => $orderType])
-            //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
-            ->all();
+            ->andWhere('(paid is NULL OR paid = 0)');
+
+        if(!empty($arGroupUsers))
+        {
+            $arPromised->orderBy(['FIELD(cuser_id,'.implode(',',$arGroupUsers).')' => SORT_DESC]);      //вначе идут ОП контрагента и его группы, затем чужие
+        }else{
+            $arPromised->orderBy(['cuser_id' => $orderType]);                   //нет группы
+        }
+            //$arPromised = $arPromised->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
+        $arPromised = $arPromised->all();
 
         $amount = 0;
         foreach($arPromised as $pr)
