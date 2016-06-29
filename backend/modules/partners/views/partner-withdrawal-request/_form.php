@@ -71,7 +71,7 @@ var
             ]])
                 ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
         </div>
-        <div class="col-md-3 col-sm-3 col-xs-12">
+        <div class="col-md-3 col-sm-3 col-xs-12 pdd-top-10">
             <span id="partner-a-amount-purse"></span>
         </div>    
     </div>
