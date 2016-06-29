@@ -74,14 +74,6 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
         $addCond = NULL;
         $addParams = NULL;
         //@todo проверить
-        if(Yii::$app->user->can('only_partner_manager'))
-        {
-            $addCond = PartnerWithdrawalRequest::tableName().'.status = :statusNew ';
-            $addParams = [
-                ':statusNew' => PartnerWithdrawalRequest::STATUS_NEW
-            ];
-        }
-        //@todo проверить
         if(Yii::$app->user->can('only_manager'))
         {
             $addCond = PartnerWithdrawalRequest::tableName().'.type = :type AND '.PartnerWithdrawalRequest::tableName().'.status = :statusNew ';
@@ -90,7 +82,17 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                 ':statusNew' => PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED
             ];
         }
+        //@todo проверить
+        if(Yii::$app->user->can('only_partner_manager'))
+        {
 
+            $addCond = PartnerWithdrawalRequest::tableName().'.status = :statusNew AND ('.CUser::tableName().'.partner_manager_id = :pmId OR '.PartnerWithdrawalRequest::tableName().'.created_by = :pmId ) ';
+            $addParams = [
+                ':statusNew' => PartnerWithdrawalRequest::STATUS_NEW,
+                ':pmId' => Yii::$app->user->id
+            ];
+
+        }
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$addCond,$addParams);
 
         $partnerDesc = '';
