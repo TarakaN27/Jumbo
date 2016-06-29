@@ -36,9 +36,9 @@ class RecalculateBonus
 	 */
 	public function run()
 	{
-		$arPaymentsTmp = Payments::find()/*->where(['>=','pay_date','1464739200'])*/->all();
+		$arPaymentsTmp = Payments::find()/*->where(['>=','pay_date','1464739200'])*/->all();		//выберем платежи для которых считаем бонусы
 		/*
-		BUserBonus::deleteAll([
+		BUserBonus::deleteAll([												//удаляем старые бонусы по платежам
 			'payment_id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),
 			'scheme_id' => [2,3,4,5,6,7],
 			//'buser_id' => 44
@@ -53,7 +53,7 @@ class RecalculateBonus
 
 		$obCount = new PaymentBonusBehavior();
 
-		//$obCount->setOnlyForIdUser(44);
+		//$obCount->setOnlyForIdUser(44);				//указываем для какого пользователя считаем бонусы
 
 		/** @var PaymentsSale $sale */
 		foreach($arSales as $key => $sale)

@@ -90,7 +90,7 @@ class SiteController extends Controller
     public function actionSpecial()
     {
 
-        \Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
+        //\Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
 
         /*
         $recalc = new RecalcPayment();
