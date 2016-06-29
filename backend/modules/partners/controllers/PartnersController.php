@@ -183,7 +183,7 @@ class PartnersController extends AbstractBaseBackendController
         if(!$model)
             throw new NotFoundHttpException('Model not found');
         $model->delete();
-        return $this->redirect(['link-lead','pid' => $id]);
+        return $this->redirect(['link-lead','pid' => $model->partner_id]);
     }
 
     /**
