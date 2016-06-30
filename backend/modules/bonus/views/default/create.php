@@ -24,7 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="x_content bonus-scheme-create">
             <?= $this->render('_form', [
                 'model' => $model,
-                'arBServices' => $arBServices
+                'arBServices' => $arBServices,
+                'arRates' => $arRates
             ]) ?>
             </div>
         </div>

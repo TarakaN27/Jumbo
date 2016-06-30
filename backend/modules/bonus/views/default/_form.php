@@ -31,6 +31,7 @@ $this->registerJs('
 <div class="bonus-scheme-form hide">
 
     <?php $form = ActiveForm::begin([
+        'id' => 'bonusFormId',
         'options' => [
             'class' => 'form-horizontal form-label-left',
             //'enctype' => 'multipart/form-data'
@@ -242,6 +243,45 @@ $this->registerJs('
             </div>
         <?php endforeach;?>
     </div>
+
+    <div class="pdd-left-10 pdd-right-10 type5 <?=$model->type== BonusScheme::TYPE_PAYMENT_RECORDS ? '' : 'hide'?>">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3 well text-center">
+            <button type="button" id="addRecordId" data-curr-num="0" class="btn btn-info btn-xs"><i class="fa fa-plus-square"></i></button>
+            <button type="button" id="removeRecordId" class="btn btn-danger btn-xs"><i class="fa fa-minus-square"></i></button>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        <?=Html::label(Yii::t('app/bonus','from'))?>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        <?=Html::label(Yii::t('app/bonus','to'))?>
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        <?=Html::label(Yii::t('app/bonus','Rate'))?>
+                    </div>
+                </div>
+            </div>
+
+            <section id="recordContainer">
+                <?php foreach ($arRates as $key => $item):?>
+                    <div class="form-group" data-col="$key">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <?=Html::textInput("records[".$key."]['from']",$item['from'],['class' => 'form-control'])?>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <?=Html::textInput("records[".$key."]['to']",$item['to'],['class' => 'form-control'])?>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                <?=Html::textInput("records[".$key."]['rate']",$item['rate'],['class' => 'form-control'])?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach;?>
+            </section>
+        </div>
+    </div>
+
     <div class="form-group">
         <div class = "col-md-12 col-sm-12 col-xs-12">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/bonus', 'Create') : Yii::t('app/bonus', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

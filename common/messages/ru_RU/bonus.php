@@ -70,6 +70,10 @@ return [
 	'Resident' => 'Резидент',
 	'Not resident' => 'Не резидент',
 	'Type complex partner' => 'Составной бонус. Партнеры',
-	'Type payment records' => 'Платежи рекорд'
+	'Type payment records' => 'Платежи рекорд',
+	'to' => 'До',
+	'from' => 'От',
+	'Rate' => 'Ставка бонуса',
+	'Create' => 'Сохранить'
 
 ];

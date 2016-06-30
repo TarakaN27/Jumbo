@@ -200,6 +200,14 @@ class BonusScheme extends AbstractActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSchemeRecords()
+    {
+        return $this->hasOne(BonusSchemeRecords::className(),['scheme_id' => 'id']);
+    }
+
+    /**
      * @return mixed
      * @throws \Exception
      */

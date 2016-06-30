@@ -21,6 +21,7 @@ use common\components\rabbitmq\workers\ActsLetterRabbitHandler;
 use common\components\tasks\RecurringTask;
 use common\models\BuserInviteCode;
 use common\models\ExchangeCurrencyHistory;
+use common\models\Payments;
 use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
@@ -89,7 +90,6 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
-
         //\Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
 
         /*

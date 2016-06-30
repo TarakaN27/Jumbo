@@ -73,4 +73,26 @@ class CustomDateHelper
         $beginMonth = CustomHelper::getBeginMonthTime(time());
         return $beginMonth <= $time;
     }
+
+    /**
+     * Проверяем является ли время $time текущим днем
+     * @param $time
+     * @return bool
+     */
+    public function isCurrentDay($time)
+    {
+        if(!is_numeric($time))
+            $time = strtotime($time);
+
+        $dateToday = new \DateTime('NOW');
+        $dateToday->setTime(0,0,0);
+
+        $dateCheck = new \DateTime();
+        $dateCheck->setTimestamp($time);
+        $dateCheck->setTime(0,0,0);
+        $iterval = $dateToday->diff($dateCheck);
+
+        return $iterval->days == 0;
+    }
+
 }
