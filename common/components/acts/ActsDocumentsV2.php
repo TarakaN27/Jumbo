@@ -27,7 +27,7 @@ use Gears\Pdf;
 class ActsDocumentsV2
 {
     CONST
-        RUB_MODE = 2,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
+        RUB_MODE = 0,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
         BEL_RUBLE_ID = 2,       //костыль указываем id бел рубля
         PRECISION = 4;          //точность округления
 
@@ -218,7 +218,7 @@ class ActsDocumentsV2
                         if($this->bUseVat)
                         {
                             $strVatAmount =
-                                CustomHelper::my_ucfirst(CustomHelper::numPropis($this->totalVatAmount)).' белорусских '. CustomHelper::ciRub($this->totalVatAmount);
+                                CustomHelper::my_ucfirst(CustomHelper::numPropis(round($this->totalVatAmount))).' белорусских '. CustomHelper::ciRub($this->totalVatAmount);
                         }
 
                         $this->vatInWords = $this->bUseVat ?
