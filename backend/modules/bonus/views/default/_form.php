@@ -21,7 +21,8 @@ $this->registerJs('
         B_TYPE_UNIT = '.BonusScheme::TYPE_UNITS.',
         B_TYPE_SIMPLE = '.BonusScheme::TYPE_SIMPLE_BONUS.',
         B_TYPE_COMPLEX = '.BonusScheme::TYPE_COMPLEX_TYPE.',
-        B_TYPE_COMPLEX_PARTNER = '.BonusScheme::TYPE_COMPLEX_PARTNER.';
+        B_TYPE_COMPLEX_PARTNER = '.BonusScheme::TYPE_COMPLEX_PARTNER.',
+        B_TYPE_PAYMENT_RECORDS = '.BonusScheme::TYPE_PAYMENT_RECORDS.';
 ',\yii\web\View::POS_HEAD);
 ?>
 <div id="preloader">

@@ -31,6 +31,7 @@ class BonusScheme extends AbstractActiveRecord
         TYPE_SIMPLE_BONUS =2,       //тип бонусной схемы бонусы за продажи(для аккаунтеров)
         TYPE_COMPLEX_TYPE = 3,      //комплексный тип (для АНТОНА!)
         TYPE_COMPLEX_PARTNER = 4,   //комплексный тип для менеджеров партнеров
+        TYPE_PAYMENT_RECORDS = 5,           //бонус за рекорды(для аккаунтеров)
         GROUP_BY_COMPANY = 1,       //группировка платежей по одной компании
         GROUP_BY_CMP_GROUP =2;      //группировка платежей по группе компаний
 
@@ -84,6 +85,7 @@ class BonusScheme extends AbstractActiveRecord
             self::TYPE_SIMPLE_BONUS => Yii::t('app/bonus','Type simple bonus'),
             self::TYPE_COMPLEX_TYPE => Yii::t('app/bonus','Type complex'),
             self::TYPE_COMPLEX_PARTNER => Yii::t('app/bonus','Type complex partner'),
+            self::TYPE_PAYMENT_RECORDS => Yii::t('app/bonus','Type payment records')
         ];
 
     }

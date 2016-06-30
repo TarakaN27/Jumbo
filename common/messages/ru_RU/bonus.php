@@ -69,6 +69,7 @@ return [
 	'Custom tax' => 'Кастомный НДС',
 	'Resident' => 'Резидент',
 	'Not resident' => 'Не резидент',
-	'Type complex partner' => 'Составной бонус. Партнеры'
+	'Type complex partner' => 'Составной бонус. Партнеры',
+	'Type payment records' => 'Платежи рекорд'
 
 ];
