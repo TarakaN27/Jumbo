@@ -80,6 +80,10 @@ if(Yii::$app->user->can('adminRights'))
     <thead>
         <tr>
             <th><?=Yii::t('app/reports','iSumTotal')?></th>
+            <?php if($modelForm->showWithoutSale):?>
+                <th><?=Yii::t('app/reports','saleAmount')?></th>
+                <th><?=Yii::t('app/reports','paymentAmountWithoutSale')?></th>
+            <?php endif;?>
             <?php if(Yii::$app->user->can('adminRights')):?>
             <th><?=Yii::t('app/reports','iProfitTotal')?></th>
             <th><?=Yii::t('app/reports','iTaxTotal')?></th>
@@ -93,6 +97,10 @@ if(Yii::$app->user->can('adminRights'))
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iSumTotal']);?>
             </td>
+            <?php if($modelForm->showWithoutSale):?>
+                <td><?=is_null($model['saleAmount']) ? NULL : Yii::$app->formatter->asDecimal($model['saleAmount']);?></td>
+                <td><?=is_null($model['paymentWithoutSale']) ? NULL : Yii::$app->formatter->asDecimal($model['paymentWithoutSale']);?></td>
+            <?php endif;?>
             <?php if(Yii::$app->user->can('adminRights')):?>
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iProfitTotal']);?>

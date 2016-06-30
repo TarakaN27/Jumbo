@@ -61,7 +61,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                         <?php endif;?>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <div class="row">
-                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-md-6 col-sm-6 col-xs-12 lineAfter">
                                     <?=$form->field($model,'dateFrom')->widget(\kartik\date\DatePicker::className(),[
                                         'options' => [
                                             'class' => 'form-control'
@@ -73,7 +73,7 @@ $this->title = Yii::t('app/reports','Payments reports');
                                         ]
                                     ])?>
                                 </div>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-md-6 col-sm-6 col-xs-12 lineAfter">
                                     <?=$form->field($model,'dateTo')->widget(\kartik\date\DatePicker::className(),[
                                         'options' => [
                                             'class' => 'form-control'
@@ -87,17 +87,22 @@ $this->title = Yii::t('app/reports','Payments reports');
                                 </div>
                             </div>
                             <div class="row">
-
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <?=$form->field($model,'groupType')->radioList(PaymentsReportForm::getGroupByMap())?>
                                 </div>
-                                <?php if(Yii::$app->user->can('adminRights')):?>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <?=$form->field($model,'generateExcel')->checkbox();?>
-                                    <?=$form->field($model,'generateExtendExcel')->checkbox();?>
-                                    <?=$form->field($model,'generateDocx')->checkbox();?>
+
+                                <div class="col-md-6 col-sm-6 col-xs-12 ">
+                                    <?php if(Yii::$app->user->can('adminRights')):?>
+                                        <?=Html::label(Yii::t('app/reports','Documents'))?>
+                                        <?=$form->field($model,'generateExcel')->checkbox();?>
+                                        <?=$form->field($model,'generateExtendExcel')->checkbox();?>
+                                        <?=$form->field($model,'generateDocx')->checkbox();?>
+                                        <hr/>
+                                    <?php endif;?>
+                                    <?=Html::label(Yii::t('app/reports','Addition settings'))?>
+                                    <?=$form->field($model,'showWithoutSale')->checkbox()?>
                                 </div>
-                                <?php endif;?>
+
                             </div>
                         </div>
                     </div>

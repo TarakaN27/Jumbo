@@ -20,6 +20,7 @@ use common\models\LegalPerson;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
+use common\models\PaymentsSale;
 use common\models\Services;
 use yii\base\Model;
 use Yii;
@@ -45,7 +46,13 @@ class PaymentsReportForm extends Model{
         $generateExtendExcel,
         $generateExcel,
         $generateDocx,
-        $dateTo;
+        $dateTo,
+        $showWithoutSale
+        ;
+
+    protected
+        $arPaymentsInByr = [],      //платежи в белорусских рублях
+        $arSales = [];              //продажи
 
     /**
      * @return array
@@ -56,7 +63,7 @@ class PaymentsReportForm extends Model{
             [['dateFrom','dateTo'],'required'],
             [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
             [['services','contractor','managers'],'safe'],
-            [['generateExcel','generateDocx','groupType','generateExtendExcel'],'integer'],
+            [['generateExcel','generateDocx','groupType','generateExtendExcel','showWithoutSale'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];
     }
@@ -85,7 +92,8 @@ class PaymentsReportForm extends Model{
             'generateExcel' => Yii::t('app/reports','Generate excel'),
             'generateDocx' => Yii::t('app/reports','Generate docx'),
             'groupType' => Yii::t('app/reports','Group type'),
-            'generateExtendExcel' => Yii::t('app/reports','Generate extend excel')
+            'generateExtendExcel' => Yii::t('app/reports','Generate extend excel'),
+            'showWithoutSale' => Yii::t('app/reports','Show without sale')
         ];
     }
 
@@ -323,7 +331,7 @@ class PaymentsReportForm extends Model{
                 default:
                     break;
             }
-
+            $this->arPaymentsInByr[$dt->id] = (float)$dt->pay_summ*$iCurr;              //соберем платежи в
             $arResult['iSumTotal']+= ($dt->pay_summ*$iCurr);
             $arResult['currency'][$dt->id] = $iCurr;
             $arResult['condCurr'][$dt->id] = $iCondCurr;
@@ -347,7 +355,17 @@ class PaymentsReportForm extends Model{
             }
 
         }
-
+        if($this->showWithoutSale)
+        {
+            $this->getSales();                          //получаем продажи
+            $saleInfo = $this->getSaleInfoAmount();                 //получаем рассчеты без продаж
+            $arResult['saleAmount'] = $saleInfo['saleAmount'];
+            $arResult['paymentWithoutSale'] = $saleInfo['paymentWithoutSale'];
+        }else{
+            $arResult['saleAmount'] = NULL;
+            $arResult['paymentWithoutSale'] = NULL;
+        }
+        
         $arResult['totalGroupSum'] = $totalGroupSum;
         $arResult['totalGroupProfit'] = $totalGroupProfit;
         $arResult['totalGroupTax'] = $totalGroupTax;
@@ -674,6 +692,46 @@ class PaymentsReportForm extends Model{
         {
         }
         return NULL;
+    }
+
+    /**
+     *
+     */
+    protected function getSales()
+    {
+        if(empty($this->arPaymentsInByr))
+            return [];
+
+        return $this->arSales = PaymentsSale::find()->select(['payment_id'])->where(['payment_id' => array_keys($this->arPaymentsInByr)])->column();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSaleInfoAmount()
+    {
+        if(empty($this->arPaymentsInByr))
+            return ['saleAmount' => 0,'paymentWithoutSale' => 0];
+
+        if(empty($this->arSales))
+        {
+            return ['saleAmount' => 0,'paymentWithoutSale' => array_sum($this->arPaymentsInByr)];
+        }
+
+        $amountSale = 0;
+        $amountPayment = 0;
+
+        foreach ($this->arPaymentsInByr as $iPayId => $payAmount)
+        {
+            if(in_array($iPayId,$this->arSales))
+            {
+                $amountSale+=(float)$payAmount;
+            }else{
+                $amountPayment+=(float)$payAmount;
+            }
+        }
+
+        return ['saleAmount' => $amountSale,'paymentWithoutSale' => $amountPayment];
     }
 
 } 

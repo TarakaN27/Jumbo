@@ -108,5 +108,10 @@ return [
     'Prospects' => 'Перспективность',
     'Paid hour' => 'Оплачено часов',
     'Spend hour' => 'Затрачено часов',
-    'Balance hour' => 'Баланс трудозатрат'
+    'Balance hour' => 'Баланс трудозатрат',
+    'Documents' => 'Документы',
+    'Show without sale' => 'Без учета продаж',
+    'Addition settings' => 'Дополнительные настройки',
+    'saleAmount' => 'Сумма платежей-продаж',
+    'paymentAmountWithoutSale' => 'Сумма платежей без продаж'
 ];

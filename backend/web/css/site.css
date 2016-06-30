@@ -328,4 +328,12 @@ tr.admin-line{background-color: #CEF6E3 !important;}
 .ul-sortable .sortable-placeholder{min-height: 100px;}
 .custom-form #servicesBlock .form-group{margin-bottom: 1px;}
 .custom-form #servicesBlock .form-group textarea{line-height: 20px;}
+.lineAfter:after{
+    display: inline-block;
+    height: 1px;
+    content: " ";
+    text-shadow: none;
+    background-color: #eee;
+    width: 100%;
+}
 

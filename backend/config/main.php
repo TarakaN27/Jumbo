@@ -118,6 +118,7 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        /*
         'view' => [
             'class' => '\rmrevin\yii\minify\View',
             'enableMinify' => false,
@@ -130,6 +131,7 @@ return [
             'compress_output' => true, // compress result html page
             'compress_options' => ['extra' => true], // options for compress
         ]
+        */
     ],
     'params' => $params,
 ];
