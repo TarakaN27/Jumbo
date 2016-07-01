@@ -9,21 +9,27 @@
 namespace common\components\ExchangeRates;
 
 
+use common\components\helpers\CustomDateHelper;
+
 class ExchangeRatesCBRF extends AbstractExchangeRates{
 
 
     CONST
-        BUR_IN_CBR_CODE = 974;  //код бел рубля в ЦБРФ
+        BYN_IN_CBR_CODE = 933,  //код деноминированной валюты после 1.07.2016
+        BYR_IN_CBR_CODE = 974;  //код бел рубля в ЦБРФ
 
     public
         $date,
         $codeID;
 
+    protected
+        $time;
+
     public function __construct($codeID = NULL,$time = NULL)
     {
-        $time = is_null($time) ? time() : $time;
+        $this->time = is_null($time) ? time() : $time;
         $this->codeID = $codeID;
-        $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $time) . '/' . date('m', $time) . '/' . date('Y', $time);
+        $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $this->time) . '/' . date('m', $this->time) . '/' . date('Y', $this->time);
     }
 
     /**
@@ -93,8 +99,9 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
                 return NULL;
             }
             foreach($sxml->Valute as $ar) {
-                if($ar->NumCode == self::BUR_IN_CBR_CODE)
-                    return  round($ar->Nominal/$this->convertValue($ar->Value),6);
+                $code = CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016',$this->time) ? self::BYN_IN_CBR_CODE : self::BYR_IN_CBR_CODE;
+                if($ar->NumCode == $code)
+                    return  $this->getRateAfterDenomination(round($ar->Nominal/$this->convertValue($ar->Value),6),$this->time);
             }
             return NULL;
         }catch (\Exception $e)
