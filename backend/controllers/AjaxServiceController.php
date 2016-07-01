@@ -555,7 +555,7 @@ class AjaxServiceController extends AbstractBaseBackendController{
             }
         }else{
             $contractDate = empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date);
-            $contractNumber = $obContract->cont_number;
+            $contractNumber = 'Договор '.$obContract->cont_number;
         }
         /** @var ActFieldTemplate $obActFieldTpl */
         $obActFieldTpl = ActFieldTemplate::find()->where(['service_id' => $iServId,'legal_id' => $iLegalPerson])->one();
