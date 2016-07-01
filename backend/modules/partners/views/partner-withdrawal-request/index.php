@@ -18,7 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class = "x_title">
                 <h2><?= Html::encode($this->title) ?></h2>
                 <section class="pull-right">
+                    <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')):?>
                     <?= Html::a(Yii::t('app/users', 'Create Partner Withdrawal Request'), ['create'], ['class' => 'btn btn-success']) ?>
+                    <?php endif;?>
                 </section>
                 <div class = "clearfix"></div>
             </div>

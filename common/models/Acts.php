@@ -236,4 +236,12 @@ class Acts extends AbstractActiveRecord
         $lastNumber = (int)self::find()->where(['lp_id' => $legalPersonId])->select(['act_num'])->max('act_num');
         return $lastNumber+1;
     }
+
+    /**
+     * @return string
+     */
+    public function getDocumentPath()
+    {
+        return Yii::getAlias(self::FILE_PATH).'/'.$this->file_name;
+    }
 }

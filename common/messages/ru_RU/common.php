@@ -116,5 +116,7 @@ return [
     'Partner. Withdrawal request' => 'Партнер. Запрос на вывод средств.',
     'No entity values' => 'Дополнительных полей не найдено',
     'Act fields template' => 'Акты. Шаблоны полей',
-    'Update task status' => 'Изменить статус задачи'
+    'Update task status' => 'Изменить статус задачи',
+    'Rate BYN' => 'Курс BYN',
+    'Rate BYR' => 'Курс BYR'
 ];

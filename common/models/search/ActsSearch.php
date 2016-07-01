@@ -54,7 +54,7 @@ class ActsSearch extends Acts
      */
     public function search($params)
     {
-        $query = Acts::find()->with('legalPerson','currency');
+        $query = Acts::find()->with('legalPerson','currency','cuser.requisites');
         $query = $this->queryHelper($query,$params);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -81,28 +81,27 @@ class ActsSearch extends Acts
     protected function queryHelper($query,$params)
     {
         $this->load($params);
-
+        $tn = Acts::tableName();
         $query->andFilterWhere([
-            'id' => $this->id,
-            'act_num' => $this->act_num,
-            'cuser_id' => $this->cuser_id,
-            'buser_id' => $this->buser_id,
-            'act_date' => $this->act_date,
-            'sent' => $this->sent,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'currency_id' => $this->currency_id,
-            'lp_id' => $this->lp_id
+            $tn.'.id' => $this->id,
+            $tn.'.act_num' => $this->act_num,
+            $tn.'.cuser_id' => $this->cuser_id,
+            $tn.'.buser_id' => $this->buser_id,
+            $tn.'.act_date' => $this->act_date,
+            $tn.'.sent' => $this->sent,
+            $tn.'.created_at' => $this->created_at,
+            $tn.'.updated_at' => $this->updated_at,
+            $tn.'.currency_id' => $this->currency_id,
+            $tn.'.lp_id' => $this->lp_id
         ]);
 
         if(!empty($this->from_date))
-            $query->andWhere(self::tableName().'.act_date >= :dateFrom',[':dateFrom' => date('Y-m-d',strtotime($this->from_date))]);
+            $query->andWhere($tn.'.act_date >= :dateFrom',[':dateFrom' => date('Y-m-d',strtotime($this->from_date))]);
 
         if(!empty($this->to_date))
-            $query->andWhere(self::tableName().'.act_date <= :dateTo',[':dateTo' => date('Y-m-d',strtotime($this->to_date))]);
+            $query->andWhere($tn.'.act_date <= :dateTo',[':dateTo' => date('Y-m-d',strtotime($this->to_date))]);
 
-        $query->andFilterWhere(['like', 'amount', $this->amount]);
-
+        $query->andFilterWhere(['like', $tn.'.amount', $this->amount]);
 
         if(
             !empty($this->cuser_id)||

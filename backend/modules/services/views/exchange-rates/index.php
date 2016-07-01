@@ -85,8 +85,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'code',
             'nbrb',
             'cbr',
-            'nbrb_rate',
-            'cbr_rate',
+            [
+                'label' => Yii::t('app/common','Rate BYN'),
+                'value' => function($model){
+                    return Yii::$app->formatter->asDecimal(round((float)$model->nbrb_rate/10000,4));
+                }
+            ],
+            [
+                'attribute' => 'nbrb_rate',
+                'format' => 'decimal',
+                'label' => Yii::t('app/common','Rate BYR')
+            ],
+            //'nbrb_rate',
+            'cbr_rate:decimal',
             [
                 'attribute' => 'show_at_widget',
                 'format' => 'raw',

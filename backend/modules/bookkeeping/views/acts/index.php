@@ -4,46 +4,30 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\bootstrap\ActiveForm;
 use common\components\helpers\CustomHelper;
+use common\components\helpers\CustomViewHelper;
+use yii\web\View;
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ActsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app/book', 'Acts');
 $this->params['breadcrumbs'][] = $this->title;
-
+$this->registerCssFile('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/acts_index.js',$this);
+CustomViewHelper::registerJsFileWithDependency('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js',$this);
+$em = new \yii\validators\EmailValidator();
+$jsPattern = new \yii\web\JsExpression($em->pattern);
 $this->registerJs("
-function sendActs()
-{
-    var
-       items = $('.selectedActs:checked');
-
-    if(items == undefined || items.length == 0)
-    {
-        alert('".Yii::t('app/book', 'You have not selected acts')."');
-        return false;
-    }
-    $.ajax({
-                type: \"POST\",
-                cache: false,
-                url: '".\yii\helpers\Url::to(['send-acts'])."',
-                dataType: \"json\",
-                data: items.serialize(),
-                success: function(msg){
-                    if(!msg)
-                      {
-                            addErrorNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/book','Acts not sent')."');
-                      }else{
-                            addSuccessNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/book','Acts successfully sent')."');
-                            location.reload();
-                      }
-                },
-                error: function(msg){
-                    addErrorNotify('".Yii::t('app/book','Sent act request')."','".Yii::t('app/users','Server error')."');
-                    return false;
-                }
-            });
-}
-",\yii\web\View::POS_END);
+var
+    errorNotSelectedActs = '".Yii::t('app/book', 'You have not selected acts')."',
+    urlSendAct = '".\yii\helpers\Url::to(['send-acts'])."',
+    errorTitleSendAct = '".Yii::t('app/book','Sent act request')."',
+    actsNotSent = '".Yii::t('app/book','Acts not sent')."',
+    actSuccessSent = '".Yii::t('app/book','Acts successfully sent')."',
+    actServerError = '".Yii::t('app/users','Server error')."',
+    emailPattern = ".$jsPattern.";
+",View::POS_HEAD);
 ?>
 
 <div class = "row">
@@ -67,19 +51,33 @@ function sendActs()
                         ['class' => 'yii\grid\SerialColumn'],
                         [
                             'class' => 'yii\grid\CheckboxColumn',
-                            'checkboxOptions' => [
-                                'class' => 'selectedActs'
-                            ]
+                            'checkboxOptions' =>  function($model, $key, $index, $widget){
+                                return [
+                                    'class' => 'selectedActs'.($model->sent ? ' hide' : ''),
+                                    'value' => $model->id
+                                ];
+                            }
+                        ],
+                        [
+                            'attribute' => 'id'
                         ],
                         [
                             'attribute' => 'act_num',
                             'format' => 'html',
+                            'visible' => function($model){
+                                return false;
+                            },
                             'value' => function($model){
                                 return $model->act_num;
+<<<<<<< HEAD
                             }
                         ],
                         'amount:decimal',
                         /*
+=======
+                            },
+                                                    ],
+>>>>>>> master
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
@@ -100,10 +98,24 @@ function sendActs()
                         ],
                         [
                             'attribute' => 'cuser_id',
-                            'value' => function($model){
-                                return is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : $model->cuser_id;
-                            },
+                            'value' => 'cuser.infoWithSite',
                             'filter' => \common\models\CUser::getContractorMap()
+                        ],
+                        [
+                            'attribute' => 'cuser.requisites.c_email',
+                            'format' => 'raw',
+                            'value' => function($model){
+                                return Html::a(ArrayHelper::getValue($model,'cuser.requisites.c_email'),'#',[
+                                    'class' => 'editable',
+                                    'data-value' => ArrayHelper::getValue($model,'cuser.requisites.c_email'),
+                                    'data-type' => "text",
+                                    'data-pk' => $model->cuser_id,
+                                    //'data-created_by' => $model->created_by,
+                                    // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+                                    'data-url' => \yii\helpers\Url::to(['update-cuser-email']),
+                                    'data-title' => Yii::t('app/common','Изменить емаил')
+                                ]);
+                            }
                         ],
                         [
                             'attribute' => 'act_date',
@@ -125,8 +137,9 @@ function sendActs()
                         ],
                         [
                             'attribute' => 'sent',
+                            'format' => 'raw',
                             'value' => function($model){
-                                return $model->getYesNoStr($model->sent);
+                                return Html::tag('span',$model->getYesNoStr($model->sent),['id' => 'sSent_'.$model->id]);
                             },
                             'filter' => \common\models\Acts::getYesNo()
                         ],

@@ -352,8 +352,13 @@ class AjaxSelectController extends AbstractBaseBackendController
 	public function actionGetPartners($q = null, $id = null)
 	{
 		$out = ['results' => ['id' => '', 'text' => '']];
-		if (!is_null($q)) {
+		$iBuserId = NULL;
+		if(!Yii::$app->user->can('adminRights'))
+		{
+			$iBuserId = Yii::$app->user->id;
+		}
 
+		if (!is_null($q)) {
 			$obCUser = CUser::find()
 				->select([
 					CUser::tableName().'.id',
@@ -373,8 +378,14 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
-				->andWhere([CUser::tableName().'.partner' => AbstractActiveRecord::YES])
-				->notArchive()
+				->andWhere([CUser::tableName().'.partner' => AbstractActiveRecord::YES]);
+
+			if(!empty($iBuserId))
+			{
+				$obCUser->andWhere(['partner_manager_id' => $iBuserId]);
+			}
+
+			$obCUser = $obCUser->notArchive()
 				->limit(10)
 				->all()
 			;
@@ -388,24 +399,33 @@ class AjaxSelectController extends AbstractBaseBackendController
 
 		}
 		elseif ($id > 0) {
+
+
+			$obUser = CUser::find()
+				->select([
+					CUser::tableName().'.id',
+					CUser::tableName().'.requisites_id',
+					CUser::tableName().'.partner',
+					CUserRequisites::tableName().'.type_id as req_type',
+					CUserRequisites::tableName().'.corp_name',
+					CUserRequisites::tableName().'.j_fname',
+					CUserRequisites::tableName().'.j_mname',
+					CUserRequisites::tableName().'.j_lname',
+					CUserRequisites::tableName().'.site',
+
+				])
+				->joinWith('requisites')
+				->where([CUser::tableName().'.partner' => AbstractActiveRecord::YES,'id' => $id]);
+
+
+			$obUser = $obUser->one();
+			if(!empty($iBuserId))
+			{
+				$obCUser->andWhere(['partner_manager_id' => $iBuserId]);
+			}
 			$out['results'] = [
 				'id' => $id,
-				'text' => is_object($obUser = CUser::find()
-					->select([
-						CUser::tableName().'.id',
-						CUser::tableName().'.requisites_id',
-						CUser::tableName().'.partner',
-						CUserRequisites::tableName().'.type_id as req_type',
-						CUserRequisites::tableName().'.corp_name',
-						CUserRequisites::tableName().'.j_fname',
-						CUserRequisites::tableName().'.j_mname',
-						CUserRequisites::tableName().'.j_lname',
-						CUserRequisites::tableName().'.site',
-
-					])
-					->joinWith('requisites')
-					->where(['contractor' => CUser::CONTRACTOR_YES,'id' => $id])
-					->one()) ? $obUser->getInfoWithSite() : NULL
+				'text' => is_object($obUser) ? $obUser->getInfoWithSite() : NULL
 			];
 		}
 		return $out;

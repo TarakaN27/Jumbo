@@ -11,6 +11,7 @@ namespace console\controllers;
 use common\components\ExchangeRates\ExchangeRatesCBRF;
 use common\components\ExchangeRates\ExchangeRatesNBRB;
 use common\components\ExchangeRates\ExchangeRatesObmennikBY;
+use common\components\helpers\CustomDateHelper;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use console\components\AbstractConsoleController;
@@ -62,7 +63,9 @@ class ExchangeRatesController extends AbstractConsoleController{
 
                 if($model->use_rur_for_byr)
                 {
-                    $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
+                    $code = CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016') ? ExchangeRatesCBRF::BYN_IN_CBR_CODE : ExchangeRatesCBRF::BYR_IN_CBR_CODE;
+
+                    $crb = new ExchangeRatesCBRF($code);
                     $curr = $crb->getRURcurrencyInBur();
 
                     $nbrbRate = round($crbRate*$curr,4); //курс по ЦБРФ
@@ -137,6 +140,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         }catch (\Exception $e){
             $trans->rollBack();
             $bHasError = TRUE;
+            var_dump($e);
         }
 
         return $this->log(!$bHasError);

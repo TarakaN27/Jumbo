@@ -14,12 +14,17 @@ class ExchangeRatesObmennikBY extends AbstractExchangeRates{
     protected
         $bankID;
 
+    /**
+     * ExchangeRatesObmennikBY constructor.
+     */
     public function __construct()
     {
         $this->url = 'http://www.obmennik.by/xml/kurs.xml';
     }
 
-
+    /**
+     * @return array|null
+     */
     public function getCurrencyUSD()
     {
         $data = json_decode(json_encode($this->loadFile(), 1));
@@ -31,21 +36,19 @@ class ExchangeRatesObmennikBY extends AbstractExchangeRates{
             if($item->idbank == $this->bankID)
             {
                 $usd = $item->usd->buy;
-                $rub = $item->rur->buy;
+                $rub = $item->rur->buy/100;
                 break;
             }
 
         if($usd != 0 && $rub != 0)
             return [
-                'bur' => $usd,
+                'bur' => $this->getRateAfterDenomination($usd),
                 'rur' => $usd/$rub
             ];
         else
             return NULL;
     }
-
-
-
+    
     /**
      * @param $id
      */

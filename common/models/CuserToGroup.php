@@ -100,4 +100,21 @@ class CuserToGroup extends AbstractActiveRecordWTB
 
         return $arResult;
     }
+
+    /**
+     * Return all users at group with having $iUserId
+     * @param $iUserId
+     * @return array
+     */
+    public static function getAllUserIdsAtGroupByUserId($iUserId)
+    {
+        /** @var CuserToGroup $obGroup */
+        $obGroup = self::find()->where(['cuser_id' => $iUserId])->one();      //get group id for user
+        if($obGroup)
+        {
+            return ArrayHelper::getColumn(self::find()->where(['group_id' => $obGroup->group_id])->all(),'cuser_id');
+        }else{
+            return [$iUserId];
+        }
+    }
 }
