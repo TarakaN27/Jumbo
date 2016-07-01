@@ -57,9 +57,9 @@ class DefaultController extends AbstractBaseBackendController
             $arLegal = LegalPerson::getLegalPersonMap();
 
         $arBServices = $model->services;
-
         $arUsers = $model->users;
         $arCusers = $model->cusers;
+        $arRecordRates = $model->schemeRecords;
 
         return $this->render('view', [
             'model' => $model,
@@ -67,7 +67,8 @@ class DefaultController extends AbstractBaseBackendController
             'arLegal' => $arLegal,
             'arBServices' => $arBServices,
             'arUsers' => $arUsers,
-            'arCusers' => $arCusers
+            'arCusers' => $arCusers,
+            'arRecordRates' => $arRecordRates
         ]);
     }
 

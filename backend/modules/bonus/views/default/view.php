@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use common\models\BonusScheme;
 use yii\data\ArrayDataProvider;
 use common\components\customComponents\collapse\CollapseWidget;
+use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $model common\models\BonusScheme */
 
@@ -80,6 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ])
                         ];
 
+                        if($model->type != BonusScheme::TYPE_PAYMENT_RECORDS)
                         $arItem [] = [
                             'label' => Yii::t('app/bonus','Detail'),
                             'content'=>\yii\grid\GridView::widget([
@@ -176,6 +178,30 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]
                             ])
                         ];
+
+                        if($model->type == BonusScheme::TYPE_PAYMENT_RECORDS)
+                            $arItem [] = [
+                                'label' => Yii::t('app/bonus','Detail'),
+                                'content'=>GridView::widget([
+                                    'dataProvider' => new ArrayDataProvider([
+                                        'allModels' => is_object($arRecordRates) ? $arRecordRates->params : []
+                                    ]),
+                                    'columns' => [
+                                        [
+                                            'attribute' => 'from',
+                                            'label' => Yii::t('app/bonus','from')
+                                        ],
+                                        [
+                                            'attribute' => 'to',
+                                            'label' => Yii::t('app/bonus','to')
+                                        ],
+                                        [
+                                            'attribute' => 'rate',
+                                            'label' => Yii::t('app/bonus','Rate')
+                                        ]
+                                    ]
+                                ])
+                            ];
                     ?>
                     <?php echo CollapseWidget::widget([
                         'items' => $arItem

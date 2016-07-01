@@ -267,13 +267,13 @@ $this->registerJs('
                     <div class="form-group" data-col="$key">
                         <div class="row">
                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."]['from']",$item['from'],['class' => 'form-control'])?>
+                                <?=Html::textInput("records[".$key."][from]",$item['from'],['class' => 'form-control'])?>
                             </div>
                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."]['to']",$item['to'],['class' => 'form-control'])?>
+                                <?=Html::textInput("records[".$key."][to]",$item['to'],['class' => 'form-control'])?>
                             </div>
                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."]['rate']",$item['rate'],['class' => 'form-control'])?>
+                                <?=Html::textInput("records[".$key."][rate]",$item['rate'],['class' => 'form-control'])?>
                             </div>
                         </div>
                     </div>

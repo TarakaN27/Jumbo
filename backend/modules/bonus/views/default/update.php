@@ -25,7 +25,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/bonus', 'Update');
             <div class="x_content bonus-scheme-create">
             <?= $this->render('_form', [
                 'model' => $model,
-                'arBServices' => $arBServices
+                'arBServices' => $arBServices,
+                'arRates' => $arRates
             ]) ?>
             </div>
         </div>

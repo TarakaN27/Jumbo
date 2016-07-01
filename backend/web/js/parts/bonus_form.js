@@ -152,19 +152,19 @@ function addRecordRow()
                     .append(
                         $('<div></div>',{class:'col-md-4 col-sm-4 col-xs-12'})
                             .append(
-                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"]['from']"})
+                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"][from]"})
                             )
                     )
                     .append(
                         $('<div></div>',{class:'col-md-4 col-sm-4 col-xs-12'})
                             .append(
-                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"]['to']"})
+                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"][to]"})
                             )
                     )
                     .append(
                         $('<div></div>',{class:'col-md-4 col-sm-4 col-xs-12'})
                             .append(
-                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"]['rate']"})
+                                $('<input/>',{class:'form-control',type:'text',name:"records["+num+"][rate]"})
                             )
                     )
             );
@@ -202,7 +202,7 @@ function beforeSubmitFormValidation()
         addErrorNotify('Сохранение бонусной схемы','Не заданы параметры рекордов');
         return false;
     }
-    return false;
+    return true;
 }
 
 //документ реади
