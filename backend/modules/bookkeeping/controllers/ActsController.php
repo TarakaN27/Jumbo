@@ -214,7 +214,7 @@ class ActsController extends AbstractBaseBackendController
         //$arSKUsers = CuserExternalAccount::getSKByCUserIDs($arCUser,CuserExternalAccount::TYPE_CSDA); // получаем внешние аккаунты
         if(!$arCUserEmail)
             throw new NotFoundHttpException('Contractor not found');
-        $arUpdActs = [];
+
         $arReturnStatus = [
             'error' => [],
             'success' => []

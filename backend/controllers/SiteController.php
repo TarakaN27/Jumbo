@@ -25,6 +25,7 @@ use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Json;
+use yii\swiftmailer\Mailer;
 use yii\web\Controller;
 use backend\models\LoginForm;
 use yii\filters\VerbFilter;
@@ -89,7 +90,34 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
+        /*
+        $obMailer = new Mailer([
+            'viewPath' => '@common/mail',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.yandex.ru',
+                'username' => 'sales@webmart.by',
+                'password' => 'web-mart',
+                'port' => '465',
+                'encryption' => 'ssl',
+            ],
+        ]);
 
+        $obMailer->compose( // отправялем уведомление по ссылке
+                [
+                    'html' => 'actNotification-html',
+                    'text' => 'actNotification-text'
+                ]
+            )
+            ->setFrom(['sales@webmart.by' => \Yii::$app->name . ' robot'])
+            //->setTo($toEmail)
+            ->setTo('motuzdev@gmail.com')
+            ->setBcc('sales@webmart.by')
+            ->setSubject('Акт об оказанных услугах ООО "Вебмарт Групп"')
+            ->attach($documentPath)
+            ->send();
+*/
         //\Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
 
         /*

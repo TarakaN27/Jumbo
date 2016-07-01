@@ -9,9 +9,44 @@ return [
             'charset' => 'utf8',
             'tablePrefix' => 'wm_'
         ],
-        'mailer' => [
+        'mailer' => [                               //маилер для внутренних писем
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
+                // send all mails to a file by default. You have to set
+                // 'useFileTransport' to false and configure a transport
+                // for the mailer to send real emails.
+            'useFileTransport' => true,
+                /*
+                'useFileTransport' => false,
+                'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'host' => 'smtp.gmail.com',
+                    'username' => 'jumbo.webmart@gmail.com',
+                    'password' => 'k8JfmgHp',
+                    'port' => '587',
+                    'encryption' => 'tls',
+                ],
+                */
+
+        ],
+        'salesMailer' => [                      //маилер для отправки актов
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+                // send all mails to a file by default. You have to set
+                // 'useFileTransport' to false and configure a transport
+                // for the mailer to send real emails.
+            'useFileTransport' => true,
+                /*
+                'useFileTransport' => false,
+                'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'host' => 'smtp.yandex.ru',
+                    'username' => 'sales@webmart.by',
+                    'password' => 'web-mart',
+                    'port' => '465',
+                    'encryption' => 'ssl',
+                ],
+                */
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',

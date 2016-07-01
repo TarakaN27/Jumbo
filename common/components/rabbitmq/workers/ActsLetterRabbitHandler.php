@@ -16,6 +16,10 @@ use yii\base\Exception;
 
 class ActsLetterRabbitHandler extends AbstractRabbitHandler
 {
+    
+    protected 
+        $obMailer = NULL;
+    
     /**
      * @param AMQPMessage $msg
      * @return bool
@@ -77,16 +81,17 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
     {
         try {
             return \Yii::$app->mailer->compose( // отправялем уведомление по ссылке
-                    [
+                    [                           //указывам шаблон
                         'html' => 'actNotification-html',
                         'text' => 'actNotification-text'
                     ]
                 )
-                ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
-                ->setTo($toEmail)
+                ->setFrom([\Yii::$app->params['salesEmail'] => \Yii::$app->params['salesName']])    //от кого уходит письмо
+                ->setTo($toEmail)                                                                   //кому
                 //->setTo('motuzdev@gmail.com')
-                ->setSubject('Act notification ' . \Yii::$app->name)
-                ->attach($documentPath)
+                ->setBcc(\Yii::$app->params['salesEmail'])                                          //скрытая копия
+                ->setSubject(\Yii::$app->params['actLetterSubject'])                                //тема письма
+                ->attach($documentPath)                                                             //прикрепляем акт к письму
                 ->send();
             }catch (Exception $e)
         {

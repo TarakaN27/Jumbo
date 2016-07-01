@@ -21,7 +21,7 @@ function sendActs()
         success: function(data){
             var
                 text = '';
-            if(data.success != undefined)
+            if(data.success != undefined && data.success.length > 0)
             {
                 text+='Успешно добавлены в очередь на отправку акты с ID: ';
                 $.each(data.success,function(ind,value){
@@ -33,7 +33,7 @@ function sendActs()
                 });
             }
 
-            if(data.error != undefined)
+            if(data.error != undefined && data.error.length > 0)
             {
                 text+='<br/> Не удалось добавить в очередь на отправку акты с ID: ';
                 $.each(data.error,function(ind,value){
@@ -50,8 +50,6 @@ function sendActs()
                 title: 'Отправка актов',
                 content: text
             });
-
-                console.log(response);
         },
     error: function(msg){
         addErrorNotify(errorTitleSendAct,actServerError);
