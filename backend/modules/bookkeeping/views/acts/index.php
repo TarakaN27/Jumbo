@@ -69,15 +69,9 @@ var
                             },
                             'value' => function($model){
                                 return $model->act_num;
-<<<<<<< HEAD
-                            }
-                        ],
-                        'amount:decimal',
-                        /*
-=======
+
                             },
-                                                    ],
->>>>>>> master
+                        ],
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
@@ -85,7 +79,6 @@ var
                                 return $model->amount;
                             }
                         ],
-                        */
                         [
                             'attribute' => 'currency_id',
                             'value' => 'currency.code',
