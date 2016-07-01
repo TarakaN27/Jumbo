@@ -484,7 +484,7 @@ class ActsDocumentsV2
         if(!$obAct)
             throw new NotFoundHttpException();
 
-        return $this->cuserContractDetail = $obAct->act_num.' от '.\Yii::$app->formatter->asDate($obAct->act_date);
+        return $this->cuserContractDetail = $obAct->contract_num.' от '.\Yii::$app->formatter->asDate($obAct->contract_date);
     }
 
 }
