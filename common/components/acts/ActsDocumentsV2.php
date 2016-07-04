@@ -386,7 +386,7 @@ class ActsDocumentsV2
      */
     protected function generateName()
     {
-        return $this->fileName = 'Act_'.$this->actNumber.$this->iLegalPerson.$this->iCUserId.$this->actDate;
+        return $this->fileName = 'Act_'.$this->actNumber.'_'.str_replace('.','_',$this->actDate).'_'.$this->iLegalPerson.$this->iCUserId;
     }
 
     protected function getDocument()
