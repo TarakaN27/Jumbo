@@ -12,6 +12,7 @@ namespace common\components\bonus;
 use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
 use common\models\BonusSchemeToBuser;
+use common\models\ExchangeCurrencyHistory;
 use common\models\Payments;
 use common\models\PaymentsSale;
 use yii\helpers\ArrayHelper;
@@ -19,13 +20,14 @@ use yii\helpers\ArrayHelper;
 class BonusRecordCalculate
 {
     protected
-        $arSales = [],
-        $arPayments = [],
-        $beginMonthTime = NULL,
-        $endMonthTime = NULL,
-        $arBUsers = [],
-        $arAmounts = [],
-        $time = NULL;
+        $arSales = [],                  //продажи
+        $arPayments = [],               //платежи
+        $beginMonthTime = NULL,         //время начала рассчетного месяца
+        $endMonthTime = NULL,           //время окончания рассчетного месяца
+        $arBUsers = [],                 //пользователи со схемами для которых рассчитываем бонус
+        $arAmounts = [],                //суммы плтажей по пользователям за рассчетный месяц, без учета продаж
+        $arCurrency = [],               //курсы валют
+        $time = NULL;                   //рассчетное время месяца
 
 
     public function __construct($date = NULL)
@@ -41,6 +43,8 @@ class BonusRecordCalculate
         $this->getBUsers();         //get Back user id and his bonus scheme
         $this->getPayments();
         $this->getSales();
+
+
 
 
 
@@ -108,4 +112,44 @@ class BonusRecordCalculate
         return $this->arBUsers = ArrayHelper::map($arTmp,'buser_id','scheme_id');
     }
 
+    /**
+     * @return array
+     */
+    protected function getAmount()
+    {
+        $arResult = [];
+        foreach ($this->arPayments as $iUserId => $payment)
+        {
+            foreach ($payment as $iPayId => $pay)
+            {
+                $tmpAmount = $this->getPaymentAmount($pay);
+                if(isset($arResult[$iUserId]))
+                {
+                    $arResult[$iUserId]+=$tmpAmount;
+                }else{
+                    $arResult[$iUserId]=$tmpAmount;
+                }
+            }
+        }
+        return $this->arAmounts = $arResult;
+    }
+
+    /**
+     * @param Payments $pay
+     * @return float
+     */
+    protected function getPaymentAmount(Payments $pay)
+    {
+        $date = date('Y-m-d',$pay->pay_date);
+        if(isset($this->arCurrency[$pay->currency_id][$date]))
+        {
+            $nCurr = $this->arCurrency[$pay->currency_id][$date];
+        }else{
+            $nCurr = (float)ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$pay->currency_id);
+            $this->arCurrency[$pay->currency_id][$date] = $nCurr;
+        }
+
+        $amount = (float)$pay->pay_summ*$nCurr;
+        return $amount;
+    }
 }
