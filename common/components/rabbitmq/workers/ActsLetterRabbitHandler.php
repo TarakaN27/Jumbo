@@ -80,7 +80,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
     protected function sendMail($toEmail,$documentPath)
     {
         try {
-            return \Yii::$app->mailer->compose( // отправялем уведомление по ссылке
+            return \Yii::$app->salesMailer->compose( // отправялем уведомление по ссылке
                     [                           //указывам шаблон
                         'html' => 'actNotification-html',
                         'text' => 'actNotification-text'
