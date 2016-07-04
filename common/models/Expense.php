@@ -160,8 +160,7 @@ class Expense extends AbstractActiveRecord
      */
     public function convertToValidAmount()
     {
-        if($this->currency_id == 2)
-            $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ);
+        $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ,$this->currency_id);
     }
 
     /**
@@ -169,7 +168,6 @@ class Expense extends AbstractActiveRecord
      */
     public function convertToInavlidAmount()
     {
-        if($this->currency_id == 2)
-            $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ);
+        $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ,$this->currency_id);
     }
 }

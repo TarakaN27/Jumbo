@@ -12,18 +12,20 @@ namespace common\components\helpers;
 class CustomHelperMoney
 {
     CONST
+        BYR_CURR_ID = 2,
         BYN_BUR_FACTOR = 10000;
 
     /**
      * @param $amount
      * @return float
      */
-    public static function convertFromBynToBur($amount)
+    public static function convertFromBynToBur($amount,$currency)
     {
         $amount = preg_replace("/\s/","",$amount);
         $amount = str_replace(',','.',$amount);
         $amount = (float)$amount;
-        $amount = $amount*self::BYN_BUR_FACTOR;        //удалить после деноминации
+        if($currency == self::BYR_CURR_ID)
+            $amount = $amount*self::BYN_BUR_FACTOR;        //удалить после деноминации
         return $amount;
     }
 
@@ -31,9 +33,11 @@ class CustomHelperMoney
      * @param $amount
      * @return float
      */
-    public static function convertFromBurToByn($amount)
+    public static function convertFromBurToByn($amount,$currency)
     {
-        return $amount/self::BYN_BUR_FACTOR;
+        if($currency == self::BYR_CURR_ID)
+            return $amount/self::BYN_BUR_FACTOR;
+        return $amount;
     }
 
     
