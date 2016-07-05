@@ -225,6 +225,9 @@ class DefaultController extends AbstractBaseBackendController
                     }
 
                 }else{
+                    
+                    
+                    
                     $obRate->params = $arRates;
                     if (!$obRate->save()) {
                         $tr->rollBack();
