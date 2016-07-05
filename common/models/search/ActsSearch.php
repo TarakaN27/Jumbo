@@ -62,6 +62,9 @@ class ActsSearch extends Acts
                 'defaultPageSize' => Yii::$app->params['defaultPageSize'],
                 'pageSizeLimit' => [1,1000]
             ],
+            'sort'=> [
+                'defaultOrder' => ['id'=>SORT_DESC]
+            ],
         ]);
 
         if (!$this->validate()) {
