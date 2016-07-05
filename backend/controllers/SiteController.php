@@ -26,7 +26,6 @@ use common\models\Payments;
 use Gears\Pdf;
 use Yii;
 use yii\filters\AccessControl;
-use yii\helpers\Json;
 use yii\web\Controller;
 use backend\models\LoginForm;
 use yii\filters\VerbFilter;
@@ -91,6 +90,34 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
+        /*
+        $obMailer = new Mailer([
+            'viewPath' => '@common/mail',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.yandex.ru',
+                'username' => 'sales@webmart.by',
+                'password' => 'web-mart',
+                'port' => '465',
+                'encryption' => 'ssl',
+            ],
+        ]);
+
+        $obMailer->compose( // отправялем уведомление по ссылке
+                [
+                    'html' => 'actNotification-html',
+                    'text' => 'actNotification-text'
+                ]
+            )
+            ->setFrom(['sales@webmart.by' => \Yii::$app->name . ' robot'])
+            //->setTo($toEmail)
+            ->setTo('motuzdev@gmail.com')
+            ->setBcc('sales@webmart.by')
+            ->setSubject('Акт об оказанных услугах ООО "Вебмарт Групп"')
+            ->attach($documentPath)
+            ->send();
+        */
         //\Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,['first' => 'test amq']);
 
         /*
@@ -133,10 +160,10 @@ class SiteController extends Controller
         $obTaskStat->userInfoTaskLoadBalance();
         */
         //восстановление курсов валют по датам
-        /*
-        $ob = new ExchangeRatesCrunch();
-        $ob->RecoveryExchangeRates('2016-06-10','2016-06-16');
-        */
+
+        //$ob = new ExchangeRatesCrunch();
+        //$ob->RecoveryExchangeRates('2016-07-01','2016-07-05');
+
         //$ob = new ExchangeCurrencyHistory();
         //$ob->getCurrencyInByrForPeriod(strtotime('2016-01-01'),strtotime('2016-06-08'),[1,3]);
         /*

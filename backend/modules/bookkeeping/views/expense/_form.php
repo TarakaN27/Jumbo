@@ -5,6 +5,10 @@ use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/expense_create.js',$this,['accounting']);
+
 /* @var $this yii\web\View */
 /* @var $model common\models\Expense */
 /* @var $form yii\widgets\ActiveForm */

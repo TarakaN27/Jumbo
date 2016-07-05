@@ -134,4 +134,22 @@ class CustomDateHelper
         return str_replace($arSearch,$arReplace,$str);
     }
 
+    /**
+     * @param $date   25-06-2016
+     * @return int
+     */
+    public static function isDateBeforeOrAfterDate($date,$timeCheck = NULL)
+    {
+        $time = strtotime($date.' 00:00:00');
+        if(is_null($timeCheck))
+            $timeCheck = time();
+        
+        if($timeCheck >= $time)
+        {
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
 }

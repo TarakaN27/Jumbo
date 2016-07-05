@@ -100,8 +100,13 @@ class ExpenseController extends AbstractBaseBackendController
     {
         $model = new Expense();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->convertToValidAmount();
+            if($model->save())
+            {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
         } else {
             // Get the initial city description
             $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();
@@ -121,9 +126,15 @@ class ExpenseController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->convertToInavlidAmount();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->convertToValidAmount();
+            if($model->save())
+            {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
         } else {
             // Get the initial city description
             $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();

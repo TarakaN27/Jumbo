@@ -380,8 +380,11 @@ class DefaultController extends AbstractBaseBackendController
         $model->status = PaymentRequest::STATUS_NEW;
         $model->pay_date = date('d.m.Y',time());
 
-        if($model->load(Yii::$app->request->post()) && $model->save())
+        if($model->load(Yii::$app->request->post()))
         {
+            $model->convertToValidAmount();
+            if($model->save())
+            {
                 $obDlg = new Dialogs();
                 $obDlg->type = Dialogs::TYPE_REQUEST;
                 $obDlg->buser_id = Yii::$app->user->id;
@@ -405,8 +408,9 @@ class DefaultController extends AbstractBaseBackendController
                 }else{
                     Yii::$app->session->setFlash('error',Yii::t('app/common','DIALOG_ERROR_ADD_DIALOG'));
                 }
-            Yii::$app->session->setFlash('success',Yii::t('app/book','New payment request successfully added'));
-            return $this->redirect(['index']);
+                Yii::$app->session->setFlash('success',Yii::t('app/book','New payment request successfully added'));
+                return $this->redirect(['index']);
+            }
         }
         return $this->render('create_payment_request',[
             'model' => $model

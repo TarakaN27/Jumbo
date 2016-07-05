@@ -40,8 +40,8 @@ class ExchangeRatesCrunch
 
     public function RecoveryExchangeRates($beginDate,$endDate)
     {
-        $beginDate = '2016-06-10';                  //дата с которой начинаем восстановление
-        $endDate = '2016-06-15';                    //дата на которой заканчиваем восстановление
+        //$beginDate = '2016-06-10';                  //дата с которой начинаем восстановление
+        //$endDate = '2016-06-15';                    //дата на которой заканчиваем восстановление
         $arRowsForInsert = [];                      //массив с строками для вставки в базу данных
 
         /** @var array $arCurrency */

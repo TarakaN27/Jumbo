@@ -3,27 +3,19 @@ use yii\bootstrap\ActiveForm;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\helpers\Html;
-
+use common\components\helpers\CustomViewHelper;
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
-
-
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payment_create_request.js',$this,['accounting']);
 $this->registerJs("
-function checkResident()
-{
     var
-        sel = $('#paymentrequest-is_unknown').val();
+        urlGetManager = '".\yii\helpers\Url::to(['get-manager'])."',
+        errorTitle = '".Yii::t('app/common','Error')."',
+        errorText = '".Yii::t('app/common','Can not load manager for contractor')."'
+        ;
+",\yii\web\View::POS_HEAD);
 
-    if(sel == '".\common\models\PaymentRequest::YES."')
-        {
-            $('.field-paymentrequest-user_name').removeClass('hide');
-        }else{
-            $('.field-paymentrequest-user_name').addClass('hide');
-        }
-}
-
-",\yii\web\View::POS_END);
-
-
+/*
 $this->registerJs('
 $("#paymentrequest-cntr_id").on("change",function(){
     var
@@ -49,6 +41,7 @@ $("#paymentrequest-cntr_id").on("change",function(){
 checkResident();
 $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResident);
 ',\yii\web\View::POS_READY);
+*/
 
 ?>
 <?php $form = ActiveForm::begin([

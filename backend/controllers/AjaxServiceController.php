@@ -543,7 +543,7 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
         /** @var CuserServiceContract $obContract */
         $obContract = CuserServiceContract::find()->where(['service_id' => $iServId,'cuser_id' => $iCUser])->one();
-        if(!$obContract) {
+        if(!$obContract || empty($obContract->cont_number) || empty($obContract->cont_date)) {
             /** @var ServiceDefaultContract $obDefaultContract */
             $obDefaultContract = ServiceDefaultContract::find()->where(['service_id' => $iServId,'lp_id' => $iLegalPerson])->one();
             if(!$obDefaultContract)
@@ -555,7 +555,7 @@ class AjaxServiceController extends AbstractBaseBackendController{
             }
         }else{
             $contractDate = empty($obContract->cont_date) ? '' : Yii::$app->formatter->asDate($obContract->cont_date);
-            $contractNumber = $obContract->cont_number;
+            $contractNumber = 'Договор '.$obContract->cont_number;
         }
         /** @var ActFieldTemplate $obActFieldTpl */
         $obActFieldTpl = ActFieldTemplate::find()->where(['service_id' => $iServId,'legal_id' => $iLegalPerson])->one();

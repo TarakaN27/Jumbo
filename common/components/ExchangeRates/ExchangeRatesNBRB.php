@@ -6,6 +6,7 @@
  * Date: 06.07.15
  */
 namespace common\components\ExchangeRates;
+
 class ExchangeRatesNBRB extends AbstractExchangeRates
 {
     public
@@ -13,9 +14,10 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
         $date = NULL;
 
     protected
+        $time = NULL,
         $internalCurrCode = [
             '980' => '224',         //гривна
-            '840' => '145',          //usd
+            '840' => '145',         //usd
             '978' => '19',          //euro
             '643' => '190'          //ruble
         ];
@@ -25,9 +27,9 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
      */
     public function __construct($codeID = NULL,$time = null)
     {
-        $time = is_null($time) ? time() : $time; //текущая дата
+        $this->time = is_null($time) ? time() : $time; //текущая дата
         $this->codeID = $codeID;
-        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('m', $time) . '/' . date('d', $time) . '/' . date('Y', $time);
+        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('m',  $this->time) . '/' . date('d',  $this->time) . '/' . date('Y',  $this->time);
     }
 
     /**
@@ -41,8 +43,10 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
                 return NULL;
             }
             foreach($sxml->Currency as $ar) {
-                if($ar->NumCode == $this->codeID)
-                    return (float) $ar->Rate;
+                if($ar->NumCode == $this->codeID) {
+                    $scale = (float)$ar->Scale;
+                    return $this->getRateAfterDenomination((float)$ar->Rate/$scale, $this->time);
+                }
            }
            return NULL;
         }catch (\Exception $e)
@@ -63,7 +67,8 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
                 return NULL;
             }
             foreach($sxml->Currency as $ar) {
-                $result[(int)$ar->NumCode] = (float) $ar->Rate;
+                $scale = (float)$ar->Scale;
+                $result[(int)$ar->NumCode] = $this->getRateAfterDenomination((float)$ar->Rate/$scale,$this->time);
             }
       //  }catch (\Exception $e)
       //  {
@@ -94,9 +99,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
         {
             $date = (string)$items->attributes()->Date;
             $dateTmp = (float)$items->Rate;
-
-           $arResult [date('Y-m-d',strtotime($date))] = $dateTmp;
-
+            $arResult [date('Y-m-d',strtotime($date))] = $this->getRateAfterDenomination($dateTmp,$this->time);
         }
 
         return $arResult;

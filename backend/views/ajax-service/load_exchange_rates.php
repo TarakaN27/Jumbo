@@ -14,9 +14,16 @@
 		'name',
 		'code',
 		[
-			'attribute' => 'nbrb_rate',
-			'label' => Yii::t('app/common','Rate')
+			'label' => Yii::t('app/common','Rate BYN'),
+			'value' => function($model){
+				return round((float)$model->nbrb_rate/10000,4);
+			}
 		],
+		[
+			'attribute' => 'nbrb_rate',
+			'label' => Yii::t('app/common','Rate BYR')
+		],
+
 
 	]
 ])?>

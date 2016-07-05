@@ -26,9 +26,7 @@ var
     actsNotSent = '".Yii::t('app/book','Acts not sent')."',
     actSuccessSent = '".Yii::t('app/book','Acts successfully sent')."',
     actServerError = '".Yii::t('app/users','Server error')."',
-    emailPattern = ".$jsPattern."
-    ;
-
+    emailPattern = ".$jsPattern.";
 ",View::POS_HEAD);
 ?>
 
@@ -71,8 +69,9 @@ var
                             },
                             'value' => function($model){
                                 return $model->act_num;
+
                             },
-                                                    ],
+                        ],
                         [
                             'attribute' => 'amount',
                             'format' => 'html',
