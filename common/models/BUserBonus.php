@@ -16,6 +16,8 @@ use backend\models\BUser;
  * @property integer $updated_at
  * @property integer $service_id
  * @property integer $cuser_id
+ * @property integer $currency_id
+ * @property integer $record_id
  *
  * @property Payments $payment
  * @property BUser $buser
@@ -40,7 +42,8 @@ class BUserBonus extends AbstractActiveRecord
             [['amount'], 'number'],
             [[
                 'buser_id', 'scheme_id', 'payment_id',
-                'created_at', 'updated_at','cuser_id','service_id'
+                'created_at', 'updated_at','cuser_id',
+                'service_id','currency_id','record_id'
             ], 'integer']
         ];
     }
@@ -52,7 +55,7 @@ class BUserBonus extends AbstractActiveRecord
     {
         return [
             'id' => Yii::t('app/bonus', 'ID'),
-            'amount' => Yii::t('app/bonus', 'Amount'),
+            'amount' => Yii::t('app/bonus', 'Bonus amount'),
             'buser_id' => Yii::t('app/bonus', 'Buser ID'),
             'scheme_id' => Yii::t('app/bonus', 'Scheme ID'),
             'payment_id' => Yii::t('app/bonus', 'Payment ID'),
@@ -60,6 +63,8 @@ class BUserBonus extends AbstractActiveRecord
             'updated_at' => Yii::t('app/bonus', 'Updated At'),
             'cuser_id' => Yii::t('app/bonus', 'CUser ID'),
             'service_id' => Yii::t('app/bonus', 'Service ID'),
+            'currency_id' => Yii::t('app/bonus','Bonus currency ID'),
+            'record_id' => Yii::t('app/bonus','Record ID')
         ];
     }
 
@@ -101,5 +106,21 @@ class BUserBonus extends AbstractActiveRecord
     public function getCuser()
     {
         return $this->hasOne(CUser::className(),['id' => 'cuser_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(),['id' => 'currency_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentRecord()
+    {
+        return $this->hasOne(BUserPaymentRecords::className(),['id' => 'record_id']);
     }
 }

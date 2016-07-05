@@ -95,4 +95,43 @@ class CustomDateHelper
         return $iterval->days == 0;
     }
 
+    /**
+     * @param $str
+     * @return mixed
+     */
+    public static function convertEnToRusMonth($str)
+    {
+        $arSearch = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December'
+        ];
+
+        $arReplace = [
+            'Январь',
+            'Февраль',
+            'Март',
+            'Апрель',
+            'Май',
+            'Июнь',
+            'Июль',
+            'Август',
+            'Сентябрь',
+            'Октябрь',
+            'Ноябрь',
+            'Декабрь'
+        ];
+
+        return str_replace($arSearch,$arReplace,$str);
+    }
+
 }

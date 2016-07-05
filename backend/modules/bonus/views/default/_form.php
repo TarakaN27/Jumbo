@@ -54,11 +54,17 @@ $this->registerJs('
         if(!in_array($model->type,[BonusScheme::TYPE_SIMPLE_BONUS,BonusScheme::TYPE_COMPLEX_TYPE,BonusScheme::TYPE_COMPLEX_PARTNER]))
             $options['disabled'] = 'disabled';
         echo $form->field($model, 'num_month')->textInput($options) ?>
-
+    <?php if(!in_array($model->type,[BonusScheme::TYPE_PAYMENT_RECORDS])):?>
     <?= $form->field($model, 'grouping_type')->dropDownList($model::getGroupByMap(),[
         'prompt' => Yii::t('app/bonus','Choose grouping type'),]) ?>
-    <div class="type2 type3  <?=$model->type!= BonusScheme::TYPE_UNITS ? '' : 'hide'?>">
+    <?php endif;?>
+
+    <div class="type2 type3  <?=!in_array($model->type,[BonusScheme::TYPE_UNITS,BonusScheme::TYPE_PAYMENT_RECORDS]) ? '' : 'hide'?>">
         <?= $form->field($model, 'payment_base')->dropDownList(BonusScheme::getPaymentBaseArr())?>
+    </div>
+
+    <div class="type5 <?=$model->type== BonusScheme::TYPE_PAYMENT_RECORDS ? '' : 'hide'?>">
+        <?= $form->field($model,'currency_id')->dropDownList(\common\models\ExchangeRates::getRatesCodes())?>
     </div>
     <div class="type1 <?=$model->type== BonusScheme::TYPE_UNITS ? '' : 'hide'?>">
         <?php foreach($arServices as $serv):?>

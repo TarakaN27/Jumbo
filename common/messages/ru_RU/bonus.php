@@ -74,6 +74,11 @@ return [
 	'to' => 'До',
 	'from' => 'От',
 	'Rate' => 'Ставка бонуса',
-	'Create' => 'Сохранить'
+	'Create' => 'Сохранить',
+	'Currency id' => 'Валюта бонуса',
+	'Payment records bonus' => 'Награды за рекорды',
+	'Bonus amount' => 'Сумма бонуса',
+	'Bonus currency ID' => 'Валюта бонуса',
+	'Record Date' => 'Дата рекорда'
 
 ];

@@ -182,8 +182,8 @@ class ExchangeRatesController extends AbstractConsoleController{
 
     public function actionRecoveryExchangeRates()
     {
-        $beginDate = '2016-01-01';                  //дата с которой начинаем восстановление
-        $endDate = '2016-06-08';                    //дата на которой заканчиваем восстановление
+        $beginDate = '2016-07-01';                  //дата с которой начинаем восстановление
+        $endDate = '2016-07-05';                    //дата на которой заканчиваем восстановление
         $arRowsForInsert = [];                      //массив с строками для вставки в базу данных
 
         /** @var ExchangeRates $arCurrency */

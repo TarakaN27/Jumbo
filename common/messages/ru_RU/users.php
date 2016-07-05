@@ -328,6 +328,9 @@ return [
     'Turnover type year' => 'Годовой оборот',
     'Counting base' => 'База расчета процента',
     'Counting base payment' => 'Платежи',
-    'Counting base enroll' => 'Зачисления'
+    'Counting base enroll' => 'Зачисления',
+    'Turnover amount' => 'Сумма оборота',
+    'Increment rate percents' => 'Процент прироста',
+    'Record Date' => 'Дата рекорда'
 
 ];

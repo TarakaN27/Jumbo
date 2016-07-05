@@ -10,8 +10,10 @@ namespace backend\modules\reports\forms;
 
 
 use backend\models\BUser;
+use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
 use common\models\BUserBonus;
+use common\models\BUserPaymentRecords;
 use common\models\CUser;
 use common\models\CUserRequisites;
 use common\models\ExchangeRates;
@@ -124,11 +126,31 @@ class BonusReportsForm extends Model
 					],
 					//'sort'=> ['defaultOrder' => ['pay_date'=>SORT_ASC]],
 				]),
-			'totalCount' => $query->sum('amount')
+			'totalCount' => $query->sum('amount'),
+			'bonusPaymentRecords' => $this->getPaymentsRecordsBonus()
 		];
 	}
 
+	/**
+	 * @return ActiveDataProvider
+	 */
+	protected function getPaymentsRecordsBonus()
+	{
+		$beginDate = date('Y-m-d',CustomHelper::getBeginMonthTime(strtotime($this->beginDate.' 00:00:00')));
+		$endDate = date('Y-m-d',CustomHelper::getBeginMonthTime(strtotime($this->endDate.' 00:00:00')));
 
+		$query = BUserBonus::find()
+			->with('currency')
+			->joinWith('paymentRecord')
+			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere(['BETWEEN',BUserPaymentRecords::tableName().'.record_date',$beginDate,$endDate]);
+			//->all();
 
-
+		return new ActiveDataProvider([
+			'query' => $query,
+			'pagination' => [
+				'pageSize' => 999
+			]
+		]);
+	}
 }

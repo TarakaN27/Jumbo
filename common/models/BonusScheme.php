@@ -21,6 +21,7 @@ use yii\helpers\Json;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $payment_base
+ * @property integer $currency_id
  */
 class BonusScheme extends AbstractActiveRecord
 {
@@ -117,11 +118,22 @@ class BonusScheme extends AbstractActiveRecord
             [[
                 'type', 'num_month',
                 'grouping_type', 'created_at', 'updated_at',
-                'infinite','payment_base'
+                'infinite','payment_base','currency_id'
             ], 'integer'],
             [['name'], 'string', 'max' => 255],
             ['grouping_type','default','value' => self::GROUP_BY_COMPANY],
-            ['name','unique']
+            ['name','unique'],
+            [['currency_id'],'required',
+                'when' => function(){
+                    return $this->type == self::TYPE_PAYMENT_RECORDS;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        type = $('#bonusscheme-type').val();
+                    
+                    return type == ".self::TYPE_PAYMENT_RECORDS." ;
+                }"
+            ]
         ];
     }
 
@@ -139,7 +151,8 @@ class BonusScheme extends AbstractActiveRecord
             'grouping_type' => Yii::t('app/bonus', 'Grouping Type'),
             'created_at' => Yii::t('app/bonus', 'Created At'),
             'updated_at' => Yii::t('app/bonus', 'Updated At'),
-            'payment_base' => Yii::t('app/bonus', 'Payment base')
+            'payment_base' => Yii::t('app/bonus', 'Payment base'),
+            'currency_id' => Yii::t('app/bonus','Currency id')
         ];
     }
 
@@ -205,6 +218,14 @@ class BonusScheme extends AbstractActiveRecord
     public function getSchemeRecords()
     {
         return $this->hasOne(BonusSchemeRecords::className(),['scheme_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(),['id' => 'currency_id']);
     }
 
     /**

@@ -3,6 +3,7 @@ namespace backend\controllers;
 
 use backend\models\forms\BUserSignupForm;
 use common\components\anubis\Anubis;
+use common\components\bonus\BonusRecordCalculate;
 use common\components\crunchs\bonus\ImportSale;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
@@ -151,6 +152,11 @@ class SiteController extends Controller
         $obRecalPer = new PartnerPercentRecounting();
         $obRecalPer->dailyRecounting();
         */
+        /*
+        $obCalc = new BonusRecordCalculate('01-06-2016');
+        $obCalc->run();
+        */
+
         die;
     }
 

@@ -87,4 +87,30 @@ class BonusSchemeRecordsHistory extends AbstractActiveRecord
             return $obParams;
         }
     }
+
+    /**
+     * @param $arSchemesIds
+     * @param $date
+     * @return mixed
+     */
+    public static function getParamsForFewSchemes($arSchemesIds,$date)
+    {
+        $arSchemesIds = array_unique($arSchemesIds);
+        if(CustomDateHelper::isCurrentMonth($date))
+        {
+            return BonusSchemeRecords::find()->where(['scheme_id' => $arSchemesIds])->indexBy('scheme_id')->all();
+        }else{
+            $obParams = self::find()
+                ->where(['scheme_id' => $arSchemesIds])
+                ->andWhere(['<=','update_date',date('Y-m-d')])
+                ->indexBy('scheme_id')
+                ->one();
+            if(!$obParams)
+            {
+                $obParams = BonusSchemeRecords::find()->where(['scheme_id' => $arSchemesIds])->indexBy('scheme_id')->all();
+            }
+            return $obParams;
+        }
+
+    }
 }

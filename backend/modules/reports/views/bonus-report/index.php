@@ -152,6 +152,35 @@ $rowContNum = $admin ? 6 : 12;
 						</div>
 					<?php endif;?>
 				</div>
+
+				<?php if(!empty($data['bonusPaymentRecords'])):?>
+					<?=Html::tag('h3',Yii::t('app/bonus','Payment records bonus'))?>
+					<?=\yii\grid\GridView::widget([
+						'dataProvider' => $data['bonusPaymentRecords'],
+						'columns' => [
+							'amount:decimal',
+							[
+								'attribute' => 'currency_id',
+								'value' => 'currency.code'
+							],
+							[
+								'attribute' => 'buser.fio',
+								'visible' => $admin
+							],
+							'paymentRecord.amount:decimal',
+							'paymentRecord.record_num',
+							'paymentRecord.percents',
+							[
+								'attribute' => 'paymentRecord.record_date',
+								'value' => function($model){
+									$tmp = \yii\helpers\ArrayHelper::getValue($model,'paymentRecord.record_date');
+									return empty($tmp) ? NULL : \common\components\helpers\CustomDateHelper::convertEnToRusMonth(Yii::$app->formatter->asDate($tmp,"MMMM Y"));
+								}
+							],
+
+						]
+					])?>
+				<?php endif;?>
 			</div>
 		</div>
 	</div>
