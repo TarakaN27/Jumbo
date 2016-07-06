@@ -43,7 +43,7 @@ return [
             'dateFormat' => 'php:d.m.Y',
             'datetimeFormat' => 'php:d.m.Y H:i',
             'thousandSeparator' => ' ',
-            'decimalSeparator' => '.',
+            'decimalSeparator' => ',',
             'timeZone' => 'Europe/Minsk',
             'defaultTimeZone' => 'Europe/Minsk'
         ],
