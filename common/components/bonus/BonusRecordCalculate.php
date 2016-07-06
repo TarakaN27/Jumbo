@@ -8,10 +8,8 @@
 
 namespace common\components\bonus;
 
-
 use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
-use common\models\BonusSchemeRecords;
 use common\models\BonusSchemeRecordsHistory;
 use common\models\BonusSchemeToBuser;
 use common\models\BUserBonus;
@@ -61,19 +59,19 @@ class BonusRecordCalculate
             return FALSE;
 
         $this->getSales();                                      //get payment is witch was sales
-        $this->getAmount();                                     //get payment amount for each buser
-        if (count($this->arAmounts) == 0)
-            return FALSE;
 
         $this->getSchemesParams();                              //get parameters for bonus scheme
         if (count($this->arSchemesParams) == 0)
+            return FALSE;
+
+        $this->getAmount();                                     //get payment amount for each buser
+        if (count($this->arAmounts) == 0)
             return FALSE;
 
         $this->getPrevRecordsForUser();                         //get prev records for users
         $tr = \Yii::$app->db->beginTransaction();
         try {
             $this->getNewRecordsForBUserRecordPayment();        //
-            //$this->insertRecords();                             //insert to records table
             $tr->commit();
         } catch (Exception $e) {
             $tr->rollBack();
@@ -114,12 +112,17 @@ class BonusRecordCalculate
                 'p.pay_summ',
                 'p.prequest_id',
                 'p.currency_id',
+                'p.legal_id',
+                'p.cuser_id',
+                'cu.id as cuid',
+                'cu.is_resident',
                 'pr.id  as prid',
-                'pr.manager_id'
+                'pr.manager_id',
             ])
             ->alias('p')
             ->joinWith('payRequest as pr')
-            ->where(['manager_id' => array_keys($this->arBUsers)])
+            ->joinWith('cuser as cu')
+            ->where(['pr.manager_id' => array_keys($this->arBUsers)])
             ->andWhere(['BETWEEN', 'p.pay_date', $this->beginMonthTime, $this->endMonthTime])
             ->all();
         return $this->arPayments = ArrayHelper::index($arTmp, 'id', 'payRequest.manager_id');
@@ -147,10 +150,11 @@ class BonusRecordCalculate
     {
         $arResult = [];
         foreach ($this->arPayments as $iUserId => $payment) {
+            $iSchemeID = $this->arBUsers[$iUserId]->scheme_id;
             foreach ($payment as $iPayId => $pay) {
                 if(in_array($iPayId,$this->arSales))
                     continue;
-                $tmpAmount = $this->getPaymentAmount($pay);
+                $tmpAmount = $this->getPaymentAmount($pay,$iSchemeID);
                 if (isset($arResult[$iUserId])) {
                     $arResult[$iUserId] += $tmpAmount;
                 } else {
@@ -166,7 +170,7 @@ class BonusRecordCalculate
      * @param Payments $pay
      * @return float
      */
-    protected function getPaymentAmount(Payments $pay)
+    protected function getPaymentAmount(Payments $pay,$iSchemeID)
     {
         $date = date('Y-m-d', $pay->pay_date);
         if (isset($this->arCurrency[$pay->currency_id][$date])) {
@@ -177,6 +181,43 @@ class BonusRecordCalculate
         }
 
         $amount = (float)$pay->pay_summ * $nCurr;
+        $amount = $this->getPaymentAmountWithoutTax($amount,$pay,$iSchemeID);
+
+        return $amount;
+    }
+
+    /**
+     * Вычтем из платежей НДС если нужно
+     * @param $amount
+     * @param Payments $payment
+     * @param $iSchemeID
+     * @return float
+     */
+    protected function getPaymentAmountWithoutTax($amount,Payments $payment,$iSchemeID)
+    {
+        if(!isset($this->arSchemesParams[$iSchemeID]) || empty($this->arSchemesParams[$iSchemeID]->deduct_lp))
+            return $amount;
+
+        $arParams = $this->arSchemesParams[$iSchemeID]->deduct_lp;      //парметры схемы по вычету НДС
+
+        if(is_array($arParams) &&  //проверяем не указано ли для Юр. лица отнимать НАЛОГ от платежа
+            isset($arParams[$payment->legal_id],$arParams[$payment->legal_id]['deduct']) &&
+            $arParams[$payment->legal_id]['deduct'] == 1)
+        {
+            $bIsResident = ArrayHelper::getValue($payment,'cuser.is_resident');
+            if(is_null($bIsResident))
+                return $amount;
+
+            $key = $bIsResident ? 'res' : 'not_res';
+            if(isset($arParams[$payment->legal_id][$key]))
+            {
+                $tax = NULL;
+                if(isset($arParams[$payment->legal_id][$key.'_tax']) && is_numeric($arParams[$payment->legal_id][$key.'_tax']))
+                    $tax = $arParams[$payment->legal_id][$key.'_tax'];
+                $amount = CustomHelper::getVatMountByAmount($amount,$tax); //отнимем от суммы платежа налог
+            }
+
+        }
         return $amount;
     }
 
@@ -225,7 +266,6 @@ class BonusRecordCalculate
             $prevRecord = NULL;
             if (isset($this->arPrevRecords[$iBuserId]))
                 $prevRecord = $this->arPrevRecords[$iBuserId];
-
 
             $bIsNewRecord = 0;
             $recordNum = '';
@@ -294,21 +334,6 @@ class BonusRecordCalculate
     }
 
     /**
-     * @return bool|int
-     * @throws \yii\db\Exception
-     */
-    protected function insertRecords()
-    {
-        if(count($this->arNewRecordForInsert) == 0)
-            return FALSE;
-
-        $model = new BUserPaymentRecords();
-        return \Yii::$app->db->createCommand()
-            ->batchInsert($model::tableName(), $model->attributes(), $this->arNewRecordForInsert)
-            ->execute();
-    }
-
-    /**
      * @param $percent
      * @param $iSchemeId
      * @return float|null
@@ -329,8 +354,13 @@ class BonusRecordCalculate
         return $amount;
     }
 
+    /**
+     * @param $oldAmount
+     * @param $newAmount
+     * @return float
+     */
     protected function getPercent($oldAmount,$newAmount)
     {
-        return ((float)$newAmount/(float)$oldAmount)*100 - 100;
+        return CustomHelper::getDiffTwoNumbersAtPercent($oldAmount,$newAmount);
     }
 }

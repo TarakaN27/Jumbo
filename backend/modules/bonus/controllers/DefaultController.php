@@ -53,7 +53,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = $this->findModel($id);
         $arServices = Services::getServicesMap();
         $arLegal = [];
-        if (in_array($model->type, [$model::TYPE_SIMPLE_BONUS, $model::TYPE_COMPLEX_TYPE]))
+        if (in_array($model->type, [$model::TYPE_SIMPLE_BONUS, $model::TYPE_COMPLEX_TYPE,$model::TYPE_PAYMENT_RECORDS]))
             $arLegal = LegalPerson::getLegalPersonMap();
 
         $arBServices = $model->services;
@@ -81,10 +81,12 @@ class DefaultController extends AbstractBaseBackendController
     {
         $model = new BonusScheme();
         $arRates = [];
+        $arRecordLpDeduct = [];
         if ($model->load(Yii::$app->request->post())) {
             $tr = Yii::$app->db->beginTransaction();
             $arServices = Services::getAllServices();
             $arRates = Yii::$app->request->post('records',[]);
+            $arRecordLpDeduct = Yii::$app->request->post('record-lp',[]);
             if ($model->save())  //сохраняем схему
             {
 
@@ -119,7 +121,8 @@ class DefaultController extends AbstractBaseBackendController
                     
                     $obRecords = new BonusSchemeRecords([
                         'scheme_id' => $model->id,
-                        'params' => $arRates
+                        'params' => $arRates,
+                        'deduct_lp' => $arRecordLpDeduct
                     ]);
 
                     if (!$obRecords->save()) {
@@ -136,7 +139,8 @@ class DefaultController extends AbstractBaseBackendController
         return $this->render('create', [
             'model' => $model,
             'arBServices' => [],
-            'arRates' => $arRates
+            'arRates' => $arRates,
+            'arRecordLpDeduct' => $arRecordLpDeduct
         ]);
     }
 
@@ -152,6 +156,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = $this->findModel($id);
         $arBServicesTmp = $model->services;
         $arBServices = [];
+        $arRecordLpDeduct = [];
         foreach ($arBServicesTmp as $value)
             $arBServices[$value->service_id] = $value;
         $arRates = [];
@@ -161,8 +166,9 @@ class DefaultController extends AbstractBaseBackendController
             if($obRate)
             {
                 $arRates = $obRate->params;
+                $arRecordLpDeduct = $obRate->deduct_lp;
             }else{
-                $obRate = new BonusSchemeRecords(['scheme_id' => $model->id,'params' => []]);
+                $obRate = new BonusSchemeRecords(['scheme_id' => $model->id,'params' => [],'deduct_lp' => []]);
             }
         }
 
@@ -170,6 +176,7 @@ class DefaultController extends AbstractBaseBackendController
             $tr = Yii::$app->db->beginTransaction();
             $arServices = Services::getAllServices();
             $arRates = Yii::$app->request->post('records',[]);
+            $arRecordLpDeduct = Yii::$app->request->post('record-lp',[]);
             if ($model->save())  //сохраняем схему
             {
 
@@ -226,9 +233,8 @@ class DefaultController extends AbstractBaseBackendController
 
                 }else{
                     
-                    
-                    
                     $obRate->params = $arRates;
+                    $obRate->deduct_lp = $arRecordLpDeduct;
                     if (!$obRate->save()) {
                         $tr->rollBack();
                         throw new ServerErrorHttpException();
@@ -245,7 +251,8 @@ class DefaultController extends AbstractBaseBackendController
         return $this->render('update', [
             'model' => $model,
             'arBServices' => $arBServices,
-            'arRates' => $arRates
+            'arRates' => $arRates,
+            'arRecordLpDeduct' => $arRecordLpDeduct
         ]);
     }
 

@@ -139,18 +139,39 @@ class BonusReportsForm extends Model
 		$beginDate = date('Y-m-d',CustomHelper::getBeginMonthTime(strtotime($this->beginDate.' 00:00:00')));
 		$endDate = date('Y-m-d',CustomHelper::getBeginMonthTime(strtotime($this->endDate.' 00:00:00')));
 
-		$query = BUserBonus::find()
-			->with('currency')
-			->joinWith('paymentRecord')
-			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+		$query = BUserPaymentRecords::find()
+			->with('bonus','buser','bonus.currency')
+			->where([BUserPaymentRecords::tableName().'.buser_id' => $this->users])
 			->andWhere(['BETWEEN',BUserPaymentRecords::tableName().'.record_date',$beginDate,$endDate]);
-			//->all();
 
-		return new ActiveDataProvider([
+		$dataProvider =  new ActiveDataProvider([
 			'query' => $query,
 			'pagination' => [
 				'pageSize' => 999
-			]
+			],
+			'sort'=> [
+				'defaultOrder' => ['buser_id' => SORT_ASC, 'record_date'=>SORT_ASC]
+			],
 		]);
+		$arDiffs = [];
+		$arTmp = [];
+		$models = $dataProvider->getModels();
+		foreach ($models as $model)
+		{
+			if(isset($arTmp[$model->buser_id]))
+			{
+				$diff = CustomHelper::getDiffTwoNumbersAtPercent($model->amount,end($arTmp[$model->buser_id]));
+				$arDiffs[$model->id] = $diff;
+				$arTmp[$model->buser_id][] = $model->amount;
+			}else{
+				$arDiffs[$model->id] = NULL;
+				$arTmp[$model->buser_id][] = $model->amount;
+			}
+		}
+		unset($models,$arTmp,$query);
+		return [
+			'dataProvider' => $dataProvider,
+			'diffs' => $arDiffs
+		];
 	}
 }

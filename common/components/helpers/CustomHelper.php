@@ -614,6 +614,17 @@ class CustomHelper {
         }
         return $arResult;
     }
+
+    /**
+     * на сколько процентов отличается первое число от второго
+     * @param $firstNumber
+     * @param $secondNumber
+     * @return float
+     */
+    public static function getDiffTwoNumbersAtPercent($firstNumber,$secondNumber)
+    {
+        return ((float)$firstNumber/(float)$secondNumber)*100 - 100;
+    }
     
 
 

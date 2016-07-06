@@ -251,40 +251,109 @@ $this->registerJs('
     </div>
 
     <div class="pdd-left-10 pdd-right-10 type5 <?=$model->type== BonusScheme::TYPE_PAYMENT_RECORDS ? '' : 'hide'?>">
-        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3 well text-center">
-            <button type="button" id="addRecordId" data-curr-num="0" class="btn btn-info btn-xs"><i class="fa fa-plus-square"></i></button>
-            <button type="button" id="removeRecordId" class="btn btn-danger btn-xs"><i class="fa fa-minus-square"></i></button>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <?=Html::label(Yii::t('app/bonus','from'))?>
-                    </div>
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <?=Html::label(Yii::t('app/bonus','to'))?>
-                    </div>
-                    <div class="col-md-4 col-sm-4 col-xs-12">
-                        <?=Html::label(Yii::t('app/bonus','Rate'))?>
-                    </div>
-                </div>
-            </div>
-
-            <section id="recordContainer">
-                <?php foreach ($arRates as $key => $item):?>
-                    <div class="form-group" data-col="$key">
-                        <div class="row">
-                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."][from]",$item['from'],['class' => 'form-control'])?>
-                            </div>
-                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."][to]",$item['to'],['class' => 'form-control'])?>
-                            </div>
-                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                <?=Html::textInput("records[".$key."][rate]",$item['rate'],['class' => 'form-control'])?>
-                            </div>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/bonus','Rates record bonus')?></label>
+            <div class="col-md-6 col-sm-6 col-xs-12 well text-center">
+                <button type="button" id="addRecordId" data-curr-num="0" class="btn btn-info btn-xs"><i class="fa fa-plus-square"></i></button>
+                <button type="button" id="removeRecordId" class="btn btn-danger btn-xs"><i class="fa fa-minus-square"></i></button>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                            <?=Html::label(Yii::t('app/bonus','from'))?>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                            <?=Html::label(Yii::t('app/bonus','to'))?>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                            <?=Html::label(Yii::t('app/bonus','Rate'))?>
                         </div>
                     </div>
+                </div>
+
+                <section id="recordContainer">
+                    <?php foreach ($arRates as $key => $item):?>
+                        <div class="form-group" data-col="$key">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    <?=Html::textInput("records[".$key."][from]",$item['from'],['class' => 'form-control'])?>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    <?=Html::textInput("records[".$key."][to]",$item['to'],['class' => 'form-control'])?>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    <?=Html::textInput("records[".$key."][rate]",$item['rate'],['class' => 'form-control'])?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach;?>
+                </section>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/bonus','Deduct tax for legal person')?></label>
+            <div class="col-md-6 col-sm-6 col-xs-12 well">
+                <?php $checked=false; $value = NULL; foreach ($arLP as $iLPId => $lpName):?>
+                    <div class="row">
+                    <div class="form-group col-md-3 col-sm-3 col-xs-12">
+                        <label>
+                            <?php
+                                $checked = isset($arRecordLpDeduct[$iLPId],$arRecordLpDeduct[$iLPId]['deduct']) && $arRecordLpDeduct[$iLPId]['deduct'] == 1 ? TRUE : FALSE;
+                                echo Html::checkbox('record-lp['.$iLPId.'][deduct]',$checked,['data-id' => $iLPId,'class' => 'deductRecordCheck']);?>
+                            <?=$lpName;?>
+                        </label>
+                    </div>
+                    <div class="form-group col-md-9 col-sm-9 col-xs-12 <?=$checked ? '' : 'hide'?>" id="rlp_group_id_<?=$iLPId;?>">
+                        <table class="table table-bordered text-center">
+                            <tr>
+                                <th>
+
+                                </th>
+                                <th class="text-center">
+                                    <?=Html::label(Yii::t('app/bonus','deduct tax'));?>
+                                </th>
+                                <th class="text-center">
+                                    <?=Html::label(Yii::t('app/bonus','Custom tax'));?>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th >
+                                    <?=Html::label(Yii::t('app/bonus','Resident'));?>
+                                </th>
+                                <td>
+                                    <?php
+                                    $checked = isset($arRecordLpDeduct[$iLPId],$arRecordLpDeduct[$iLPId]['res']) && $arRecordLpDeduct[$iLPId]['res'] == 1 ? TRUE : FALSE;
+                                    echo Html::checkbox('record-lp['.$iLPId.'][res]',$checked);
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    $value = isset($arRecordLpDeduct[$iLPId],$arRecordLpDeduct[$iLPId]['res_tax']) ? $arRecordLpDeduct[$iLPId]['res_tax'] : FALSE;
+                                    echo Html::textInput('record-lp['.$iLPId.'][res_tax]',$value)?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <?=Html::label(Yii::t('app/bonus','Not resident'));?>
+                                </th>
+                                <td>
+                                    <?php
+                                    $checked = isset($arRecordLpDeduct[$iLPId],$arRecordLpDeduct[$iLPId]['not_res']) && $arRecordLpDeduct[$iLPId]['not_res'] == 1 ? TRUE : FALSE;
+                                    echo Html::checkbox('record-lp['.$iLPId.'][not_res]',$checked);
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    $value = isset($arRecordLpDeduct[$iLPId],$arRecordLpDeduct[$iLPId]['not_res_tax']) ? $arRecordLpDeduct[$iLPId]['not_res_tax'] : FALSE;
+                                    echo Html::textInput('record-lp['.$iLPId.'][not_res_tax]',$value);
+                                    ?>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr/>
+                    </div>
+                    </div>
                 <?php endforeach;?>
-            </section>
+            </div>
         </div>
     </div>
 

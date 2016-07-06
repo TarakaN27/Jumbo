@@ -26,7 +26,8 @@ $this->params['breadcrumbs'][] = Yii::t('app/bonus', 'Update');
             <?= $this->render('_form', [
                 'model' => $model,
                 'arBServices' => $arBServices,
-                'arRates' => $arRates
+                'arRates' => $arRates,
+                'arRecordLpDeduct' => $arRecordLpDeduct
             ]) ?>
             </div>
         </div>

@@ -110,8 +110,9 @@ return [
     'Spend hour' => 'Затрачено часов',
     'Balance hour' => 'Баланс трудозатрат',
     'Documents' => 'Документы',
-    'Show without sale' => 'Без учета продаж',
+    'Show without sale' => 'Общая информация о продажах',
     'Addition settings' => 'Дополнительные настройки',
     'saleAmount' => 'Сумма платежей-продаж',
-    'paymentAmountWithoutSale' => 'Сумма платежей без продаж'
+    'paymentAmountWithoutSale' => 'Сумма платежей без продаж',
+    'record diffs' => 'Разница платежей'
 ];

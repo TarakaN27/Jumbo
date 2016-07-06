@@ -182,7 +182,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         if($model->type == BonusScheme::TYPE_PAYMENT_RECORDS)
                             $arItem [] = [
                                 'label' => Yii::t('app/bonus','Detail'),
-                                'content'=>GridView::widget([
+                                'content'=>
+                                    Html::tag('h3',Yii::t('app/bonus','Rates record bonus')).
+                                    GridView::widget([
                                     'dataProvider' => new ArrayDataProvider([
                                         'allModels' => is_object($arRecordRates) ? $arRecordRates->params : []
                                     ]),
@@ -200,6 +202,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'label' => Yii::t('app/bonus','Rate')
                                         ]
                                     ]
+                                ]).
+                                Html::tag('h3',Yii::t('app/bonus','Deduct tax at legal person')).
+                                $this->render('_part_record_deduct_tax',[
+                                    'model' => is_object($arRecordRates) ? $arRecordRates->deduct_lp : [],
+                                    'arLegal' => $arLegal
                                 ])
                             ];
                     ?>

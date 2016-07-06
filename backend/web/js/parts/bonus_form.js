@@ -204,6 +204,24 @@ function beforeSubmitFormValidation()
     }
     return true;
 }
+/**
+ *
+ */
+function deductRecordChnage() {
+    var
+        id = $(this).attr('data-id'),
+        container = $('#rlp_group_id_'+id),
+        bCheck = $(this).prop('checked');
+
+    if(bCheck)
+    {
+        container.removeClass('hide');
+    }else{
+        container.addClass('hide');
+        container.find('input[type="text"]').val('');
+        container.find('input[type="checkbox"]').prop('checked',false);
+    }
+}
 
 //документ реади
 jQuery(document).ready(function(){
@@ -215,5 +233,6 @@ jQuery(document).ready(function(){
     $('#addRecordId').on('click',addRecordRow);
     $('#removeRecordId').on('click',removeRecordRow);
     $(document).on("submit", "form#bonusFormId", beforeSubmitFormValidation);
+    $('.deductRecordCheck').on('change',deductRecordChnage);
 });
 

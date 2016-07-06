@@ -79,6 +79,8 @@ return [
 	'Payment records bonus' => 'Награды за рекорды',
 	'Bonus amount' => 'Сумма бонуса',
 	'Bonus currency ID' => 'Валюта бонуса',
-	'Record Date' => 'Дата рекорда'
+	'Record Date' => 'Дата рекорда',
+	'Rates record bonus' => 'Диапазоны бонусов за рекорды',
+	'Deduct tax at legal person' => 'Параметры вычета НДС'
 
 ];

@@ -69,4 +69,12 @@ class BUserPaymentRecords extends AbstractActiveRecord
     {
         return $this->hasOne(BUser::className(), ['id' => 'buser_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBonus()
+    {
+        return $this->hasOne(BUserBonus::className(),['record_id' => 'id']);
+    }
 }

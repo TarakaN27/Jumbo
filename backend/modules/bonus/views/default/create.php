@@ -25,7 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $this->render('_form', [
                 'model' => $model,
                 'arBServices' => $arBServices,
-                'arRates' => $arRates
+                'arRates' => $arRates,
+                'arRecordLpDeduct' => $arRecordLpDeduct
             ]) ?>
             </div>
         </div>

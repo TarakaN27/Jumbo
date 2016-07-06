@@ -330,7 +330,11 @@ return [
     'Counting base payment' => 'Платежи',
     'Counting base enroll' => 'Зачисления',
     'Turnover amount' => 'Сумма оборота',
-    'Increment rate percents' => 'Процент прироста',
-    'Record Date' => 'Дата рекорда'
+    'Increment rate percents' => 'Процент прироста рекорда',
+    'Record Date' => 'Отчетный месяц',
+    'Deduct tax at legal person' => 'Параметры вычета НДС',
+    'Is Record' => 'Рекорд',
+    'Record Num' => 'Номер рекорда'
+
 
 ];
