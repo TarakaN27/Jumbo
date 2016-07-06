@@ -9,6 +9,7 @@
 namespace common\components\crunchs\denomination;
 
 
+use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\Services;
 use yii\db\Query;
@@ -81,8 +82,11 @@ class Denomination
             throw new ServerErrorHttpException('Exchange rate');
         }
 
-        
-
+        $sql = 'UPDATE '.ExchangeCurrencyHistory::tableName().' set rate_nbrb = rate_nbrb/10000,old_rate_nbrb = old_rate_nbrb/10000 ';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Exchange rate history');
+        }
 
     }
 
