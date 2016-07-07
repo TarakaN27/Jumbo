@@ -9,370 +9,43 @@ use wbraganca\dynamicform\DynamicFormWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use common\components\helpers\CustomViewHelper;
+use yii\helpers\Url;
 $this->title  = Yii::t('app/book','Add payment');
 $sCurrn = is_object($obCur = $modelP->currency) ? $obCur->code : 'N/A';
 $this->registerCssFile('@web/css/select/select2.min.css');
-$this->registerJsFile('@web/js/wm_app/helpers.js',[
-        'depends' => [
-            'yii\web\YiiAsset',
-            'yii\bootstrap\BootstrapAsset'],
-        ]
-    );
-$this->registerJsFile('@web/js/select/select2.full.js',[
-        'depends' => [
-            'yii\web\YiiAsset',
-            'yii\bootstrap\BootstrapAsset'],
-    ]
-);
-$this->registerJs('
-    function countASumm()
-    {
-        var
-            aSumm = $("#aSumm"),
-            pSumm = $(".psumm"),
-            aSummDispl = $("#aSummDispl"),
-            tmpSumm = 0;
+CustomViewHelper::registerJsFileWithDependency('@web/js/wm_app/helpers.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/select/select2.full.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/add_payment.js',$this,['accounting']);
+$this->registerJs("
+var
+    sCurrn = '".$sCurrn."',
+    addPErrorTitle = '".Yii::t('app/book','Error')."',
+    addPErrorTitleCond = '".Yii::t('app/book','Condition request')."',
+    addPErrorTitleBoundCheckCond = '".Yii::t('app/book','Bounds checking conditions request')."',
+    addPErrorTitleCheckIsSale = '".Yii::t('app/book','Check is sale')."',
+    addPErrorTextFullAmount = '".Yii::t('app/book','You have to spend all amout')."',
+    addPErrorTextFullSetAmountAndService = '".Yii::t('app/book','You must set amount and choose service')."',
+    addPErrorTextServerErr = '".Yii::t('app/book','Server error')."',
+    addPErrorTextBoundCheckCond = '".Yii::t('app/book','Bounds checking conditions FAIL')."',
+    urlFindCondition = '".Url::to(['find-condition'])."',
+    urlBoundsCheckingConditions = '".Url::to(['bounds-checking-conditions'])."',
+    urlIsSale = '".Url::to(['is-sale'])."',
+    iLegalPersonId = ".$modelP->legal_id.",
+    iContractorId = ".$modelP->cntr_id.",
+    iPaymentRequestId = ".$modelP->id.",
+    iPayCondTypeUsual = ".\common\models\PaymentCondition::TYPE_USUAL.",
+    iPayCondTypeCustom = ".\common\models\PaymentCondition::TYPE_CUSTOM.",
+    iCurrencyId = ".$modelP->currency_id.",
+    sPayDate = '".$modelP->pay_date."',
+    conditions = ".\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date))).",
+    keys = ".\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).",
+    condIdVisible = ".\yii\helpers\Json::encode($arCondVisible).",
+    condTypeMap = ".\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap())."
+    ;
+",\yii\web\View::POS_HEAD);
 
-        $.each( pSumm, function( key, value ) {
-            var
-                val = $(value).val();
-            if($.isNumeric(val))
-                tmpSumm+=parseFloat(val);
-        });
-
-        $tmp = aSumm.val() - tmpSumm;
-        aSummDispl.html((aSumm.val() - tmpSumm)+" '.$sCurrn.'");
-        if($tmp < 0)
-        {
-            aSummDispl.removeClass("green");
-            aSummDispl.removeClass("yellow");
-            if(!aSummDispl.hasClass("red"))
-                aSummDispl.addClass("red");
-        }
-        if($tmp == 0)
-        {
-            aSummDispl.removeClass("red");
-            aSummDispl.removeClass("yellow");
-            if(!aSummDispl.hasClass("green"))
-                aSummDispl.addClass("green");
-        }
-        if($tmp > 0)
-        {
-            aSummDispl.removeClass("red");
-            aSummDispl.removeClass("green");
-            if(!aSummDispl.hasClass("yellow"))
-                aSummDispl.addClass("yellow");
-        }
-    }
-    function initBehavior()
-    {
-        $(".psumm").on("change",function(){
-            countASumm();
-        });
-        $(".psumm").on("keyup",function(){
-            countASumm();
-        });
-    }
-
-    function validateFormLogic()
-    {
-        var
-            aSumm = $("#aSumm"),
-            pSumm = $(".psumm"),
-            tmpSumm = 0;
-
-        $.each( pSumm, function( key, value ) {
-            var
-                val = $(value).val();
-            if($.isNumeric(val))
-                tmpSumm+=parseFloat(val);
-        });
-
-        if(aSumm.val() != tmpSumm)
-        {
-             addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You have to spend all amout').'");
-             return false;
-        }
-        return true;
-    }
-
-    function findCondition($this){
-
-        var
-            serviceID = $($this).val(),
-            lineID = $($this).attr("id"),
-            lPID = "'.$modelP->legal_id.'"
-            contrID = "'.$modelP->cntr_id.'",
-            amount = $("#" + lineID.replace(/-service/gi,"-summ")).val(),
-            condID = lineID.replace(/-service/gi,"-condid"),
-            condContainer = $(".field-"+condID);
-            
-         
-
-        if(serviceID == "" || amount == " " || amount == undefined || amount == "")
-        {
-            $("#"+condID).val("");
-            $($this).val("");
-            addErrorNotify("'.Yii::t('app/book','Error').'","'.Yii::t('app/book','You must set amount and choose service').'")
-            return false;
-        }
-        let
-            preloader = getPreloaderEntity(lineID+"preloader");
-            
-        condContainer.append(preloader);
-        condContainer.find("select").addClass("hide");    
-        $.ajax({
-            type: "POST",
-            cache: false,
-            url: "'.\yii\helpers\Url::to(['find-condition']).'",
-            dataType: "json",
-            data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount,prID:"'.$modelP->id.'"},
-            success: function(msg){
-                showOptions(msg.visable,"#"+condID);
-                /*
-                if(msg.default != "" && msg.default  != null)
-                {
-                    $("#"+condID).val(msg.default);
-                    boundsCheckingConditions("#"+condID);
-                }
-                */
-                var
-                    lineIDCT = lineID.replace(/-service/gi,"-condtype"),
-                    lineIDCP = lineID.replace(/-service/gi,"-customproduction");
-                $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
-                $("#"+lineIDCP).attr("disabled","disabled");
-                $("#"+lineIDCP).val("");
-                $("#"+lineID+"preloader").remove();
-                condContainer.find("select").removeClass("hide");
-            },
-            error: function(msg){
-                addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
-                $("#"+condID).val("");
-                $("#"+lineID+"preloader").remove();
-                condContainer.find("select").removeClass("hide");
-                return false;
-            }
-        });
-    }
-    function initPayment()
-    {
-        var
-            aSumm = $("#aSumm"),
-            count = 0,
-            pSumm = $(".psumm");
-
-
-        $.each( pSumm, function( key, value ) {
-            count++;
-        });
-
-        if(count == 1)
-        {
-            pSumm.val(aSumm.val());
-            countASumm();
-        }else{
-            if(pSumm.val() == aSumm.val())
-            {
-                pSumm.val("");
-                countASumm();
-            }
-        }
-    }
-    // Проверка суммы на соотвествие границам условия.
-    function boundsCheckingConditions($this)
-    {
-        if(typeof $this === "number")
-        {
-            var
-                ID = $this;
-        }else{
-            var
-                ID = parseNum($($this).attr("id"));
-        }
-
-        if((ID == undefined || ID == "") && ID != 0)
-            return false;
-
-        var
-            iCondID = $("#addpaymentform-"+ID+"-condid").val(),
-            iSumm = $("#addpaymentform-"+ID+"-summ").val();
-
-        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" )
-            return false;
-
-        $.ajax({
-            type: "POST",
-            cache: false,
-            url: "'.\yii\helpers\Url::to(['bounds-checking-conditions']).'",
-            dataType: "json",
-            data: {iCondID:iCondID,iSumm:iSumm,iCurr:"'.$modelP->currency_id.'",payDate:"'.$modelP->pay_date.'"},
-            success: function(msg){
-                if(msg)
-                  {
-                    addWarningNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Bounds checking conditions FAIL').'");
-                  }else{
-                  }
-            },
-            error: function(msg){
-                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
-                return false;
-            }
-        });
-    }
-
-    var
-        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date))).',
-        keys = '.\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).';
-
-    function showOptions(condID,lineID)
-    {
-        var
-            select = $(lineID);
-        select.val("");
-
-        showAll = $(lineID.replace(/-condid/gi,"-showall")).is(":checked");
-
-        select.find("option:not([value=\'\'])").remove();
-
-        $.each(keys, function( index, key ) {
-            var
-                value = conditions[parseInt(key)];
-            if(showAll || $.inArray(parseInt(key),condID) !== -1)
-                {
-                    select.append("<option value=\'"+key+"\'>"+value+"</option>")
-                }
-        });
-
-    }
-
-    // по дефолту инициализирцем
-    function initDefaultCondition()
-    {
-        var
-            defaultVal = $("#addpaymentform-0-condid").val(),
-            condID = '.\yii\helpers\Json::encode($arCondVisible).';
-        showOptions(condID,"#addpaymentform-0-condid");
-        if(defaultVal != undefined && defaultVal != "" && defaultVal != null )
-        {
-            $("#addpaymentform-0-condid").val(defaultVal);
-        }
-    }
-
-    // действия по клику
-    function showAllBtnActions()
-    {
-        if($(this).is(":checked"))
-        {
-            var
-                lineID = $(this).attr("id").replace(/-showall/gi,"-condid");
-            showOptions(new Array(),"#"+lineID);
-        }else{
-            var
-                lineID = $(this).attr("id").replace(/-showall/gi,"-service");
-            findCondition("#"+lineID);
-        }
-    }
-
-    function actionByCondType()
-    {
-        var
-            lineIDCT = $(this).attr("id").replace(/-condid/gi,"-condtype"),
-            lineIDCP = $(this).attr("id").replace(/-condid/gi,"-customproduction"),
-            value = $(this).val(),
-            condType = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap()).';
-       if(value == undefined || value == "")
-            {
-                $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
-                $("#"+lineIDCP).attr("disabled","disabled");
-                $("#"+lineIDCP).val("");
-
-            }else{
-
-               if(condType[value] == '.\common\models\PaymentCondition::TYPE_CUSTOM.')
-                {
-                    $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_CUSTOM.');
-                    $("#"+lineIDCP).removeAttr("disabled");
-                }else{
-                    $("#"+lineIDCT).val('.\common\models\PaymentCondition::TYPE_USUAL.');
-                    $("#"+lineIDCP).attr("disabled","disabled");
-                    $("#"+lineIDCP).val("");
-                }
-            }
-    }
-
-    function isSaleCheck(this1)
-    {
-        var
-            block = $(this1).offsetParent().offsetParent().find(".maybesale"),
-            lines = $(this1).attr("id"),
-            check = $("#"+lines.replace(/-service/gi,"-issale")),
-            saleUser = $("#"+lines.replace(/-service/gi,"-saleuser")),
-            value = $(this1).val();
-
-        if(value == undefined || value == "")
-            {
-                saleUser.val("");
-                check.prop("checked",false);
-                block.addClass("hide");
-                //saleUser.select2("val", "");
-                //addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
-                return false;
-            }
-
-        $.ajax({
-            type: "POST",
-            cache: false,
-            url: "'.\yii\helpers\Url::to(['is-sale']).'",
-            dataType: "json",
-            data: {iServID:value,iContrID:"'.$modelP->cntr_id.'",payDate:"'.$modelP->pay_date.'"},
-            success: function(msg){
-                if(msg)
-                  {
-                        block.removeClass("hide");
-                  }else{
-                        block.addClass("hide");
-                  }
-            },
-            error: function(msg){
-                block.removeClass("hide");
-                addErrorNotify("'.Yii::t('app/book','Check is sale').'","'.Yii::t('app/book','Server error').'");
-                return false;
-            }
-        });
-
-    }
-',\yii\web\View::POS_END);
-$this->registerJs('
-    countASumm();
-    initBehavior();
-    $(".dynamicform_wrapper").on("afterInsert", function(e, item) {
-        $(item).find(".maybesale").addClass("hide");
-        initBehavior();
-        initPayment();
-        var
-            selectDrop = $(this).find(".selectDrop");
-
-        selectDrop.select2("destroy");
-        selectDrop.select2();
-
-    });
-    $(".dynamicform_wrapper").on("afterDelete", function(e) {
-        countASumm();
-    });
-    $(document).on("submit", "form#dynamic-form", validateFormLogic);
-    initPayment();
-    initDefaultCondition();
-    $(".dynamicform_wrapper").on("change",".showAllBtn",showAllBtnActions);
-    $(".dynamicform_wrapper").on("change",".cond-class",actionByCondType);
-    $(".dynamicform_wrapper").on("change",".psumm",function(){
-        var
-            lineID = $(this).attr("id"),
-            service = "#" + lineID.replace(/-summ/gi,"-service");
-        findCondition(service);
-    });
-    $(".selectDrop").select2();
-
-',\yii\web\View::POS_READY);
 ?>
 <div class="payments-form">
     <?php $form = ActiveForm::begin([

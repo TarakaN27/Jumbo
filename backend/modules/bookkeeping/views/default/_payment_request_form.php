@@ -14,35 +14,6 @@ $this->registerJs("
         errorText = '".Yii::t('app/common','Can not load manager for contractor')."'
         ;
 ",\yii\web\View::POS_HEAD);
-
-/*
-$this->registerJs('
-$("#paymentrequest-cntr_id").on("change",function(){
-    var
-        cID = $(this).val();
-
-   if(cID != "" && cID !=  undefined)
-    {
-        $.post( "'.\yii\helpers\Url::to(['get-manager']).'", { cID: cID }, function( data ) {
-           if(data.mID)
-           {
-                $("#paymentrequest-manager_id").val(data.mID).change();
-           }
-           else
-           {
-                $("#paymentrequest-manager_id").val("").change();
-           }
-        }, "json")
-        .fail(function() {
-            addErrorNotify("'.Yii::t('app/common','Error').'","'.Yii::t('app/common','Can not load manager for contractor').'")
-        });
-    }
-});
-checkResident();
-$(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResident);
-',\yii\web\View::POS_READY);
-*/
-
 ?>
 <?php $form = ActiveForm::begin([
     'options' => [

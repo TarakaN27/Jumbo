@@ -33,9 +33,8 @@ class AddPaymentForm extends AbstractModel{
         return [
             [['summ','service','condID'],'required'],
             [['service','condID','condType','isSale','saleUser','hide_act_payment'], 'integer'],
-            [['summ','fullSumm','customProduction'], 'number'],
+            [['summ','fullSumm','customProduction'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['comment'], 'string'],
-
             ['condType','required','when' => function($model) {
                 if($this->condType == PaymentCondition::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
                     return FALSE;

@@ -102,6 +102,12 @@ $this->params['breadcrumbs'][] = $this->title;
             //'nbrb_rate',
             'cbr_rate:decimal',
             [
+                'attribute' => 'cbr_rate',
+                'value' => function($model){
+                    return Yii::$app->formatter->asDecimal($model->cbr_rate,4);
+                }
+            ],
+            [
                 'attribute' => 'show_at_widget',
                 'format' => 'raw',
                 'value' => function($model){

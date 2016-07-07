@@ -35,6 +35,8 @@ use yii\db\ActiveQuery;
 class ExchangeRates extends AbstractActiveRecord
 {
     CONST
+        BYN_ID =2,                          //костыль указываем id валюты бел. руб.
+        BYR_BYN_CORR_FACTOR = 10000,        //множитель для деноминации
         N_2_W_TYPE_BYR = 0,
         N_2_W_TYPE_USD = 1,
         N_2_W_TYPE_EURO = 2;

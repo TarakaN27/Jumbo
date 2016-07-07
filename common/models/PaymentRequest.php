@@ -143,7 +143,7 @@ class PaymentRequest extends AbstractActiveRecord
     {
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
-
+        $this->pay_summ = CustomHelperMoney::convertNumberToValid($this->pay_summ);
         return parent::beforeValidate();
     }
 
@@ -155,6 +155,7 @@ class PaymentRequest extends AbstractActiveRecord
     {
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
+        $this->pay_summ = CustomHelperMoney::convertNumberToValid($this->pay_summ);
         return parent::beforeSave($insert);
     }
 
@@ -246,21 +247,5 @@ class PaymentRequest extends AbstractActiveRecord
     public function callEventPinManager()
     {
         $this->trigger(self::EVENT_PIN_MANAGER);
-    }
-
-    /**
-     * 
-     */
-    public function convertToValidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ,$this->currency_id);
-    }
-
-    /**
-     *
-     */
-    public function convertToInavlidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ,$this->currency_id);
     }
 }
