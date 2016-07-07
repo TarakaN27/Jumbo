@@ -29,15 +29,31 @@ use yii\helpers\ArrayHelper;
  * @property string $telephone_number
  * @property string $ynp
  * @property string $mailing_address
+ * @property integer $letter_tpl_type
  */
 class LegalPerson extends AbstractActiveRecord
 {
+    CONST
+        LETTER_TPL_TYPE_1 = 0,      //шаблон для ООО
+        LETTER_TPL_TYPE_2 = 1;      //шаблон для ИП
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return '{{%legal_person}}';
+    }
+
+    /**
+     * @return array
+     */
+    public static function getLetterTplTypeMap()
+    {
+        return [
+            self::LETTER_TPL_TYPE_1 => Yii::t('app/services','Letter type OOO'),
+            self::LETTER_TPL_TYPE_2 => Yii::t('app/services','Letter type IP')
+        ];
     }
 
     /**
@@ -51,7 +67,8 @@ class LegalPerson extends AbstractActiveRecord
                 'status', 'created_at',
                 'updated_at','use_vat',
                 'docx_id','act_tpl_id',
-                'admin_expense','partner_cntr'
+                'admin_expense','partner_cntr',
+                'letter_tpl_type'
             ], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['name'],'unique','targetClass' => self::className(),
@@ -85,8 +102,18 @@ class LegalPerson extends AbstractActiveRecord
             'mailing_address' => Yii::t('app/services','Mailing address'),
             'telephone_number' => Yii::t('app/services','Telephone number'),
             'doc_site' => Yii::t('app/services','Document site'),
-            'doc_email' => Yii::t('app/services','Document email')
+            'doc_email' => Yii::t('app/services','Document email'),
+            'letter_tpl_type' => Yii::t('app/services','Letter template type')
         ];
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getLetterTplTypeStr()
+    {
+        $tmp = self::getLetterTplTypeMap();
+        return isset($tmp[$this->letter_tpl_type]) ? $tmp[$this->letter_tpl_type] : NULL;
     }
 
     /**
