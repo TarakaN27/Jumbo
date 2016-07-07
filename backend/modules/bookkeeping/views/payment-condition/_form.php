@@ -2,7 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 /* @var $this yii\web\View */
 /* @var $model common\models\PaymentCondition */
 /* @var $form yii\widgets\ActiveForm */
@@ -22,8 +23,20 @@ function initFieldsByType(){
 }
 ",\yii\web\View::POS_END);
 $this->registerJs("
-initFieldsByType();
+    initFieldsByType();
     $('#paymentcondition-type').on('click','input',initFieldsByType);
+    
+    $('#paymentcondition-summ_from,#paymentcondition-summ_to,#paymentcondition-corr_factor,#paymentcondition-commission,#paymentcondition-sale,#paymentcondition-tax').on('change',function(){
+        amountFormatter(this);
+    });
+    amountFormatter('#paymentcondition-summ_from');
+    amountFormatter('#paymentcondition-summ_to');
+    amountFormatter('#paymentcondition-corr_factor');
+    
+    amountFormatter('#paymentcondition-commission');
+    amountFormatter('#paymentcondition-sale');
+    amountFormatter('#paymentcondition-tax');
+    
 ",\yii\web\View::POS_READY);
 ?>
 

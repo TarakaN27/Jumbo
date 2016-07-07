@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'pay_date',
                             'value' => Yii::$app->formatter->asDate($model->pay_date)
                         ],
-                        'pay_summ',
+                        'pay_summ:decimal',
                         [
                             'attribute' => 'currency_id',
                             'value' => is_object($obCurrency = $model->currency) ? '('.$obCurrency->code.') '.$obCurrency->name : 'N/A'

@@ -9,6 +9,8 @@
 namespace backend\modules\bookkeeping\form;
 
 
+use common\components\customComponents\validation\ValidNumber;
+use common\components\helpers\CustomHelper;
 use common\models\AbstractModel;
 use common\models\PaymentCondition;
 use Yii;
@@ -32,6 +34,7 @@ class AddPaymentForm extends AbstractModel{
     {
         return [
             [['summ','service','condID'],'required'],
+            [['summ'],ValidNumber::className()],
             [['service','condID','condType','isSale','saleUser','hide_act_payment'], 'integer'],
             [['summ','fullSumm','customProduction'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['comment'], 'string'],
@@ -42,6 +45,8 @@ class AddPaymentForm extends AbstractModel{
             }]
         ];
     }
+
+
 
 
     /**

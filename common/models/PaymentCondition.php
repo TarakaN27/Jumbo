@@ -10,7 +10,7 @@ use Yii;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
-
+use common\components\customComponents\validation\ValidNumber;
 /**
  * This is the model class for table "{{%payment_condition}}".
  *
@@ -95,6 +95,7 @@ class PaymentCondition extends AbstractActiveRecord
                 'type',
                 'cond_currency'
              ], 'required'],
+            [['commission', 'sale', 'tax','summ_from', 'summ_to','corr_factor'],ValidNumber::className()],
             [[
                 'corr_factor',
                 'sale',
@@ -119,9 +120,9 @@ class PaymentCondition extends AbstractActiveRecord
             [['description'], 'string'],
             [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['summ_from', 'summ_to','corr_factor'],'number','min' => 0],
-            [['commission', 'sale', 'tax'],'number','min' => 0],
-            [['commission', 'sale', 'tax'],'number','max' => 100],
+            [['summ_from', 'summ_to','corr_factor'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['commission', 'sale', 'tax'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['commission', 'sale', 'tax'],'number','max' => 100,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             ['is_console','safe'],
             [['not_use_sale', 'not_use_corr_factor'],'integer']
         ];
@@ -247,7 +248,7 @@ class PaymentCondition extends AbstractActiveRecord
         $arReturn = [];
         foreach($arTmp as $tmp)
         {
-            $strExh = isset($arExch[$tmp->cond_currency]) ? ' <'.$arExch[$tmp->cond_currency].'>' : '';
+            $strExh = isset($arExch[$tmp->cond_currency]) ? ' <'.Yii::$app->formatter->asDecimal($arExch[$tmp->cond_currency],4).'>' : '';
             $arReturn[$tmp->id] = $tmp->name.$strExh;
         }
 

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use common\components\loggingUserBehavior\LogModelBehavior;
 use common\components\payment\PaymentBonusBehavior;
 use common\components\payment\PaymentEnrollmentBehavior;
@@ -87,6 +88,8 @@ class Payments extends AbstractActiveRecord
                 'currency_id', 'service_id',
                 'legal_id','condition_id'
             ], 'required', 'except' => [self::SCENARIO_ACT_CLOSE]],
+            [['pay_summ','customProd'],ValidNumber::className()],
+            [['pay_summ','customProd'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [[
                 'cuser_id', 'currency_id',
                 'service_id', 'legal_id',
@@ -95,7 +98,7 @@ class Payments extends AbstractActiveRecord
                 'updateWithNewCondition',
                 'act_close','hide_act_payment'
             ], 'integer'],
-            [['pay_summ','customProd','actAmount'], 'number'],
+            [['actAmount'], 'number'],
             [['description'], 'string'],
             ['showAll','safe']
         ];

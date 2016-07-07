@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use Yii;
 use common\components\helpers\CustomHelperMoney;
 /**
@@ -44,6 +45,7 @@ class Expense extends AbstractActiveRecord
                 'pay_date', 'pay_summ', 'currency_id',
                 'legal_id',  'cat_id'
             ], 'required'],
+            [['pay_summ'],ValidNumber::className()],
             [[
                 'pay_date', 'currency_id',
                 'legal_id', 'cuser_id',
@@ -153,21 +155,5 @@ class Expense extends AbstractActiveRecord
     public function getPartnerWithdrawalRequest()
     {
         return $this->hasOne(PartnerWithdrawalRequest::className(),['id' => 'pw_request_id']);
-    }
-
-    /**
-     *
-     */
-    public function convertToValidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ,$this->currency_id);
-    }
-
-    /**
-     *
-     */
-    public function convertToInavlidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ,$this->currency_id);
     }
 }

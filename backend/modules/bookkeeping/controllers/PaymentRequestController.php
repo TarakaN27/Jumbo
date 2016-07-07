@@ -470,16 +470,13 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
         if(empty($model))
             throw new NotFoundHttpException('Payment request not found');
-
-        $model->convertToInavlidAmount();
-
+        
         $model->updateNotifications = TRUE;
         if(!Yii::$app->user->can('adminRights') && $model->owner_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action.');
 
         if($model->load(Yii::$app->request->post()))
         {
-            $model->convertToValidAmount();
             if($model->save())
             {
                 Yii::$app->session->setFlash('success',Yii::t('app/book','Payments request successfully updated'));

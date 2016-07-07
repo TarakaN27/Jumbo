@@ -34,9 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attributes' => [
                                 'id',
                                 'amount',
-                                'repay',
-                                'enroll',
-                                'enr_req_id',
+                                'repay:decimal',
+                                'enroll:decimal',
+                                'enr_req_id:decimal',
                                 [
                                     'attribute' => 'service_id',
                                     'value' => is_object($obSrv = $model->service) ? $obSrv->name.' ['.$obSrv->enroll_unit.']' : NULL

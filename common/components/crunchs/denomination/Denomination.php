@@ -9,9 +9,17 @@
 namespace common\components\crunchs\denomination;
 
 
+use common\models\Acts;
+use common\models\ActServices;
+use common\models\ActToPayments;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
+use common\models\Expense;
+use common\models\PaymentCondition;
 use common\models\PaymentRequest;
+use common\models\Payments;
+use common\models\PaymentsCalculations;
+use common\models\ServiceRateHist;
 use common\models\Services;
 use yii\db\Query;
 use yii\web\ServerErrorHttpException;
@@ -60,7 +68,22 @@ class Denomination
         //#3
         //echo 'Payments request</br>'.PHP_EOL;
         //$this->paymentRequest();
-        //echo ' end services</br>'.PHP_EOL;
+        //echo ' end Payments request</br>'.PHP_EOL;
+
+        //#4
+        //echo 'Payments </br>'.PHP_EOL;
+        //$this->payment();
+        //echo ' end Payments</br>'.PHP_EOL;
+
+        //#8
+        //echo 'Expense </br>'.PHP_EOL;
+        //$this->expense();
+        //echo ' end expense</br>'.PHP_EOL;
+
+        //#9
+        echo 'Act </br>'.PHP_EOL;
+        $this->act();
+        echo ' end act</br>'.PHP_EOL;
 
 
 
@@ -81,6 +104,13 @@ class Denomination
         {
             throw new ServerErrorHttpException('Service query error');
         }
+
+        $sql = 'UPDATE '.ServiceRateHist::tableName().' set old_rate = old_rate/10000, new_rate = new_rate/10000';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Service hist query error');
+        }
+
         return TRUE;
     }
 
@@ -109,9 +139,63 @@ class Denomination
         {
             throw new ServerErrorHttpException('Exchange rate');
         }
+    }
 
+    protected function payment()
+    {
+        $sql = 'UPDATE '.Payments::tableName().' set pay_summ = pay_summ/10000 WHERE currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Payment');
+        }
 
+        $sql = 'UPDATE '.PaymentsCalculations::tableName().' SET tax = tax/10000, profit =  profit/10000, production = production/10000';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Payment calculations');
+        }
 
+        $sql = 'UPDATE '.PaymentCondition::tableName().' SET summ_from = summ_from/10000, summ_to = summ_to/10000 WHERE currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Payment conditions');
+        }
+    }
+
+    protected function expense()
+    {
+        $sql = 'UPDATE '.Expense::tableName().' set pay_summ = pay_summ/10000 WHERE currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Expense');
+        }
+    }
+
+    protected function act()
+    {
+        $sql = 'UPDATE '.Acts::tableName().' set amount = amount/10000 WHERE currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Acts');
+        }
+
+        $sql = 'UPDATE '.ActServices::tableName().' as1 
+        LEFT JOIN '.Acts::tableName().' as t ON t.id = as1.act_id
+        SET as1.amount = as1.amount/10000
+        WHERE t.currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Act services');
+        }
+
+        $sql = 'UPDATE '.ActToPayments::tableName().' ap 
+        LEFT JOIN '.Payments::tableName().' as p ON p.id = ap.payment_id
+        SET ap.amount = ap.amount/10000 
+        WHERE p.currency_id = '.ExchangeRates::BYN_ID;
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Acts to payment');
+        }
     }
 
 }

@@ -70,8 +70,7 @@ function validateFormLogic()
     $.each( pSumm, function( key, value ) {
         var
             val = $(value).val();
-        if($.isNumeric(val))
-            tmpSumm+=parseFloat(val);
+        tmpSumm+=convertAmountToValid(val);
     });
 
     if(aSumm.val() != tmpSumm)
@@ -114,7 +113,7 @@ function findCondition($this){
         cache: false,
         url: urlFindCondition,
         dataType: "json",
-        data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:amount,prID:iPaymentRequestId},
+        data: {iServID:serviceID,iContrID:contrID,lPID:lPID,amount:convertAmountToValid(amount),prID:iPaymentRequestId},
         success: function(msg){
             showOptions(msg.visable,"#"+condID);
             /*
@@ -198,7 +197,7 @@ function boundsCheckingConditions($this)
         cache: false,
         url: urlBoundsCheckingConditions,
         dataType: "json",
-        data: {iCondID:iCondID,iSumm:iSumm,iCurr:iCurrencyId,payDate:sPayDate},
+        data: {iCondID:iCondID,iSumm:convertAmountToValid(iSumm),iCurr:iCurrencyId,payDate:sPayDate},
         success: function(msg){
             if(msg)
             {
@@ -343,9 +342,21 @@ function initAmountFormater()
 {
     var
         arAmounts = $(".dynamicform_wrapper .psumm");
-    $.each(function(idx,item){
+    $.each(arAmounts,function(idx,item){
         amountFormatter(item);
+        showByrInfo(item)
     });
+}
+
+function showByrInfo(this1)
+{
+    if(iCurrencyId != 2)
+        return false;
+
+    var
+        amount = convertAmountToValid($(this1).val());
+    $(this1).siblings('.amountInfo').remove();
+    $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
 }
 
 //document ready
@@ -380,6 +391,7 @@ jQuery(function(){
     $(".selectDrop").select2();
     $(".dynamicform_wrapper").on("change",".psumm",function(){
         amountFormatter(this);
+        showByrInfo(this);
     });
     initAmountFormater();
 });

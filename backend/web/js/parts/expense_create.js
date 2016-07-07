@@ -1,23 +1,28 @@
 /**
  * Created by zhenya on 24.6.16.
  */
-function amountFormatter()
-{
-    var
-        amount = $('#expense-pay_summ').val();
-    if(amount == '')
-        amount = '0';
-
-    amount = amount.replace(/\s+/g, '');
-    amount = amount.replace(/,/g,'.');
-    amount = parseFloat(amount);
-    amount = accounting.formatNumber(amount, 2, " ");
-    amount = amount.replace(/\./g,',');
-    $('#expense-pay_summ').val(amount);
-}
-
 //document ready
+function showByrInfo(this1)
+{
+    $(this1).siblings('.amountInfo').remove();
+    if($('#expense-currency_id').val() != 2)
+        return false;
+
+    var
+        amount = convertAmountToValid($(this1).val());
+
+    $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+}
 $(function(){
-    $("#expense-pay_summ").on('change',amountFormatter);
-    amountFormatter();
+    $("#expense-pay_summ").on('change',function(){
+        "use strict";
+        amountFormatter(this);
+        showByrInfo(this);
+    });
+    $('#expense-currency_id').on('change',function(){
+        "use strict";
+        showByrInfo("#expense-pay_summ");
+    });
+    amountFormatter("#expense-pay_summ");
+    showByrInfo("#expense-pay_summ");
 });

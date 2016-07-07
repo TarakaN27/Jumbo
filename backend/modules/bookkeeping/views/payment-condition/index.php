@@ -75,10 +75,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\PaymentCondition::getTypeArr()
                         ],
-                        'corr_factor',
-                        'commission',
-                        'sale',
-                        'tax',
+                        'corr_factor:decimal',
+                        'commission:decimal',
+                        'sale:decimal',
+                        'tax:decimal',
                         [
                             'attribute' => 'not_use_sale',
                             'format' => 'boolean',

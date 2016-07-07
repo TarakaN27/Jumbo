@@ -72,13 +72,7 @@ var
 
                             },
                         ],
-                        [
-                            'attribute' => 'amount',
-                            'format' => 'html',
-                            'value' => function($model){
-                                return $model->amount;
-                            }
-                        ],
+                        'amount:decimal',
                         [
                             'attribute' => 'currency_id',
                             'value' => 'currency.code',

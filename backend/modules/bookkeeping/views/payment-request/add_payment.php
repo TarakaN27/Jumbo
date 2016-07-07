@@ -106,7 +106,7 @@ var
                                          ],
                                          [
                                               'attribute' => 'pay_summ',
-                                              'value' => $modelP->pay_summ.' '.$sCurrn
+                                              'value' => Yii::$app->formatter->asDecimal($modelP->pay_summ).' '.$sCurrn
                                          ],
                                          [
                                              'attribute' => 'pay_date',

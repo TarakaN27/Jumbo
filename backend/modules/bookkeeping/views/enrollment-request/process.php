@@ -13,6 +13,7 @@ use yii\web\View;
 use yii\helpers\Url;
 $this->title = Yii::t('app/book','Process enrollment request');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/enroll_request_process.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $this->registerJs("
 var
     urlGetPromisedPayment = '".Url::to(['get-promised-payment'])."',
