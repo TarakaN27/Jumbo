@@ -28,8 +28,25 @@ class ValidNumber extends Validator
     public function validateAttribute($model, $attribute)
     {
         $value = $model->$attribute;
-        if (!$this->skipOnArray || !is_array($value)) {
+        if (!is_array($value)) {
             $model->$attribute = CustomHelperMoney::convertNumberToValid($value);
         }
+
+        if(is_array($value))
+        {
+            foreach ($model->$attribute as &$item)
+            {
+                if(is_array($item))
+                {
+                    foreach ($item as &$it)
+                    {
+                        $it = CustomHelperMoney::convertNumberToValid($it);
+                    }
+                }else{
+                    $item = CustomHelperMoney::convertNumberToValid($item);
+                }
+            }
+        }
+
     }
 }

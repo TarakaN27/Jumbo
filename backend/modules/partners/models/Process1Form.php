@@ -9,6 +9,7 @@
 namespace backend\modules\partners\models;
 
 
+use common\components\customComponents\validation\ValidNumber;
 use common\models\AbstractActiveRecord;
 use common\models\LegalPerson;
 use common\models\PartnerWBookkeeperRequest;
@@ -34,7 +35,8 @@ class Process1Form extends Model
     {
         return [
             [['amount','legalPerson'],'required'],
-            ['amount','number'],
+            ['amount',ValidNumber::className()],
+            ['amount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['currency','legalPerson','contractor'],'integer'],
             ['description','string','max' => 255],
             ['contractor','customValidate','skipOnEmpty' => false, 'skipOnError' => false],

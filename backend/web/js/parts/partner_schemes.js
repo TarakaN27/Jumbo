@@ -35,9 +35,9 @@ jQuery(document).ready(function(){
             inputMax = $(document.createElement('input')),
             inputPercent = $(document.createElement('input'));
 
-        inputMin.addClass('form-control');
-        inputMax.addClass('form-control');
-        inputPercent.addClass('form-control');
+        inputMin.addClass('form-control rangeClass');
+        inputMax.addClass('form-control rangeClass');
+        inputPercent.addClass('form-control rangeClass');
 
         inputMin.attr('name','range['+servID+']['+colNext+'][left]');
         inputMax.attr('name','range['+servID+']['+colNext+'][right]');
@@ -69,4 +69,17 @@ jQuery(document).ready(function(){
         col = col -1;
         addBtn.attr('data-col',col);
     });
+    
+    $('.partner-schemes-form').on('change','.rangeClass',function(){
+        "use strict";
+        amountFormatter(this);
+    });
+
+    $.each($('.partner-schemes-form .rangeClass'),function(ind,item){
+        "use strict";
+        amountFormatter(item);
+    });
+    
+    
 });
+

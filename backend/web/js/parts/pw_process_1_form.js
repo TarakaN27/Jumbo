@@ -21,7 +21,7 @@ function calculateAvalableAmount()
         let
             aTmp = $(value).val();
         if (aTmp != undefined && aTmp != '') {
-            countA += parseFloat(aTmp);
+            countA += convertAmountToValid(aTmp);
         }
     });
 
@@ -76,10 +76,31 @@ function validateWPProcessForm()
     return true;
 }
 
+
+function showByrInfo(this1)
+{
+    $(this1).siblings('.amountInfo').remove();
+    if(iCurrId != 2)
+        return false;
+
+    var
+        amount = convertAmountToValid($(this1).val());
+
+    $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+}
+
 $(function(){
     checkAvailableAmount();                                                 //init available amount
     $('#dynamic-form').on('change','.amounts',checkAvailableAmount);        //bind recalculate available amount by change events
     $(document).on("submit", "form#dynamic-form", validateWPProcessForm);   //validate form before send
+    $('#dynamic-form').on('change','.amounts',function(){
+        amountFormatter(this,4);
+        showByrInfo(this);
+    });
+    $.each($('#dynamic-form .amounts'),function (idx,item) {
+        amountFormatter(item,4);
+        showByrInfo(item);
+    });
 });
 
 

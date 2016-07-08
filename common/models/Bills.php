@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use Yii;
 use backend\models\BUser;
 use yii\db\Query;
@@ -56,6 +57,7 @@ class Bills extends AbstractActiveRecord
     public function rules()
     {
         return [
+            ['vat_rate',ValidNumber::className()],
             [[
                 'manager_id', 'cuser_id', 'l_person_id',
                 'docx_tmpl_id', 'amount',
@@ -70,7 +72,7 @@ class Bills extends AbstractActiveRecord
             ['amount','number','min' => 1],
             ['bsk','unique'],
             [['bill_date'], 'safe'],
-            [['vat_rate'], 'number'],
+            [['vat_rate'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['description', 'object_text','bsk'], 'string'],
             [['buy_target','offer_contract'], 'string', 'max' => 255]
         ];

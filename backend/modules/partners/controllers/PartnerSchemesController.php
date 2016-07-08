@@ -3,6 +3,7 @@
 namespace backend\modules\partners\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\components\helpers\CustomHelperMoney;
 use common\models\LegalPerson;
 use common\models\PartnerSchemesServices;
 use common\models\PartnerSchemesServicesHistory;
@@ -82,6 +83,19 @@ class PartnerSchemesController extends AbstractBaseBackendController
                 $ranges = Yii::$app->request->post('range',[]);
                 $group = Yii::$app->request->post('group',[]);
 
+                if(!empty($ranges))
+                    foreach ($ranges as &$rangeItem)
+                        if(!empty($rangeItem))
+                            foreach ($rangeItem as &$item)
+                            {
+                                if(isset($item['left'],$item['right'],$item['percent']))
+                                {
+                                    $item['left'] = CustomHelperMoney::convertNumberToValid($item['left']);
+                                    $item['right'] = CustomHelperMoney::convertNumberToValid($item['right']);
+                                    $item['percent'] = CustomHelperMoney::convertNumberToValid($item['percent']);
+                                }
+                            }
+
                 foreach ($arServices as $serviceID => $serviceName)
                 {
                     $obSchemeServ = new PartnerSchemesServices([
@@ -139,7 +153,18 @@ class PartnerSchemesController extends AbstractBaseBackendController
                 $ranges = Yii::$app->request->post('range',[]);
                 $group = Yii::$app->request->post('group',[]);
                 $model->unlinkAll('partnerSchemesServices',TRUE); //удаляем старые услуги
-
+                if(!empty($ranges))
+                    foreach ($ranges as &$rangeItem)
+                        if(!empty($rangeItem))
+                            foreach ($rangeItem as &$item)
+                            {
+                                if(isset($item['left'],$item['right'],$item['percent']))
+                                {
+                                    $item['left'] = CustomHelperMoney::convertNumberToValid($item['left']);
+                                    $item['right'] = CustomHelperMoney::convertNumberToValid($item['right']);
+                                    $item['percent'] = CustomHelperMoney::convertNumberToValid($item['percent']);
+                                }
+                            }
                 $rows = [];
                 foreach($arSchServOld as $item)
                 {

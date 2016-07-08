@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'amount',
-                            'value' => $model->amount.' ( '.
+                            'value' => Yii::$app->formatter->asDecimal($model->amount).' ( '.
                                 CustomHelper::numPropis((int)$model->amount).' '.
                                 CustomHelper::ciRub((int)$model->amount).' )'
                         ],

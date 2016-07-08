@@ -138,11 +138,11 @@ function recountHidePaymentAvailableAmount(paymentId)
     apAmount = parseFloat(apAmount);
     $.each($('#pay-id-'+paymentId+' input.inputHidePayment'),function(index,value){
         let
-            tmpA = parseFloat($(value).val());
+            tmpA = convertAmountToValid($(value).val());
         apAmount-=tmpA;
     });
 
-    aAmountContainer.html(apAmount);
+    aAmountContainer.html(convertAmountToInvalid(apAmount));
 
     if(apAmount == 0)
     {
@@ -168,14 +168,14 @@ function addServiceBlock(this1)
             processUnfillService(this1);
             let
                 fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val()) - parseFloat($(this1).attr('data-sum')));
+            fAmount.val(convertAmountToValid(fAmount.val()) - parseFloat($(this1).attr('data-sum')));
         }
     } else {
         if (currencyId == parseInt($(this1).attr('data-curr'))) {
             processFillService(this1);
             let
                 fAmount = $('#actform-famount');
-            fAmount.val(parseFloat(fAmount.val()) + parseFloat($(this1).attr('data-sum')));
+            fAmount.val(convertAmountToValid(fAmount.val()) + parseFloat($(this1).attr('data-sum')));
         }
     }
     return true;
@@ -190,6 +190,7 @@ function changeCurrencyField() {
     if (id != undefined && id != 0 && id != '') {
         fillServices();
     }
+    showByrInfo('#actform-famount');
 }
 /**
  * Очистка значений услуг и неявных платежей
@@ -223,7 +224,7 @@ function fillServices() {
         }
     });
 
-    fAmount.val(valAmount);
+    fAmount.val(convertAmountToInvalid(valAmount));
 }
 /**
  * Создаем услуги, если услуга новая, то для ней необходимо получить информацию по контракту и описание для услуги из шаблона
@@ -235,9 +236,9 @@ function processFillService(value) {
         containter = $('#s' + servID);
     if (containter.length > 0) {
         let
-            currAmount = parseFloat(containter.find('.serv-amount').val());
-        currAmount += parseFloat($(value).attr('data-sum'));
-        containter.find('.serv-amount').val(currAmount);
+            currAmount = convertAmountToValid(containter.find('.serv-amount').val());
+        currAmount += convertAmountToValid($(value).attr('data-sum'));
+        containter.find('.serv-amount').val(convertAmountToInvalid(currAmount));
     } else {
         let
             contractDetail = $.parseJSON(getContractDateAndContractNumber(servID)),
@@ -281,10 +282,10 @@ function processUnfillService(value) {
 
     if (containter.length > 0) {
         let
-            currAmount = parseFloat(containter.find('.serv-amount').val());
-        currAmount -= parseFloat($(value).attr('data-sum'));
+            currAmount = convertAmountToValid(containter.find('.serv-amount').val());
+        currAmount -= convertAmountToValid($(value).attr('data-sum'));
         if (currAmount > 0) {
-            containter.find('.serv-amount').val(currAmount);
+            containter.find('.serv-amount').val(convertAmountToInvalid(currAmount));
         } else {
             removeServiceInputFromHiddenPayment(servID);    //remove service block from hidden payment and recalculate available amount
             containter.remove();
@@ -509,15 +510,15 @@ function hideAmountProcess() {
         obj = $(this);
 
     var
-        oldAmount = parseFloat(obj.attr('data-old-amount')),
-        newAmount = parseFloat(obj.val()),
+        oldAmount = convertAmountToValid(obj.attr('data-old-amount')),
+        newAmount = convertAmountToValid(obj.val()),
         serviceId = obj.attr('data-service');
 
     var
         serviceAmount = $('input[name="ActForm[arServAmount]['+serviceId+']"]');
 
     var
-        currAmount = parseFloat(serviceAmount.val());
+        currAmount = convertAmountToValid(serviceAmount.val());
 
     currAmount-=oldAmount;
     currAmount+=newAmount;
@@ -628,10 +629,10 @@ function recalculateActFullActAmount()
         services = $('#servicesBlock .serv-amount');
 
     $.each(services,function(index,value){
-        fAmount+=parseFloat($(value).val());
+        fAmount+=convertAmountToValid($(value).val());
     });
 
-    $('#actform-famount').val(fAmount);
+    $('#actform-famount').val(convertAmountToInvalid(fAmount));
 }
 /**
  * Валидация формы перед сохранением
@@ -656,10 +657,10 @@ function customValidateForm()
         services = $('#servicesBlock .serv-amount');
 
     $.each(services,function(index,value){
-        fAmount+=parseFloat($(value).val());
+        fAmount+=convertAmountToValid($(value).val());
     });
 
-    if(parseFloat($('#actform-famount').val(fAmount)) < fAmount)
+    if(convertAmountToValid($('#actform-famount').val(fAmount)) < fAmount)
     {
         addErrorNotify('Сохрание акта', 'Сумма акта должна быть больше либо равна сумме по услугам!');
         return false;
@@ -770,7 +771,7 @@ function customValidateForm()
         $.each($arHidePayments,function(index,value){
             let
                 iPCurr = $(value).attr('data-curr'),
-                iAmount = parseFloat($(value).attr('data-sum')),
+                iAmount = convertAmountToValid($(value).attr('data-sum')),
                 iPayId = $(value).val();
 
             if(iPCurr == currId)
@@ -780,7 +781,7 @@ function customValidateForm()
                     arHidePay = $('#hidePaymentBlock #pay-id-'+iPayId+' .inputHidePayment');
 
                 $.each(arHidePay,function(ind,val){
-                    shareAmount+=parseFloat($(val).val());
+                    shareAmount+=convertAmountToValid($(val).val());
                 });
 
                 if(shareAmount != iAmount)
@@ -820,8 +821,8 @@ function customValidateForm()
                 checkHidePayment = false;
             }
             
-            sAmount = parseFloat(sAmount);
-            if(sAmount < item)
+            sAmount = convertAmountToValid(sAmount);
+            if(sAmount < convertAmountToValid(item))
             {
                 addErrorNotify('Сохрание акта', 'Неявные платежи. Сумма по услуге меньше, чем сумма неявного платежа по услуге');
                 checkHidePayment = false;
@@ -942,6 +943,17 @@ function initDatePicker(item)
         }
     });
 }
+function showByrInfo(this1)
+{
+    $(this1).siblings('.amountInfo').remove();
+    if($('#actform-icurr').val() != 2)
+        return false;
+
+    var
+        amount = convertAmountToValid($(this1).val());
+
+    $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+}
 /**
  * Вешаем обработчики событий в document.ready
  */
@@ -961,4 +973,12 @@ $(function () {
     $('#actform-ilegalperson').on('change',getActsNumber);
     $('#actform-icuser').on('change',checkContactor);
     $('#hidePaymentBlock').on('change','.inputHidePayment',hideAmountProcess);      //действие при изменении суммы у неявных платежей
+
+    $('#act-form').on('change','#actform-famount,.serv-amount,.inputHidePayment',function(){
+        amountFormatter(this);
+        showByrInfo('#actform-famount');
+    });
+
+    $('#actform-famount').on('change',function(){showByrInfo(this)});
+
 });

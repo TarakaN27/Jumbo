@@ -12,9 +12,16 @@ namespace common\components\crunchs\denomination;
 use common\models\Acts;
 use common\models\ActServices;
 use common\models\ActToPayments;
+use common\models\Bills;
+use common\models\BonusScheme;
+use common\models\BonusSchemeService;
+use common\models\BonusSchemeServiceHistory;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\Expense;
+use common\models\PartnerPurse;
+use common\models\PartnerPurseHistory;
+use common\models\PartnerWithdrawalRequest;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\Payments;
@@ -81,13 +88,24 @@ class Denomination
         //echo ' end expense</br>'.PHP_EOL;
 
         //#9
-        echo 'Act </br>'.PHP_EOL;
-        $this->act();
-        echo ' end act</br>'.PHP_EOL;
+        //echo 'Act </br>'.PHP_EOL;
+        //$this->act();
+        //echo ' end act</br>'.PHP_EOL;
 
+        //#10
+        //echo 'Bonus scheme </br>'.PHP_EOL;
+        //$this->bonusScheme();
+        //echo ' end bonus scheme</br>'.PHP_EOL;
 
+        //#12
+        //echo 'partner </br>'.PHP_EOL;
+        //$this->partner();
+        //echo ' end partner</br>'.PHP_EOL;
 
-
+        //#14
+        //echo 'bills </br>'.PHP_EOL;
+        //$this->bills();
+        //echo ' end bills</br>'.PHP_EOL;
 
 
         die('end');
@@ -196,6 +214,54 @@ class Denomination
         {
             throw new ServerErrorHttpException('Acts to payment');
         }
+    }
+
+    protected function bonusScheme()
+    {
+        $sql = 'UPDATE '.BonusSchemeService::tableName().' set cost = cost/10000 WHERE  cost IS NOT NULL';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Bonus scheme service');
+        }
+        $sql = 'UPDATE '.BonusSchemeServiceHistory::tableName().' set cost = cost/10000 WHERE  cost IS NOT NULL';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('Bonus scheme service');
+        }
+    }
+
+    protected function partner()
+    {
+        $sql = 'UPDATE '.PartnerWithdrawalRequest::tableName().' set amount = amount/10000 WHERE  currency_id = 2';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('partner withdrawal ');
+        }
+
+        $sql = 'UPDATE '.PartnerPurse::tableName().' set amount = amount/10000';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('partner withdrawal ');
+        }
+
+        $sql = 'UPDATE '.PartnerPurseHistory::tableName().' set amount = amount/10000';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('partner withdrawal ');
+        }
+
+    }
+
+    protected function bills()
+    {
+        $sql = 'UPDATE '.Bills::tableName().' set amount = amount/10000';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('bills');
+        }
+
+
+
     }
 
 }

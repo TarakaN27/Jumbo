@@ -26,3 +26,11 @@ function findPartnerAvailableAmount()
 }
 
 $('#partnerwithdrawalrequest-partner_id,#partnerwithdrawalrequest-currency_id,#partnerwithdrawalrequest-date').on('change',findPartnerAvailableAmount);
+
+$(function(){
+    "use strict";
+    $('#partnerwithdrawalrequest-amount').on('change',function(){
+       amountFormatter(this);
+    });
+    amountFormatter('#partnerwithdrawalrequest-amount');
+});

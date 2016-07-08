@@ -19,6 +19,7 @@ use common\models\Services;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',$this,[],'html-sortable');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/bill_refactoring.js',$this,['html-sortable']);
 $this->registerJs('

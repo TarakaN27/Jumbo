@@ -262,10 +262,10 @@ function removeService()
 {
     var
         servId = $(this).attr('data-serv'),                             //service id
-        amount = parseFloat($('#s'+servId+' .serv-amount').val()),      //get amount for del service
+        amount = convertAmountToValid($('#s'+servId+' .serv-amount').val()),      //get amount for del service
         fullAmount = $('#billform-famount');                            //get full amount input
     var
-        currAmount = parseFloat(fullAmount.val());                      //current amount
+        currAmount = convertAmountToValid(fullAmount.val());                      //current amount
     if(amount < 0 || customEmpty(amount))
     {
         amount = 0;
@@ -276,7 +276,7 @@ function removeService()
     {
         currAmount = 0;
     }
-    fullAmount.val(currAmount);                                         //set new amount
+    fullAmount.val(convertAmountToInvalid(currAmount));                                         //set new amount
 
     if($('.chooseService[data-id="'+servId+'"]').attr('data-choose') == 1)
     {
@@ -401,10 +401,10 @@ function chooseService()
 function changeServiceAmount(){
 
     var
-        oldAmount = parseFloat($(this).attr('old-amount')),
-        newAmount = parseFloat($(this).val()),
+        oldAmount = convertAmountToValid($(this).attr('old-amount')),
+        newAmount = convertAmountToValid($(this).val()),
         fullAMountContainer = $('#billform-famount'),
-        fullAmount = parseFloat(fullAMountContainer.val());
+        fullAmount = convertAmountToValid(fullAMountContainer.val());
 
     if(newAmount < 0 || customEmpty(newAmount))
     {
@@ -422,7 +422,7 @@ function changeServiceAmount(){
     if(fullAmount < 0)
         fullAmount = 0;
 
-    fullAMountContainer.val(fullAmount);
+    fullAMountContainer.val(convertAmountToInvalid(fullAmount));
     $(this).attr('old-amount',newAmount);
 }
 /**
@@ -481,7 +481,7 @@ function validateFormBefore()
 
     var
         bError = false,
-        fullAmount = parseFloat($('#billform-famount').val()),
+        fullAmount = convertAmountToValid($('#billform-famount').val()),
         tmpAmount = 0,
         sDescription = $.trim($('#billform-sdescription').val()),
         sOffertaContract = $.trim($('#billform-soffercontract').val());
@@ -493,7 +493,7 @@ function validateFormBefore()
         let
             contract = $('.serv-contract[data-serv-id="'+servId+'"]').val(),
             servDescription = $.trim($('.serv-desc[data-serv-id="'+servId+'"]').val()),
-            amount = parseFloat($('.serv-amount[data-serv-id="'+servId+'"]').val());
+            amount = convertAmountToValid($('.serv-amount[data-serv-id="'+servId+'"]').val());
 
         tmpAmount+=amount;
 
@@ -533,6 +533,16 @@ function removeContractOrLegalPerson()
     $('#servicesBlock .fa-minus').trigger('click');
 }
 
+function showByrInfo(this1)
+{
+    $(this1).siblings('.amountInfo').remove();
+
+    var
+        amount = convertAmountToValid($(this1).val());
+
+    $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+}
+
 //document ready
 $(function(){
     $('#addServId').on('click',addService);
@@ -551,4 +561,15 @@ $(function(){
     $('#servicesBlock').on('change','.tpl',changeServiceTpl);
     $('#billform-icuserid, #billform-ilegalperson').on('change',removeContractOrLegalPerson);
     $(document).on("submit", "form#form-bill", validateFormBefore);
+
+    $('#form-bill').on('change','#billform-famount,#servicesBlock .serv-amount',function(idx,item){
+        amountFormatter(this,2);
+        showByrInfo(this);
+    });
+
+    showByrInfo('#billform-famount');
+    $.each($('#servicesBlock .serv-amount'),function(idx,item){
+        amountFormatter(item,2);
+        showByrInfo(item);
+    });
 });

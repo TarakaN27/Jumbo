@@ -27,7 +27,7 @@ use Gears\Pdf;
 class ActsDocumentsV2
 {
     CONST
-        RUB_MODE = 0,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
+        RUB_MODE = 2,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
         BEL_RUBLE_ID = 2,       //костыль указываем id бел рубля
         PRECISION = 4;          //точность округления
 
@@ -251,23 +251,23 @@ class ActsDocumentsV2
                 $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat).'  ('.$this->getNewByr($this->totalAmountWithVat).')';
                     break;
                 case 2:
-                    $this->amountInWords = CustomHelper::num2str(($this->totalFiniteAmount/10000),$this->n2wUnit);
+                    $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
                     $strVatAmount = '';
                     if($this->bUseVat)
                     {
-                        $strVatAmount = CustomHelper::num2str($this->totalVatAmount/10000,$this->n2wUnit);
+                        $strVatAmount = CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
                     }
 
                     $this->vatInWords = $this->bUseVat ?
                         ' в т.ч.: НДС - '.$strVatAmount :
                         ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
 
-                    $this->totalAmount = $this->getNewByr($this->totalAmount);
-                    $this->totalFiniteAmount = $this->getNewByr($this->totalFiniteAmount);
+                    $this->totalAmount = $this->formatterHelper($this->totalAmount);
+                    $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
                     if($this->bUseVat)
-                        $this->totalVatAmount = $this->getNewByr($this->totalVatAmount);
+                        $this->totalVatAmount = $this->formatterHelper($this->totalVatAmount);
 
-                    $this->totalAmountWithVat = $this->getNewByr($this->totalAmountWithVat);
+                    $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat);
                     break;
                 default:
                     break;
@@ -338,11 +338,11 @@ class ActsDocumentsV2
                 $arResult['amountWithVat'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($amountWithVat).'  ('.$this->getNewByr($amountWithVat).') ' :  $this->formatterHelper($amountWithVat);
                 break;
             case 2:
-                $arResult['price'] = $this->iCurrencyId == 2 ? $this->getNewByr($price) :  $this->formatterHelper($price);
-                $arResult['amount'] = $this->iCurrencyId == 2 ? $this->getNewByr($amount) :  $this->formatterHelper($amount);
+                $arResult['price'] = $this->formatterHelper($price);
+                $arResult['amount'] = $this->formatterHelper($amount);
                 $arResult['vatRate'] = $vatRate;
-                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->iCurrencyId == 2 ? $this->getNewByr($vatAmount) :  $this->formatterHelper($vatAmount);
-                $arResult['amountWithVat'] = $this->iCurrencyId == 2 ? $this->getNewByr($amountWithVat) :  $this->formatterHelper($amountWithVat);
+                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->formatterHelper($vatAmount);
+                $arResult['amountWithVat'] = $this->formatterHelper($amountWithVat);
                 break;
             default:
                 break;
@@ -357,8 +357,7 @@ class ActsDocumentsV2
      */
     protected function formatterHelper($amount)
     {
-        $precision = $this->iCurrencyId == self::BEL_RUBLE_ID ? 0 : 2;
-        return \Yii::$app->formatter->asDecimal($amount,$precision);
+        return \Yii::$app->formatter->asDecimal($amount,2);
     }
 
     /**

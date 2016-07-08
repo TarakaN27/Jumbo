@@ -222,6 +222,15 @@ function deductRecordChnage() {
         container.find('input[type="checkbox"]').prop('checked',false);
     }
 }
+function initDefault()
+{
+    var
+        costs = $('.costs');
+
+    $.each(costs,function(ind,item){
+        amountFormatter(item);
+    });
+}
 
 //документ реади
 jQuery(document).ready(function(){
@@ -234,5 +243,9 @@ jQuery(document).ready(function(){
     $('#removeRecordId').on('click',removeRecordRow);
     $(document).on("submit", "form#bonusFormId", beforeSubmitFormValidation);
     $('.deductRecordCheck').on('change',deductRecordChnage);
+    $('.costs').on('change',function(){
+        amountFormatter(this);
+    });
+    initDefault();
 });
 

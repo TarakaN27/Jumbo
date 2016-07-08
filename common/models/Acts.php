@@ -7,6 +7,7 @@ use common\components\acts\ActsDocuments;
 use common\components\acts\PartnerProfitActBehavior;
 use common\components\behavior\acts\ActsActionBehavior;
 use common\components\behavior\UploadBehavior;
+use common\components\customComponents\validation\ValidNumber;
 use common\components\entityFields\EntityFieldsTrait;
 use common\components\helpers\CustomHelper;
 use common\components\loggingUserBehavior\LogModelBehavior;
@@ -66,6 +67,8 @@ class Acts extends AbstractActiveRecord
     {
         return [
             [['act_num','cuser_id', 'buser_id','lp_id', 'amount'], 'required'],
+            ['amount',ValidNumber::className()],
+            [['amount'],'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [[
                 'act_num','cuser_id','lp_id' ,
                 'buser_id',
@@ -74,7 +77,7 @@ class Acts extends AbstractActiveRecord
             [['act_date','entityFields'], 'safe'],
             [['ask'],'unique'],
             //[['act_date','contract_date'],'date', 'format' => 'yyyy-m-dd'],
-            [['amount','ask','contract_num'], 'string', 'max' => 255],
+            [['ask','contract_num'], 'string', 'max' => 255],
             ['file_name','file','on' => ['insert', 'update'],'when' => function($model) {
                 return !$model->genFile;
             }],

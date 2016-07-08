@@ -4,7 +4,7 @@ namespace common\models;
 
 use common\components\helpers\CustomHelper;
 use Yii;
-
+use common\components\customComponents\validation\ValidNumber;
 /**
  * This is the model class for table "{{%bonus_scheme_service_history}}".
  *
@@ -38,9 +38,12 @@ class BonusSchemeServiceHistory extends AbstractActiveRecord
     public function rules()
     {
         return [
+            ['cost',ValidNumber::className()],
             [['scheme_id', 'service_id', 'unit_multiple', 'created_at', 'updated_at'], 'integer'],
             [['month_percent','legal_person'], 'string'],
-            [['cost','simple_percent'], 'number']
+            [['simple_percent'], 'number'],
+            ['cost','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
+
         ];
     }
 

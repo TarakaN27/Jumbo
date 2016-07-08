@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use Yii;
 use backend\models\BUser;
 /**
@@ -77,8 +78,9 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
     {
         return [
             [['partner_id', 'type','amount','currency','date'], 'required'],
+            ['amount',ValidNumber::className()],
             [['partner_id', 'type', 'currency_id', 'manager_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['amount'], 'number'],
+            [['amount'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id']],
             [['manager_id'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['manager_id' => 'id']],

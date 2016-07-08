@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use Yii;
 
 /**
@@ -33,9 +34,10 @@ class CuserSettings extends AbstractActiveRecord
     {
         return [
             [['cuser_id'], 'required'],
+            ['pp_max',ValidNumber::className()],
             [['cuser_id', 'created_at', 'updated_at'], 'integer'],
             ['pp_percent','integer','min' => 0,'max' => 100],
-            ['pp_max','integer','min'=>0]
+            ['pp_max','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
         ];
     }
 

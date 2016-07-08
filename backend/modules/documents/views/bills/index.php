@@ -38,7 +38,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attribute' => 'amount',
                         'format' => 'html',
                         'value' =>function($model){
-                                return Html::a($model->amount,['update','id' => $model->id],['class' => 'link-upd']);
+                                $amount = is_null($model->amount) ? NULL : Yii::$app->formatter->asDecimal($model->amount);
+                                return Html::a($amount,['update','id' => $model->id],['class' => 'link-upd']);
                             }
                     ],
                     [
