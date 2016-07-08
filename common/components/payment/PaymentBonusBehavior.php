@@ -698,6 +698,10 @@ class PaymentBonusBehavior extends Behavior
 			if(!isset($arPartner[$lead->partner_id]))
 				continue;
 			$iManID = $arPartner[$lead->partner_id]; 	//Partner manager
+
+			if(!empty($this->onlyForId) && $this->onlyForId != $iManID)
+				continue;
+
 			/** @var BonusScheme $obScheme */
 			$obScheme = $this->getBonusSchemeForPartnerBonus($lead->cuser_id,$iManID);
 			if(empty($obScheme))
