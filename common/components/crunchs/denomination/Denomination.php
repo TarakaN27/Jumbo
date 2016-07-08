@@ -16,6 +16,7 @@ use common\models\Bills;
 use common\models\BonusScheme;
 use common\models\BonusSchemeService;
 use common\models\BonusSchemeServiceHistory;
+use common\models\BUserBonus;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\Expense;
@@ -107,6 +108,10 @@ class Denomination
         //$this->bills();
         //echo ' end bills</br>'.PHP_EOL;
 
+        //#16
+        echo 'Buser bonus </br>'.PHP_EOL;
+        $this->buserBonus();
+        echo 'End buser bonus</br>'.PHP_EOL;
 
         die('end');
     }
@@ -259,9 +264,15 @@ class Denomination
         {
             throw new ServerErrorHttpException('bills');
         }
+    }
 
-
-
+    protected function buserBonus()
+    {
+        $sql = 'UPDATE '.BUserBonus::tableName().' set amount = amount/10000 WHERE currency_id IS NULL OR currency_id = 2';
+        if(!$this->sqlExecute($sql))
+        {
+            throw new ServerErrorHttpException('buser bonus');
+        }
     }
 
 }

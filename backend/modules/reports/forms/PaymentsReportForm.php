@@ -649,10 +649,10 @@ class PaymentsReportForm extends Model{
             $doc->setValue('startDay',Yii::$app->formatter->asDate($this->dateFrom));
             $doc->setValue('endDay',Yii::$app->formatter->asDate($this->dateTo));
             $doc->setValue('currentDay',date('Y-m-d'));
-            $doc->setValue('iSumTotal',$data['iSumTotal']);
-            $doc->setValue('iTaxTotal',$data['iTaxTotal']);
-            $doc->setValue('iProdTotal',$data['iProdTotal']);
-            $doc->setValue('iProfTotal',$data['iProfitTotal']);
+            $doc->setValue('iSumTotal',is_numeric($data['iSumTotal']) ? Yii::$app->formatter->asDecimal($data['iSumTotal']) : $data['iSumTotal']);
+            $doc->setValue('iTaxTotal',is_numeric($data['iTaxTotal']) ? Yii::$app->formatter->asDecimal($data['iTaxTotal']) : $data['iTaxTotal']);
+            $doc->setValue('iProdTotal',is_numeric($data['iProdTotal']) ? Yii::$app->formatter->asDecimal($data['iProdTotal']) : $data['iProdTotal']);
+            $doc->setValue('iProfTotal',is_numeric($data['iProfitTotal']) ? Yii::$app->formatter->asDecimal($data['iProfitTotal']) : $data['iProfitTotal']);
 
             $iCount = 0;
             foreach($data['data'] as $dt)
@@ -661,8 +661,6 @@ class PaymentsReportForm extends Model{
 
             //таблица Рекламная сеть Яндекса
             $doc->cloneRow('cDate',$iCount);
-
-
                 $iter = 1;
                 foreach($data['data'] as $key=>$dt)
                     foreach($dt as $item)
@@ -675,15 +673,12 @@ class PaymentsReportForm extends Model{
                         $doc->setValue('iSum#'.$iter,$item->pay_summ);
                         $doc->setValue('currCode#'.$iter,is_object($curr = $item->currency) ? $curr->code : 'N/A');
                         $doc->setValue('exRate#'.$iter,isset($data['currency'][$item->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$item->id]) : '');
-                        $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
-                        $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? $calc->production : 'N/A');
-                        $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
+                        $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A');
+                        $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? Yii::$app->formatter->asDecimal($calc->production) : 'N/A');
+                        $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A');
                         $doc->setValue('exCondRate#'.$iter,isset($data['condCurr'][$item->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$item->id]) : 'N/A');
                         $iter++;
                     }
-
-
-
             $doc->saveAs(Yii::getAlias('@backend/web/reports/').$sFileName);
             if(file_exists(Yii::getAlias('@backend/web/reports/').$sFileName))
                 return $sFileName;
