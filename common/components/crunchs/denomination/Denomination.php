@@ -109,9 +109,9 @@ class Denomination
         //echo ' end bills</br>'.PHP_EOL;
 
         //#16
-        echo 'Buser bonus </br>'.PHP_EOL;
-        $this->buserBonus();
-        echo 'End buser bonus</br>'.PHP_EOL;
+        //echo 'Buser bonus </br>'.PHP_EOL;
+        //$this->buserBonus();
+        //echo 'End buser bonus</br>'.PHP_EOL;
 
         die('end');
     }
