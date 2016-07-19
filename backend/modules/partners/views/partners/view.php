@@ -57,9 +57,10 @@ $this->title = Yii::t('app/users',Yii::t('app/users','Partner detail'))
                             'model' => $obPurse,
                             'attributes' => [
                                 'id',
-                                'amount:decimal',
-                                'withdrawal:decimal',
+                                'totalIncomingAmount:decimal',
+                                'totalExpenseAmount:decimal',
                                 'availableAmount:decimal',
+                                'pendingAmount:decimal',
                                 /*
                                 [
                                     'label' => Yii::t('app/users','Amount available partner purse'),

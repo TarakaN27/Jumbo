@@ -21,6 +21,7 @@ $columns = [
 		'label' => Yii::t('app/users', 'Corp Name'),
 		'format' => 'html',
 		'value' => function($model) use ($arCompanyRedisList){
+			
 			/** @var CUserRequisites $obR */
 			$obR = $model->requisites;
 

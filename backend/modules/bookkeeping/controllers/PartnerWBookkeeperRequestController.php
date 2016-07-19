@@ -8,9 +8,9 @@ use Yii;
 use common\models\PartnerWBookkeeperRequest;
 use common\models\search\PartnerWBookkeeperRequestSearch;
 use yii\base\Exception;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use common\models\CuserToGroup;
 
 
 /**
@@ -27,9 +27,6 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
         $searchModel = new PartnerWBookkeeperRequestSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
-        
-        
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -132,7 +129,7 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
             ->with('buser','partner','contractor','currency','legal')
             ->where(['id' => $id])
             ->one();
-
+        $model->setScenario('update');
         if(!$model)
             throw new NotFoundHttpException('Request not found');
 
@@ -154,16 +151,15 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
                 $transaction->rollBack();
             }
         }
+        $arContractor = CuserToGroup::getUserByGroup($model->partner_id);
         return $this->render('process',[
-            'model' => $model
+            'model' => $model,
+            'arContractor'=>$arContractor,
         ]);
     }
-
     public function actionPdf($id)
     {
         $model = PartnerWBookkeeperRequestManager::find()->where(['id' => $id])->one();
-
-
     }
 
 }

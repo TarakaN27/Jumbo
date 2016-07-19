@@ -18,6 +18,7 @@ use Yii;
  */
 class PartnerPurse extends AbstractActiveRecord
 {
+    public $pendingAmount = false;
     /**
      * @inheritdoc
      */
@@ -49,10 +50,12 @@ class PartnerPurse extends AbstractActiveRecord
             'id' => Yii::t('app/users', 'ID'),
             'cuser_id' => Yii::t('app/users', 'Cuser ID'),
             'amount' => Yii::t('app/users', 'Amount partner purse'),
-            'withdrawal' => Yii::t('app/users', 'Withdrawal partner purse'),
+            'totalExpenseAmount' => Yii::t('app/users', 'Withdrawal partner purse'),
             'created_at' => Yii::t('app/users', 'Created At'),
             'updated_at' => Yii::t('app/users', 'Updated At'),
-            'availableAmount' => Yii::t('app/users','Amount available partner purse')
+            'availableAmount' => Yii::t('app/users','Amount available partner purse'),
+            'totalIncomingAmount'=> Yii::t('app/users','Amount partner purse'),
+            'pendingAmount' => Yii::t('app/users','Pending Amount'),
         ];
     }
 
@@ -69,7 +72,31 @@ class PartnerPurse extends AbstractActiveRecord
      */
     public function getAvailableAmount()
     {
-        return (float)$this->amount -(float)$this->withdrawal;
+        $pendingAmount = $this->getPendingAmount();
+        return (float)$this->amount - $pendingAmount;
+    }
+
+    public function getPendingAmount()
+    {
+        if($this->pendingAmount === false) {
+            $pendingAmount = PartnerWithdrawalRequest::getAmountPendingByCuserId($this->cuser_id);
+            $this->pendingAmount = $pendingAmount;
+        }
+        return $this->pendingAmount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTotalIncomingAmount(){
+        return PartnerPurseHistory::getTotalIncomingByCUserId($this->cuser_id);
+    }
+
+    /**
+     * @return float
+     */
+    public function getTotalExpenseAmount(){
+        return PartnerPurseHistory::getTotalExpenseByCUserId($this->cuser_id);
     }
 
     /**

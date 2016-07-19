@@ -13,6 +13,7 @@ use common\models\AbstractActiveRecord;
 use common\models\LegalPerson;
 use common\models\PartnerWBookkeeperRequest;
 use common\models\PartnerWithdrawalRequest;
+use common\models\ExchangeCurrencyHistory;
 use yii\base\Model;
 use Yii;
 
@@ -27,13 +28,18 @@ class Process1Form extends Model
         $contractor,
         $description;
 
-    /**
-     * @return array
-     */
+    public function scenarios()
+    {
+        return [
+            'manager' => ['amount', 'number', 'currency','contractor', 'description'],
+            'bookkiper' => ['amount', 'legalPerson', 'number', 'currency','contractor', 'description'],
+        ];
+    }
+
     public function rules()
     {
         return [
-            [['amount','legalPerson'],'required'],
+            [['amount','legalPerson'],'required' ],
             ['amount','number'],
             [['currency','legalPerson','contractor'],'integer'],
             ['description','string','max' => 255],
@@ -83,6 +89,8 @@ class Process1Form extends Model
         $obBRequest->buser_id = $this->obBookkeeper->id;
         $obBRequest->contractor_id = $this->contractor;
         $obBRequest->amount = $this->amount;
+        $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(time(), $this->obRequest->currency_id);
+        $obBRequest->factual_amount_in_base_currency = $this->amount * $curr;
         $obBRequest->currency_id = $this->obRequest->currency_id;
         $obBRequest->legal_id = $this->legalPerson;
         $obBRequest->request_id = $this->obRequest->id;

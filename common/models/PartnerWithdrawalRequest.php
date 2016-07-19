@@ -14,6 +14,7 @@ use backend\models\BUser;
  * @property integer $currency_id
  * @property integer $manager_id
  * @property integer $created_by
+ * @property pending_in_base_currency
  * @property integer $date
  * @property integer $status
  * @property integer $created_at
@@ -32,7 +33,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
 
     CONST
         STATUS_NEW = 5,                     //new request
-        STATUS_MANAGER_PROCESSED = 10,      //when request have type SERVICE, and request goes to manager
+        STATUS_PROCESSING_IN_BOOKKEEPING = 10,      //when request have type SERVICE, and request goes to manager
         STATUS_DONE = 15;                   //request is done
 
     CONST
@@ -54,7 +55,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
     {
         return [
             self::STATUS_NEW => Yii::t('app/users', 'Status new'),
-            self::STATUS_MANAGER_PROCESSED => Yii::t('app/users', 'Status manager processed'),
+            self::STATUS_PROCESSING_IN_BOOKKEEPING => Yii::t('app/users', 'Status manager processed'),
             self::STATUS_DONE => Yii::t('app/users', 'Status done'),
         ];
     }
@@ -78,7 +79,7 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
         return [
             [['partner_id', 'type','amount','currency','date'], 'required'],
             [['partner_id', 'type', 'currency_id', 'manager_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['amount'], 'number'],
+            [['amount','pending_in_base_currency'], 'number'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['created_by' => 'id']],
             [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id']],
             [['manager_id'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['manager_id' => 'id']],
@@ -202,12 +203,28 @@ class PartnerWithdrawalRequest extends AbstractActiveRecord
         if(!is_numeric($this->date))
             $this->date = strtotime($this->date);
 
-        if($insert)
+        if($insert) {
             $this->status = self::STATUS_NEW;
-
-        if($insert)
             $this->created_by = Yii::$app->user->id;
-
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate($this->date, $this->currency_id);
+            $this->pending_in_base_currency = $this->amount * $curr;
+        }
         return parent::beforeSave($insert);
+    }
+    public static function getAmountPendingByCuserId($id){
+        $amount = static::find()->select(['pending'=>'SUM(pending_in_base_currency)'])->where(['partner_id'=>$id,'status'=>[static::STATUS_NEW, static::STATUS_PROCESSING_IN_BOOKKEEPING]])->asArray()->one();
+        return $amount['pending'];
+    }
+
+    public function processBookkeeper($amount = false){
+        if($amount) {
+            $this->pending_in_base_currency -= $amount;
+        }
+        $notProcessedBookkeeperRequest = PartnerWBookkeeperRequest::find()->where(['request_id'=>$this->id, 'status'=>PartnerWBookkeeperRequest::STATUS_NEW])->exists();
+        if(!$notProcessedBookkeeperRequest){
+            $this->status = static::STATUS_DONE;
+            $this->pending_in_base_currency = 0;
+        }
+        $this->save();
     }
 }

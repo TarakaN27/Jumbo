@@ -14,6 +14,7 @@ use common\models\ExchangeCurrencyHistory;
 use common\models\PartnerCuserServ;
 use common\models\PartnerPurseHistory;
 use common\models\Services;
+use Faker\Provider\DateTime;
 use yii\base\Model;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -32,6 +33,26 @@ class PartnerDetailLeadsForm extends Model
     /**
      * @return array
      */
+    public function __construct(array $config)
+    {
+        parent::__construct($config);
+        if($params = Yii::$app->request->get('PartnerDetailLeadsForm')){
+            $this->endDate = $params['endDate'];
+            $this->beginDate = $params['beginDate'];
+        }else
+        {
+            $date = new \DateTime();
+            $this->endDate = $date->format('d.m.Y');
+            $date->modify("-3 month");
+            $this->beginDate = $date->format('d.m.Y');
+
+
+        }
+
+
+
+    }
+
     public function rules()
     {
         return [
@@ -67,14 +88,15 @@ class PartnerDetailLeadsForm extends Model
     public function makeRequest()
     {
         $beginTime = strtotime($this->beginDate.' 00:00:00');
-        $endTime = strtotime($this->endDate.' 00:00:00');
+        $endTime = strtotime($this->endDate.' 23:59:59');
         $arPrev = $this->getPervPeriodStat($beginTime);   //получаем сумму
         $arLeads =  $this->getLeads();
         $arCurrPeriod = $this->getCurrentPeriodStat($beginTime,$endTime);
 
+
         $arStatIncomingByLead = $this->getStatIncomingByLeads($arCurrPeriod);
         $arStatWithdrawal = $this->getStatWithdrawal($arCurrPeriod);
-        $arStatFull = $this->getStatFullSortByDate($arCurrPeriod);
+      //  $arStatFull = $this->getStatFullSortByDate($arCurrPeriod);
         $arStatIncomingByLead = $this->normalizeStatIncomingByLead($arStatIncomingByLead);
         $arLeadsDetail = $this->getLeadsDetail($arLeads);
         //$arServIds = array_unique(ArrayHelper::getColumn($arCurrPeriod,'service_id'));
@@ -87,7 +109,7 @@ class PartnerDetailLeadsForm extends Model
                 'expense' => $this->withdSum
             ],
             'incoming' => $arStatIncomingByLead,
-            'fullStat' => $arStatFull,
+            'fullStat' => $arCurrPeriod,
             'withdrawal' => $arStatWithdrawal,
             'arLeads' => $arLeadsDetail,
             'arService' => $arService
@@ -164,9 +186,10 @@ class PartnerDetailLeadsForm extends Model
             ->joinWith('payment p')
             ->joinWith('payment.service s')
             ->joinWith('expense ex')
-            ->where(' (p.pay_date >= :beginDate AND p.pay_date <= :endDate) OR (ex.pay_date >= :beginDate AND ex.pay_date <= :endDate) ')
+            ->where('(h.created_at >= :beginDate AND h.created_at <= :endDate)')
             ->andWhere(['h.cuser_id' => $this->obPartner->id])
             ->params([':beginDate' => $beginDate,':endDate' => $endDate])
+            ->orderBy(['created_at'=>SORT_DESC, 'p.pay_date'=>SORT_DESC])
             ->all();
     }
 

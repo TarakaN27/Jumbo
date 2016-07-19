@@ -37,23 +37,19 @@ class RecalculateBonus
 	public function run()
 	{
 		$arPaymentsTmp = Payments::find()/*->where(['>=','pay_date','1464739200'])*/->all();		//выберем платежи для которых считаем бонусы
-		/*
+
 		BUserBonus::deleteAll([												//удаляем старые бонусы по платежам
 			'payment_id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),
-			'scheme_id' => [2,3,4,5,6,7],
-			//'buser_id' => 44
+			'buser_id' => 17
 		]);
-		*/
 
 		$arPayments = [];
 		foreach ($arPaymentsTmp as $payment)
 			$arPayments[$payment->id] = $payment;
 
-		$arSales = PaymentsSale::find()->all();
-
+		$arSales = PaymentsSale::find()->where(['buser_id'=>17])->all();
 		$obCount = new PaymentBonusBehavior();
-
-		//$obCount->setOnlyForIdUser(44);				//указываем для какого пользователя считаем бонусы
+		$obCount->setOnlyForIdUser(17);				//указываем для какого пользователя считаем бонусы
 
 		/** @var PaymentsSale $sale */
 		foreach($arSales as $key => $sale)
@@ -66,8 +62,10 @@ class RecalculateBonus
 			$model->saleUser = $sale->buser_id;
 			$model->isSale = TRUE;
 
+			$obCount->countingPartnerBonus($model);
 			$obCount->countingSimpleBonus($model);
 			$obCount->countingComplexBonus($model);
+
 			unset($arPayments[$sale->payment_id]);
 		}
 
@@ -75,6 +73,7 @@ class RecalculateBonus
 		{
 			$obCount->countingSimpleBonus($pay,BonusScheme::BASE_PAYMENT);
 			$obCount->countingComplexBonus($pay,BonusScheme::BASE_PAYMENT);
+			$obCount->countingPartnerBonus($pay,BonusScheme::BASE_PAYMENT);
 		}
 		echo 'done'.PHP_EOL;
 		return TRUE;

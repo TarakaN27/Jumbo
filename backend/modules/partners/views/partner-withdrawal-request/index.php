@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'process3' => function($model, $key, $index){
 
                                                 return $model->type == PartnerWithdrawalRequest::TYPE_SERVICE &&
-                                                        $model->status == PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED &&
+                                                        $model->status == PartnerWithdrawalRequest::STATUS_PROCESSING_IN_BOOKKEEPING &&
                                                         (
                                                             $model->manager_id == Yii::$app->user->id ||
                                                             Yii::$app->user->can('adminRights')
