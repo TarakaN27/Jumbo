@@ -112,7 +112,7 @@ return [
     'Partner schemes serv group' => 'Группы партнерских схем',
     'Partner schemes' => 'Партнерские схемы',
     'Partners' => 'Партнерка',
-    'BOOK_partner_withdrawal_b_request' => 'Партнер. Запрос на вывод средств',
+    'BOOK_partner_withdrawal_b_request' => 'Партнёрские выплаты',
     'Partner. Withdrawal request' => 'Партнер. Запрос на вывод средств.',
     'No entity values' => 'Дополнительных полей не найдено',
     'Act fields template' => 'Акты. Шаблоны полей',

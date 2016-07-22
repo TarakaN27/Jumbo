@@ -11,6 +11,7 @@ use yii\base\Exception;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use common\models\CuserToGroup;
+use yii\filters\AccessControl;
 
 
 /**
@@ -18,6 +19,20 @@ use common\models\CuserToGroup;
  */
 class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
 {
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
     /**
      * Lists all PartnerWBookkeeperRequest models.
      * @return mixed

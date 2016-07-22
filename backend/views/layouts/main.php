@@ -114,14 +114,12 @@ $menuItems[] = [
 
             <div class = "col-md-3 left_col">
                 <div class = "left_col scroll-view">
-
                     <div class = "navbar nav_title" style = "border: 0;">
                         <a href = "<?php echo Yii::$app->homeUrl; ?>"
                            class = "site_title"><?php echo Html::img('@web/images/logo.png', ['alt' => 'Webmart Logo']); ?>
                             <span>Webmart Group.</span></a>
                     </div>
                     <div class = "clearfix"></div>
-
                     <!-- menu prile quick info -->
                     <div class = "profile">
                         <div class = "profile_pic">
@@ -223,6 +221,7 @@ $menuItems[] = [
                                         <span class = "fa fa-chevron-down"></span>
                                         <?= \common\components\notification\widget\PaymentRequestWidget::widget();?>
                                         <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
+                                        <?= \common\components\notification\widget\PartnerWithdrowalRequestWidget::widget();?>
                                     </a>
                                     <ul class = "nav child_menu" style = "display: none">
                                         <!---Запросы на платеж -->
@@ -266,9 +265,9 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
                                         <!-- Запросы на выведение средств-->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
-                                                <?=Html::a(Yii::t('app/common', 'BOOK_partner_withdrawal_b_request'),['/bookkeeping/partner-w-bookkeeper-request/index'])?>
+                                                <?=Html::a(Yii::t('app/common', 'BOOK_partner_withdrawal_b_request') .\common\components\notification\widget\PartnerWithdrowalRequestWidget::widget(),['/bookkeeping/partner-w-bookkeeper-request/index'])?>
                                             </li>
                                         <?php endif;?>
                                         <!---Затраты ---------------------->

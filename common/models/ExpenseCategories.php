@@ -127,7 +127,7 @@ class ExpenseCategories extends AbstractActiveRecord
             if($t->parent_id == 0 || empty($t->parent_id))
             {
                 $arParent[] = $t->id;
-                $arResult[]= $t;
+//                $arResult[]= $t;
                 unset($arCat[$key]);
             }
 
