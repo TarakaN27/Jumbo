@@ -514,7 +514,7 @@ class CUser extends AbstractUser
     public static function getAllContractor()
     {
         $models = CUser::find()->joinWith('requisites')
-            ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name'])
+            ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
             ->where(['contractor' => self::CONTRACTOR_YES])
             ->notArchive()
             ->asArray()
@@ -641,7 +641,7 @@ class CUser extends AbstractUser
     public static function getContractorForManager($iMngID)
     {
             return self::find()
-                ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname'])
+                ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
                 ->joinWith('requisites')
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
                 ->notArchive()
