@@ -8,6 +8,7 @@ use common\components\payment\PaymentEnrollmentBehavior;
 use common\components\payment\PaymentQuantityHoursBehavior;
 use common\components\payment\PaymentRecalculatePartnerPercentBehavior;
 use Yii;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -191,6 +192,7 @@ class Payments extends AbstractActiveRecord
     {
         return $this->hasOne(ExchangeRates::className(), ['id' => 'currency_id']);
     }
+
 
     /**
      * @return \yii\db\ActiveQuery

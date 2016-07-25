@@ -50,7 +50,7 @@ class PromisedPaymentController extends AbstractBaseBackendController
             $tmp = CUser::getContractorForManager(Yii::$app->user->id);
             $arUserID = [];
             foreach ($tmp as $t)
-                $arUserID [] = $t->id;
+                $arUserID [] = $t['id'];
             $addQuery [PromisedPayment::tableName().'.cuser_id'] = $arUserID;
         }
 

@@ -188,7 +188,6 @@ class PaymentsReportForm extends Model{
             array_push($arSelect,CuserQuantityHour::tableName().'.hours');
             array_push($arSelect,CuserQuantityHour::tableName().'.spent_time');
         }
-
         $data->joinWith('legal');
         $data->joinWith('service');
         $data->joinWith('calculate.payCond');
@@ -206,9 +205,7 @@ class PaymentsReportForm extends Model{
         ]);
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
-
-        $data = $data->all();
-
+        $data = $data->asArray()->all();
         $arResult = [
             'data' => [],
             'excelLink' => '',
@@ -235,19 +232,28 @@ class PaymentsReportForm extends Model{
         $totalGroupProd = [];
 
         // курсы обмена валют за период
+
         $obECH = new ExchangeCurrencyHistory();
         $arCurrIds = array_unique(ArrayHelper::getColumn($data,'currency_id'));
         if(!empty($arCurrIds))
             $arCurrInBur = $obECH->getCurrencyInByrForPeriod(strtotime($this->dateFrom),strtotime($this->dateTo),$arCurrIds);
         else
             $arCurrInBur = [];
-
         /** @var Payments $dt */
         foreach($data as $dt)
         {
-            $date = date('Y-m-d',$dt->pay_date);
+            $date = date('Y-m-d',$dt['pay_date']);
             $iCurr = 0;
+            $dt['full_corp_name'] = false;
+            if($dt['requisites_id']){
+                $dt['full_corp_name'] = CUserRequisites::getCorpNameByDataArray($dt);
+            }
 
+            $dt['manager_name'] = false;
+            if($dt['preq_man_id'] && ($dt['lname'] || $dt['fname'] || $dt['mname'])){
+                $dt['manager_name'] = trim($dt['lname'].' '.$dt['fname'].' '.$dt['mname']);
+            }else
+                $dt['manager_name'] = 'N/A';
             /*
             if(isset($arCurr[$date]) && isset($arCurr[$date][$dt->currency_id]))
             {
@@ -257,102 +263,108 @@ class PaymentsReportForm extends Model{
                 $arCurr[$date][$dt->currency_id] = $iCurr;
             }
             */
-            if(!isset($arCurrInBur[$dt->currency_id],$arCurrInBur[$dt->currency_id][$date]))
-                throw new NotFoundHttpException('Exchange rate for currency '.$dt->currency_id.' at  '.$date.' not found.');
+            if(!isset($arCurrInBur[$dt['currency_id']],$arCurrInBur[$dt['currency_id']][$date]))
+                throw new NotFoundHttpException('Exchange rate for currency '.$dt['currency_id'].' at  '.$date.' not found.');
 
-            $iCurr = $arCurrInBur[$dt->currency_id][$date];
+            $iCurr = $arCurrInBur[$dt['currency_id']][$date];
 
 
             $iCondCurr = 0;
-            if(is_object($calc=$dt->calculate) && is_object($cond = $calc->payCond))
+            if($dt['pay_cond_id'] && ($dt['pay_cond_name']))
             {
-                if(isset($arCurr[$date]) && isset($arCurr[$date][$cond->cond_currency]))
+                if( isset($arCurr[$date]) && isset($arCurr[$date][$dt['cond_currency']]))
                 {
-                    $iCondCurr = $arCurr[$date][$cond->cond_currency];
+                    $iCondCurr = $arCurr[$date][$dt['cond_currency']];
                 }else{
-                    $iCondCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$cond->cond_currency);
-                    $arCurr[$date][$cond->cond_currency] = $iCondCurr;
+                    $iCondCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate($date,$dt['cond_currency']);
+                    $arCurr[$date][$dt['cond_currency']] = $iCondCurr;
                 }
-                $arCondition [] = $cond->id;
+                $arCondition [] = $dt['pay_cond_id'];
             }
-
-            $tmpCalc = $dt->calculate;
-
             //формируем массив с данными
             switch ($this->groupType){
                 case self::GROUP_BY_DATE:
                     $arResult['data'][$date][] = $dt;
-                    $totalGroupSum = $this->totalHelper($totalGroupSum,$date,$dt->pay_summ*$iCurr);
-                    if(is_object($tmpCalc))
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$date,$dt['pay_summ']*$iCurr);
+                    if($dt['pay_cond_id'])
                     {
-                        $totalGroupProd = $this->totalHelper($totalGroupProd,$date,$tmpCalc->production);
-                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$date,$tmpCalc->profit);
-                        $totalGroupTax = $this->totalHelper($totalGroupTax,$date,$tmpCalc->tax);
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$date,$dt['production']);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$date,$dt['profit']);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$date,$dt['tax']);
                     }
                     break;
                 case self::GROUP_BY_MANAGER:
-                    $manID = is_object($obUser = $dt->payRequest) ? is_object($obMan = $obUser->manager) ? $obMan->getFio() : 'n_a' : 'n_a';
+                    if($dt['manager_name'])
+                        $manID = $dt['manager_name'];
+                    else
+                        $manID = 'n_a';
+
                     $arResult['data'][$manID][] = $dt;
 
-                    $totalGroupSum = $this->totalHelper($totalGroupSum,$manID,$dt->pay_summ*$iCurr);
-                    if(is_object($tmpCalc))
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$manID,$dt['pay_summ']*$iCurr);
+                    if($dt['pay_cond_id'])
                     {
-                        $totalGroupProd = $this->totalHelper($totalGroupProd,$manID,$tmpCalc->production);
-                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$manID,$tmpCalc->profit);
-                        $totalGroupTax = $this->totalHelper($totalGroupTax,$manID,$tmpCalc->tax);
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$manID,$dt['production']);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$manID,$dt['profit']);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$manID,$dt['tax']);
                     }
                     break;
                 case self::GROUP_BY_SERVICE:
-                    $obServ = $dt->service;
-                    $servName = is_object($obServ) ? $obServ->name : 'n_a';
+                    if($dt['service_name'])
+                        $servName = $dt['name'];
+                    else
+                        $servName = 'n_a';
+
                     $arResult['data'][$servName][] = $dt;
 
-                    $totalGroupSum = $this->totalHelper($totalGroupSum,$servName,$dt->pay_summ*$iCurr);
-                    if(is_object($tmpCalc))
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$servName,$dt['pay_summ']*$iCurr);
+                    if($dt['pay_cond_id'])
                     {
-                        $totalGroupProd = $this->totalHelper($totalGroupProd,$servName,$tmpCalc->production);
-                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$servName,$tmpCalc->profit);
-                        $totalGroupTax = $this->totalHelper($totalGroupTax,$servName,$tmpCalc->tax);
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$servName,$dt['production']);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$servName,$dt['profit']);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$servName,$dt['tax']);
                     }
                     break;
                 case self::GROUP_BY_CONTRACTOR:
-                    $obCuser = $dt->cuser;
-                    $corpName = is_object($obCuser) ? $obCuser->getInfoWithSite() : 'n_a';
+                   if($dt['requisites_id']){
+                       $corpName = CUserRequisites::getCorpNameWithSiteByDataArray($dt);
+                   }
                     $arResult['data'][$corpName][] = $dt;
 
-                    $totalGroupSum = $this->totalHelper($totalGroupSum,$corpName,$dt->pay_summ*$iCurr);
-                    if(is_object($tmpCalc))
+                    $totalGroupSum = $this->totalHelper($totalGroupSum,$corpName,$dt['pay_summ']*$iCurr);
+                    if($dt['pay_cond_id'])
                     {
-                        $totalGroupProd = $this->totalHelper($totalGroupProd,$corpName,$tmpCalc->production);
-                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$corpName,$tmpCalc->profit);
-                        $totalGroupTax = $this->totalHelper($totalGroupTax,$corpName,$tmpCalc->tax);
+                        $totalGroupProd = $this->totalHelper($totalGroupProd,$corpName,$dt['production']);
+                        $totalGroupProfit = $this->totalHelper($totalGroupProfit,$corpName,$dt['profit']);
+                        $totalGroupTax = $this->totalHelper($totalGroupTax,$corpName,$dt['tax']);
                     }
                     break;
                 default:
                     break;
             }
-            $this->arPaymentsInByr[$dt->id] = (float)$dt->pay_summ*$iCurr;              //соберем платежи в
-            $arResult['iSumTotal']+= ($dt->pay_summ*$iCurr);
-            $arResult['currency'][$dt->id] = $iCurr;
-            $arResult['condCurr'][$dt->id] = $iCondCurr;
-            $arResult['fullAmount'][$dt->id] = $dt->pay_summ*$iCurr;
+            $this->arPaymentsInByr[$dt['id']] = (float)$dt['pay_summ']*$iCurr;              //соберем платежи в
+            $arResult['iSumTotal']+= ($dt['pay_summ']*$iCurr);
+            $arResult['currency'][$dt['id']] = $iCurr;
+            $arResult['condCurr'][$dt['id']] = $iCondCurr;
+            $arResult['fullAmount'][$dt['id']] = $dt['pay_summ']*$iCurr;
 
             /**  @var CuserQuantityHour $obQuant */
-            if($this->generateExtendExcel && is_object($obCuser= $dt->cuser) && is_object($obQuant = $obCuser->quantityHour))
+            if($this->generateExtendExcel && $dt['requisites_id'] && $dt['quant_user'])
             {
-                $arResult['quantityHours'][$dt->id] = [
-                    'paid' => $obQuant->hours,
-                    'spent' => $obQuant->spent_time,
-                    'balance' => $obQuant->hours - $obQuant->spent_time
+                $arResult['quantityHours'][$dt['id']] = [
+                    'paid' => $dt['hours'],
+                    'spent' => $dt['spent_time'],
+                    'balance' => $dt['hours'] - $dt['spent_time']
                 ];
             }
 
-            if(is_object($tmpCalc))
+            if($dt['pay_cond_id'])
             {
-                $arResult['iProfitTotal']+= $tmpCalc->profit;
-                $arResult['iTaxTotal']+= $tmpCalc->tax;
-                $arResult['iProdTotal']+= $tmpCalc->production;
+                $arResult['iProfitTotal']+= $dt['profit'];
+                $arResult['iTaxTotal']+= $dt['tax'];
+                $arResult['iProdTotal']+= $dt['production'];
             }
+
 
         }
         if($this->showWithoutSale)
@@ -459,24 +471,22 @@ class PaymentsReportForm extends Model{
             {
                 foreach($dt as $d)
                 {
-                    $cuser=$d->cuser;
-                    $calc=$d->calculate;
-                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,Yii::$app->formatter->asDate($d->pay_date));
-                    $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($req = $d->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d->pay_summ);
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,Yii::$app->formatter->asDate($d['pay_date']));
+                    $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,($d['full_corp_name'] ? $d['full_corp_name'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,($d['manager_name']  ? $d['manager_name'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,($d['legal_name'] ? $d['legal_name'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,($d['service_name'] ? $d['service_name'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,$d['pay_summ']);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d->id]) ? $data['currency'][$d->id] : '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,($d['code']?$d['code'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,isset($data['currency'][$d['id']]) ? $data['currency'][$d['id']] : '');
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,is_object($calc) ? $calc->profit : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($calc) ? $calc->production : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,is_object($calc) ? $calc->tax : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,($d['profit'] ? Yii::$app->formatter->asDecimal($d['profit']) : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,($d['production'] ? Yii::$app->formatter->asDecimal($d['production']) : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,($d['tax'] ? Yii::$app->formatter->asDecimal($d['tax']) : 'N/A'));
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($calc) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
-                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['condCurr'][$d->id]) ? $data['condCurr'][$d->id] : 'N/A');
+                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,($d['pay_cond_name']? $d['pay_cond_name'] : 'N/A'));
+                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['condCurr'][$d['id']]) ? $data['condCurr'][$d['id']] : 'N/A');
                     $i++;
                 }
             }
@@ -582,41 +592,43 @@ class PaymentsReportForm extends Model{
                 /** @var PaymentsCalculations $calc */
                 $calc=$d->calculate;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d->id);
+                $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d['id']);
                 //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,);
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d->pay_date+86400));
+                $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d['pay_date']+86400));
                 $objPHPExcel->getActiveSheet()->getStyle('B'.$i)->getNumberFormat()->setFormatCode('DD.MM.YYYY');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,is_object($cuser) ? $cuser->getInfo() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,is_object($cuser)&&is_object($obProspects = $cuser->prospects) ? $obProspects->name : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('C'.$i,($d['full_corp_name'] ? $d['full_corp_name'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('D'.$i,($d['prospects_name'] ? $d['prospects_name'] : 'N/A'));
 
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,isset($data['quantityHours'][$d->id]) ? $data['quantityHours'][$d->id]['paid'] : '');
-                $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,isset($data['quantityHours'][$d->id]) ? $data['quantityHours'][$d->id]['spent'] : '');
-                $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,isset($data['quantityHours'][$d->id]) ? $data['quantityHours'][$d->id]['balance'] : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$i,isset($data['quantityHours'][$d['id']]) ? $data['quantityHours'][$d['id']]['paid'] : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('F'.$i,isset($data['quantityHours'][$d['id']]) ? $data['quantityHours'][$d['id']]['spent'] : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$i,isset($data['quantityHours'][$d['id']]) ? $data['quantityHours'][$d['id']]['balance'] : '');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,is_object($req = $d->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,is_object($lp=$d->legal) ? $lp->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,is_object($serv=$d->service) ? $serv->name : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,$d->pay_summ);
+                $objPHPExcel->getActiveSheet()->setCellValue('H'.$i,($d['manager_name']  ? $d['manager_name'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('I'.$i,($d['legal_name'] ? $d['legal_name'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('J'.$i,($d['service_name'] ? $d['service_name'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('K'.$i,$d['pay_summ']);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,is_object($curr = $d->currency) ? $curr->code : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['currency'][$d->id]) ? $data['currency'][$d->id] : '');
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$i,isset($data['fullAmount'][$d->id]) ? $data['fullAmount'][$d->id] : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('L'.$i,($d['code']?$d['code'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('M'.$i,isset($data['currency'][$d['id']]) ? $data['currency'][$d['id']] : '');
+                $objPHPExcel->getActiveSheet()->setCellValue('N'.$i,isset($data['fullAmount'][$d['id']]) ? $data['fullAmount'][$d['id']] : '');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$i,is_object($calc) ? $calc->profit : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$i,is_object($calc) ? $calc->production : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$i,is_object($calc) ? $calc->tax : 'N/A');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$i,is_object($calc) ? $calc->cnd_corr_factor : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$i,is_object($calc) ? $calc->cnd_commission : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$i,is_object($calc) ? $calc->cnd_sale : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('U'.$i,is_object($calc) ? $calc->cnd_tax : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$i,($d['profit'] ? Yii::$app->formatter->asDecimal($d['profit']) : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$i,($d['production'] ? Yii::$app->formatter->asDecimal($d['production']) : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$i,($d['tax'] ? Yii::$app->formatter->asDecimal($d['tax']) : 'N/A'));
 
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$i,is_object($calc) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$i,isset($data['condCurr'][$d->id]) ? $data['condCurr'][$d->id] : 'N/A');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['code'] : 'N/A');
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$i,is_object($calc) && isset($arCond[$calc->pay_cond_id]) ? $arCond[$calc->pay_cond_id]['name'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$i,($d['cnd_corr_factor'] ? Yii::$app->formatter->asDecimal($d['cnd_corr_factor']) : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$i,($d['cnd_commission'] ? Yii::$app->formatter->asDecimal($d['cnd_commission']) : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$i,($d['cnd_sale'] ? Yii::$app->formatter->asDecimal($d['cnd_sale']) : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$i,($d['cnd_tax'] ? Yii::$app->formatter->asDecimal($d['cnd_tax']) : 'N/A'));
+
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$i,($d['pay_cond_name']? $d['pay_cond_name'] : 'N/A'));
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$i,isset($data['condCurr'][$d['id']]) ? $data['condCurr'][$d['id']] : 'N/A');
+
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$i,isset($arCond[$d['pay_cond_id']]) ? $arCond[$d['pay_cond_id']]['code'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$i,isset($arCond[$d['pay_cond_id']]) ? $arCond[$d['pay_cond_id']]['name'] : 'N/A');
 
                 $i++;
             }

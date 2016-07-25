@@ -42,7 +42,6 @@ class PaymentsReportController extends AbstractBaseBackendController{
     public function actionIndex()
     {
         $model = new PaymentsReportForm();
-        $arContractorMap = [];
         if(!\Yii::$app->user->can('adminRights'))
         {
             $model->managers = [\Yii::$app->user->id];
@@ -50,7 +49,6 @@ class PaymentsReportController extends AbstractBaseBackendController{
         }else{
             $arContractorMap = CUser::getContractorMap();
         }
-        
         $arData = [];
         if($model->load(\Yii::$app->request->post()) && $model->validate())
         {
