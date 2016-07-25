@@ -588,10 +588,6 @@ class PaymentsReportForm extends Model{
         {
             foreach($dt as $d)
             {
-                $cuser=$d->cuser;
-                /** @var PaymentsCalculations $calc */
-                $calc=$d->calculate;
-
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$i,$d['id']);
                 //$objPHPExcel->getActiveSheet()->setCellValue('B'.$i,);
                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$i,\PHPExcel_Shared_Date::PHPToExcel($d['pay_date']+86400));
