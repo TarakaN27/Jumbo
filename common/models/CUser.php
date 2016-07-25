@@ -641,7 +641,7 @@ class CUser extends AbstractUser
     public static function getContractorForManager($iMngID)
     {
             return self::find()
-                ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
+                ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname'])
                 ->joinWith('requisites')
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
                 ->notArchive()
