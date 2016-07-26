@@ -130,6 +130,7 @@ class PaymentsReportForm extends Model{
      */
     public function getData()
     {
+
         $data = Payments::find();//->with('calculate','cuser','legal','service','calculate.payCond');
         $arSelect = [
             Payments::tableName().'.id',
@@ -205,7 +206,7 @@ class PaymentsReportForm extends Model{
         ]);
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
-        $data = $data->asArray()->all();
+        $data = $data->createCommand()->queryAll();
         $arResult = [
             'data' => [],
             'excelLink' => '',
@@ -392,8 +393,6 @@ class PaymentsReportForm extends Model{
             $arResult['excelExtendLink'] = $this->generateExtendExcelDocument($arResult,$arCondition);
 
         $arResult['summControll'] = $arResult['iSumTotal'] - ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal']);
-        echo memory_get_usage(false) / 1024 / 1024;
-        die;
         return $arResult;
     }
 
