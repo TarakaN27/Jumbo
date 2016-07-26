@@ -386,9 +386,9 @@ class PaymentsReportForm extends Model{
         if($this->generateExcel)
             $arResult['excelLink'] = $this->generateExcelDocument($arResult);
 
-        if($this->generateDocx)
+/*        if($this->generateDocx)
             $arResult['docxLink'] = $this->generateDocxDocument($arResult);
-
+*/
         if($this->generateExtendExcel)
             $arResult['excelExtendLink'] = $this->generateExtendExcelDocument($arResult,$arCondition);
 
@@ -645,7 +645,6 @@ class PaymentsReportForm extends Model{
         $template = \Yii::getAlias('@common/php_office_tmpl/').'payment_report_tpl.docx';
         $sFileName = 'payments-report-'.uniqid(time()).'.docx';
         try{
-
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($template);
             //название клиентской систмы
             $doc->setValue('systemName',Yii::$app->name);
@@ -669,29 +668,24 @@ class PaymentsReportForm extends Model{
 
             //таблица Рекламная сеть Яндекса
             $doc->cloneRow('cDate',$iCount);
-
-
                 $iter = 1;
                 foreach($data['data'] as $key=>$dt)
                     foreach($dt as $item)
                     {
-                        $doc->setValue('cDate#'.$iter, Yii::$app->formatter->asDate($item->pay_date));
-                        $doc->setValue('contractor#'.$iter,is_object($cuser=$item->cuser) ? $cuser->getInfo() : 'N/A');
-                        $doc->setValue('manager#'.$iter,is_object($req = $item->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A');
-                        $doc->setValue('legalPerson#'.$iter,is_object($lp=$item->legal) ? $lp->name : 'N/A');
-                        $doc->setValue('service#'.$iter,is_object($serv=$item->service) ? $serv->name : 'N/A');
-                        $doc->setValue('iSum#'.$iter,$item->pay_summ);
-                        $doc->setValue('currCode#'.$iter,is_object($curr = $item->currency) ? $curr->code : 'N/A');
-                        $doc->setValue('exRate#'.$iter,isset($data['currency'][$item->id]) ? Yii::$app->formatter->asDecimal($data['currency'][$item->id]) : '');
-                        $doc->setValue('iTax#'.$iter, is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
-                        $doc->setValue('iProd#'.$iter,is_object($calc=$item->calculate) ? $calc->production : 'N/A');
-                        $doc->setValue('iProfit#'.$iter,is_object($calc=$item->calculate) ? $calc->tax : 'N/A');
-                        $doc->setValue('exCondRate#'.$iter,isset($data['condCurr'][$item->id]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$item->id]) : 'N/A');
+                        $doc->setValue('cDate#'.$iter, Yii::$app->formatter->asDate($item['pay_date']));
+                        $doc->setValue('contractor#'.$iter,($item['full_corp_name'] ? $item['full_corp_name'] : 'N/A'));
+                        $doc->setValue('manager#'.$iter,($item['manager_name']  ? $item['manager_name'] : 'N/A'));
+                        $doc->setValue('legalPerson#'.$iter,($item['legal_name'] ? $item['legal_name'] : 'N/A'));
+                        $doc->setValue('service#'.$iter,($item['service_name'] ? $item['service_name'] : 'N/A'));
+                        $doc->setValue('iSum#'.$iter,$item['pay_summ']);
+                        $doc->setValue('currCode#'.$iter,($item['code']?$item['code'] : 'N/A'));
+                        $doc->setValue('exRate#'.$iter,isset($data['currency'][$item['id']]) ? Yii::$app->formatter->asDecimal($data['currency'][$item['id']]) : '');
+                        $doc->setValue('iTax#'.$iter, ($item['tax'] ? Yii::$app->formatter->asDecimal($item['tax']) : 'N/A'));
+                        $doc->setValue('iProd#'.$iter,($item['production'] ? Yii::$app->formatter->asDecimal($item['production']) : 'N/A'));
+                        $doc->setValue('iProfit#'.$iter,($item['profit'] ? Yii::$app->formatter->asDecimal($item['profit']) : 'N/A'));
+                        $doc->setValue('exCondRate#'.$iter,isset($data['condCurr'][$item['id']]) ? Yii::$app->formatter->asDecimal($data['condCurr'][$item['id']]) : 'N/A');
                         $iter++;
                     }
-
-
-
             $doc->saveAs(Yii::getAlias('@backend/web/reports/').$sFileName);
             if(file_exists(Yii::getAlias('@backend/web/reports/').$sFileName))
                 return $sFileName;
