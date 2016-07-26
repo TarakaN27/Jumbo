@@ -311,7 +311,7 @@ class PaymentsReportForm extends Model{
                     break;
                 case self::GROUP_BY_SERVICE:
                     if($dt['service_name'])
-                        $servName = $dt['name'];
+                        $servName = $dt['service_name'];
                     else
                         $servName = 'n_a';
 
@@ -364,9 +364,8 @@ class PaymentsReportForm extends Model{
                 $arResult['iTaxTotal']+= $dt['tax'];
                 $arResult['iProdTotal']+= $dt['production'];
             }
-
-
         }
+        unset($data);
         if($this->showWithoutSale)
         {
             $this->getSales();                          //получаем продажи
@@ -393,7 +392,8 @@ class PaymentsReportForm extends Model{
             $arResult['excelExtendLink'] = $this->generateExtendExcelDocument($arResult,$arCondition);
 
         $arResult['summControll'] = $arResult['iSumTotal'] - ($arResult['iProfitTotal']+$arResult['iTaxTotal']+$arResult['iProdTotal']);
-
+        echo memory_get_usage(false) / 1024 / 1024;
+        die;
         return $arResult;
     }
 
@@ -419,6 +419,7 @@ class PaymentsReportForm extends Model{
      */
     protected function generateExcelDocument($data)
     {
+
         if(empty($data))
             return NULL;
 
@@ -632,6 +633,7 @@ class PaymentsReportForm extends Model{
 
         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save(Yii::getAlias('@backend/web/reports/').$sFileName);
+
 
         return $sFileName;
     }
