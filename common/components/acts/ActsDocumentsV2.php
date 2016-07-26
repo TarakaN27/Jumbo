@@ -189,8 +189,8 @@ class ActsDocumentsV2
             $amountWithVat = $serv->amount;
             $vatRate = $this->bUseVat ? $this->vatRate : '';
             $amount = $this->bUseVat ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
-            $amount = round($amount,2);
-            $price = round($amount/$serv->quantity, 2);
+            $amount = round($amount/10000,2) * 10000;
+            $price = round($amount/$serv->quantity/10000, 2)*10000;
 
             $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
 
@@ -204,7 +204,6 @@ class ActsDocumentsV2
         }
 
         $this->amountInWordsMode();
-      
         return $this->arServices = $arResult;
     }
 
