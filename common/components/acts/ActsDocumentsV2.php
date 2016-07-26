@@ -189,9 +189,11 @@ class ActsDocumentsV2
             $amountWithVat = $serv->amount;
             $vatRate = $this->bUseVat ? $this->vatRate : '';
             $amount = $this->bUseVat ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
-            $price = $amount/$serv->quantity;
+            $amount = round($amount,2);
+            $price = round($amount/$serv->quantity, 2);
 
-            $vatAmount = $this->bUseVat ? $serv->amount-$amount: '';
+            $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
+
             $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat);
             $this->totalAmount+= $amount;
             if($this->bUseVat)
@@ -202,6 +204,7 @@ class ActsDocumentsV2
         }
 
         $this->amountInWordsMode();
+      
         return $this->arServices = $arResult;
     }
 
