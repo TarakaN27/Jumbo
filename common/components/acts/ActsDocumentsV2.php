@@ -27,7 +27,7 @@ use Gears\Pdf;
 class ActsDocumentsV2
 {
     CONST
-        RUB_MODE = 0,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
+        RUB_MODE = 2,           //0 - миллионы, 1 -- миллионы/рубли, 2- рубли после деноминации
         BEL_RUBLE_ID = 2,       //костыль указываем id бел рубля
         PRECISION = 4;          //точность округления
 
@@ -95,6 +95,7 @@ class ActsDocumentsV2
         $this->getLegalPersonAndActTpl();
         $this->getCUserDetail();
         $this->getContractDetail();
+
         $this->getCurrencyUnits();
         $this->getServices();
         return $this->generatePDF();
@@ -121,7 +122,7 @@ class ActsDocumentsV2
 
         if(!$obLegalPerson)
             throw new NotFoundHttpException();
-        
+
         $this->legalPersonName = $obLegalPerson->name;
         $this->legalPersonBankDetail = $obLegalPerson->doc_requisites;
         $this->legalPersonAddress = $obLegalPerson->address;
@@ -138,9 +139,10 @@ class ActsDocumentsV2
             throw new NotFoundHttpException('template id not found');
 
         $this->obActTpl = ActsTemplate::findOne($obLegalPerson->act_tpl_id);
+        
         if(!$this->obActTpl || ($this->obActTpl && !file_exists($this->obActTpl->getFilePath())))
             throw new NotFoundHttpException('Template not found');
-        
+
         return $obLegalPerson;
     }
 
