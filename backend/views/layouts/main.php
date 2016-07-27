@@ -285,6 +285,7 @@ $menuItems[] = [
                                     </ul>
                                 </li>
                                 <?php endif;?>
+                                <?php if(Yii::$app->user->id !=12){?>
                                 <li><a><i class="fa fa-bar-chart-o"></i><?php echo Yii::t('app/common', 'Reports'); ?> <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" style="display: none">
                                         <li>
@@ -303,6 +304,7 @@ $menuItems[] = [
                                         <?php endif;?>
                                     </ul>
                                 </li>
+                                <?php }?>
                                 <?php if(Yii::$app->user->can('adminRights')):?>
                                 <li>
                                     <a>
