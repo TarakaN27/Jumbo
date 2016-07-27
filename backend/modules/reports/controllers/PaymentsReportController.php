@@ -42,9 +42,10 @@ class PaymentsReportController extends AbstractBaseBackendController{
      */
     public function actionIndex()
     {
-        if(Yii::$app->user->id == 12)
+        if(Yii::$app->user->id == 12) {
             echo 'Доступ запрещен';
             return die;
+        }
         
         $model = new PaymentsReportForm();
         if(!\Yii::$app->user->can('adminRights'))
