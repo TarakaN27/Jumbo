@@ -8,9 +8,10 @@ use Yii;
 use common\models\PartnerWBookkeeperRequest;
 use common\models\search\PartnerWBookkeeperRequestSearch;
 use yii\base\Exception;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use common\models\CuserToGroup;
+use yii\filters\AccessControl;
 
 
 /**
@@ -18,6 +19,20 @@ use yii\web\ServerErrorHttpException;
  */
 class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
 {
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
     /**
      * Lists all PartnerWBookkeeperRequest models.
      * @return mixed
@@ -27,9 +42,6 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
         $searchModel = new PartnerWBookkeeperRequestSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
-        
-        
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -132,7 +144,7 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
             ->with('buser','partner','contractor','currency','legal')
             ->where(['id' => $id])
             ->one();
-
+        $model->setScenario('update');
         if(!$model)
             throw new NotFoundHttpException('Request not found');
 
@@ -154,16 +166,15 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
                 $transaction->rollBack();
             }
         }
+        $arContractor = CuserToGroup::getUserByGroup($model->partner_id);
         return $this->render('process',[
-            'model' => $model
+            'model' => $model,
+            'arContractor'=>$arContractor,
         ]);
     }
-
     public function actionPdf($id)
     {
         $model = PartnerWBookkeeperRequestManager::find()->where(['id' => $id])->one();
-
-
     }
 
 }

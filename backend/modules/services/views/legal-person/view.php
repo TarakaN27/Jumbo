@@ -46,6 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'doc_email:email',
                         'doc_site',
                         [
+                            'attribute' => 'letter_tpl_type',
+                            'value' => $model->getLetterTplTypeStr()
+                        ],
+                        [
                             'attribute' => 'docx_id',
                             'value' => is_object($obDocxID = $model->docx) ? $obDocxID->name : 'N/A'
                         ],

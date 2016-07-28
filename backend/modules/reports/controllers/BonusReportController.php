@@ -12,7 +12,7 @@ namespace backend\modules\reports\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\modules\reports\forms\BonusReportsForm;
 use yii\filters\AccessControl;
-
+use Yii;
 class BonusReportController extends AbstractBaseBackendController
 {
 	/**
@@ -37,6 +37,10 @@ class BonusReportController extends AbstractBaseBackendController
 
 	public function actionIndex()
 	{
+		if(Yii::$app->user->id == 12) {
+			echo 'Доступ запрещен';
+			return die;
+		}
 		$model = new BonusReportsForm();
 		if(!\Yii::$app->user->can('adminRights'))
 			$model->users = [\Yii::$app->user->id];

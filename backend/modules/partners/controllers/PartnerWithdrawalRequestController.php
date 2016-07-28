@@ -79,7 +79,7 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
             $addCond = PartnerWithdrawalRequest::tableName().'.type = :type AND '.PartnerWithdrawalRequest::tableName().'.status = :statusNew ';
             $addParams = [
                 ':type' => PartnerWithdrawalRequest::TYPE_SERVICE,
-                ':statusNew' => PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED
+                ':statusNew' => PartnerWithdrawalRequest::STATUS_PROCESSING_IN_BOOKKEEPING
             ];
         }
         //@todo проверить
@@ -223,13 +223,13 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
         {
             $models = AbstractModel::createMultiple(Process1Form::classname());
             /** @var Process1Form $mod */
-            foreach ($models as &$mod) {
+            foreach ($models as $mod) {
+                $mod->setScenario('manager');
                 $mod->obRequest = $model;
                 $mod->obBookkeeper = $obBookkeeper;
             }
             AbstractModel::loadMultiple($models,Yii::$app->request->post());
             $valid = AbstractModel::validateMultiple($models);
-            
             $amount = 0;                                                        //Check, what all amount is spent
             foreach ($models as $item)
             {
@@ -258,14 +258,15 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                         }
                     if($bFlag)                                                  //All good, apply transaction
                     {
-                        $model->status = PartnerWithdrawalRequest::STATUS_DONE;
+                        $model->status = PartnerWithdrawalRequest::STATUS_PROCESSING_IN_BOOKKEEPING;
                         if(!$model->save())
                             throw new ServerErrorHttpException();
 
                         $transaction->commit();
-                        Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_SUCCESS,Yii::t('app/users','Request successfully processed'));
+                        Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_SUCCESS,Yii::t('app/users','Request processed in bookkeeping'));
                         return $this->redirect(['index']);
                     }else{
+
                         $transaction->rollBack();
                     }
                 }catch (Exception $e) {
@@ -300,7 +301,7 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
 
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
-            $model->status = PartnerWithdrawalRequest::STATUS_MANAGER_PROCESSED;
+            $model->status = PartnerWithdrawalRequest::STATUS_PROCESSING_IN_BOOKKEEPING;
             if($model->save())
             {
                 Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_SUCCESS,Yii::t('app/users','Request successfully processed'));
@@ -320,7 +321,7 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
     public function actionProcess3($id)
     {
         $model = $this->findModel($id);
-        if($model->type != $model::TYPE_SERVICE || $model->status != $model::STATUS_MANAGER_PROCESSED)        //Shall see, what request is correct
+        if($model->type != $model::TYPE_SERVICE || $model->status != $model::STATUS_PROCESSING_IN_BOOKKEEPING)        //Shall see, what request is correct
             throw new Exception($message = "Illegal request", $code = 404);
         
         $arModels = [new Process3Form(['amount' => $model->amount])];

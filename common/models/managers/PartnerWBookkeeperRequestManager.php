@@ -16,10 +16,12 @@ use common\models\Expense;
 use common\models\ExchangeCurrencyHistory;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
-use yii\helpers\ArrayHelper;
+use common\models\PartnerWithdrawalRequest;
 use yii\helpers\BaseStringHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use Yii;
+use backend\widgets\Alert;
 
 class PartnerWBookkeeperRequestManager extends PartnerWBookkeeperRequest
 {
@@ -44,24 +46,23 @@ class PartnerWBookkeeperRequestManager extends PartnerWBookkeeperRequest
     protected function createExpense()
     {
         $obCat = PartnerExpenseCatLink::find()->where(['type' => PartnerExpenseCatLink::TYPE_MONEY,'legal_person_id' => $this->legal_id])->one();
-        if(!$obCat)
-        {
-            return NULL;
+        if($obCat) {
+            $obExpense = new Expense();
+            $obExpense->cat_id = $obCat->expanse_cat_id;
+            $obExpense->currency_id = $this->currency_id;
+            $obExpense->cuser_id = $this->contractor_id;
+            $obExpense->legal_id = $this->legal_id;
+            $obExpense->pay_date = time();
+            $obExpense->pay_summ = $this->amount;
+            $obExpense->description = $this->description;
+            $obExpense->pw_request_id = $this->request_id;
+            if($obExpense->save())
+                return $obExpense->id;
         }
-
-        $obExpense = new Expense();
-        $obExpense->cat_id = $obCat->id;
-        $obExpense->currency_id = $this->currency_id;
-        $obExpense->cuser_id = $this->contractor_id;
-        $obExpense->legal_id = $this->legal_id;
-        $obExpense->pay_date = time();
-        $obExpense->pay_summ = $this->amount;
-        $obExpense->description = $this->description;
-        $obExpense->pw_request_id = $this->request_id;
-
-        if($obExpense->save())
-            return $obExpense->id;
-
+        else{
+            Yii::$app->session->setFlash(Alert::TYPE_WARNING,Yii::t('app/users','Category expense not found'));
+            return true;
+        }
         return NULL;
     }
 
@@ -73,23 +74,22 @@ class PartnerWBookkeeperRequestManager extends PartnerWBookkeeperRequest
      */
     protected function partnerPurseOperations($iExpenseID)
     {
-        $pCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$this->request->date),$this->currency_id);
-        if(!$pCurr)
-            throw new NotFoundHttpException('Currency not found');
-
-        $amount = $this->amount*$pCurr;
-
         $obPurseHistory = new PartnerPurseHistory();
-        $obPurseHistory->amount = $amount;
+        $obPurseHistory->amount = $this->factual_amount_in_base_currency;
         $obPurseHistory->type = PartnerPurseHistory::TYPE_EXPENSE;
         $obPurseHistory->cuser_id = $this->partner_id;
-        $obPurseHistory->expense_id = $iExpenseID;
+        if($iExpenseID !== true)
+            $obPurseHistory->expense_id = $iExpenseID;
         if(!$obPurseHistory->save())
             throw new ServerErrorHttpException('Can not save purse history');
 
         /** @var PartnerPurse $obPurse */
+        $this->request->processBookkeeper($obPurseHistory->amount);
+
         $obPurse = PartnerPurse::getPurse($this->partner_id);
-        $obPurse->withdrawal+=$amount;
+        $obPurse->amount -= $obPurseHistory->amount;
+        
+        
         if(!$obPurse->save())
             throw new ServerErrorHttpException('Can not save purse');
 

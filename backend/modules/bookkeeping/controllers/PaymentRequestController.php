@@ -318,7 +318,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $arContrMap = [];
         foreach($arContr as $ac)
         {
-            $arContrMap[$ac->id] = $ac->getInfo();
+            $arContrMap[$ac['id']] = CUser::getInfoByArData($ac);
         }
 
         $model = new SetManagerContractorForm(['obPR' => $modelP,'contractorMap' => $arContrMap]);

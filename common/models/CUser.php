@@ -513,16 +513,12 @@ class CUser extends AbstractUser
      */
     public static function getAllContractor()
     {
-        $dep =  new TagDependency([
-            'tags' => [
-                NamingHelper::getCommonTag(self::className()),
-                NamingHelper::getCommonTag(CUserRequisites::className())
-            ]
-        ]);
-        $models = self::getDb()->cache(function ($db) {
-            return CUser::find()->with('requisites')->where(['contractor' => self::CONTRACTOR_YES])->notArchive()->all($db);
-        },86400,$dep);
-
+        $models = CUser::find()->joinWith('requisites')
+            ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
+            ->where(['contractor' => self::CONTRACTOR_YES])
+            ->notArchive()
+            ->asArray()
+            ->all();
         return $models;
     }
 
@@ -536,11 +532,10 @@ class CUser extends AbstractUser
         $result = [];
         foreach($tmp as $t)
         {
-            $result[$t->id] = $t->getInfo();
+            $result[$t['id']] = static::getInfoByArData($t);
         }
         return $result;
     }
-
     /**
      * @param $iManagerID
      * @return array
@@ -551,7 +546,7 @@ class CUser extends AbstractUser
         $result = [];
         foreach($tmp as $t)
         {
-            $result[$t->id] = $t->getInfo();
+            $result[$t['id']] = static::getInfoByArData($t);
         }
         return $result;
     }
@@ -628,25 +623,30 @@ class CUser extends AbstractUser
             return $this->username;
     }
 
+    public static function getInfoByArData($arData){
+
+        if($arData['type_id'] == CUserRequisites::TYPE_I_PERSON)
+            return 'ИП '.$arData['j_lname'].' '.$arData['j_fname'].' '.$arData['j_mname'];
+
+        if($arData['type_id'] == CUserRequisites::TYPE_F_PERSON)
+            return 'ФИЗ '.$arData['j_lname'].' '.$arData['j_fname'].' '.$arData['j_mname'];
+        else
+            return $arData['corp_name'];
+    }
+
     /**
      * @param $iMngID
      * @return array
      */
     public static function getContractorForManager($iMngID)
     {
-        $dep = new DbDependency(['sql' =>
-            'SELECT (MAX(c.updated_at) + MAX(r.updated_at)) as control '.
-            'FROM '.CUser::tableName().' c '.
-            'LEFT JOIN '.CUserRequisites::tableName().' as r ON r.id = c.requisites_id '.
-            'WHERE c.manager_id = '.$iMngID
-        ]);
-       return self::getDb()->cache(function($db) use ($iMngID){
             return self::find()
-                ->with('requisites')
+                ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
+                ->joinWith('requisites')
                 ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
                 ->notArchive()
-                ->all($db);
-        },86400,$dep);
+                ->asArray()
+                ->all();
     }
 
     /**

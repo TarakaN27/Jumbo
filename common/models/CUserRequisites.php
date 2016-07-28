@@ -476,4 +476,23 @@ class CUserRequisites extends AbstractActiveRecord
 
         return $str;
     }
+
+    public static function getCorpNameByDataArray($arData)
+    {
+        if($arData['type_id'] == self::TYPE_I_PERSON)
+            return 'ИП '.$arData['j_lname'].' '.$arData['j_fname'].' '.$arData['j_mname'];
+
+        if($arData['type_id'] == self::TYPE_F_PERSON)
+            return 'ФИЗ '.$arData['j_lname'].' '.$arData['j_fname'].' '.$arData['j_mname'];
+        else
+            return $arData['corp_name'];
+    }
+    public static function getCorpNameWithSiteByDataArray($arData)
+    {
+        $str = static::getCorpNameByDataArray($arData);
+
+        if(!empty($arData['site']))
+            $str.=' ('.$arData['site'].')';
+        return $str;
+    }
 }

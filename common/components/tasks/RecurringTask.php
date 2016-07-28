@@ -218,6 +218,7 @@ class RecurringTask
         $arTasksIds = [];
         foreach ($arTasks as $item)
         {
+            $item->isCreateRepeatTask = true;
             $taskID = $item->id;
             if(CrmTaskManager::cloneTask($item->id,true,$item))
                 $arTasksIds [] = $taskID;

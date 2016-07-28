@@ -140,7 +140,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         }catch (\Exception $e){
             $trans->rollBack();
             $bHasError = TRUE;
-            var_dump($e);
+            var_dump($e->getCode().' '.$e->getMessage());
         }
 
         return $this->log(!$bHasError);

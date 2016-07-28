@@ -160,8 +160,9 @@ class ExpenseSearch extends Expense
             ExpenseCategories::tableName().'.ignore_at_report',
         ]);
         $query->joinWith('currency');
+        $query->joinWith('legal');
         $query->joinWith('cat');
-        $query = $this->queryHelper($query,$params,$additionQuery=NULL);
+        $query = $this->queryHelper($query,$params,$additionQuery);
 
         if(!$this->bCountTotal)
             return [];

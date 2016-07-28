@@ -90,6 +90,7 @@ class CrmTask extends AbstractActiveRecord
         $arrFiles = [],
         $hourEstimate = '',
         $minutesEstimate = '';
+    public $isCreateRepeatTask = false;
 
     /**
      * @inheritdoc

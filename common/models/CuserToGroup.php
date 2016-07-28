@@ -72,22 +72,21 @@ class CuserToGroup extends AbstractActiveRecordWTB
         if(!empty($iGroup))     //if user have group
         {
             $query = CUser::find()  //find all user for user group
-                ->select([
-                    CUser::tableName().'id',
-                    CUser::tableName().'requisites_id',
-                    CUser::tableName().'type',
-                    CUser::tableName().'.archive',
-                    CuserToGroup::tableName().'group_id',
-                    CuserToGroup::tableName().'cuser_id',
-                    CUserRequisites::tableName().'id',
-                    CUserRequisites::tableName().'.id',
-                    CUserRequisites::tableName().'.type_id',
-                    CUserRequisites::tableName().'.j_lname',
-                    CUserRequisites::tableName().'.j_fname',
-                    CUserRequisites::tableName().'.j_mname'
-                ])
-                ->with('cmpGroup')
-                ->with('requisites')
+            ->select([
+                CUser::tableName().'.id',
+                CUser::tableName().'.requisites_id',
+                CUser::tableName().'.type',
+                CUser::tableName().'.archive',
+                CuserToGroup::tableName().'.group_id',
+                CuserToGroup::tableName().'.cuser_id',
+                CUserRequisites::tableName().'.id',
+                CUserRequisites::tableName().'.type_id',
+                CUserRequisites::tableName().'.j_lname',
+                CUserRequisites::tableName().'.j_fname',
+                CUserRequisites::tableName().'.j_mname'
+            ])
+                ->joinWith('cmpGroup')
+                ->joinWith('requisites')
                 ->where([
                     CuserToGroup::tableName().'.group_id' => $iGroup->group_id
                 ])

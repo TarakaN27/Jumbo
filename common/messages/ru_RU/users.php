@@ -267,6 +267,7 @@ return [
     'Partner detail' => 'Детали партнера',
     'Amount partner purse' => 'Сумма начисленных процентов',
     'Withdrawal partner purse' => 'Сумма выплаченных средств',
+    'Pending Amount' => 'Сумма в обработке',
     'Amount available partner purse' => 'Сумма доступных средств для вывода',
     'Partner purse' => 'Партнерский кошелёк',
     'View detail lead statistic' => 'Детальная статистика по лидам',
@@ -296,7 +297,7 @@ return [
     'Currency ID' => 'Валюта',
     'Partner request date' => 'Дата запроса',
     'Status new' => 'Новый',
-    'Status manager processed' => 'Обрабатывается менеджером',
+    'Status manager processed' => 'Обрабатывается бухгалтером',
     'Status done' => 'Завершен',
     'Created By' => 'Кто добавил',
     'Partner withdrawal request' => 'Запрос на вывод средств',
@@ -334,7 +335,9 @@ return [
     'Record Date' => 'Отчетный месяц',
     'Deduct tax at legal person' => 'Параметры вычета НДС',
     'Is Record' => 'Рекорд',
-    'Record Num' => 'Номер рекорда'
-
-
+    'Record Num' => 'Номер рекорда',
+    'Factual amount in base currency' => 'Фактическая сумма',
+    'Category expense not found' => 'Внимание! Не задана категория затрат для данной операции, не забудьте внести вручную в затраты данную операцию',
+    'Request processed in bookkeeping' => 'Запрос успешно передан в бухгалтерию',
+    
 ];

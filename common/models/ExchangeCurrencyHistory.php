@@ -146,13 +146,14 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
             ->where(['currency_id' => $arCurIds])
             ->andWhere(['between', 'date', $beginDate, $endDate])
             ->orderBy(['date' => SORT_ASC])
+            ->asArray()
             ->all();
 
         $arItems = ArrayHelper::index($arItems,'date',['currency_id']);
 
         foreach ($arItems as &$item)
             foreach ($item as &$it)
-                $it = (float)$it->rate_nbrb;
+                $it = (float)$it['rate_nbrb'];
 
         return $arItems;
     }

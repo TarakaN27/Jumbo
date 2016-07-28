@@ -95,6 +95,7 @@ class ActsDocumentsV2
         $this->getLegalPersonAndActTpl();
         $this->getCUserDetail();
         $this->getContractDetail();
+
         $this->getCurrencyUnits();
         $this->getServices();
         return $this->generatePDF();
@@ -121,7 +122,7 @@ class ActsDocumentsV2
 
         if(!$obLegalPerson)
             throw new NotFoundHttpException();
-        
+
         $this->legalPersonName = $obLegalPerson->name;
         $this->legalPersonBankDetail = $obLegalPerson->doc_requisites;
         $this->legalPersonAddress = $obLegalPerson->address;
@@ -138,9 +139,10 @@ class ActsDocumentsV2
             throw new NotFoundHttpException('template id not found');
 
         $this->obActTpl = ActsTemplate::findOne($obLegalPerson->act_tpl_id);
+        
         if(!$this->obActTpl || ($this->obActTpl && !file_exists($this->obActTpl->getFilePath())))
             throw new NotFoundHttpException('Template not found');
-        
+
         return $obLegalPerson;
     }
 
@@ -187,9 +189,11 @@ class ActsDocumentsV2
             $amountWithVat = $serv->amount;
             $vatRate = $this->bUseVat ? $this->vatRate : '';
             $amount = $this->bUseVat ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
-            $price = $amount/$serv->quantity;
+            $amount = round($amount/10000,2) * 10000;
+            $price = round($amount/$serv->quantity/10000, 2)*10000;
 
-            $vatAmount = $this->bUseVat ? $serv->amount-$amount: '';
+            $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
+
             $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat);
             $this->totalAmount+= $amount;
             if($this->bUseVat)

@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\grid\ActionColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PartnerWBookkeeperRequestSearch */
@@ -66,17 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'created_at:datetime',
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{pdf}',
-                            'buttons' => [
-                                'pdf' => function($url, $model, $key){
-                                    return Html::a('<i class="fa fa-file-pdf-o"></i>',$url,[
-                                        'target' => '_blank'
-                                    ]);
-                                }
-                            ]
-                        ],
-                        [
-                            'class' => 'yii\grid\ActionColumn',
                             'template' => '{process}',
                             'buttons' => [
                                 'process' => function($url, $model, $key){
@@ -91,6 +81,24 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{delete}',
+                            'buttons' => [
+                                'delete' => function($url, $model, $key){
+                                    if($model->status == \common\models\PartnerWBookkeeperRequest::STATUS_NEW) {
+                                        $options = [
+                                            'title' => Yii::t('yii', 'Delete'),
+                                            'aria-label' => Yii::t('yii', 'Delete'),
+                                            'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                            'data-method' => 'post',
+                                            'data-pjax' => '0',
+                                        ];
+                                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                                    }
+                                }
+                            ]
                         ],
                         /*
                         [

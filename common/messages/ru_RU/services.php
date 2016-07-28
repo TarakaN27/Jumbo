@@ -86,5 +86,8 @@ return [
     'Mailing address' => 'Почтовый адрес',
     'Telephone number' => 'Телефонный номер',
     'Document site' => 'Сайт для документов',
-    'Document email' => 'Емаил для документов'
+    'Document email' => 'Емаил для документов',
+    'Letter type OOO' => 'Шаблон письма для ООО',
+    'Letter type IP' => 'Шаблон письма для ИП',
+    'Letter template type' => 'Тип шаблона для отправки писем'
 ];

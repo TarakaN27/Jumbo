@@ -13,6 +13,7 @@ use common\models\Acts;
 use PhpAmqpLib\Message\AMQPMessage;
 use common\components\rabbitmq\Rabbit;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 
 class ActsLetterRabbitHandler extends AbstractRabbitHandler
 {
@@ -41,7 +42,10 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
         $toEmail = trim($params['toEmail']);
 
         /** @var Acts $obAct */
-        $obAct = Acts::find()->where(['id' => $iActId])->andWhere('sent is NULL OR sent = 0')->one();
+        $obAct = Acts::find()->where(['id' => $iActId])->with('legalPerson')->andWhere('sent is NULL OR sent = 0')->one();
+        $tmpType = ArrayHelper::getValue($obAct,'legalPerson.letter_tpl_type');
+        $tmpType = $tmpType > 0 ? '-'.$tmpType : '';
+
         if(!$obAct || !file_exists($obAct->getDocumentPath()))
         {
             $errorText = 'Ошибка отправки акта '.$iActId.' . Акт не найден или не существует pdf файл акта';
@@ -50,7 +54,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
             return TRUE;
         }
 
-        if(!$this->sendMail($toEmail,$obAct->getDocumentPath()))
+        if(!$this->sendMail($toEmail,$obAct->getDocumentPath(),$tmpType))
         {
             $errorText = 'Ошибка отправки акта '.$iActId.' . Не удалось отправить письмо';
             $this->addError($iBUSerId, $errorText);
@@ -77,13 +81,13 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
      * @param $documentPath
      * @return bool
      */
-    protected function sendMail($toEmail,$documentPath)
+    protected function sendMail($toEmail,$documentPath,$tplType = '')
     {
         try {
             return \Yii::$app->salesMailer->compose( // отправялем уведомление по ссылке
                     [                           //указывам шаблон
-                        'html' => 'actNotification-html',
-                        'text' => 'actNotification-text'
+                        'html' => 'actNotification-html'.$tplType,
+                        'text' => 'actNotification-text'.$tplType
                     ]
                 )
                 ->setFrom([\Yii::$app->params['salesEmail'] => \Yii::$app->params['salesName']])    //от кого уходит письмо

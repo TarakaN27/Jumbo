@@ -99,8 +99,8 @@ class CUserSearch extends CUser
 
         // сортировка по присоедененной таблице CuserQuantityHour
         $dataProvider->sort->attributes['quantityHour'] = [
-            'asc'=>[CuserQuantityHour::tableName().'.hours IS NULL ' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_ASC],
-            'desc'=>[CuserQuantityHour::tableName().'.hours IS NULL' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_DESC],
+            'asc'=>['ISNULL('.CuserQuantityHour::tableName().'.hours)' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_ASC],
+            'desc'=>['ISNULL('.CuserQuantityHour::tableName().'.hours)' => SORT_ASC,'('.CuserQuantityHour::tableName().'.hours - '.CuserQuantityHour::tableName().'.spent_time)'=>SORT_DESC],
         ];
 
         $this->load($params);

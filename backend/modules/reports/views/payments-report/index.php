@@ -96,7 +96,6 @@ $this->title = Yii::t('app/reports','Payments reports');
                                         <?=Html::label(Yii::t('app/reports','Documents'))?>
                                         <?=$form->field($model,'generateExcel')->checkbox();?>
                                         <?=$form->field($model,'generateExtendExcel')->checkbox();?>
-                                        <?=$form->field($model,'generateDocx')->checkbox();?>
                                         <hr/>
                                     <?php endif;?>
                                     <?=Html::label(Yii::t('app/reports','Addition settings'))?>
@@ -131,15 +130,6 @@ $this->title = Yii::t('app/reports','Payments reports');
                             <?php if(!empty($arData['excelExtendLink'])):?>
                                 <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get extended excel report'),[
                                     '/site/get-document','name' => $arData['excelExtendLink'],'hidfold' => 'reports'],
-                                    [
-                                        'target' => '_blank',
-                                        'class' => "btn btn-default"
-                                    ]
-                                )?>
-                            <?php endif;?>
-                            <?php if(!empty($arData['docxLink'])):?>
-                                <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get docx report'),[
-                                    '/site/get-document','name' => $arData['docxLink'],'hidfold' => 'reports'],
                                     [
                                         'target' => '_blank',
                                         'class' => "btn btn-default"

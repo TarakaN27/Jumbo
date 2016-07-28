@@ -19,7 +19,7 @@ use yii\helpers\Html;
                 <div class="row">
                     <div class = "col-md-6 col-sm-6 col-xs-12 ">
                         <div class = "col-md-4 col-sm-4 col-xs-12">
-                            <?php $form = ActiveForm::begin([]);?>
+                            <?php $form = ActiveForm::begin(['method'=>'GET']);?>
                             <?=$form->field($model,'beginDate')->widget(\kartik\date\DatePicker::className(),[
                                 'options' => [
                                     'class' => 'form-control'

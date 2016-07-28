@@ -114,14 +114,7 @@ $this->title = Yii::t('app/users','Partner withdrawal request');
                                                             'class' => 'amounts form-control'
                                                         ]);?>
                                                     </div>
-                                                    <div class="col-sm-4">
-                                                        <?= $form->field($model, "[{$i}]legalPerson")->dropDownList(
-                                                            LegalPerson::getLegalPersonMap(),
-                                                            [
-                                                                'prompt' => Yii::t('app/users','Choose legal person')
-                                                            ]
-                                                        ) ?>
-                                                    </div>
+                                                    
                                                     <div class="col-sm-4">
                                                         <?= $form->field($model, "[{$i}]contractor")->dropDownList(
                                                             $arContractor,

@@ -232,16 +232,16 @@ if(Yii::$app->user->can('adminRights'))
             <th class="width-4-percent"><?=Yii::t('app/reports','Condition currency')?></th>
         </tr>
         <?php
-        foreach($data as $dt): $cuser=$dt->cuser;?>
+        foreach($data as $dt): ?>
         <tr>
             <td class="width-4-percent">    <?=\yii\helpers\Html::a(
-                    $dt->id,
-                    ['/bookkeeping/default/view','id' => $dt->id],
+                    $dt['id'],
+                    ['/bookkeeping/default/view','id' => $dt['id']],
                     ['target' => '_blank']
                 );?></td>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_CONTRACTOR):?>
             <td class="width-16-percent">
-                    <?=is_object($cuser) ? $cuser->getInfo() : 'N/A';?>
+                    <?=($dt['full_corp_name'] ? $dt['full_corp_name'] : 'N/A');?>
             </td>
             <?php endif;?>
 
@@ -251,7 +251,7 @@ if(Yii::$app->user->can('adminRights'))
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_CONTRACTOR
             ):?>
             <td class="width-8-percent">
-                    <?=is_object($req = $dt->payRequest)&&is_object($obMan = $req->manager) ? $obMan->getFio() : 'N/A';?>
+                    <?=($dt['manager_name']  ? $dt['manager_name'] : 'N/A');?>
             </td>
             <?php endif;?>
             <?php if(
@@ -260,43 +260,43 @@ if(Yii::$app->user->can('adminRights'))
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_CONTRACTOR
             ):?>
                 <td class="width-8-percent">
-                    <?=Yii::$app->formatter->asDate($dt->pay_date)?>
+                    <?=Yii::$app->formatter->asDate($dt['pay_date'])?>
                 </td>
             <?php endif;?>
             <td class="width-8-percent">
-                     <?=is_object($lp=$dt->legal) ? $lp->name : 'N/A';?>
+                     <?=($dt['legal_name'] ? $dt['legal_name'] : 'N/A');?>
             </td>
             <?php if($modelForm->groupType != PaymentsReportForm::GROUP_BY_SERVICE):?>
             <td class="<?php if($isAdmin):?>width-8-percent<?php else:?>width-12-percent <?php endif;?>">
-                     <?=is_object($serv=$dt->service) ? $serv->name : 'N/A';?>
+                     <?=($dt['service_name'] ? $dt['service_name'] : 'N/A');?>
             </td>
             <?php endif;?>
             <td class="width-8-percent">
-                    <?=\yii\helpers\Html::a(Yii::$app->formatter->asDecimal($dt->pay_summ),
-                        ['/bookkeeping/default/view','id' => $dt->id],
+                    <?=\yii\helpers\Html::a(Yii::$app->formatter->asDecimal($dt['pay_summ']),
+                        ['/bookkeeping/default/view','id' => $dt['id']],
                         ['target' =>'_blank']
                         );?>
             </td>
-            <td class="width-4-percent">    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
+            <td class="width-4-percent">    <?=($dt['code']?$dt['code'] : 'N/A');?></td>
             <td class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>">
-                    <?=isset($model['currency'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt->id],4) : 'N/A'?>
+                    <?=isset($model['currency'][$dt['id']]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt['id']]) : 'N/A'?>
             </td>
             <?php if(Yii::$app->user->can('adminRights')):?>
             <td class="width-8-percent">
-                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->profit) : 'N/A';?>
+                    <?=($dt['profit'] ? Yii::$app->formatter->asDecimal($dt['profit']) : 'N/A');?>
             </td>
             <td class="width-8-percent">
-                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->production) : 'N/A';?>
+                    <?=($dt['production']) ? Yii::$app->formatter->asDecimal($dt['production']) : 'N/A';?>
             </td>
             <td class="width-8-percent">
-                    <?=is_object($calc=$dt->calculate) ? Yii::$app->formatter->asDecimal($calc->tax) : 'N/A';?>
+                    <?=($dt['tax']) ? Yii::$app->formatter->asDecimal($dt['tax']) : 'N/A';?>
             </td>
             <?php endif;?>
             <td class="<?php if($isAdmin):?>width-12-percent<?php else:?>width-16-percent <?php endif;?>">
-                    <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
+                    <?=($dt['pay_cond_name']? $dt['pay_cond_name'] : 'N/A');?>
             </td>
             <td class="width-4-percent">
-                    <?=isset($model['condCurr'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt->id],4) : 'N/A';?>
+                    <?=isset($model['condCurr'][$dt['id']]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt['id']]) : 'N/A';?>
             </td>
         </tr>
         <?php endforeach;?>

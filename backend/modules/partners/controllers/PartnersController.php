@@ -260,10 +260,7 @@ class PartnersController extends AbstractBaseBackendController
         $model = new PartnerDetailLeadsForm(['obPartner' => $obPartner]);
 
         $data = [];
-        if($model->load(Yii::$app->request->post()) && $model->validate())
-        {
-            $data = $model->makeRequest();
-        }
+        $data = $model->makeRequest();
 
         return $this->render('view-lead-detail',[
             'model' => $model,

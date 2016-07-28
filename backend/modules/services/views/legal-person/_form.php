@@ -44,6 +44,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'act_tpl_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap())?>
 
+    <?= $form->field($model, 'letter_tpl_type')->dropDownList(\common\models\LegalPerson::getLetterTplTypeMap())?>
+
     <?= $form->field($model, 'status')->dropDownList(\common\models\LegalPerson::getStatusArr()) ?>
     <div class="form-group">
         <div class = "col-md-9 col-sm-9 col-xs-12 col-md-offset-3">

@@ -70,11 +70,15 @@ class ActsController extends AbstractBaseBackendController
         $searchModel = new ActsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $iTotal = $searchModel->countTotal(Yii::$app->request->queryParams);
+        $cuserDesc = '';
+        if($searchModel->cuser_id)
+            $cuserDesc = CUser::getCuserInfoById($searchModel->cuser_id);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'iTotal' => $iTotal
+            'iTotal' => $iTotal,
+            'cuserDesc' =>$cuserDesc
         ]);
     }
 

@@ -13,6 +13,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\modules\reports\forms\PaymentsReportForm;
 use yii\filters\AccessControl;
 use common\models\CUser;
+use Yii;
 
 class PaymentsReportController extends AbstractBaseBackendController{
 
@@ -41,8 +42,12 @@ class PaymentsReportController extends AbstractBaseBackendController{
      */
     public function actionIndex()
     {
+        if(Yii::$app->user->id == 12) {
+            echo 'Доступ запрещен';
+            return die;
+        }
+        
         $model = new PaymentsReportForm();
-        $arContractorMap = [];
         if(!\Yii::$app->user->can('adminRights'))
         {
             $model->managers = [\Yii::$app->user->id];
@@ -50,7 +55,6 @@ class PaymentsReportController extends AbstractBaseBackendController{
         }else{
             $arContractorMap = CUser::getContractorMap();
         }
-        
         $arData = [];
         if($model->load(\Yii::$app->request->post()) && $model->validate())
         {

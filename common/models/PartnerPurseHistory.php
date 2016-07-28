@@ -108,4 +108,14 @@ class PartnerPurseHistory extends AbstractActiveRecord
     {
         return $this->hasOne(Payments::className(), ['id' => 'payment_id']);
     }
+
+    public static function getTotalIncomingByCUserId($id){
+        $totalIncoming= static::find()->select(['total'=>'SUM(amount)'])->where(['cuser_id'=>$id, 'type'=>static::TYPE_INCOMING])->asArray()->one();
+        return $totalIncoming['total'];
+    }
+
+    public static function getTotalExpenseByCUserId($id){
+        $totalIncoming= static::find()->select(['total'=>'SUM(amount)'])->where(['cuser_id'=>$id, 'type'=>static::TYPE_EXPENSE])->asArray()->one();
+        return $totalIncoming['total'];
+    }
 }
