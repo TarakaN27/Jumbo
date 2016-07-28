@@ -62,7 +62,9 @@ class ExchangeRatesSearch extends ExchangeRates
         }
         $nbrb_rate = str_replace(",", ".", $this->nbrb_rate);
         if($this->nbrb_rate_old) {
-            $nbrb_rate_old = $this->nbrb_rate_old/10000;
+            $query->andFilterWhere([
+                'nbrb_rate' => $this->nbrb_rate_old/10000,
+            ]);
         }
         $query->andFilterWhere([
             'id' => $this->id,
@@ -74,10 +76,7 @@ class ExchangeRatesSearch extends ExchangeRates
             'updated_at' => $this->updated_at,
             'show_at_widget' => $this->show_at_widget
         ]);
-        $query->andFilterWhere([
-            'nbrb_rate' => $this->nbrb_rate_old,
 
-        ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'code', $this->code]);
