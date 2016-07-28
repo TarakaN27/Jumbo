@@ -27,16 +27,14 @@ $this->registerJs("
     $('#paymentcondition-type').on('click','input',initFieldsByType);
     
     $('#paymentcondition-summ_from,#paymentcondition-summ_to,#paymentcondition-corr_factor,#paymentcondition-commission,#paymentcondition-sale,#paymentcondition-tax').on('change',function(){
-        amountFormatter(this);
+        amountFormatter(this,4);
     });
-    amountFormatter('#paymentcondition-summ_from');
-    amountFormatter('#paymentcondition-summ_to');
-    amountFormatter('#paymentcondition-corr_factor');
-    
-    amountFormatter('#paymentcondition-commission');
-    amountFormatter('#paymentcondition-sale');
-    amountFormatter('#paymentcondition-tax');
-    
+    amountFormatter('#paymentcondition-summ_from',4);
+    amountFormatter('#paymentcondition-summ_to',4);
+    amountFormatter('#paymentcondition-corr_factor',4);    
+    amountFormatter('#paymentcondition-commission',4);
+    amountFormatter('#paymentcondition-sale',4);
+    amountFormatter('#paymentcondition-tax',4);        
 ",\yii\web\View::POS_READY);
 ?>
 

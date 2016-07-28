@@ -14,12 +14,19 @@ use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\partners\PartnerPercentCounting;
 use console\components\AbstractConsoleController;
 use yii\console\Controller;
+use common\components\crunchs\denomination\Denomination;
 
 class RecalculateController extends AbstractConsoleController
 {
     /**
      * @return int
      */
+    public function actionDenomination(){
+        $denomination = new Denomination();
+        $denomination->run();
+
+    }
+
     public function actionQuantityHours()
     {
         $obQantity = new RecalcQuantityHours();

@@ -28,11 +28,11 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     public function __construct($codeID = NULL,$time = NULL)
     {
         $this->time = is_null($time) ? time() : $time;
-        
         if(!CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016',$this->time) && $codeID == self::BYN_IN_CBR_CODE)
         {
             $this->codeID = self::BYR_IN_CBR_CODE;
-        }
+        }else
+            $this->codeID = $codeID;
         $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $this->time) . '/' . date('m', $this->time) . '/' . date('Y', $this->time);
     }
 
@@ -43,7 +43,6 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     {
         try{
             $sxml = $this->loadFile();
-
             if(!is_object($sxml)) {
                 return NULL;
             }

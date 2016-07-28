@@ -106,7 +106,7 @@ var
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Production'),
-                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYR'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
+                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYN'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Description'),

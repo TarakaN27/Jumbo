@@ -424,6 +424,7 @@ function changeServiceAmount(){
 
     fullAMountContainer.val(convertAmountToInvalid(fullAmount));
     $(this).attr('old-amount',newAmount);
+    $(fullAMountContainer).trigger('change');
 }
 /**
  *

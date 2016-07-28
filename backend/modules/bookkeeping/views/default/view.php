@@ -82,17 +82,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?=DetailView::widget([
                         'model' => $obDetail,
                         'attributes' => [
-                            'profit',
-                            'production',
-                            'tax',
+                            'profit:decimal',
+                            'production:decimal',
+                            'tax:decimal',
                             [
                                 'attribute' => 'pay_cond_id',
                                 'value' => is_object($obCond = $obDetail->payCond) ? $obCond->name : 'N/A'
                             ],
-                            'cnd_tax',
-                            'cnd_sale',
-                            'cnd_commission',
-                            'cnd_corr_factor',
+                            'cnd_tax:decimal',
+                            'cnd_sale:decimal',
+                            'cnd_commission:decimal',
+                            'cnd_corr_factor:decimal',
                             [
                                 'attribute' => 'created_at',
                                 'value' => Yii::$app->formatter->asDatetime($obDetail->created_at)

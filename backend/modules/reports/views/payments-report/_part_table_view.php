@@ -279,7 +279,7 @@ if(Yii::$app->user->can('adminRights'))
             </td>
             <td class="width-4-percent">    <?=is_object($curr = $dt->currency) ? $curr->code : 'N/A';?></td>
             <td class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>">
-                    <?=isset($model['currency'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt->id]) : 'N/A'?>
+                    <?=isset($model['currency'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt->id],4) : 'N/A'?>
             </td>
             <?php if(Yii::$app->user->can('adminRights')):?>
             <td class="width-8-percent">
@@ -296,7 +296,7 @@ if(Yii::$app->user->can('adminRights'))
                     <?=is_object($calc=$dt->calculate) ? (is_object($cond = $calc->payCond) ? $cond->name : 'N/A') : 'N/A';?>
             </td>
             <td class="width-4-percent">
-                    <?=isset($model['condCurr'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt->id]) : 'N/A';?>
+                    <?=isset($model['condCurr'][$dt->id]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt->id],4) : 'N/A';?>
             </td>
         </tr>
         <?php endforeach;?>

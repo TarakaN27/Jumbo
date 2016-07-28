@@ -38,6 +38,11 @@ $(function(){
     });
     checkResident();
     $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResident);
-    $("#paymentrequest-pay_summ").on('change',function(){amountFormatter(this);});
+    $("#paymentrequest-pay_summ").on('change',function(){
+        amountFormatter(this);
+        var amount = convertAmountToValid($(this).val());
+        $(this).siblings('.amountInfo').remove();
+        $(this).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+    });
     amountFormatter('#paymentrequest-pay_summ');
 });

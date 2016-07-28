@@ -52,17 +52,34 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'is_resident',
                             'value' => $model->getYesNoStr($model->is_resident)
                         ],
-                        'summ_from',
-                        'summ_to',
+                        [
+                            'attribute' => 'summ_from',
+                            'format'=>['decimal',4]
+                        ],
+                        [
+                            'attribute' => 'summ_to',
+                            'format'=>['decimal',4]
+                        ],
                         [
                             'attribute' => 'caurrency_id',
                             'value' => is_object($obCurr = $model->currency) ? $obCurr->code : 'N/A'
                         ],
-                        'corr_factor',
-                        'commission',
-                        'sale',
-                        'tax',
-
+                        [
+                            'attribute' => 'corr_factor',
+                            'format'=>['decimal',4]
+                        ],
+                        [
+                            'attribute' => 'commission',
+                            'format'=>['decimal',4]
+                        ],
+                        [
+                            'attribute' => 'sale',
+                            'format'=>['decimal',4]
+                        ],
+                        [
+                            'attribute' => 'tax',
+                            'format'=>['decimal',4]
+                        ],
                         [
                             'attribute' => 'created_at',
                             'value' => Yii::$app->formatter->asDatetime($model->created_at)

@@ -31,6 +31,9 @@ $(function(){
     "use strict";
     $('#partnerwithdrawalrequest-amount').on('change',function(){
        amountFormatter(this);
+        var amount = convertAmountToValid($(this).val());
+        $(this).siblings('.amountInfo').remove();
+        $(this).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
     });
     amountFormatter('#partnerwithdrawalrequest-amount');
 });

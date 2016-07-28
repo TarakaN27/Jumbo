@@ -38,7 +38,8 @@ class AppAsset extends AssetBundle
         'js/notify/pnotify.buttons.js',
         'js/notify/pnotify.nonblock.js',
         'js/wm_app/custom_notify.js',
-        'js/craftpip-jquery-confirm/js/jquery-confirm.js'
+        'js/craftpip-jquery-confirm/js/jquery-confirm.js',
+        'js/accounting/accounting.min.js',
         //'js/jquery-confirm/jquery.confirm.min.js'
         //'js/tooltips/toltips.js'
         //'js/socket_io/socket.io.js',

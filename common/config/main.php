@@ -45,7 +45,8 @@ return [
             'thousandSeparator' => ' ',
             'decimalSeparator' => ',',
             'timeZone' => 'Europe/Minsk',
-            'defaultTimeZone' => 'Europe/Minsk'
+            'defaultTimeZone' => 'Europe/Minsk',
+            'decimalSeparator'=>','
         ],
     ],
 ];

@@ -4,6 +4,7 @@ use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use common\components\helpers\CustomViewHelper;
+
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payment_create_request.js',$this,['accounting']);

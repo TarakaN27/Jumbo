@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'use_vat',
                             'value' => $model->getYesNoStr($model->use_vat)
                         ],
-                        'vat_rate',
+                        'vat_rate:decimal',
                         'description:ntext',
                         'object_text:ntext',
                         'offer_contract',
