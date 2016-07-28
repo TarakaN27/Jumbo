@@ -74,6 +74,8 @@ function checkboxPaymentProcessed() {
     }else{
         addServiceBlock(this);
     }
+    $("#actform-famount").trigger('change');
+    $('.serv-amount').trigger('change');
 
     return false;
 }
@@ -190,7 +192,9 @@ function changeCurrencyField() {
     if (id != undefined && id != 0 && id != '') {
         fillServices();
     }
-    showByrInfo('#actform-famount');
+    $('#actform-famount').trigger('change');
+    $('.serv-amount').trigger('change');
+
 }
 /**
  * Очистка значений услуг и неявных платежей
