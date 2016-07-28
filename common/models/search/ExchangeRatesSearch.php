@@ -75,7 +75,7 @@ class ExchangeRatesSearch extends ExchangeRates
             'show_at_widget' => $this->show_at_widget
         ]);
         $query->andFilterWhere([
-            'nbrb_rate' => $nbrb_rate_old,
+            'nbrb_rate' => $this->nbrb_rate_old,
 
         ]);
 
