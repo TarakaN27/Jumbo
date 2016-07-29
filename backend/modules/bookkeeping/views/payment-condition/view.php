@@ -66,19 +66,19 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'corr_factor',
-                            'format'=>['decimal',4]
+                            'format'=>['decimal',10]
                         ],
                         [
                             'attribute' => 'commission',
-                            'format'=>['decimal',4]
+                            'format'=>['decimal',10]
                         ],
                         [
                             'attribute' => 'sale',
-                            'format'=>['decimal',4]
+                            'format'=>['decimal',10]
                         ],
                         [
                             'attribute' => 'tax',
-                            'format'=>['decimal',4]
+                            'format'=>['decimal',10]
                         ],
                         [
                             'attribute' => 'created_at',

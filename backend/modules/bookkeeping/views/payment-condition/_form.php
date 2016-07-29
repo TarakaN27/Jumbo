@@ -31,10 +31,10 @@ $this->registerJs("
     });
     amountFormatter('#paymentcondition-summ_from',4);
     amountFormatter('#paymentcondition-summ_to',4);
-    amountFormatter('#paymentcondition-corr_factor',4);    
-    amountFormatter('#paymentcondition-commission',4);
-    amountFormatter('#paymentcondition-sale',4);
-    amountFormatter('#paymentcondition-tax',4);        
+    amountFormatter('#paymentcondition-corr_factor',10);    
+    amountFormatter('#paymentcondition-commission',10);
+    amountFormatter('#paymentcondition-sale',10);
+    amountFormatter('#paymentcondition-tax',10);        
 ",\yii\web\View::POS_READY);
 ?>
 
