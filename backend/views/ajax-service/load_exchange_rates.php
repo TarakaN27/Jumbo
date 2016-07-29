@@ -16,14 +16,14 @@
 		[
 			'label' => Yii::t('app/common','Rate BYN'),
 			'value' => function($model){
-				return $model->nbrb_rate;
+				return Yii::$app->formatter->asDecimal($model->nbrb_rate, 4);
 			}
 		],
 		[
 			'attribute' => 'nbrb_rate',
 			'label' => Yii::t('app/common','Rate BYR'),
 			'value' => function($model){
-				return round((float)$model->nbrb_rate*10000);
+				return Yii::$app->formatter->asDecimal(round((float)$model->nbrb_rate*10000),0);
 			}
 		],
 	]

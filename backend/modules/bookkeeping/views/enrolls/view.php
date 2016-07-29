@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'model' => $model,
                             'attributes' => [
                                 'id',
-                                'amount',
+                                'amount:decimal',
                                 'repay:decimal',
                                 'enroll:decimal',
                                 'enr_req_id:decimal',
