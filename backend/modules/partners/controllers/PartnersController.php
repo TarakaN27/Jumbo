@@ -10,6 +10,7 @@ namespace backend\modules\partners\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\modules\partners\models\Partner;
 use backend\modules\partners\models\PartnerAllowForm;
 use backend\modules\partners\models\PartnerDetailLeadsForm;
 use backend\modules\partners\models\PartnerMultiLInkForm;
@@ -60,7 +61,7 @@ class PartnersController extends AbstractBaseBackendController
      */
     public function actionIndex()
     {
-        $searchModel = new CUserSearch();
+        $searchModel = new Partner();
         $dataProvider = $searchModel->searchPartners(Yii::$app->request->queryParams);
 
         return $this->render('index',[

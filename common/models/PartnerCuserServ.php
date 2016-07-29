@@ -7,7 +7,7 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
-
+use common\models\Payments;
 /**
  * This is the model class for table "{{%partner_cuser_serv}}".
  *
@@ -107,6 +107,11 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function getPartner()
     {
         return $this->hasOne(CUser::className(), ['id' => 'partner_id']);
+    }
+
+    public function getPartnerPayments()
+    {
+        return $this->hasOne(Payments::className(), ['cuser_id' => 'cuser_id', 'service_id'=>'service_id']);
     }
 
     /**
