@@ -153,8 +153,6 @@ class BillsManager extends Bills{
             $contractorEmail = $obR->c_email;
             $contractorSite = $obR->site;
         }
-
-
         $arFields = [];
         $billVatRate  =  "Без НДС";
         $billVatSumm  =  "Без НДС";
@@ -176,7 +174,8 @@ class BillsManager extends Bills{
                 {
                     $service->amount = round((float)$service->amount,2);
                     $price = round(round((float)$service->amount,2)/(1+CustomHelper::getVat()/100),2);
-                    $vatAmount = (float)$service->amount - $price;
+                    $vatAmount = round($price*CustomHelper::getVat()/100,2);
+                    $service->amount = $price + $vatAmount;
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
@@ -219,22 +218,23 @@ class BillsManager extends Bills{
             if($this->use_vat)
             {
                 $billTotalSumVat = $this->amount;
+                $price = $sum = rount($this->amountHelperFormat($this->amount/(1+CustomHelper::getVat()/100)),2);
+                $vatAmount = $price * CustomHelper::getVat()/100;
+                $totalSum = $price + $vatAmount;
                 $arFields [] = [
                     'colNum' => 1,
                     'billSubject' => $this->object_text,
-                    'billPrice' => $this->amountHelperFormat($this->amount/(1+CustomHelper::getVat()/100)),
-                    'billSumm' => $this->amountHelperFormat($this->amount/(1+CustomHelper::getVat()/100)),
-                    'billVatSumm' => $this->amountHelperFormat($this->amount - round($this->amount/(1+CustomHelper::getVat()/100))),
-                    'totalSummVat' => $this->amountHelperFormat($this->amount),
+                    'billPrice' => $this->amountHelperFormat($price),
+                    'billSumm' => $this->amountHelperFormat($sum),
+                    'billVatSumm' => $this->amountHelperFormat($vatAmount),
+                    'totalSummVat' => $this->amountHelperFormat($totalSum),
                     'billVatRate' => CustomHelper::getVat(),
-                    'billTotalSumVat' => $this->amountHelperFormat($this->amount)
+                    'billTotalSumVat' => $this->amountHelperFormat($totalSum)
                 ];
-                $price = $this->amount/(1+CustomHelper::getVat()/100);
-                $vatAmount = $this->amount - round($this->amount/(1+CustomHelper::getVat()/100));
-                $totalSumm=$price  ;
+                $totalSumm=$price;
                 $billTotalVat = $vatAmount ;
-                $totalSummVat = $this->amount;
-                $billTotalSumVat = $this->amount;
+                $totalSummVat = $totalSum;
+                $billTotalSumVat = $totalSum;
             }else{
                 $billTotalSumVat = $this->amount;
                 $totalSummVat = $this->amount;
@@ -263,7 +263,7 @@ class BillsManager extends Bills{
         */
         $totalSummInWords =
             CustomHelper::num2str($billTotalSumVat);
-
+        
         $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
         try{
 
