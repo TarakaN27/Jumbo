@@ -174,9 +174,9 @@ class BillsManager extends Bills{
                 /** @var BillServices $service */
                 foreach ($arServices as $service)
                 {
-                    $price = round((float)$service->amount/(1+CustomHelper::getVat()/100),2);
+                    $service->amount = round((float)$service->amount,2);
+                    $price = round(round((float)$service->amount,2)/(1+CustomHelper::getVat()/100),2);
                     $vatAmount = (float)$service->amount - $price;
-
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
@@ -197,6 +197,7 @@ class BillsManager extends Bills{
             }else{
                 foreach ($arServices as $service)
                 {
+
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
@@ -214,6 +215,7 @@ class BillsManager extends Bills{
                 }
             }
         }else{
+            $this->amount = round((float)$this->amount,2);
             if($this->use_vat)
             {
                 $billTotalSumVat = $this->amount;
@@ -259,7 +261,6 @@ class BillsManager extends Bills{
                 CustomHelper::ciRub((int)$billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
         */
-
         $totalSummInWords =
             CustomHelper::num2str($billTotalSumVat);
 
