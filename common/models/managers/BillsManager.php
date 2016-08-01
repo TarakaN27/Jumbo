@@ -174,7 +174,7 @@ class BillsManager extends Bills{
                 /** @var BillServices $service */
                 foreach ($arServices as $service)
                 {
-                    $price = round((float)$service->amount/(1+CustomHelper::getVat()/100));
+                    $price = round((float)$service->amount/(1+CustomHelper::getVat()/100),2);
                     $vatAmount = (float)$service->amount - $price;
 
                     $arFields [] = [
@@ -264,7 +264,6 @@ class BillsManager extends Bills{
             CustomHelper::num2str($billTotalSumVat);
 
         $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
-
         try{
 
             $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
