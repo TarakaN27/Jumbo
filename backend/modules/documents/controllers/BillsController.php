@@ -115,7 +115,7 @@ class BillsController extends AbstractBaseBackendController
     {
         $model = new BillForm();
         $model->sBayTarget = Yii::t('app/documents','DefaultBuytarget');
-        if($model->load(Yii::$app->request->post()))
+        if($model->load(Yii::$app->request->post()) && $model->validate())
         {
             if($billId = $model->makeRequest())
             {

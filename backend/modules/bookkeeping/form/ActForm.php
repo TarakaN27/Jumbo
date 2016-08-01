@@ -11,6 +11,7 @@ namespace backend\modules\bookkeeping\form;
 
 use common\components\acts\ActsDocumentsV2;
 use common\components\behavior\UploadBehavior;
+use common\components\customComponents\validation\ValidNumber;
 use common\components\helpers\CustomHelper;
 use common\models\ActImplicitPayment;
 use common\models\Acts;
@@ -56,6 +57,8 @@ class ActForm extends Model
     public function rules()
     {
         return [
+            ['fAmount',ValidNumber::className()],
+            [['arServAmount','arHidePayments'],'each','rule' => [ValidNumber::className()]],
             [[
                 'iCUser','iLegalPerson','iCurr',
                 'iActNumber','actDate','sContractNumber',
@@ -67,7 +70,7 @@ class ActForm extends Model
             ['fCustomFileAct','file','on' => ['insert'],'when' => function($model) {
                 return $model->bCustomAct;
             }],
-            ['fAmount','number'],
+            ['fAmount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['arServAmount','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments'],'safe']
         ];
     }
@@ -193,6 +196,8 @@ class ActForm extends Model
             return FALSE;
         }
     }
+    
+    
 
     /**
      * @return null

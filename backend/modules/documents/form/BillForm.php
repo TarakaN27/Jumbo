@@ -8,14 +8,13 @@
 
 namespace backend\modules\documents\form;
 
-
+use common\components\customComponents\validation\ValidNumber;
 use common\models\AbstractActiveRecord;
 use common\models\Bills;
 use common\models\BillServices;
 use yii\base\InvalidParamException;
 use yii\base\Model;
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class BillForm extends Model
@@ -46,6 +45,8 @@ class BillForm extends Model
     {
         return [
             [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sOfferContract','fAmount'],'required'],
+            [['fAmount'],ValidNumber::className()],
+            ['arServAmount','each','rule' => [ValidNumber::className()]],
             [['bUseTax'],'integer'],
             ['sDescription','trim'],
             [['bTaxRate'],'required',
@@ -57,7 +58,7 @@ class BillForm extends Model
                 }"
             ],
             [['arServices','arServAmount','arServTitle','arServDesc','arServContract','arServTpl','arServOrder'],'safe'],
-            [['fAmount'],'number','min' => 1]
+            [['fAmount'],'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
         ];
     }
 

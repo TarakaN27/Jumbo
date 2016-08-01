@@ -35,9 +35,9 @@ abstract class AbstractExchangeRates {
     {
         if(CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016',$time))
         {
-            return $rate*self::CORRECTION_FACTOR;
-        }else{
             return $rate;
+        }else{
+            return round($rate/self::CORRECTION_FACTOR);
         }
     }
 

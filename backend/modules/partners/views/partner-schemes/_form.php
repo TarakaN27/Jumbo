@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $this->registerJsFile('@web/js/parts/partner_schemes.js',[
     'depends' => [
         'yii\web\JqueryAsset',
@@ -110,32 +112,32 @@ $this->registerJsFile('@web/js/parts/partner_schemes.js',[
                                         <td>
                                             <?php
                                                 $value = isset($item['left']) ? $item['left'] : NULL;
-                                                echo Html::textInput('range['.$servID.']['.$key.'][left]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][left]',$value,['class' => 'form-control rangeClass']);
                                             ?>
                                         </td>
                                         <td>
                                             <?php
                                                 $value = isset($item['right']) ? $item['right'] : NULL;
-                                                echo Html::textInput('range['.$servID.']['.$key.'][right]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][right]',$value,['class' => 'form-control rangeClass']);
                                             ?>
                                         </td>
                                         <td>
                                             <?php
                                                 $value = isset($item['percent']) ? $item['percent'] : NULL;
-                                                echo Html::textInput('range['.$servID.']['.$key.'][percent]',$value,['class' => 'form-control']);
+                                                echo Html::textInput('range['.$servID.']['.$key.'][percent]',$value,['class' => 'form-control rangeClass']);
                                             ?>
                                         </td>
                                     </tr>
                                     <?php endforeach;else:?>
                                             <tr class="" data-col="0">
                                                 <td>
-                                                    <?=Html::textInput('range['.$servID.'][0][left]', NULL,['class' => 'form-control']);?>
+                                                    <?=Html::textInput('range['.$servID.'][0][left]', NULL,['class' => 'form-control rangeClass']);?>
                                                 </td>
                                                 <td>
-                                                    <?=Html::textInput('range['.$servID.'][0][right]',NULL,['class' => 'form-control']);?>
+                                                    <?=Html::textInput('range['.$servID.'][0][right]',NULL,['class' => 'form-control rangeClass']);?>
                                                 </td>
                                                 <td>
-                                                    <?=Html::textInput('range['.$servID.'][0][percent]',NULL,['class' => 'form-control']);?>
+                                                    <?=Html::textInput('range['.$servID.'][0][percent]',NULL,['class' => 'form-control rangeClass']);?>
                                                 </td>
                                             </tr>
                                     <?php endif;?>

@@ -4,197 +4,37 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
 use kartik\select2\Select2;
+use common\components\helpers\CustomViewHelper;
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\Payments */
 /* @var $form yii\widgets\ActiveForm */
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
-$this->registerJsFile('@web/js/wm_app/helpers.js',[
-        'depends' => [
-            'yii\web\YiiAsset',
-            'yii\bootstrap\BootstrapAsset'
-        ],
-    ]
-);
-$this->registerJsFile('@web/js/php_functions/strtotime.js',[
-    'position' => \yii\web\View::POS_HEAD
-]);
-$this->registerJs('
-
-function condTypeAction()
-{
-    var
-        condTypes = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap()).'
-        condID = $("#payments-condition_id").val();
-
-    if(condTypes[condID] == '.\common\models\PaymentCondition::TYPE_CUSTOM.')
-        {
-            $("#payments-customprod").removeAttr("disabled");
-        }else{
-            $("#payments-customprod").val("");
-            $("#payments-customprod").attr("disabled","disabled");
-        }
-}
+CustomViewHelper::registerJsFileWithDependency('@web/js/wm_app/helpers.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/update_payment.js',$this,['accounting']);
+$this->registerJsFile('@web/js/php_functions/strtotime.js',['position' => \yii\web\View::POS_HEAD]);
+$this->registerJs("
+var
+    arCondTypes = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionTypeMap()).'
+    urlFindCondition = '".Url::to(['find-condition'])."',
+    urlBoundsCheckingConditions = '".Url::to(['/bookkeeping/payment-request/bounds-checking-conditions'])."',
+    urlGetCondition = '".Url::to(['get-conditions'])."',
+    titleCondFind = '".Yii::t('app/book','Condition request')."',
+    errorCondFind = '".Yii::t('app/book','Server error')."',
+    addPErrorTextServerErr = '".Yii::t('app/book','Server error')."',
+    titleBoundsCheck = '".Yii::t('app/book','Bounds checking conditions request')."',
+    errorBoundsCheck = '".Yii::t('app/book','Bounds checking conditions FAIL')."',
+    conditions = ".\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$model->pay_date))).",
+    keys = ".\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).",
+    arCondIdVisible = ".\yii\helpers\Json::encode($arCondVisible)."
+    ;
 
 
-function findCondition()
-{
-    var
-       iServ = $("#payments-service_id").val(),
-       iCuser = $("#payments-cuser_id").val(),
-       amount = $("#payments-pay_summ").val(),
-       iCurr = $("#payments-currency_id").val(),
-       payDate = $("#payments-pay_date").val(),
-       iLP = $("#payments-legal_id").val(),
-       condContainer = $(".field-payments-condition_id");
-
-    if(iServ == "" || iLP == "" || iCuser == "")
-    {
-        $("#payments-condition_id").val("");
-        return false;
-    }
-    
-    let
-            preloader = getPreloaderEntity("preloader");
-        condContainer.append(preloader);
-        condContainer.find("select").addClass("hide");   
-    $.ajax({
-        type: "POST",
-        cache: false,
-        url: "'.\yii\helpers\Url::to(['find-condition']).'",
-        dataType: "json",
-        data: {iServID:iServ,iContrID:iCuser,lPID:iLP,amount:amount,iCurr:iCurr,payDate:payDate},
-        success: function(msg){
-                showOptions(msg.visable,"#payments-condition_id");
-                $("#preloader").remove();
-                condContainer.find("select").removeClass("hide");
-                /*
-                if(msg.default != "" && msg.default  != null)
-                {
-                    $("#payments-condition_id").val(msg.default);
-                    boundsCheckingConditions("#"+condID);
-                    condTypeAction();
-                }
-                */
-        },
-        error: function(msg){
-            addErrorNotify("'.Yii::t('app/book','Condition request').'","'.Yii::t('app/book','Server error').'");
-            $("#preloader").remove();
-            condContainer.find("select").removeClass("hide");
-            return false;
-        }
-    });
-}
-
-    // Проверка суммы на соотвествие границам условия.
-    function boundsCheckingConditions()
-    {
-
-        var
-            payDate = $("#payments-pay_date").val(),
-            iCondID = $("#payments-condition_id").val(),
-            iSumm = $("#payments-pay_summ").val(),
-            iCurr = $("#payments-currency_id").val();
-
-        if(iCondID == undefined || iCondID == "" || iSumm == undefined || iSumm == "" || iCurr == undefined || iCurr == "" || payDate == undefined || payDate == "" )
-            return false;
-
-        $.ajax({
-            type: "POST",
-            cache: false,
-            url: "'.\yii\helpers\Url::to(['/bookkeeping/payment-request/bounds-checking-conditions']).'",
-            dataType: "json",
-            data: {iCondID:iCondID,iSumm:iSumm,iCurr:iCurr,payDate:strtotime(payDate)},
-            success: function(msg){
-                if(msg)
-                  {
-                    addWarningNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Bounds checking conditions FAIL').'");
-                  }
-            },
-            error: function(msg){
-                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
-                return false;
-            }
-        });
-    }
-
-    var
-        conditions = '.\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$model->pay_date))).',
-        keys = '.\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).';
-
-    function showOptions(condID,lineID)
-    {
-        var
-            select = $(lineID);
-        select.val("");
-
-        showAll = $("#show_all_id").is(":checked");
-
-        select.find("option:not([value=\'\'])").remove();
-
-        $.each(keys, function( index, key ) {
-            var
-                value = conditions[parseInt(key)];
-            if(showAll || $.inArray(parseInt(key),condID) !== -1)
-                {
-                    select.append("<option value=\'"+key+"\'>"+value+"</option>")
-                }
-        });
-    }
-
-    // действия по клику
-    function showAllBtnActions()
-    {
-        if($(this).is(":checked"))
-        {
-            showOptions(new Array(),"#payments-condition_id");
-        }else{
-            findCondition();
-        }
-    }
-    function initDefaultCondition()
-    {
-        var
-            condID = '.\yii\helpers\Json::encode($arCondVisible).';
-        showOptions(condID,"#payments-condition_id");
-        $("#payments-condition_id").val('.$model->condition_id.');
-        condTypeAction();
-    }
-',\yii\web\View::POS_END);
+",\yii\web\View::POS_HEAD);
 
 $this->registerJs('
-     $("#payments-cuser_id").on("change",findCondition);
-     // по дефолту инициализирцем
-     initDefaultCondition();
-     $("#show_all_id").on("change",showAllBtnActions);
-     $("#payments-condition_id").on("change",function(){
-            condTypeAction();
-     });
-     $("#payments-pay_summ").on("change",function(){
-            findCondition();
-     });
-
-     $("#payments-pay_date").on("change",function(){
-        $.ajax({
-            type: "POST",
-            cache: false,
-            url: "'.\yii\helpers\Url::to(['get-conditions']).'",
-            dataType: "json",
-            data: {date:$(this).val()},
-            success: function(msg){
-                conditions = msg;
-                $.each( $("#payments-condition_id").find("option:not([value=\'\'])"), function( key1, value ) {
-                    var
-                        key = $(value).attr("value");
-
-                     $(value).html(conditions[key]);
-                });
-            },
-            error: function(msg){
-                addErrorNotify("'.Yii::t('app/book','Bounds checking conditions request').'","'.Yii::t('app/book','Server error').'");
-                return false;
-            }
-        });
-     });
+     
 
 ',\yii\web\View::POS_READY);
 

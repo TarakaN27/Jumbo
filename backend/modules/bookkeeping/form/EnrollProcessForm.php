@@ -11,6 +11,7 @@ namespace backend\modules\bookkeeping\form;
 
 
 use backend\widgets\Alert;
+use common\components\customComponents\validation\ValidNumber;
 use common\models\CuserToGroup;
 use common\models\EnrollmentRequest;
 use common\models\Enrolls;
@@ -41,7 +42,9 @@ class EnrollProcessForm extends Model{
         return [
             [['description'],'string','max' => 255],
             [['isPayment','part_enroll','cuserOP'],'integer'],
-            [['enroll','repay','availableAmount'],'number'],
+            [['availableAmount'],'number'],
+            [['enroll','repay'],ValidNumber::className()],
+            [['enroll','repay'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
     //        ['enroll','validateAmount']
         ];
     }

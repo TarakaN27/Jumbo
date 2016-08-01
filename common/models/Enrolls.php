@@ -4,7 +4,7 @@ namespace common\models;
 
 use Yii;
 use backend\models\BUser;
-
+use common\components\customComponents\validation\ValidNumber;
 /**
  * This is the model class for table "{{%enrolls}}".
  *
@@ -41,9 +41,12 @@ class Enrolls extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['amount', 'repay', 'enroll'], 'number','min'=>0],
+            [['enroll','repay'],ValidNumber::className()],
+            //[['amount', 'repay', 'enroll'], 'number','min'=>0],
             [['enr_req_id', 'service_id', 'cuser_id', 'buser_id', 'created_at', 'updated_at'], 'integer'],
             [['description'], 'string', 'max' => 255],
+
+            [['enroll','repay'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/','min'=>0],
     //        ['enroll','validateAmount']
         ];
     }

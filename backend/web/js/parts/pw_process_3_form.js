@@ -109,7 +109,7 @@ function PWFindCondition()
                     data: {
                         iservId:service.val(),
                         iLegalId:legalPerson.val(),
-                        amount:amount.val(),
+                        amount:convertAmountToValid(amount.val()),
                         iCuserId:cntr.val(),
                         iPayDate:payDate,
                         iCurrID:currencyID

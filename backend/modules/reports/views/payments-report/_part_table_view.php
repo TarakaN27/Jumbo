@@ -279,7 +279,7 @@ if(Yii::$app->user->can('adminRights'))
             </td>
             <td class="width-4-percent">    <?=($dt['code']?$dt['code'] : 'N/A');?></td>
             <td class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>">
-                    <?=isset($model['currency'][$dt['id']]) ? Yii::$app->formatter->asDecimal($model['currency'][$dt['id']]) : 'N/A'?>
+                    <?=isset($model['currency'][$dt['id']]) ? str_replace('.',',',$model['currency'][$dt['id']]) : 'N/A'?>
             </td>
             <?php if(Yii::$app->user->can('adminRights')):?>
             <td class="width-8-percent">
@@ -296,7 +296,7 @@ if(Yii::$app->user->can('adminRights'))
                     <?=($dt['pay_cond_name']? $dt['pay_cond_name'] : 'N/A');?>
             </td>
             <td class="width-4-percent">
-                    <?=isset($model['condCurr'][$dt['id']]) ? Yii::$app->formatter->asDecimal($model['condCurr'][$dt['id']]) : 'N/A';?>
+                    <?=isset($model['condCurr'][$dt['id']]) ? str_replace('.',',',$model['condCurr'][$dt['id']]) : 'N/A';?>
             </td>
         </tr>
         <?php endforeach;?>

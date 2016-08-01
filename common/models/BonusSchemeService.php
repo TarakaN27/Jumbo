@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\customComponents\validation\ValidNumber;
 use Yii;
 use yii\helpers\Json;
 
@@ -38,12 +39,14 @@ class BonusSchemeService extends AbstractActiveRecord
     public function rules()
     {
         return [
+            ['cost',ValidNumber::className()],
             [[
                 'scheme_id', 'service_id', 'unit_multiple',
                 'created_at', 'updated_at'
             ], 'integer'],
             [['month_percent','legal_person'], 'string'],
-            [['cost','simple_percent'], 'number']
+            ['cost','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['simple_percent'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
         ];
     }
 

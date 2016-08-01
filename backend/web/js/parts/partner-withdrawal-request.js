@@ -26,3 +26,14 @@ function findPartnerAvailableAmount()
 }
 
 $('#partnerwithdrawalrequest-partner_id,#partnerwithdrawalrequest-currency_id,#partnerwithdrawalrequest-date').on('change',findPartnerAvailableAmount);
+
+$(function(){
+    "use strict";
+    $('#partnerwithdrawalrequest-amount').on('change',function(){
+       amountFormatter(this);
+        var amount = convertAmountToValid($(this).val());
+        $(this).siblings('.amountInfo').remove();
+        $(this).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+    });
+    amountFormatter('#partnerwithdrawalrequest-amount');
+});

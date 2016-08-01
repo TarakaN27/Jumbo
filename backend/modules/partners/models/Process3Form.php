@@ -20,7 +20,7 @@ use common\models\Services;
 use yii\base\Model;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
-
+use common\components\customComponents\validation\ValidNumber;
 class Process3Form extends Model
 {
     public
@@ -40,8 +40,9 @@ class Process3Form extends Model
     {
         return [
             [['serviceID','amount','legalPersonID','contractorID','conditionID'],'required'],
+            ['amount',ValidNumber::className()],
             ['description','string','max' => 255],
-            ['amount','number'],
+            ['amount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['serviceID','legalPersonID','contractorID','conditionID'],'integer']
         ];
     }

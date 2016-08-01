@@ -52,8 +52,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             'filter' => \common\models\LegalPerson::getLegalPersonMap()
                         ],
-                        'summ_from:decimal',
-                        'summ_to:decimal',
+                        [
+                            'attribute' => 'summ_from',
+                            'format'=>['decimal',4]
+                        ],
+                        [
+                            'attribute' => 'summ_to',
+                            'format'=>['decimal',4]
+                        ],
                         [
                             'attribute' => 'currency_id',
                             'value' => function($model){
@@ -75,10 +81,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'filter' => \common\models\PaymentCondition::getTypeArr()
                         ],
-                        'corr_factor',
-                        'commission',
-                        'sale',
-                        'tax',
+                        [
+                            'attribute' => 'corr_factor',
+                            'format'=>['decimal',10]
+                        ],
+                        [
+                            'attribute' => 'commission',
+                            'format'=>['decimal',10]
+                        ],
+                        [
+                            'attribute' => 'sale',
+                            'format'=>['decimal',10]
+                        ],
+                        [
+                            'attribute' => 'tax',
+                            'format'=>['decimal',10]
+                        ],
                         [
                             'attribute' => 'not_use_sale',
                             'format' => 'boolean',

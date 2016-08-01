@@ -4,6 +4,8 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
 use yii\web\JsExpression;
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 /* @var $this yii\web\View */
 /* @var $model common\models\PartnerWithdrawalRequest */

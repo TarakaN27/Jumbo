@@ -5,10 +5,10 @@ namespace common\models;
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
-use yii\caching\DbDependency;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\db\ActiveQuery;
+use common\components\customComponents\validation\ValidNumber;
 /**
  * This is the model class for table "{{%exchange_rates}}".
  *
@@ -35,6 +35,8 @@ use yii\db\ActiveQuery;
 class ExchangeRates extends AbstractActiveRecord
 {
     CONST
+        BYN_ID =2,                          //костыль указываем id валюты бел. руб.
+        BYR_BYN_CORR_FACTOR = 10000,        //множитель для деноминации
         N_2_W_TYPE_BYR = 0,
         N_2_W_TYPE_USD = 1,
         N_2_W_TYPE_EURO = 2;
@@ -82,7 +84,8 @@ class ExchangeRates extends AbstractActiveRecord
                 'use_exchanger','bank_id','use_rur_for_byr',
                 'show_at_widget','doc_n2w_type'
             ],'integer'],
-            [['nbrb_rate', 'cbr_rate','factor'], 'number'],
+            [['nbrb_rate', 'cbr_rate','factor'], 'number','numberPattern' => '/^\s*[-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['nbrb_rate', 'cbr_rate','factor'],ValidNumber::className()],
             [['name', 'code'], 'string', 'max' => 255],
             ['factor','number','min' => 0],
             [['factor'],'default','value' => 1],
@@ -228,6 +231,9 @@ class ExchangeRates extends AbstractActiveRecord
         if(parent::beforeSave($insert))
         {
             $this->_oldModelAttribute = $this->oldAttributes;
+            $this->nbrb_rate = str_replace(",", ".", $this->nbrb_rate);
+            $this->cbr_rate = str_replace(",", ".", $this->cbr_rate);
+            $this->factor = str_replace(",", ".", $this->factor);
             return TRUE;
         }
         return FALSE;

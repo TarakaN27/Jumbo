@@ -15,12 +15,13 @@ class ExchangeRatesSearch extends ExchangeRates
     /**
      * @inheritdoc
      */
+    public $nbrb_rate_old;
     public function rules()
     {
         return [
             [['id', 'nbrb', 'cbr', 'created_at', 'updated_at','show_at_widget'], 'integer'],
             [['name', 'code'], 'safe'],
-            [['nbrb_rate', 'cbr_rate'], 'number'],
+            [['nbrb_rate', 'nbrb_rate_old', 'cbr_rate','factor'], 'number','numberPattern' => '/^\s*[-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
         ];
     }
 
@@ -59,17 +60,23 @@ class ExchangeRatesSearch extends ExchangeRates
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        $nbrb_rate = str_replace(",", ".", $this->nbrb_rate);
+        if($this->nbrb_rate_old) {
+            $query->andFilterWhere([
+                'nbrb_rate' => $this->nbrb_rate_old/10000,
+            ]);
+        }
         $query->andFilterWhere([
             'id' => $this->id,
             'nbrb' => $this->nbrb,
             'cbr' => $this->cbr,
-            'nbrb_rate' => $this->nbrb_rate,
+            'nbrb_rate' => $nbrb_rate,
             'cbr_rate' => $this->cbr_rate,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'show_at_widget' => $this->show_at_widget
         ]);
+
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'code', $this->code]);

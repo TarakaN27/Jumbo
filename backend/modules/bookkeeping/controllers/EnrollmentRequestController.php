@@ -285,7 +285,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
         }
 
-        if($obForm->load(Yii::$app->request->post()))
+        if($obForm->load(Yii::$app->request->post()) && $obForm->validate())
         {
             if($obForm->makeRequest())
             {

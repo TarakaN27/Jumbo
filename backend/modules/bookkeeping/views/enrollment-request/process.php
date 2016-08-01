@@ -13,6 +13,7 @@ use yii\web\View;
 use yii\helpers\Url;
 $this->title = Yii::t('app/book','Process enrollment request');
 CustomViewHelper::registerJsFileWithDependency('@web/js/parts/enroll_request_process.js',$this);
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $this->registerJs("
 var
     urlGetPromisedPayment = '".Url::to(['get-promised-payment'])."',
@@ -105,7 +106,7 @@ var
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Production'),
-                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYR'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
+                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYN'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Description'),

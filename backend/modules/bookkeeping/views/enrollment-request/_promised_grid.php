@@ -19,7 +19,7 @@
 				$repAmount = 0;
 				foreach($repay as $rep)
 					$repAmount+=$rep->amount;
-				return $model->amount-$repAmount.'('.$model->amount.'/'.$repAmount.')';
+				return Yii::$app->formatter->asDecimal($model->amount-$repAmount).'('.Yii::$app->formatter->asDecimal($model->amount).'/'.Yii::$app->formatter->asDecimal($repAmount).')';
 			}
 		],
 		[

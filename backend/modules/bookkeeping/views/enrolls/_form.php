@@ -2,10 +2,20 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use common\components\helpers\CustomViewHelper;
 /* @var $this yii\web\View */
 /* @var $model common\models\Enrolls */
 /* @var $form yii\widgets\ActiveForm */
+
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
+$this->registerJs('
+    $("#enrolls-amount,#enrolls-repay,#enrolls-enroll").on("change",function(){
+        amountFormatter(this);
+    });
+    amountFormatter("#enrolls-amount");
+    amountFormatter("#enrolls-repay");
+    amountFormatter("#enrolls-enroll");
+',\yii\web\View::POS_READY);
 ?>
 
 <div class="enrolls-form">

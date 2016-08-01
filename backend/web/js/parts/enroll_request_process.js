@@ -7,7 +7,7 @@ function countDelta()
     var
         delta = 0,
         amount =  $('#enrollprocessform-availableamount').val(),
-        repay = $('#enrollprocessform-repay').val(),
+        repay = convertAmountToValid($('#enrollprocessform-repay').val()),
         enroll = $('#enrollprocessform-enroll');
 
     delta = amount-repay;
@@ -17,7 +17,10 @@ function countDelta()
     }else{
         enroll.val(delta);
     }
+    enroll.triggerHandler('change');
 }
+
+
 //documents ready
 $(function(){
     $('#enrollprocessform-repay').on('change',countDelta);
@@ -46,6 +49,7 @@ $(function(){
                     }else{
                         repay.val(amount);
                     }
+                    repay.triggerHandler('change');
                     countDelta();
                 }
             },
@@ -61,5 +65,12 @@ $(function(){
             }
         });
     });
+    $('#enrollprocessform-repay,#enrollprocessform-enroll').on('change',function(){
+        amountFormatter(this);
+    });
+    amountFormatter('#enrollprocessform-repay');
+    amountFormatter('#enrollprocessform-enroll');
+
+
     
 });

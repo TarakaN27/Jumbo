@@ -9,6 +9,8 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use wbraganca\dynamicform\DynamicFormWidget;
 use common\models\LegalPerson;
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $this->registerJsFile('@web/js/parts/pw_process_1_form.js',[
     'depends' => [
         'yii\web\JqueryAsset',
@@ -26,6 +28,8 @@ $this->registerJsFile('@web/js/parts/pw_process_3_form.js',[
 $this->registerJs('
     var
         FIND_CONDITION_URL = "'.\yii\helpers\Url::to(['/ajax-select/get-condition']).'";
+    var
+        iCurrId = '.$model->currency_id.';
 ',\yii\web\View::POS_HEAD);
 
 $this->title = Yii::t('app/users','Partner withdrawal request');

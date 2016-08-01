@@ -99,7 +99,6 @@ class ExchangeRatesController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -146,7 +145,6 @@ class ExchangeRatesController extends AbstractBaseBackendController
     public function actionUpdateRates($id)
     {
         $model = $this->findModel($id);
-
 
         if($model->use_exchanger)
         {
@@ -213,6 +211,7 @@ class ExchangeRatesController extends AbstractBaseBackendController
                 Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
             }
         }else{
+
             if($model->nbrb != 0)
             {
                 $nbrb = new ExchangeRatesNBRB($model->nbrb);

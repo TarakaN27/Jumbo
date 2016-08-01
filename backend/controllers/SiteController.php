@@ -7,6 +7,7 @@ use common\components\bonus\BonusRecordCalculate;
 use common\components\crunchs\bonus\ImportSale;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\bonus\RecalculateUnitBonus;
+use common\components\crunchs\denomination\Denomination;
 use common\components\crunchs\exchange_rates\ExchangeRatesCrunch;
 use common\components\crunchs\Payment\RecalcPayment;
 use common\components\crunchs\Payment\RecalcQuantityHours;
@@ -90,6 +91,11 @@ class SiteController extends Controller
 
     public function actionSpecial()
     {
+        $obDen = new Denomination();
+
+        $obDen->run();
+
+
         /*
         $obMailer = new Mailer([
             'viewPath' => '@common/mail',

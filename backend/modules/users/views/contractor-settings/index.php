@@ -1,12 +1,20 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use common\components\helpers\CustomViewHelper;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 /**
  * Created by PhpStorm.
  * User: zhenya
  * Date: 20.10.15
  * Time: 15.09
  */
+$this->registerJs('
+$("#cusersettings-pp_max").on("change",function(){
+	amountFormatter(this);
+});
+amountFormatter("#cusersettings-pp_max");
+',\yii\web\View::POS_READY);
 $this->title = Yii::t('app/users', 'Create external account');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/users', 'Cusers'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

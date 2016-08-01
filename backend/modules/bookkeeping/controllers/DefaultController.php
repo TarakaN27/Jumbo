@@ -382,7 +382,6 @@ class DefaultController extends AbstractBaseBackendController
 
         if($model->load(Yii::$app->request->post()))
         {
-            $model->convertToValidAmount();
             if($model->save())
             {
                 $obDlg = new Dialogs();

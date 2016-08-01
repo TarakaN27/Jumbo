@@ -13,23 +13,6 @@ function checkResident()
         $('.field-paymentrequest-user_name').addClass('hide');
     }
 }
-/**
- * Фунция форматирования суммы
- */
-function amountFormatter()
-{
-    var
-        amount = $('#paymentrequest-pay_summ').val();
-    if(amount == '')
-        amount = '0';
-
-    amount = amount.replace(/\s+/g, '');
-    amount = amount.replace(/,/g,'.');
-    amount = parseFloat(amount);
-    amount = accounting.formatNumber(amount, 2, " ");
-    amount = amount.replace(/\./g,',');
-    $('#paymentrequest-pay_summ').val(amount);
-}
 
 //document ready
 $(function(){
@@ -55,6 +38,11 @@ $(function(){
     });
     checkResident();
     $(".form-payment-request").on("change","#paymentrequest-is_unknown",checkResident);
-    $("#paymentrequest-pay_summ").on('change',amountFormatter);
-    amountFormatter();
+    $("#paymentrequest-pay_summ").on('change',function(){
+        amountFormatter(this);
+        var amount = convertAmountToValid($(this).val());
+        $(this).siblings('.amountInfo').remove();
+        $(this).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
+    });
+    amountFormatter('#paymentrequest-pay_summ');
 });

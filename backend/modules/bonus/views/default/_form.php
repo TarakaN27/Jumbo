@@ -3,12 +3,14 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\BonusScheme;
+use common\components\helpers\CustomViewHelper;
 /* @var $this yii\web\View */
 /* @var $model common\models\BonusScheme */
 /* @var $form yii\widgets\ActiveForm */
 
 $arServices = \common\models\Services::getAllServices();
 $arLP = \common\models\LegalPerson::getLegalPersonMap();
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 $this->registerJsFile('@web/js/parts/bonus_form.js',[
     'depends' => [
         'yii\web\JqueryAsset',
@@ -80,7 +82,7 @@ $this->registerJs('
                             $value = NULL;
                             if(isset($arBServices[$serv->id]))
                                 $value = $arBServices[$serv->id]->cost;
-                            echo Html::textInput('costs['.$serv->id.']',$value,['class' => 'form-control']);
+                            echo Html::textInput('costs['.$serv->id.']',$value,['class' => 'form-control costs']);
                         ?>
                     </div>
                 </div>

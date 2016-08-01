@@ -14,6 +14,7 @@ use common\models\ExchangeRates;
 use common\components\helpers\CustomViewHelper;
 use common\models\Services;
 use yii\helpers\Html;
+CustomViewHelper::registerJsFileWithDependency('@web/js/accounting/accounting.min.js',$this,[],'accounting');
 CustomViewHelper::registerJsFileWithDependency('@web/js/vendor/bower/html.sortable/dist/html.sortable.min.js',$this,[],'html-sortable');
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/array_diff.js',$this,[],'array_diff');
 CustomViewHelper::registerJsFileWithDependency('@web/js/php_functions/strtotime.js',$this,[],'strTotime');

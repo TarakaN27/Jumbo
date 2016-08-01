@@ -28,7 +28,11 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     public function __construct($codeID = NULL,$time = NULL)
     {
         $this->time = is_null($time) ? time() : $time;
-        $this->codeID = $codeID;
+        if(!CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016',$this->time) && $codeID == self::BYN_IN_CBR_CODE)
+        {
+            $this->codeID = self::BYR_IN_CBR_CODE;
+        }else
+            $this->codeID = $codeID;
         $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.date('d', $this->time) . '/' . date('m', $this->time) . '/' . date('Y', $this->time);
     }
 
@@ -39,13 +43,14 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     {
         try{
             $sxml = $this->loadFile();
-
             if(!is_object($sxml)) {
                 return NULL;
             }
             foreach($sxml->Valute as $ar) {
-                if($ar->NumCode == $this->codeID)
-                    return  round($this->convertValue($ar->Value)/$ar->Nominal,6);
+                if($ar->NumCode == $this->codeID) {
+                    $tmp =round($this->convertValue($ar->Value) / $ar->Nominal, 6);
+                    return $this->codeID == self::BYR_IN_CBR_CODE ? $this->getRateAfterDenomination($tmp,$this->time) : $tmp;
+                }
             }
             return NULL;
         }catch (\Exception $e)
@@ -67,7 +72,8 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
                 return NULL;
             }
             foreach($sxml->Valute as $ar) {
-                $result[(int)$ar->NumCode] = round($this->convertValue($ar->Value)/$ar->Nominal,4);
+                $tmp = round($this->convertValue($ar->Value)/$ar->Nominal,4);
+                $result[(int)$ar->NumCode] =$this->codeID == self::BYR_IN_CBR_CODE ? $this->getRateAfterDenomination($tmp,$this->time) : $tmp;
             }
         //}catch (\Exception $e)
        // {

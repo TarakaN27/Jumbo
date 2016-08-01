@@ -4,6 +4,7 @@
  * Useful scripts
  * Only native JavaScripts!!!!!
  */
+"use strict";
 /**
  * Get number from sting
  * @param str

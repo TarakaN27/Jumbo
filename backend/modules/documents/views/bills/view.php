@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'amount',
-                            'value' => $model->amount.' ( '.
+                            'value' => Yii::$app->formatter->asDecimal($model->amount).' ( '.
                                 CustomHelper::numPropis((int)$model->amount).' '.
                                 CustomHelper::ciRub((int)$model->amount).' )'
                         ],
@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'use_vat',
                             'value' => $model->getYesNoStr($model->use_vat)
                         ],
-                        'vat_rate',
+                        'vat_rate:decimal',
                         'description:ntext',
                         'object_text:ntext',
                         'offer_contract',

@@ -44,8 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'code',
                                             'nbrb',
                                             'cbr',
-                                            'nbrb_rate',
-                                            'cbr_rate',
+                                            [
+                                                'attribute' => 'nbrb_rate',
+                                                'format'=>['decimal',4]
+                                            ],
+                                            [
+                                                'attribute' => 'cbr_rate',
+                                                'format'=>['decimal',4]
+                                            ],
                                             [
                                                 'attribute' => 'use_rur_for_byr',
                                                 'value' => $model->getYesNoStr($model->use_rur_for_byr)
@@ -58,7 +64,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'attribute' => 'base_id',
                                                 'value' => is_object($obBase = $model->base) ? $obBase->code : NULL
                                             ],
-                                            'factor',
+                                            [
+                                                'attribute' => 'factor',
+                                                'format'=>['decimal',4]
+                                            ],
                                             [
                                                 'attribute' => 'use_exchanger',
                                                 'value' => $model->getYesNoStr($model->use_exchanger)

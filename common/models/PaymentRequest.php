@@ -5,6 +5,7 @@ namespace common\models;
 use backend\models\BUser;
 use common\components\behavior\notifications\PaymentRequestNotificationBehavior;
 use common\components\behavior\PaymentRequest\PaymentRequestBehavior;
+use common\components\customComponents\validation\ValidNumber;
 use common\components\helpers\CustomHelperMoney;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -81,6 +82,7 @@ class PaymentRequest extends AbstractActiveRecord
     {
         return [
             [['owner_id','pay_date', 'currency_id', 'legal_id','payment_order'],'required'],
+            ['pay_summ',ValidNumber::className()],
             [[
                  'cntr_id', 'manager_id', 'owner_id', 'is_unknown',
                   'currency_id', 'legal_id', 'dialog_id',
@@ -143,7 +145,6 @@ class PaymentRequest extends AbstractActiveRecord
     {
         if(!is_numeric($this->pay_date))
             $this->pay_date = strtotime($this->pay_date);
-
         return parent::beforeValidate();
     }
 
@@ -246,21 +247,5 @@ class PaymentRequest extends AbstractActiveRecord
     public function callEventPinManager()
     {
         $this->trigger(self::EVENT_PIN_MANAGER);
-    }
-
-    /**
-     * 
-     */
-    public function convertToValidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBynToBur($this->pay_summ,$this->currency_id);
-    }
-
-    /**
-     *
-     */
-    public function convertToInavlidAmount()
-    {
-        $this->pay_summ = CustomHelperMoney::convertFromBurToByn($this->pay_summ,$this->currency_id);
     }
 }

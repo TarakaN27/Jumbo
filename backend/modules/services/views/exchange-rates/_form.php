@@ -6,7 +6,6 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\ExchangeRates */
 /* @var $form yii\widgets\ActiveForm */
-
 $this->registerJs("
 function checkStateUseBase()
 {
@@ -66,6 +65,12 @@ checkStateUseBase();
 checkStateUseExchanger();
 $('#exchangerates-use_base').on('change',checkStateUseBase);
 $('#exchangerates-use_exchanger').on('change',checkStateUseExchanger);
+$('#exchangerates-nbrb_rate,#exchangerates-cbr_rate,#exchangerates-factor').on('change',function(){
+        amountFormatter(this, 4);
+    });
+    amountFormatter('#exchangerates-nbrb_rate',4);
+    amountFormatter('#exchangerates-cbr_rate',4);
+    amountFormatter('#exchangerates-factor',4);        
 ",\yii\web\View::POS_READY);
 ?>
 
