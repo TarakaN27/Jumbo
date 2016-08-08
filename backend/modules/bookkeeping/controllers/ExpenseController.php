@@ -99,13 +99,8 @@ class ExpenseController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new Expense();
-
-        if ($model->load(Yii::$app->request->post())) {
-            if($model->save())
-            {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
-            }
-
         } else {
             // Get the initial city description
             $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();

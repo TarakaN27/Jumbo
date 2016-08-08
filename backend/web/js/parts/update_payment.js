@@ -156,10 +156,13 @@ function showByrInfo(this1)
  */
 function initDefaultCondition()
 {
+
     var
-        condID = arCondIdVisible;
+        condID = arCondIdVisible,
+        selectedVal = selectedCondVal;
+
     showOptions(condID,"#payments-condition_id");
-    $("#payments-condition_id").val('.$model->condition_id.');
+    $("#payments-condition_id").val(selectedVal);
     condTypeAction();
 }
 
