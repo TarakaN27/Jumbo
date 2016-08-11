@@ -175,13 +175,13 @@ $this->title = Yii::t('app/users','Partners')
                         <tbody>
                         <tr>
                             <td>
-                               <?=$total['totalCurrentMonthSum']?>           </td>
+                               <?=$total->totalCurrentMonthSum?>           </td>
                             <td>
-                                <?=$total['totalProcessedSum']?>            </td>
+                                <?=$total->totalProcessedSum?>            </td>
                             <td>
-                                <?=$total['totalPercentSum']?>            </td>
+                                <?=$total->totalPercentSum?>            </td>
                             <td>
-                                <?=$total['availToWithdrawal']?>            </td>
+                                <?=$total->availToWithdrawal?>            </td>
                         </tr>
                         </tbody>
                     </table>

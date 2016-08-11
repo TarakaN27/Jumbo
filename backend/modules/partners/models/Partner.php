@@ -91,10 +91,7 @@ class Partner extends CUserSearch
             'totalProcessedSum'=>'SUM(total_processed_sum)',
             'totalPercentSum' => 'SUM(total_percent_sum)'
         ];
-        unset($tempQuery->joinWith[0]);
-        
-        return $tempQuery->asArray()->one();
-
+        return $tempQuery->one();
     }
     public function searchPartners($params,$addQuery = NULL,$addParams = [])
     {
