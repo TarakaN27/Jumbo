@@ -13,6 +13,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\modules\partners\models\Partner;
 use backend\modules\partners\models\PartnerAllowForm;
 use backend\modules\partners\models\PartnerDetailLeadsForm;
+use backend\modules\partners\models\PartnerLinkLead;
 use backend\modules\partners\models\PartnerMultiLInkForm;
 use backend\widgets\Alert;
 use common\models\AbstractActiveRecord;
@@ -63,10 +64,12 @@ class PartnersController extends AbstractBaseBackendController
     {
         $searchModel = new Partner();
         $dataProvider = $searchModel->searchPartners(Yii::$app->request->queryParams);
+        $total = $searchModel->getTotalSum($dataProvider->query);
 
         return $this->render('index',[
             'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
+            'searchModel' => $searchModel,
+            'total' => $total,
         ]);
     }
 
@@ -76,13 +79,12 @@ class PartnersController extends AbstractBaseBackendController
      */
     public function actionLinkLead($pid)
     {
-        $query = PartnerCuserServ::find()->where(['partner_id' => $pid]);
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query
-        ]);
+        $searchModel = new PartnerLinkLead();
+        $dataProvider = $searchModel->searchLinkLead(Yii::$app->request->queryParams, $pid);
 
         return $this->render('link-lead',[
             'dataProvider' => $dataProvider,
+            'searchModel'=>$searchModel,
             'pid' => $pid
         ]);
     }
@@ -232,15 +234,14 @@ class PartnersController extends AbstractBaseBackendController
         $obPurse = $obPartner->partnerPurse;
 
         $arLeadsProvider = new ActiveDataProvider([
-            'query' => PartnerCuserServ::find()->with('partner','cuser','service')->where(['partner_id' => $id]),
+            'query' => PartnerCuserServ::find()->with('partner','cuser','service')->where(['partner_id' => $id])->orderBy(['cuser_id'=>SORT_DESC, 'connect'=>'DESC']),
             'pagination' => [
                 'pageSize' => -1,
             ],
         ]);
-
         return $this->render('view',[
             'obPartner' => $obPartner,
-            'arLeadsProvider' => $arLeadsProvider,
+            'arLeads' => $arLeadsProvider->getModels(),
             'pid' => $id,
             'obPurse' => $obPurse
         ]);

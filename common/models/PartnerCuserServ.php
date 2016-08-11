@@ -7,7 +7,8 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
-use common\models\Payments;
+use yii\data\ActiveDataProvider;
+
 /**
  * This is the model class for table "{{%partner_cuser_serv}}".
  *
@@ -50,13 +51,13 @@ class PartnerCuserServ extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['partner_id', 'cuser_id', 'service_id'], 'required','except' => self::SCENARIO_ARCHIVE],
-            [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive','st_period_checked'], 'integer'],
-            [['connect','archiveDate'], 'safe'],
-            [['service_id','cuser_id'],'uniqueValid','except' => self::SCENARIO_ARCHIVE],
-            [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
-            [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
-            [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id'],'except' => self::SCENARIO_ARCHIVE],
+            [['partner_id', 'cuser_id', 'service_id'], 'required', 'except' => self::SCENARIO_ARCHIVE],
+            [['partner_id', 'cuser_id', 'service_id', 'created_at', 'updated_at', 'archive', 'st_period_checked'], 'integer'],
+            [['connect', 'archiveDate'], 'safe'],
+            [['service_id', 'cuser_id'], 'uniqueValid', 'except' => self::SCENARIO_ARCHIVE],
+            [['cuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['cuser_id' => 'id'], 'except' => self::SCENARIO_ARCHIVE],
+            [['partner_id'], 'exist', 'skipOnError' => true, 'targetClass' => CUser::className(), 'targetAttribute' => ['partner_id' => 'id'], 'except' => self::SCENARIO_ARCHIVE],
+            [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id'], 'except' => self::SCENARIO_ARCHIVE],
         ];
     }
 
@@ -83,14 +84,15 @@ class PartnerCuserServ extends AbstractActiveRecord
      * @param $attribute
      * @param $param
      */
-    public function uniqueValid($attribute,$param)
+    public function uniqueValid($attribute, $param)
     {
-        if(self::find()->where([
+        if (self::find()->where([
             'partner_id' => $this->partner_id,
             'cuser_id' => $this->cuser_id,
             'service_id' => $this->service_id
-        ])->exists())
-            $this->addError($attribute,Yii::t('app/users','Link already exists'));
+        ])->exists()
+        )
+            $this->addError($attribute, Yii::t('app/users', 'Link already exists'));
     }
 
     /**
@@ -111,7 +113,7 @@ class PartnerCuserServ extends AbstractActiveRecord
 
     public function getPartnerPayments()
     {
-        return $this->hasOne(Payments::className(), ['cuser_id' => 'cuser_id', 'service_id'=>'service_id']);
+        return $this->hasOne(Payments::className(), ['cuser_id' => 'cuser_id', 'service_id' => 'service_id']);
     }
 
     /**
@@ -128,8 +130,8 @@ class PartnerCuserServ extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
-        if(!empty($this->connect))
-            $this->connect = date('Y-m-d',strtotime($this->connect));
+        if (!empty($this->connect))
+            $this->connect = date('Y-m-d', strtotime($this->connect));
 
         return parent::beforeSave($insert);
     }
@@ -153,8 +155,7 @@ class PartnerCuserServ extends AbstractActiveRecord
                 throw new ServerErrorHttpException();
             $this->callTriggerAfterArchive();
             $tr->commit();
-        }catch (Exception $e)
-        {
+        } catch (Exception $e) {
             $tr->rollBack();
         }
 
@@ -182,9 +183,11 @@ class PartnerCuserServ extends AbstractActiveRecord
      */
     public function behaviors()
     {
-        $arParent =  parent::behaviors();
-        return ArrayHelper::merge($arParent,[
+        $arParent = parent::behaviors();
+        return ArrayHelper::merge($arParent, [
             PartnerCuserServActionBehavior::className()
         ]);
     }
+
+   
 }

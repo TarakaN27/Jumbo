@@ -77,24 +77,100 @@ $this->title = Yii::t('app/users',Yii::t('app/users','Partner detail'))
 
 
                 <?=Html::tag('h4',Yii::t('app/users','Partner leads'))?>
-                <?php echo \yii\grid\GridView::widget([
-                    'dataProvider' => $arLeadsProvider,
-                    'columns' => [
-                        'id',
-                        [
-                            'attribute' => 'cuser_id',
-                            'value' => 'cuser.infoWithSite'
-                        ],
-                        [
-                            'attribute' => 'service_id',
-                            'value' => 'service.name'
-                        ],
-                        'connect:date',
-                        'archive:boolean',
-                        'st_period_checked:boolean',
-                        'created_at:datetime'
-                    ]
-                ])?>
+                <?php
+                $prevId=0;
+                foreach($arLeads as $model){
+                ?>
+                <?php if ($prevId == 0){ ?>
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse<?=$model->cuser_id?>"><?= $model->cuser->infoWithSite ?></a>
+                            </h4>
+                        </div>
+                        <div id="collapse<?=$model->cuser_id?>" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Услуга</th>
+                                        <th>Дата подключения</th>
+                                        <th>Архивная</th>
+                                        <th>Стартовый период пройден</th>
+                                        <th>Создано</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><?= $model->id ?></td>
+                                        <td><?= $model->service->name ?></td>
+                                        <td><?= Yii::$app->formatter->asDate($model->connect) ?></td>
+                                        <td><?= Yii::$app->formatter->asBoolean($model->archive) ?>Нет</td>
+                                        <td><?= Yii::$app->formatter->asBoolean($model->st_period_checked) ?></td>
+                                        <td><?= Yii::$app->formatter->asDatetime($model->created_at) ?></td>
+                                    </tr>
+                                    <?
+                                    } elseif ($model->cuser_id == $prevId) { ?>
+                                        <tr>
+                                            <td><?= $model->id ?></td>
+                                            <td><?= $model->service->name ?></td>
+                                            <td><?= Yii::$app->formatter->asDate($model->connect) ?></td>
+                                            <td><?= Yii::$app->formatter->asBoolean($model->archive) ?></td>
+                                            <td><?= Yii::$app->formatter->asBoolean($model->st_period_checked) ?></td>
+                                            <td><?= Yii::$app->formatter->asDatetime($model->created_at) ?></td>
+                                        </tr>
+                                    <?php }
+                                    else{ ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse<?=$model->cuser_id?>"><?= $model->cuser->infoWithSite ?></a>
+                            </h4>
+                        </div>
+                        <div id="collapse<?=$model->cuser_id?>" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Услуга</th>
+                                        <th>Дата подключения</th>
+                                        <th>Архивная</th>
+                                        <th>Стартовый период пройден</th>
+                                        <th>Создано</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><?= $model->id ?></td>
+                                        <td><?= $model->service->name ?></td>
+                                        <td><?= Yii::$app->formatter->asDate($model->connect) ?></td>
+                                        <td><?= Yii::$app->formatter->asBoolean($model->archive) ?></td>
+                                        <td><?= Yii::$app->formatter->asBoolean($model->st_period_checked) ?></td>
+                                        <td><?= Yii::$app->formatter->asDatetime($model->created_at) ?></td>
+                                    </tr>
+
+                                    <?
+                                    }
+                                    $prevId=$model->cuser_id;
+                                    }
+
+                ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>

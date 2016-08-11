@@ -9,6 +9,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use common\components\helpers\CustomHelper;
 use common\models\CUserRequisites;
+use yii\widgets\ActiveForm;
 $this->title = Yii::t('app/users','Partners')
 ?>
 <div class = "row">
@@ -34,6 +35,46 @@ $this->title = Yii::t('app/users','Partners')
             </div>
             <div class = "x_content">
 
+                    <div class="row">
+                        <div class = "col-md-6 col-sm-6 col-xs-12 ">
+                            <div class = "col-md-4 col-sm-4 col-xs-12">
+                                <?php $form = ActiveForm::begin(['method'=>'get']);?>
+                                <?=$form->field($searchModel,'beginDate')->widget(\kartik\date\DatePicker::className(),[
+                                    'options' => [
+                                        'class' => 'form-control'
+                                    ],
+                                    'pluginOptions' => [
+                                        'autoclose' => TRUE,
+                                        'format' => 'dd.mm.yyyy',
+                                        'defaultDate' => date('d.m.Y', time())
+                                    ]
+                                ])?>
+                            </div>
+                            <div class = "col-md-4 col-sm-4 col-xs-12">
+                                <?=$form->field($searchModel,'endDate')->widget(\kartik\date\DatePicker::className(),[
+                                    'options' => [
+                                        'class' => 'form-control'
+                                    ],
+                                    'pluginOptions' => [
+                                        'autoclose' => TRUE,
+                                        'format' => 'dd.mm.yyyy',
+                                        'defaultDate' => date('d.m.Y', time())
+                                    ]
+                                ])?>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-12 ppd-top-23">
+                                <div class="form-group text-center">
+                                    <?= Html::submitButton(Yii::t('app/reports', 'Get report'), ['class' => 'btn btn-success']) ?>
+                                </div>
+                            </div>
+                            <div class = "col-md-6 col-sm-6 col-xs-12 ">
+                                <?=$form->field($searchModel,'showByAllPayments')->checkbox();?>
+                            </div>
+                            <?php ActiveForm::end();?>
+                        </div>
+
+
+                    </div>
                 <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -49,7 +90,7 @@ $this->title = Yii::t('app/users','Partners')
                         ],
                         [
                             'attribute' => 'corp_name',
-                            'label' => Yii::t('app/users','Partner'),
+                            'label' => Yii::t('app/users','Partner ID'),
                             'value' => function($model){
                                 return $model->getInfoWithSite();
                             }
@@ -120,7 +161,31 @@ $this->title = Yii::t('app/users','Partners')
                     
                     //'columns' => $columns
                 ]); ?>
-
+                <div class="row">
+                    <h3><?=Yii::t('app/users','Total Sum');?></h3>
+                    <table class="table table-bordered ">
+                        <thead>
+                        <tr>
+                            <th><?=Yii::t('app/users','Total Current Month Sum');?></th>
+                            <th><?=Yii::t('app/users','Total Processed Sum');?></th>
+                            <th><?=Yii::t('app/users','Total Percent Sum');?></th>
+                            <th><?=Yii::t('app/users','Avail To Withdrawal');?></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                               <?=$total['totalCurrentMonthSum']?>           </td>
+                            <td>
+                                <?=$total['totalProcessedSum']?>            </td>
+                            <td>
+                                <?=$total['totalPercentSum']?>            </td>
+                            <td>
+                                <?=$total['availToWithdrawal']?>            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

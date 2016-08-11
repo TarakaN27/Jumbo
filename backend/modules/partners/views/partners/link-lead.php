@@ -39,6 +39,7 @@ $this->title = Yii::t('app/users','Partner link lead');
             <div class = "x_content">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
+                    'filterModel'=>$searchModel,
                     'columns' => [
                         'id',
                         [
@@ -47,13 +48,17 @@ $this->title = Yii::t('app/users','Partner link lead');
                         ],
                         [
                             'attribute' => 'service_id',
-                            'value' => 'service.name'
+                            'value' => function($model){
+                                return is_object($service = $model->service) ? $service->name : 'N/A';
+                            },
+                            'filter' => \common\models\Services::getServicesMap()
                         ],
                         'connect:date',
                         'created_at:datetime',
                         [
                             'attribute' => 'archive',
                             'format' => 'raw',
+                            'filter' => \common\models\Payments::getYesNo(),
                             'value' => function($model){
                                 $str = '<i class="fa fa-archive"></i>';
                                 $options = [

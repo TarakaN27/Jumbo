@@ -339,5 +339,11 @@ return [
     'Factual amount in base currency' => 'Фактическая сумма',
     'Category expense not found' => 'Внимание! Не задана категория затрат для данной операции, не забудьте внести вручную в затраты данную операцию',
     'Request processed in bookkeeping' => 'Запрос успешно передан в бухгалтерию',
+    'Total Current Month Sum'=> 'Платежи в текущем месяце',
+    'Total Processed Sum' => 'Обработанные платежи (за период)',
+    'Total Percent Sum' => 'Сумма начисленных процентов (за период)',
+    'Avail To Withdrawal' => 'Сумма доступных средств для вывода',
+    'Total Sum' => 'Итого',
+    'Show By All Payments' => 'Учитывать все платежи (не только партнёрские)'
     
 ];
