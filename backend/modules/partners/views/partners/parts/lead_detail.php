@@ -141,7 +141,7 @@
                     return $model->type == \common\models\PartnerPurseHistory::TYPE_EXPENSE ? $model->expense->pay_date : $model->payment->pay_date;
                 }
             ],
-            'payment.pay_date:date',
+            'date:date',
             'expense_id',
             'percent',
             'created_at:datetime'

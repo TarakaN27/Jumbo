@@ -15,6 +15,7 @@ use Yii;
  * @property integer $expense_id
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $date
  * @property string $percent
  *
  * @property Expense $expense

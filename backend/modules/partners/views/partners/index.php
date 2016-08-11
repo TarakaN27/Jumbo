@@ -81,7 +81,10 @@ $this->title = Yii::t('app/users','Partners')
                             'attribute' => 'partner_manager_id',
                             'value' => 'partnerManager.fio',
                         ],
-                        'totalPaySum:decimal',
+                        'totalCurrentMonthSum:decimal',
+                        'totalProcessedSum:decimal',
+                        'totalPercentSum:decimal',
+                        'availToWithdrawal:decimal',
                         [
                             'label' => '',
                             'format' => 'raw',

@@ -93,7 +93,6 @@ class PartnerDetailLeadsForm extends Model
         $arLeads =  $this->getLeads();
         $arCurrPeriod = $this->getCurrentPeriodStat($beginTime,$endTime);
 
-
         $arStatIncomingByLead = $this->getStatIncomingByLeads($arCurrPeriod);
         $arStatWithdrawal = $this->getStatWithdrawal($arCurrPeriod);
       //  $arStatFull = $this->getStatFullSortByDate($arCurrPeriod);
@@ -126,7 +125,7 @@ class PartnerDetailLeadsForm extends Model
             ->select(['h.id','p.id as pid','p.pay_date','h.type','h.amount','h,payment_id'])
             ->alias('h')
             ->joinWith('payment p')
-            ->where('p.pay_date < :beginDate')
+            ->where('h.date < :beginDate')
             ->andWhere([
                 'h.type' => PartnerPurseHistory::TYPE_INCOMING,
                 'h.cuser_id' => $this->obPartner->id
@@ -135,20 +134,8 @@ class PartnerDetailLeadsForm extends Model
             ->sum('h.amount');
 
         $sumExpense = PartnerPurseHistory::find()
-            ->select([
-                'h.id',
-                'p.id as pid',
-                'p.pay_date',
-                'h.type',
-                'h.amount',
-                'h.payment_id',
-                'ex.id as exid',
-                'ex.pay_date as ex_pay_date'
-            ])
             ->alias('h')
-            ->joinWith('payment p')
-            ->joinWith('expense ex')
-            ->where(' (p.pay_date < :beginDate) OR (ex.pay_date < :beginDate)')
+            ->where('(h.date < :beginDate)')
             ->andWhere([
                 'h.type' => PartnerPurseHistory::TYPE_EXPENSE,
                 'h.cuser_id' => $this->obPartner->id
@@ -169,6 +156,7 @@ class PartnerDetailLeadsForm extends Model
      */
     protected function getCurrentPeriodStat($beginDate,$endDate)
     {
+
         return PartnerPurseHistory::find()->with('payment.currency')
             ->select([
                 'h.*',
@@ -176,21 +164,16 @@ class PartnerDetailLeadsForm extends Model
                 'p.pay_summ',
                 'p.cuser_id as pcuser_id',
                 'p.currency_id',
-                'p.pay_date',
                 'p.service_id',
-                's.name as serv_name',
-                'ex.id as exid',
-                'ex.pay_date as ex_pay_date'
             ])
             ->alias('h')
             ->joinWith('payment p')
-            ->joinWith('payment.service s')
-            ->joinWith('expense ex')
-            ->where('(h.created_at >= :beginDate AND h.created_at <= :endDate)')
+            ->where('(h.date >= :beginDate AND h.date <= :endDate)')
             ->andWhere(['h.cuser_id' => $this->obPartner->id])
             ->params([':beginDate' => $beginDate,':endDate' => $endDate])
-            ->orderBy(['created_at'=>SORT_DESC, 'p.pay_date'=>SORT_DESC])
+            ->orderBy(['h.date'=>SORT_DESC])
             ->all();
+
     }
 
     /**

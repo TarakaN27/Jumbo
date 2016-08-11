@@ -12,9 +12,13 @@ namespace console\controllers;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\partners\PartnerPercentCounting;
+use common\models\PartnerPurse;
+use common\models\PartnerPurseHistory;
 use console\components\AbstractConsoleController;
 use yii\console\Controller;
 use common\components\crunchs\denomination\Denomination;
+use yii\helpers\ArrayHelper;
+use common\models\ExchangeCurrencyHistory;
 
 class RecalculateController extends AbstractConsoleController
 {
@@ -64,5 +68,27 @@ class RecalculateController extends AbstractConsoleController
         $obCalc = new PartnerPercentCounting();
         $obCalc->countPercentByMonth($date);
         return Controller::EXIT_CODE_NORMAL;
+    }
+
+    public function actionAllPartnersPercent(){
+        $date = new \DateTime("2016-01-01");
+        $now = date('Y-m').'-01';
+        PartnerPurseHistory::deleteAll(['type'=>PartnerPurseHistory::TYPE_INCOMING]);
+        PartnerPurse::deleteAll();
+        $withdrowalHistory = PartnerPurseHistory::findAll(['type'=>PartnerPurseHistory::TYPE_EXPENSE]);
+        while($date->format('Y-m-d')<=$now){
+            $obCalc = new PartnerPercentCounting();
+            // бовтрутенко считаем только с 01.06.2016
+       //     $obCalc->excludePartnerPeriod[8869] = '2016-06-01';
+            
+            $obCalc->countPercentByMonth($date->format('Y-m-d'));
+            $date->modify("+1 month");
+        }
+        foreach($withdrowalHistory as $item){
+            $purse = PartnerPurse::findOne(['cuser_id'=>$item->cuser_id]);
+            $purse->amount -= $item->amount;
+            $purse->save();
+        }
+
     }
 }

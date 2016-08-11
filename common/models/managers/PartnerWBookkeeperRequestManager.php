@@ -52,7 +52,7 @@ class PartnerWBookkeeperRequestManager extends PartnerWBookkeeperRequest
             $obExpense->currency_id = $this->currency_id;
             $obExpense->cuser_id = $this->contractor_id;
             $obExpense->legal_id = $this->legal_id;
-            $obExpense->pay_date = time();
+            $obExpense->pay_date = $this->request->date;
             $obExpense->pay_summ = $this->amount;
             $obExpense->description = $this->description;
             $obExpense->pw_request_id = $this->request_id;
@@ -77,6 +77,7 @@ class PartnerWBookkeeperRequestManager extends PartnerWBookkeeperRequest
         $obPurseHistory = new PartnerPurseHistory();
         $obPurseHistory->amount = $this->factual_amount_in_base_currency;
         $obPurseHistory->type = PartnerPurseHistory::TYPE_EXPENSE;
+        $obPurseHistory->date = $this->request->date;
         $obPurseHistory->cuser_id = $this->partner_id;
         if($iExpenseID !== true)
             $obPurseHistory->expense_id = $iExpenseID;

@@ -51,7 +51,7 @@ $this->title = Yii::t('app/book','Process partner withdrawal request');
                                     'value' => is_object($obLegal = $model->legal) ? $obLegal->name : NULL
                                 ],
                                 'request_id',
-                                'created_by:datetime',
+                                'request.date:datetime',
                                 [
                                     'attribute' => 'created_by',
                                     'value' => is_object($obCrt = $model->createdBy) ? $obCrt->getFio() : NULL
