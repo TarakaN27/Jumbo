@@ -4,6 +4,7 @@ namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
+use common\components\payment\PaymentBonusBehavior;
 use common\components\payment\PaymentOperations;
 use common\models\Acts;
 use common\models\ActToPayments;
@@ -446,5 +447,16 @@ class DefaultController extends AbstractBaseBackendController
 
         $time = strtotime($date);
         return PaymentCondition::getConditionWithCurrency(date('Y-m-d',$time));
+    }
+    public function actionSetSale($id, $userId){
+        $behavior = new PaymentBonusBehavior();
+        $model = $this->findModel($id);
+        $model->isSale = true;
+        $model->saleUser = $userId;
+        $behavior->saveSale($model);
+        $behavior->countingSimpleBonus($model);
+        $behavior->countingComplexBonus($model);
+        echo 'Бонус пересчитан';
+        die;
     }
 }

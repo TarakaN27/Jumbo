@@ -200,7 +200,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool|PaymentsSale|null
 	 * @throws ServerErrorHttpException
 	 */
-	protected function saveSale(Payments $model,$simpleBonus = FALSE)
+	public function saveSale(Payments $model,$simpleBonus = FALSE)
 	{
 		if(empty($model->saleUser))
 			return FALSE;
