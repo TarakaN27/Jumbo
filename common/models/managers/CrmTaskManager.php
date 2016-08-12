@@ -46,6 +46,7 @@ class CrmTaskManager extends CrmTask
             $obTask->closed_by = '';
             $obTask->closed_date = '';
             $obTask->recurring_last_upd = '';
+            $obTask->isCreateRepeatTask = true;
             if($setRecurringID)
                 $obTask->recurring_id = $taskID;
             if(!$obTask->save())

@@ -210,19 +210,20 @@ class TaskNotificationBehavior extends Behavior
 			foreach($arAcc as $acc)
 				$arUsers[] = $acc;
 		// исключим постановщика задачи. Он и так в курсе того, что задача поставлена
-		foreach($arUsers as $key=>$user)
-			if($user == $owner->created_by)
-				unset($arUsers[$key]);
 
+		foreach($arUsers as $key=>$user) {
+			if (!$owner->isCreateRepeatTask && $user == $owner->created_by)
+				unset($arUsers[$key]);
+		}
 		// если нет пользователей, для оповещения, то вернем TRUE
 		if(empty($arUsers))
 			return TRUE;
 
 		//Добавляем realtime уведомление
 		$this->addTabledNotification($arUsers);
-
 		// добавляем в список новых задач redis запись о новой задаче
-		RedisNotification::addNewTaskToList($arUsers,$owner->id);
+		if(!$owner->isCreateRepeatTask)
+			RedisNotification::addNewTaskToList($arUsers,$owner->id);
 
 		return TRUE;
 	}
