@@ -14,6 +14,16 @@ if(isset($isCmpList))
 $this->registerJs("
 initCmptasks();
 ",\yii\web\View::POS_READY);
+foreach ($models as $obModel)
+{
+	if($obModel->crm_task_id && ($obTask = $obModel->tasks))
+	{
+		$obModel->theme = Yii::t('app/crm','Task').' "'.Html::a($obTask->title,['/crm/task/view','id' => $obTask->id],[
+				'target' => '_blank',
+				'class' => 'dialog-title-link'
+			]).'"';
+	}
+}
 ?>
 <?foreach($models as $model):?>
 <li id="dialogBlockId_<?php echo $model->id;?>" class="<?php if(in_array($model->id,$arRedisDialog)):?>dialog-not-viewed<?php endif;?>">
