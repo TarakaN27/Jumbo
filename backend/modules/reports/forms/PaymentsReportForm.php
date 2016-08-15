@@ -254,10 +254,12 @@ class PaymentsReportForm extends Model{
             }
 
             $dt['responsible_manager_name'] = false;
-            if(($dt['managerFname'] || $dt['managerLname'] || $dt['managerMname'])){
-                $dt['responsible_manager_name'] = trim($dt['managerLname'].' '.$dt['managerFname'].' '.$dt['managerMname']);
-            }else
-                $dt['responsible_manager_name'] = 'N/A';
+            if($this->generateExtendExcel) {
+                if (($dt['managerFname'] || $dt['managerLname'] || $dt['managerMname'])) {
+                    $dt['responsible_manager_name'] = trim($dt['managerLname'] . ' ' . $dt['managerFname'] . ' ' . $dt['managerMname']);
+                } else
+                    $dt['responsible_manager_name'] = 'N/A';
+            }
 
             $dt['manager_name'] = false;
             if($dt['preq_man_id'] && ($dt['lname'] || $dt['fname'] || $dt['mname'])){
