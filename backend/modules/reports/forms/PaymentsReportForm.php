@@ -183,7 +183,7 @@ class PaymentsReportForm extends Model{
         {
             $data->joinWith('cuser.quantityHour');
             $data->joinWith('cuser.prospects');
-            $data->joinWith('cuser.manager');
+            $data->joinWith('cuser.manager manager');
             array_push($arSelect,CuserProspects::tableName().'.name as prospects_name');
             array_push($arSelect,CuserQuantityHour::tableName().'.cuser_id as quant_user');
             array_push($arSelect,CuserQuantityHour::tableName().'.hours');
@@ -195,7 +195,7 @@ class PaymentsReportForm extends Model{
         $data->joinWith('legal');
         $data->joinWith('service');
         $data->joinWith('calculate.payCond');
-        $data->joinWith('payRequest.manager manager');
+        $data->joinWith('payRequest.manager');
         $data->select($arSelect);
         $data->where(
             Payments::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
