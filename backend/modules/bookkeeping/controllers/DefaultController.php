@@ -5,6 +5,7 @@ namespace backend\modules\bookkeeping\controllers;
 use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use common\components\payment\PaymentBonusBehavior;
+use common\components\payment\PaymentEnrollmentBehavior;
 use common\components\payment\PaymentOperations;
 use common\models\Acts;
 use common\models\ActToPayments;
@@ -118,6 +119,13 @@ class DefaultController extends AbstractBaseBackendController
      */
     public function actionView($id)
     {
+    /*    $model = $this->findModel($id);
+        $behavior = new PaymentEnrollmentBehavior();
+
+        $amount = $behavior->countAmoutForEnrollment($model, $model->calculate->payCond, $model->calculate);
+        echo $amount;
+        die;
+    */
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
