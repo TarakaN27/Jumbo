@@ -37,10 +37,6 @@ class BonusReportController extends AbstractBaseBackendController
 
 	public function actionIndex()
 	{
-		if(Yii::$app->user->id == 12) {
-			echo 'Доступ запрещен';
-			return die;
-		}
 		$model = new BonusReportsForm();
 		if(!\Yii::$app->user->can('adminRights'))
 			$model->users = [\Yii::$app->user->id];
