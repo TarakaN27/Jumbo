@@ -26,8 +26,11 @@ $this->registerJs("
     initFieldsByType();
     $('#paymentcondition-type').on('click','input',initFieldsByType);
     
-    $('#paymentcondition-summ_from,#paymentcondition-summ_to,#paymentcondition-corr_factor,#paymentcondition-commission,#paymentcondition-sale,#paymentcondition-tax').on('change',function(){
+    $('#paymentcondition-summ_from,#paymentcondition-summ_to').on('change',function(){
         amountFormatter(this,4);
+    });
+    $('#paymentcondition-corr_factor,#paymentcondition-commission,#paymentcondition-sale,#paymentcondition-tax').on('change',function(){
+        amountFormatter(this,10);
     });
     amountFormatter('#paymentcondition-summ_from',4);
     amountFormatter('#paymentcondition-summ_to',4);
