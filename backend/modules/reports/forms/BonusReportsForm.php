@@ -160,7 +160,7 @@ class BonusReportsForm extends Model
 		{
 			if(isset($arTmp[$model->buser_id]))
 			{
-				$diff = CustomHelper::getDiffTwoNumbersAtPercent($model->amount,end($arTmp[$model->buser_id]));
+				$diff = CustomHelper::getDiffTwoNumbersAtPercent(end($arTmp[$model->buser_id]),$model->amount);
 				$arDiffs[$model->id] = $diff;
 				$arTmp[$model->buser_id][] = $model->amount;
 			}else{

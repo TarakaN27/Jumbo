@@ -621,9 +621,9 @@ class CustomHelper {
      * @param $secondNumber
      * @return float
      */
-    public static function getDiffTwoNumbersAtPercent($firstNumber,$secondNumber)
+    public static function getDiffTwoNumbersAtPercent($oldNumber, $newNumber)
     {
-        return ((float)$firstNumber/(float)$secondNumber)*100 - 100;
+        return (float)($newNumber-$oldNumber)/(float)$oldNumber*100;
     }
     
 
