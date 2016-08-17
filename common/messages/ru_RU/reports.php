@@ -114,6 +114,6 @@ return [
     'Addition settings' => 'Дополнительные настройки',
     'saleAmount' => 'Сумма платежей-продаж',
     'paymentAmountWithoutSale' => 'Сумма платежей без продаж',
-    'record diffs' => 'Разница платежей',
+    'record diffs' => 'Прирост к предыдущему месяцу',
     'Manager'=> 'Ответственный менеджер'
 ];
