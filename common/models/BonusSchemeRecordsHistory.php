@@ -106,7 +106,7 @@ class BonusSchemeRecordsHistory extends AbstractActiveRecord
                 ->where(['scheme_id' => $arSchemesIds])
                 ->andWhere(['<=','update_date',date('Y-m-d')])
                 ->indexBy('scheme_id')
-                ->one();
+                ->all();
             if(!$obParams)
             {
                 $obParams = BonusSchemeRecords::find()->where(['scheme_id' => $arSchemesIds])->indexBy('scheme_id')->all();
