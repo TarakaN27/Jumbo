@@ -73,7 +73,7 @@ function validateFormLogic()
         tmpSumm+=convertAmountToValid(val);
     });
 
-    if(aSumm.val() != tmpSumm)
+    if(parseFloat(aSumm.val()).toFixed(2) != tmpSumm.toFixed(2))
     {
         addErrorNotify(addPErrorTitle,addPErrorTextFullAmount);
         return false;

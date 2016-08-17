@@ -174,9 +174,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
             {
                 $tmpSumm+=$m->summ;
             }
-
-            if($tmpSumm != $modelP->pay_summ)
-                Yii::$app->session->setFlash('error',Yii::t('app/book','You have to spend all amout'));
+            if(round($tmpSumm,2) != round($modelP->pay_summ,2)) {
+                Yii::$app->session->setFlash('error', Yii::t('app/book', 'You have to spend all amout'));
+            }
             else
                 $validSumm = TRUE;
 
