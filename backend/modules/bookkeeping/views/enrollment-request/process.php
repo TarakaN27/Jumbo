@@ -64,7 +64,7 @@ var
                             [
                                 'attribute' => 'amount',
                                 'label' => Yii::t('app/book','Counting unit amount'),
-                                'value' => Yii::$app->formatter->asDecimal($model->amount) .' '.(is_object($obServ = $model->service) ? $obServ->enroll_unit : NULL)
+                                'value' => Yii::$app->formatter->asDecimal($model->amount) .' '.(is_object($model->unitEnroll) ? $model->unitEnroll->name : NULL)
                             ],
                         ]
                     ])?>

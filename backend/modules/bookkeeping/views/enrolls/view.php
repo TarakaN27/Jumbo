@@ -38,8 +38,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'enroll:decimal',
                                 'enr_req_id',
                                 [
-                                    'attribute' => 'service_id',
-                                    'value' => is_object($obSrv = $model->service) ? $obSrv->name.' ['.$obSrv->enroll_unit.']' : NULL
+                                    'attribute' => 'enroll_unit_id',
+                                    'value' => $model->unitEnroll->name,
                                 ],
                                 [
                                     'attribute' => 'cuser_id',

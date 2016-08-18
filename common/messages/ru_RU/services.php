@@ -89,5 +89,9 @@ return [
     'Document email' => 'Емаил для документов',
     'Letter type OOO' => 'Шаблон письма для ООО',
     'Letter type IP' => 'Шаблон письма для ИП',
-    'Letter template type' => 'Тип шаблона для отправки писем'
+    'Letter template type' => 'Тип шаблона для отправки писем',
+    'Create Units Enroll' => 'Создать единицу зачисления',
+    'ATTR_NAME' =>'Название',
+    'Update Units Enroll' => 'Редактирование единицы зачисления',
+    'Choose Units Enroll' => 'Выберите единицу зачисления'
 ];

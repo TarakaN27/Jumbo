@@ -74,6 +74,7 @@ class Enrolls extends AbstractActiveRecord
             'description' => Yii::t('app/book', 'Description'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'enroll_unit_id' =>  Yii::t('app/services','Unit enrollment'),
         ];
     }
 
@@ -85,6 +86,10 @@ class Enrolls extends AbstractActiveRecord
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
     }
 
+    public function getUnitEnroll()
+    {
+        return $this->hasOne(UnitsEnroll::className(), ['id' => 'enroll_unit_id']);
+    }
     /**
      * @return \yii\db\ActiveQuery
      */

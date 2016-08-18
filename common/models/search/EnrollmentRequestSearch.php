@@ -30,7 +30,7 @@ class EnrollmentRequestSearch extends EnrollmentRequest
             [[
                 'id', 'payment_id', 'pr_payment_id',
                 'service_id', 'assigned_id', 'cuser_id',
-                'pay_currency', 'pay_date', 'created_at', 'updated_at','status'], 'integer'],
+                'pay_currency', 'pay_date', 'created_at', 'updated_at','status','enroll_unit_id'], 'integer'],
             [['amount', 'pay_amount'], 'number'],
             [['from_date','to_date'],'safe'],
             [['from_date','to_date'],'date','format' => 'php:m.d.Y']
@@ -110,6 +110,7 @@ class EnrollmentRequestSearch extends EnrollmentRequest
             'pay_date' => $this->pay_date,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'enroll_unit_id' => $this->enroll_unit_id,
             EnrollmentRequest::tableName().'.status' => $this->status
         ]);
 
@@ -147,27 +148,24 @@ class EnrollmentRequestSearch extends EnrollmentRequest
      */
     public function countTotal($params,$additionQuery = NULL)
     {
-        $query = EnrollmentRequest::find()->select([
-            'amount',
-            'service_id',
-            Services::tableName().'.name',
-            Services::tableName().'.enroll_unit'
-        ]);
-        $query->joinWith('service');
+        $query = EnrollmentRequest::find()->select(['sumAmount'=>'SUM(amount)', 'unitEnrollName'=>'ue.name', 'service_id', 'servName'=>'serv.name','enroll_unit_id']);
+        $query->joinWith('service serv');
+        $query->joinWith('unitEnroll ue');
+        $query->groupBy(['service_id', 'enroll_unit_id']);
+        $query->asArray();
+
         $query = $this->queryHelper($query,$params,$additionQuery);
         if(!$this->bCountTotal)
             return [];
+        $arEnroll = $query->all();
 
-        $arEnrTmp = $query->all();
-        $arResult = [];
-        foreach($arEnrTmp as $tmp)
-        {
-            $name = is_object($tmp->service) ? $tmp->service->getNameWithEnrollUnit() : $tmp->service_id;
-            if(isset($arResult[$name]))
-                $arResult[$name]+=$tmp->amount;
-            else
-                $arResult[$name]=$tmp->amount;
-        }
+        if(empty($arEnroll))
+            return [];
+
+
+        foreach($arEnroll as $enroll)
+            $arResult[$enroll['service_id'].'-'.$enroll['enroll_unit_id']]=['amount'=>$enroll['sumAmount'], 'nameServiceWithUnitEnroll' => $enroll['servName'].'['.$enroll['unitEnrollName'].']'];
+        
         return $arResult;
     }
 }

@@ -21,7 +21,7 @@ class PaymentConditionSearch extends PaymentCondition
             [[
                 'id', 'service_id', 'l_person_id',
                 'is_resident', 'created_at',
-                'updated_at','type','currency_id','cond_currency','not_use_sale','not_use_corr_factor'
+                'updated_at','type','currency_id','cond_currency','not_use_sale','not_use_corr_factor', 'enroll_unit_id'
             ], 'integer'],
             [['name', 'description'], 'safe'],
             [['summ_from', 'summ_to', 'corr_factor', 'commission', 'sale', 'tax'], 'number'],
@@ -80,7 +80,8 @@ class PaymentConditionSearch extends PaymentCondition
             'type' => $this->type,
             'cond_currency' => $this->cond_currency,
             'not_use_sale' => $this->not_use_sale,
-            'not_use_corr_factor' => $this->not_use_corr_factor
+            'not_use_corr_factor' => $this->not_use_corr_factor,
+            'enroll_unit_id' =>$this->enroll_unit_id,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

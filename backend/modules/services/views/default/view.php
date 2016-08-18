@@ -60,7 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'attribute' => 'b_user_enroll',
                                                 'value' => is_object($obUser = $model->responsibilityUser) ? $obUser->getFio() : NULL
                                             ],
-                                            'enroll_unit'
                                         ],
                                     ]) ?>
 

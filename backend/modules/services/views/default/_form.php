@@ -12,21 +12,17 @@ function enrollmentAction(clean)
 {
     var
         check = $('#services-allow_enrollment'),
-        sel = $('#services-b_user_enroll'),
-        text = $('#services-enroll_unit');
+        sel = $('#services-b_user_enroll');        
 
     if(check.is(':checked'))
     {
-        sel.removeAttr('disabled');
-        text.removeAttr('disabled');
+        sel.removeAttr('disabled');        
     }else{
         if(clean)
         {
-            sel.val('');
-            text.val('');
+            sel.val('');            
         }
-        sel.attr('disabled','disabled');
-        text.attr('disabled','disabled');
+        sel.attr('disabled','disabled');        
     }
 }
 ",\yii\web\View::POS_END);
@@ -82,9 +78,6 @@ $('#services-allow_enrollment').on('change',function(){
         ],
     ])?>
 
-    <?= $form->field($model,'enroll_unit')->textInput([
-        'disabled' => 'disabled'
-    ])?>
 
     <div class="form-group">
          <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

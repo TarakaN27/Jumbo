@@ -21,7 +21,7 @@ use common\components\behavior\Service\ServiceRateBehavior;
  * @property integer $updated_at
  * @property integer $allow_enrollment
  * @property integer $b_user_enroll
- * @property string $enroll_unit
+
  */
 class Services extends AbstractActiveRecord
 {
@@ -45,13 +45,13 @@ class Services extends AbstractActiveRecord
                 'updated_at','b_user_enroll',
                 'allow_enrollment'
             ], 'integer'],
-            [['name','enroll_unit'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 255],
             ['rate','number','min' => 100],
             [['description'], 'string', 'max' => 32],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
 
-            [['b_user_enroll','enroll_unit'],'required','when' => function($model) {
+            [['b_user_enroll'],'required','when' => function($model) {
                 if($model->allow_enrollment)
                     return TRUE;
                 return FALSE;
@@ -81,7 +81,6 @@ class Services extends AbstractActiveRecord
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'allow_enrollment' => Yii::t('app/services', 'Allow enrollment'),
             'b_user_enroll' => Yii::t('app/services', 'Responsibility for enrollment'),
-            'enroll_unit' => Yii::t('app/services', 'Unit enrollment')
         ];
     }
 
@@ -148,8 +147,4 @@ class Services extends AbstractActiveRecord
     /**
      * @return string
      */
-    public function getNameWithEnrollUnit()
-    {
-        return $this->name.' ['.$this->enroll_unit.']';
-    }
 }

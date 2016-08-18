@@ -29,7 +29,7 @@ class EnrollsSearch extends Enrolls
     public function rules()
     {
         return [
-            [['id', 'enr_req_id', 'service_id', 'cuser_id', 'buser_id',  'updated_at'], 'integer'],
+            [['id', 'enr_req_id', 'service_id', 'cuser_id', 'buser_id',  'updated_at','enroll_unit_id'], 'integer'],
             [['amount', 'repay', 'enroll'], 'number'],
             [['created_at','description','from_date','to_date'], 'safe'],
             ['unitname','string'],
@@ -110,6 +110,7 @@ class EnrollsSearch extends Enrolls
             'buser_id' => $this->buser_id,
             //'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'enroll_unit_id' => $this->enroll_unit_id,
         ]);
 
         if(!empty($this->created_at))
@@ -153,39 +154,23 @@ class EnrollsSearch extends Enrolls
      */
     public function totalCount($params,$additionQuery = [],$addParams = [])
     {
-        $query = Enrolls::find()->select(['amount','service_id']);
-        $query->joinWith('cuser');
+        $query = Enrolls::find()->select(['sumAmount'=>'SUM(amount)', 'unitEnrollName'=>'ue.name', 'service_id', 'servName'=>'serv.name','enroll_unit_id']);
         $query->joinWith('service serv');
+        $query->joinWith('unitEnroll ue');
+        $query->groupBy(['service_id', 'enroll_unit_id']);
+        $query->asArray();
+
         $query = $this->queryHelper($query,$params,$additionQuery,$addParams);
         if(!$this->countTotal)
             return [];
-        $arEnrTmp = $query->all();
-        if(empty($arEnrTmp))
+        $arEnroll = $query->all();
+
+        if(empty($arEnroll))
             return [];
 
-        $arResultTmp = [];
-        foreach($arEnrTmp as $tmp)
-        {
-            if(isset($arResultTmp[$tmp->service_id]))
-                $arResultTmp[$tmp->service_id]+=$tmp['amount'];
-            else
-                $arResultTmp[$tmp->service_id]=$tmp['amount'];
-        }
 
-        $arServ = ArrayHelper::map(
-            Services::find()->select(['id','name','enroll_unit'])->where(['id' => array_keys($arResultTmp)])->all(),
-            'id','nameWithEnrollUnit'
-        );
-
-        $arResult = [];
-        foreach($arResultTmp as $key => $value)
-        {
-            if(isset($arServ[$key]))
-                $arResult[$arServ[$key]] = $value;
-            else
-                $arResult[$key] = $value;
-        }
-
+        foreach($arEnroll as $enroll)
+            $arResult[$enroll['service_id'].'-'.$enroll['enroll_unit_id']]=['amount'=>$enroll['sumAmount'], 'nameServiceWithUnitEnroll' => $enroll['servName'].'['.$enroll['unitEnrollName'].']'];
         return $arResult;
     }
 }

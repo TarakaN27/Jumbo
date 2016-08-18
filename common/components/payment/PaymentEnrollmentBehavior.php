@@ -72,10 +72,13 @@ class PaymentEnrollmentBehavior extends Behavior{
         $obEnrollReq->payment_id = $model->id;
         $obEnrollReq->cuser_id = $model->cuser_id;
         $obEnrollReq->pay_amount = $model->pay_summ;
+        $obEnrollReq->enroll_unit_id = $obCond->enroll_unit_id;
+        
         $obEnrollReq->pay_currency = $model->currency_id;
         $obEnrollReq->pay_date = $model->pay_date;
         $obEnrollReq->status = EnrollmentRequest::STATUS_NEW;
         $obEnrollReq->added_by = \Yii::$app->user->id;
+        
         if(!$obEnrollReq->save())
         {
             throw new ServerErrorHttpException('Error. Save record');

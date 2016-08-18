@@ -164,8 +164,20 @@ class BonusReportsForm extends Model
 				$arDiffs[$model->id] = $diff;
 				$arTmp[$model->buser_id][] = $model->amount;
 			}else{
-				$arDiffs[$model->id] = NULL;
-				$arTmp[$model->buser_id][] = $model->amount;
+				$prevMonthBegin = (new \DateTime($beginDate))->modify("-1 month")->format("Y-m-d");
+				$prevMonthEnd = (new \DateTime($prevMonthBegin))->format("Y-m-t");
+				$tempRecord = BUserPaymentRecords::find()
+					->where(['buser_id'=>$model->buser_id])
+					->andWhere(['BETWEEN','record_date',$prevMonthBegin,$prevMonthEnd])
+					->one();
+				if($tempRecord){
+					$diff = CustomHelper::getDiffTwoNumbersAtPercent($tempRecord->amount,$model->amount);
+					$arDiffs[$model->id] = $diff;
+					$arTmp[$model->buser_id][] = $model->amount;
+				}else {
+					$arDiffs[$model->id] = NULL;
+					$arTmp[$model->buser_id][] = $model->amount;
+				}
 			}
 		}
 		unset($models,$arTmp,$query);

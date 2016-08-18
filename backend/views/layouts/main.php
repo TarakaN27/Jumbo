@@ -201,6 +201,11 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>
                                              </li>
                                         <?php endif;?>
+                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/services/units-enroll/index']); ?>"><?php echo Yii::t('app/services', 'Unit enrollment'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
                                         
                                         <?php if(Yii::$app->user->can('superRights')):?>
                                             <li>

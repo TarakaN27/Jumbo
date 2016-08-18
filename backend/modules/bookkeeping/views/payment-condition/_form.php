@@ -108,6 +108,9 @@ $this->registerJs("
     <?= $form->field($model,'cond_currency')->dropDownList(\common\models\ExchangeRates::getRatesCodes(),[
         'prompt' => Yii::t('app/book','Choose currency')
     ])?>
+    <?= $form->field($model,'enroll_unit_id')->dropDownList(\common\models\UnitsEnroll::getUnitsEnrollsDropDown(),[
+        'prompt' => Yii::t('app/services','Choose Units Enroll')
+    ])?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

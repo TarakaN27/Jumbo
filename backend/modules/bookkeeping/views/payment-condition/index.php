@@ -68,6 +68,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'filter' => \common\models\ExchangeRates::getRatesCodes()
                         ],
                         [
+                            'attribute' => 'enroll_unit_id',
+                            'value' => 'unitEnroll.name',
+                            'filter' => \common\models\UnitsEnroll::getUnitsEnrollsDropDown()
+                        ],
+                        [
                             'attribute' => 'cond_currency',
                             'value' => function($model){
                                 return is_object($obCC = $model->condCurrency) ? $obCC->code : 'N/A';

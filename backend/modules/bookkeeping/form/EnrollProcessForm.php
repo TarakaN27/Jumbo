@@ -86,6 +86,7 @@ class EnrollProcessForm extends Model{
             $obEnroll->amount = $this->availableAmount;
             $obEnroll->repay = $this->repay;
             $obEnroll->enroll = $this->enroll;
+            $obEnroll->enroll_unit_id = $this->request->enroll_unit_id;
             $obEnroll->enr_req_id = $this->request->id;
             $obEnroll->description = $this->description;
             if(!$obEnroll->save())

@@ -65,6 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => is_object($obCurr = $model->currency) ? $obCurr->code : 'N/A'
                         ],
                         [
+                            'attribute' => 'enroll_unit_id',
+                            'value' => $model->unitEnroll->name
+                        ],
+                        [
                             'attribute' => 'corr_factor',
                             'format'=>['decimal',10]
                         ],

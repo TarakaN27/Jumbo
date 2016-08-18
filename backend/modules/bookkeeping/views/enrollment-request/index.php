@@ -83,11 +83,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'amount:decimal',
                         [
-                            'label' => Yii::t('app/book','Unit enroll name'),
-                            'value' =>  function($model){
-                                return is_object($obServ = $model->service) ? $obServ->enroll_unit : NULL;
-                            },
+                            'attribute' => 'enroll_unit_id',
+                            'value' =>  'unitEnroll.name',
+                            'filter' => \common\models\UnitsEnroll::getUnitsEnrollsDropDown()
                         ],
+                      
                         [
                             'attribute' => 'assigned_id',
                             'visible' => Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'),
@@ -172,10 +172,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php if(!empty($arTotal)):?>
                         <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
                         <table class="table table-striped table-bordered">
-                            <?php foreach($arTotal as $key => $value):?>
+                            <?php foreach($arTotal as $value):?>
                                 <tr>
-                                    <th><?=$key;?></th>
-                                    <td><?=Yii::$app->formatter->asDecimal($value);?></td>
+                                    <th><?=$value['nameServiceWithUnitEnroll'];?></th>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['amount']);?></td>
                                 </tr>
                             <?php endforeach;?>
                         </table>

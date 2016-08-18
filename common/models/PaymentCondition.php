@@ -33,6 +33,7 @@ use common\components\customComponents\validation\ValidNumber;
  * @property integer $type
  * @property integer $not_use_sale
  * @property integer $not_use_corr_factor
+ * @property integer enroll_unit_id
  *
  * @property Services $service
  * @property LegalPerson $lPerson
@@ -90,7 +91,6 @@ class PaymentCondition extends AbstractActiveRecord
                 'summ_from',
                 'summ_to',
                 'currency_id',
-
                 'tax',
                 'type',
                 'cond_currency'
@@ -118,7 +118,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['name'],'unique','targetClass' => self::className(),
                 'message' => Yii::t('app/book','This name has already been taken.')],
             [['description'], 'string'],
-            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type'], 'integer'],
+            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type', 'enroll_unit_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['commission', 'sale', 'tax'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
@@ -152,7 +152,8 @@ class PaymentCondition extends AbstractActiveRecord
             'cond_currency' => Yii::t('app/book', 'Condition currency'),
             'type' => Yii::t('app/book','Type'),
             'not_use_sale' => Yii::t('app/services','Not use sale with counting unit enrollment'),
-            'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment')
+            'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment'),
+            'enroll_unit_id' => Yii::t('app/services','Unit enrollment'),
         ];
     }
 
@@ -162,6 +163,11 @@ class PaymentCondition extends AbstractActiveRecord
     public function getService()
     {
         return $this->hasOne(Services::className(), ['id' => 'service_id']);
+    }
+
+    public function getUnitEnroll()
+    {
+        return $this->hasOne(UnitsEnroll::className(), ['id' => 'enroll_unit_id']);
     }
 
     /**

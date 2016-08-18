@@ -165,6 +165,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         }
         else
         {
+
             $model = AbstractModel::createMultiple(AddPaymentForm::classname());
             AbstractModel::loadMultiple($model,Yii::$app->request->post());
             $valid = AbstractModel::validateMultiple($model);
@@ -182,6 +183,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
             if($valid &&  $validSumm)
             {
+
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
 

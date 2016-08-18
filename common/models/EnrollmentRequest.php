@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property Payments $payment
  * @property PromisedPayment $prPayment
  * @property Services $service
+ * @property Services $enroll_unit_id
  */
 class EnrollmentRequest extends AbstractActiveRecord
 {
@@ -88,7 +89,8 @@ class EnrollmentRequest extends AbstractActiveRecord
                 'added_by',
                 'parent_id',
                 'part_enroll',
-                'pw_request_id'
+                'pw_request_id',
+                'enroll_unit_id'
             ], 'integer'],
             [['service_id', 'cuser_id'], 'required'],
             [['amount', 'pay_amount'], 'number'],
@@ -118,7 +120,8 @@ class EnrollmentRequest extends AbstractActiveRecord
             'added_by' => Yii::t('app/book','Added by'),
             'parent_id' => Yii::t('app/book','Parent request'),
             'part_enroll' => Yii::t('app/book','Partial enrollment'),
-            'pw_request_id' => Yii::t('app/book','Partner withdrawal request')
+            'pw_request_id' => Yii::t('app/book','Partner withdrawal request'),
+            'enroll_unit_id' =>  Yii::t('app/services','Unit enrollment'),
         ];
     }
 
@@ -235,6 +238,11 @@ class EnrollmentRequest extends AbstractActiveRecord
                 $arReturn = ArrayHelper::merge($arReturn,$childs);
         }
         return $arReturn;
+    }
+
+    public function getUnitEnroll()
+    {
+        return $this->hasOne(UnitsEnroll::className(), ['id' => 'enroll_unit_id']);
     }
 
 }
