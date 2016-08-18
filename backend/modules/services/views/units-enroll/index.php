@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\search\UnitsEnrollSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app/services', 'Units Enrolls');
+$this->title = Yii::t('app/services', 'Unit enrollment');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

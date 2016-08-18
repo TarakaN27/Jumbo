@@ -7,6 +7,7 @@ use common\models\UnitsEnroll;
 use common\models\search\UnitsEnrollSearch;
 use backend\components\AbstractBaseBackendController;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
 
 
 /**
@@ -18,6 +19,25 @@ class UnitsEnrollController extends AbstractBaseBackendController
      * Lists all UnitsEnroll models.
      * @return mixed
      */
+    public function behaviors()
+    {
+        $tmp = parent::behaviors();
+        $tmp['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'actions' => ['index','view'],
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper','moder']
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['admin','bookkeeper']
+                ]
+            ]
+        ];
+        return $tmp;
+    }
     public function actionIndex()
     {
         $searchModel = new UnitsEnrollSearch();
