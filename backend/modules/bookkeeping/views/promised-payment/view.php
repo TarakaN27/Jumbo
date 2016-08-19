@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     [
                         'attribute' => 'amount',
-                        'value' => $model->amount.' '.(is_object($obServ = $model->service) ? $obServ->enroll_unit : '')
+                        'value' => $model->amount
                     ],
                     [
                         'attribute' => 'service_id',
