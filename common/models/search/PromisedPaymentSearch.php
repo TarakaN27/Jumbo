@@ -123,7 +123,7 @@ class PromisedPaymentSearch extends PromisedPayment
      */
     public function countTotal($params,$additionQuery = NULL)
     {
-        $query = PromisedPayment::find()->select(['amount','service_id',Services::tableName().'.name',Services::tableName().'.enroll_unit']);
+        $query = PromisedPayment::find()->select(['amount','service_id',Services::tableName().'.name']);
         $query->joinWith('service');
         $query = $this->queryHelper($query,$params,$additionQuery);
         if(!$this->bCountTotal)
@@ -136,7 +136,7 @@ class PromisedPaymentSearch extends PromisedPayment
         $arResult = [];
         foreach($arPP as $tmp)
         {
-            $name = is_object($tmp->service) ? $tmp->service->getNameWithEnrollUnit() : $tmp->service_id;
+            $name = is_object($tmp->service) ? $tmp->service->name : $tmp->service_id;
             if(isset($arResult[$name]))
                 $arResult[$name]+=(float)$tmp->amount;
             else
