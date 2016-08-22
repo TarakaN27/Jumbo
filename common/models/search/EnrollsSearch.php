@@ -156,6 +156,7 @@ class EnrollsSearch extends Enrolls
     {
         $query = Enrolls::find()->select(['sumAmount'=>'SUM(amount)', 'unitEnrollName'=>'ue.name', 'service_id', 'servName'=>'serv.name','enroll_unit_id']);
         $query->joinWith('service serv');
+        $query->joinWith('cuser');
         $query->joinWith('unitEnroll ue');
         $query->groupBy(['service_id', 'enroll_unit_id']);
         $query->asArray();
