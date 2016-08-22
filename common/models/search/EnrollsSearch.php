@@ -154,9 +154,9 @@ class EnrollsSearch extends Enrolls
      */
     public function totalCount($params,$additionQuery = [],$addParams = [])
     {
-        $query = Enrolls::find()->select(['sumAmount'=>'SUM(amount)', 'unitEnrollName'=>'ue.name', 'service_id', 'servName'=>'serv.name','enroll_unit_id']);
-        $query->joinWith('service serv');
+        $query = Enrolls::find()->select(['sumAmount'=>'SUM(amount)', 'unitEnrollName'=>'ue.name', 'service_id', 'cuser_id', 'servName'=>'serv.name','enroll_unit_id']);
         $query->joinWith('cuser');
+        $query->joinWith('service serv');
         $query->joinWith('unitEnroll ue');
         $query->groupBy(['service_id', 'enroll_unit_id']);
         $query->asArray();
