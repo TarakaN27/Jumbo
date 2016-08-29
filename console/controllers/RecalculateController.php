@@ -78,8 +78,10 @@ class RecalculateController extends AbstractConsoleController
         $withdrowalHistory = PartnerPurseHistory::findAll(['type'=>PartnerPurseHistory::TYPE_EXPENSE]);
         while($date->format('Y-m-d')<=$now){
             $obCalc = new PartnerPercentCounting();
-            // бовтрутенко считаем только с 01.06.2016
-       //     $obCalc->excludePartnerPeriod[8869] = '2016-06-01';
+            //бовтрутенко считаем только с 01.06.2016
+            $obCalc->excludePartnerPeriod[8869] = '2016-06-01';
+			//зубарева с 01.08.2016
+            $obCalc->excludePartnerPeriod[8859] = '2016-08-01';
             
             $obCalc->countPercentByMonth($date->format('Y-m-d'));
             $date->modify("+1 month");

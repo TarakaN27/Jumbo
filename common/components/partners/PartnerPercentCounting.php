@@ -64,7 +64,6 @@ class PartnerPercentCounting
         $arSchemes = $this->getSchemes($arPartners);                     //Get all schemes for current partner
 
         foreach ($arPartners as $partner) {
-            // бовтрутенко считаем только с 01.06.2016
             if (!array_key_exists($partner->id, $this->excludePartnerPeriod) || (array_key_exists($partner->id, $this->excludePartnerPeriod) && $beginTime > $this->excludePartnerPeriod[$partner->id])){
                 if (!isset($arSchemes[$partner->partner_scheme]))
                     continue;
