@@ -121,7 +121,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type', 'enroll_unit_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['summ_from', 'summ_to','corr_factor'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
-            [['commission', 'sale', 'tax'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['commission', 'tax'],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['commission', 'sale', 'tax'],'number','max' => 100,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             ['is_console','safe'],
             [['not_use_sale', 'not_use_corr_factor'],'integer']

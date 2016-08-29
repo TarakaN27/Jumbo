@@ -51,7 +51,7 @@ class PaymentOperations {
     {
         if($this->condType != PaymentCondition::TYPE_CUSTOM)
         {
-            if($this->sale > 100 || $this->sale < 0)
+            if($this->sale > 100)
                 throw new InvalidParamException("Sale must be more than 0 and less then 100 (0 <= sale <= 100)");
 
             if($this->commission > 100 || $this->commission < 0)
