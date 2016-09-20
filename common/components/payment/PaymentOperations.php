@@ -65,9 +65,9 @@ class PaymentOperations {
         }
 
 
-        if($this->tax > 100 || $this->tax < 0)
+/*        if($this->tax > 100 || $this->tax < 0)
             throw new InvalidParamException("Tax must be more than 0 and less then 100 (0 <= tax <= 100)");
-
+*/
 
         if($this->paySumm < 0)
             throw new InvalidParamException("Payment summ factor must be more than 0  (0 <= payment summ )");
