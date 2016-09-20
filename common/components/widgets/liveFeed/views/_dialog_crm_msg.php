@@ -49,7 +49,7 @@ foreach ($models as $obModel)
 								'data-type' => "select",
 								'data-pk' => $model->crm_task_id,
 								'data-created_by' => ArrayHelper::getValue($model,'tasks.created_by'),
-								// 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+								'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
 								'data-url' => \yii\helpers\Url::to(['/crm/task/update-status']),
 								'data-title' => Yii::t('app/common','change status')
 							]);
