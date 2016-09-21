@@ -38,13 +38,16 @@ class RecurringTask
      */
     function run()
     {
-        $arRecurringTask = $this->getTasksRepeat();                 //get recurring tasks
+        $arRecurringTask = $this->getTasksRepeat();
         if(empty($arRecurringTask))
             return TRUE;
-        $this->getTasks($arRecurringTask);                          //get tasks with last recurring update
+        $this->getTasks($arRecurringTask);
+        //get tasks with last recurring update
         if(empty($this->arTask))
             return TRUE;
-        $this->getTaskIdsForClone($arRecurringTask);                //get task ids for clone
+        $this->getTaskIdsForClone($arRecurringTask);
+
+        //get task ids for clone
         if(!empty($this->arTaskIds))
             $this->createTasks();
         
@@ -70,6 +73,7 @@ class RecurringTask
                 continue;
 
             $iLastUpd = $this->arTask[$item->task_id];
+
             switch ($item->type)
             {
                 case CrmTaskRepeat::TYPE_DAILY:
@@ -85,6 +89,7 @@ class RecurringTask
                     break;
             }
         }
+
         return $this->arTaskIds;
     }
 
@@ -127,11 +132,12 @@ class RecurringTask
     {
         if(empty($iLastUpd))
         {
-            $this->arTaskIds = [$obTaskRepeat->task_id];
+            $this->arTaskIds[] = $obTaskRepeat->task_id;
             return $obTaskRepeat->task_id;
         }
 
         $iDiffDays = CustomDateHelper::getDiffInDays($this->iCurrentTime,CustomHelper::getBeginDayTime($iLastUpd));
+
         $iDays = $obTaskRepeat->everyday_custom ? $obTaskRepeat->everyday_value : 1;
 
         if(!$iDays)
@@ -142,6 +148,7 @@ class RecurringTask
             $this->arTaskIds = [$obTaskRepeat->task_id];
             return $obTaskRepeat->task_id;
         }
+
 
         return NULL;
     }
@@ -158,7 +165,7 @@ class RecurringTask
 
         if(empty($iLastUpd) && (is_null($wd) || (!is_null($wd) && $wd == $currWD)))
         {
-            $this->arTaskIds = [$obTaskRepeat->task_id];
+            $this->arTaskIds[] = $obTaskRepeat->task_id;
             return $obTaskRepeat->task_id;
         }
 
@@ -189,7 +196,7 @@ class RecurringTask
     {
         if(empty($iLastUpd))
         {
-            $this->arTaskIds = [$obTaskRepeat->task_id];
+            $this->arTaskIds[] = $obTaskRepeat->task_id;
             return $obTaskRepeat->task_id;
         }
 
