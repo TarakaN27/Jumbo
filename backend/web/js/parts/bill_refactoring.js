@@ -515,8 +515,7 @@ function validateFormBefore()
             bError = true;
         }
     });
-
-    if(tmpAmount != fullAmount)
+    if(tmpAmount.toFixed(2) != fullAmount.toFixed(2))
     {
         addErrorNotify('Сохранение счета', 'Сумма сумм по услугам не равна общей сумме!');
         bError = true;
