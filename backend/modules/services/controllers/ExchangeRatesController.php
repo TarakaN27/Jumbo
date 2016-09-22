@@ -145,100 +145,89 @@ class ExchangeRatesController extends AbstractBaseBackendController
     public function actionUpdateRates($id)
     {
         $model = $this->findModel($id);
+        if(!$model->fix_exchange) {
+            if ($model->use_exchanger) {
+                $obExch = new ExchangeRatesObmennikBY();
+                $obExch->setBankID($model->bank_id);
 
-        if($model->use_exchanger)
-        {
-            $obExch = new ExchangeRatesObmennikBY();
-            $obExch ->setBankID($model->bank_id);
+                $data = $obExch->getCurrencyUSD();
 
-            $data = $obExch ->getCurrencyUSD();
+                if (empty($data))
+                    throw new NotFoundHttpException('Cant get currency from obmennik.by');
 
-            if(empty($data))
-                throw new NotFoundHttpException('Cant get currency from obmennik.by');
+                $factor = empty($model->factor) ? 1 : $model->factor;
 
-            $factor = empty($model->factor) ? 1 : $model->factor;
-
-            $model->cbr_rate = $data['rur']*$factor;
-            $model->nbrb_rate = round($data['bur']*$factor,4);
-            if($model->save())
-            {
-                Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
-            }else{
-                Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
-            }
-        }
-        elseif($model->use_base)
-        {
-            /** @var ExchangeRates $obBase */
-            $obBase = ExchangeRates::findOne(['id' => $model->base_id]);
-            if(empty($obBase))
-                throw new NotFoundHttpException('Base currency not found');
-
-            $model->cbr_rate = round($obBase->cbr_rate*$model->factor,4);
-            $model->nbrb_rate = round($obBase->nbrb_rate*$model->factor,4);
-
-            if($model->save())
-            {
-                Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
-            }else{
-                Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
-            }
-        }elseif($model->use_rur_for_byr){
-            if($model->cbr != 0)
-            {
-                $crb = new ExchangeRatesCBRF($model->cbr);
-                $crbRate = $crb->makeRequest();
-            }else{
-                $crbRate = 1;
-            }
-
-            $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
-            $curr = $crb->getRURcurrencyInBur();
-
-            $nbrbRate = round($crbRate*$curr,4); //курс по ЦБРФ
-
-            if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
-            {
-                $model->cbr_rate = $crbRate;
-                $model->nbrb_rate= $nbrbRate;
-                if($model->save())
-                {
-                    Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
-                }else{
-                    Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
+                $model->cbr_rate = $data['rur'] * $factor;
+                $model->nbrb_rate = round($data['bur'] * $factor, 4);
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'Курсы валют успешно обновлены!.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось сохранить курсы валют.');
                 }
-            }else{
-                Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
-            }
-        }else{
+            } elseif ($model->use_base) {
+                /** @var ExchangeRates $obBase */
+                $obBase = ExchangeRates::findOne(['id' => $model->base_id]);
+                if (empty($obBase))
+                    throw new NotFoundHttpException('Base currency not found');
 
-            if($model->nbrb != 0)
-            {
-                $nbrb = new ExchangeRatesNBRB($model->nbrb);
-                $nbrbRate = $nbrb->makeRequest();
-            }else{
-                $nbrbRate = 1;
-            }
-            if($model->cbr != 0)
-            {
-                $crb = new ExchangeRatesCBRF($model->cbr);
-                $crbRate = $crb->makeRequest();
-            }else{
-                $crbRate = 1;
-            }
+                $model->cbr_rate = round($obBase->cbr_rate * $model->factor, 4);
+                $model->nbrb_rate = round($obBase->nbrb_rate * $model->factor, 4);
 
-            if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
-            {
-                $model->cbr_rate = $crbRate;
-                $model->nbrb_rate= $nbrbRate;
-                if($model->save())
-                {
-                    Yii::$app->session->setFlash('success','Курсы валют успешно обновлены!.');
-                }else{
-                    Yii::$app->session->setFlash('error','Не удалось сохранить курсы валют.');
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'Курсы валют успешно обновлены!.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось сохранить курсы валют.');
                 }
-            }else{
-                Yii::$app->session->setFlash('error','Не удалось получить курсы валют.');
+            } elseif ($model->use_rur_for_byr) {
+                if ($model->cbr != 0) {
+                    $crb = new ExchangeRatesCBRF($model->cbr);
+                    $crbRate = $crb->makeRequest();
+                } else {
+                    $crbRate = 1;
+                }
+
+                $crb = new ExchangeRatesCBRF(ExchangeRatesCBRF::BUR_IN_CBR_CODE);
+                $curr = $crb->getRURcurrencyInBur();
+
+                $nbrbRate = round($crbRate * $curr, 4); //курс по ЦБРФ
+
+                if ((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0)) {
+                    $model->cbr_rate = $crbRate;
+                    $model->nbrb_rate = $nbrbRate;
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Курсы валют успешно обновлены!.');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Не удалось сохранить курсы валют.');
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось получить курсы валют.');
+                }
+            } else {
+
+                if ($model->nbrb != 0) {
+                    $nbrb = new ExchangeRatesNBRB($model->nbrb);
+                    $nbrbRate = $nbrb->makeRequest();
+                } else {
+                    $nbrbRate = 1;
+                }
+                if ($model->cbr != 0) {
+                    $crb = new ExchangeRatesCBRF($model->cbr);
+                    $crbRate = $crb->makeRequest();
+                } else {
+                    $crbRate = 1;
+                }
+
+                if ((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0)) {
+                    $model->cbr_rate = $crbRate;
+                    $model->nbrb_rate = $nbrbRate;
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Курсы валют успешно обновлены!.');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Не удалось сохранить курсы валют.');
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', 'Не удалось получить курсы валют.');
+                }
             }
         }
 

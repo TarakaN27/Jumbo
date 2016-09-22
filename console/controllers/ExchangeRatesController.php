@@ -47,7 +47,7 @@ class ExchangeRatesController extends AbstractConsoleController{
             /** @var  ExchangeRates $model*/
             foreach($arCurrency as $key => $model)
             {
-                if($model->use_base || $model->use_exchanger)
+                if($model->fix_exchange || $model->use_base || $model->use_exchanger)
                     continue;
 
                 $nbrbRate = $model->nbrb_rate;
@@ -129,6 +129,9 @@ class ExchangeRatesController extends AbstractConsoleController{
                     {
                         $bHasError = TRUE;
                     }
+                }
+                elseif($item->fix_exchange){
+                    $item->save();
                 }
             }
 

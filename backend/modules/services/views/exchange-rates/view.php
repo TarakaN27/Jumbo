@@ -72,6 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 'attribute' => 'use_exchanger',
                                                 'value' => $model->getYesNoStr($model->use_exchanger)
                                             ],
+                                            [
+                                                'attribute' => 'fix_exchange',
+                                                'value' => $model->getYesNoStr($model->fix_exchange)
+                                            ],
                                             'bank_id',
                                             [
                                                 'attribute' => 'is_default',

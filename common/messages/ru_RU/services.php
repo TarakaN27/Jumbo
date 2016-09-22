@@ -93,5 +93,6 @@ return [
     'Create Units Enroll' => 'Создать единицу зачисления',
     'ATTR_NAME' =>'Название',
     'Update Units Enroll' => 'Редактирование единицы зачисления',
-    'Choose Units Enroll' => 'Выберите единицу зачисления'
+    'Choose Units Enroll' => 'Выберите единицу зачисления',
+    'Fixing exchange' => 'Фиксировать курс'
 ];

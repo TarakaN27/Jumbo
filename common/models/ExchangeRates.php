@@ -82,7 +82,7 @@ class ExchangeRates extends AbstractActiveRecord
                 'nbrb', 'cbr', 'created_at', 'updated_at',
                 'need_upd','is_default','use_base','base_id',
                 'use_exchanger','bank_id','use_rur_for_byr',
-                'show_at_widget','doc_n2w_type'
+                'show_at_widget','doc_n2w_type', 'fix_exchange'
             ],'integer'],
             [['nbrb_rate', 'cbr_rate','factor'], 'number','numberPattern' => '/^\s*[-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['nbrb_rate', 'cbr_rate','factor'],ValidNumber::className()],
@@ -133,7 +133,8 @@ class ExchangeRates extends AbstractActiveRecord
             'use_exchanger' => Yii::t('app/services', 'Use exchanger'),
             'use_rur_for_byr' => Yii::t('app/services', 'Use currency rur for count byr'),
             'show_at_widget' => Yii::t('app/services','Show in widget'),
-            'doc_n2w_type' => Yii::t('app/services','Document number to words type')
+            'doc_n2w_type' => Yii::t('app/services','Document number to words type'),
+            'fix_exchange' => Yii::t('app/services','Fixing exchange'),
         ];
     }
 
