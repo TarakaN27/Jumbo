@@ -222,9 +222,7 @@ class TaskNotificationBehavior extends Behavior
 		//Добавляем realtime уведомление
 		$this->addTabledNotification($arUsers);
 		// добавляем в список новых задач redis запись о новой задаче
-		if(!$owner->isCreateRepeatTask)
-			RedisNotification::addNewTaskToList($arUsers,$owner->id);
-
+		RedisNotification::addNewTaskToList($arUsers,$owner->id);
 		return TRUE;
 	}
 
