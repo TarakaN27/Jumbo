@@ -105,7 +105,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool
 	 * @throws ServerErrorHttpException
 	 */
-	protected function countingUnits($model,$iPayID,$iCUserID,$sDate,$iService)
+	public function countingUnits($model,$iPayID,$iCUserID,$sDate,$iService)
 	{
 		/** @var BUser $obManager */
 		$obManager = BUser::find()      //находим менеджера, для которого зачисляется unit
@@ -434,8 +434,6 @@ class PaymentBonusBehavior extends Behavior
 	{
 		$arCuserGroup = PaymentsManager::getUserByGroup($model->cuser_id);  //получаем пользователей группы
 		$inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
-		
-
 		$saleUser = NULL;   //определеяем кому начислять бонус
 		$obSale = PaymentsSale::find()
 			->where(['cuser_id' => $arCuserGroup])
@@ -459,6 +457,7 @@ class PaymentBonusBehavior extends Behavior
 				])
 				->orderBy(['pay_date' => SORT_DESC])
 				->one();
+
 			if(empty($obLast)) {
 				if($paymentBase == BonusScheme::BASE_PAYMENT)
 					return FALSE;
@@ -541,12 +540,11 @@ class PaymentBonusBehavior extends Behavior
 			if(is_array($obBServ->month_percent) && isset($obBServ->month_percent[1]) && !empty($obBServ->month_percent[1]))
 				$percent = $obBServ->month_percent[1];
 		}else{
-
 			$beginDate = CustomHelper::getDateMinusNumMonth(time(),$inActivePeriod);
 			if($lastPayment->pay_date > $beginDate)
 			{
 				$payMonth = PaymentsManager::getPaymentMonth($model->service_id,$model->cuser_id,$model->pay_date,TRUE);
-
+				
 				if(!is_null($payMonth) && is_array($obBServ->month_percent) && isset($obBServ->month_percent[$payMonth+1]) && !empty($obBServ->month_percent[$payMonth+1]))
 					$percent = $obBServ->month_percent[$payMonth+1];
 			}else{

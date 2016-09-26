@@ -36,32 +36,33 @@ class RecalculateBonus
 	 */
 	public function run()
 	{
-		$arPaymentsTmp = Payments::find()/*->where(['>=','pay_date','1464739200'])*/->all();		//выберем платежи для которых считаем бонусы
-
+		$arPaymentsTmp = Payments::find()->where(['id'=>3237])/*->where(['>=','pay_date','1464739200'])*/->all();		//выберем платежи для которых считаем бонусы
 		BUserBonus::deleteAll([												//удаляем старые бонусы по платежам
 			'payment_id' => ArrayHelper::getColumn($arPaymentsTmp,'id'),
-			'buser_id' => 17
+//			'buser_id' => 17
 		]);
 
 		$arPayments = [];
 		foreach ($arPaymentsTmp as $payment)
 			$arPayments[$payment->id] = $payment;
 
-		$arSales = PaymentsSale::find()->where(['buser_id'=>17])->all();
+		$arSales = PaymentsSale::find()->all();
 		$obCount = new PaymentBonusBehavior();
-		$obCount->setOnlyForIdUser(17);				//указываем для какого пользователя считаем бонусы
-
+//		$obCount->setOnlyForIdUser(17);				//указываем для какого пользователя считаем бонусы
 		/** @var PaymentsSale $sale */
 		foreach($arSales as $key => $sale)
 		{
 			if(!isset($arPayments[$sale->payment_id]))
 				continue;
-
 			/** @var Payments $model */
 			$model = $arPayments[$sale->payment_id];
 			$model->saleUser = $sale->buser_id;
 			$model->isSale = TRUE;
-
+			$iPayID = $model->id;             // ID платежа
+			$iCUserID = $model->cuser_id;     // ID контрагента
+			$sDate = $model->pay_date;        // Дата платежа
+			$iService = $model->service_id;   // ID услуги
+			$obCount->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
 			$obCount->countingPartnerBonus($model);
 			$obCount->countingSimpleBonus($model);
 			$obCount->countingComplexBonus($model);
@@ -71,6 +72,11 @@ class RecalculateBonus
 
 		foreach ($arPayments as $pay)
 		{
+			$iPayID = $pay->id;             // ID платежа
+			$iCUserID = $pay->cuser_id;     // ID контрагента
+			$sDate = $pay->pay_date;        // Дата платежа
+			$iService = $pay->service_id;   // ID услуги
+			$obCount->countingUnits($pay,$iPayID,$iCUserID,$sDate,$iService);
 			$obCount->countingSimpleBonus($pay,BonusScheme::BASE_PAYMENT);
 			$obCount->countingComplexBonus($pay,BonusScheme::BASE_PAYMENT);
 			$obCount->countingPartnerBonus($pay,BonusScheme::BASE_PAYMENT);
