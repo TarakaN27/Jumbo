@@ -54,8 +54,9 @@ class PaymentOperations {
             if($this->sale > 100)
                 throw new InvalidParamException("Sale must be more than 0 and less then 100 (0 <= sale <= 100)");
 
-            if($this->commission > 100 || $this->commission < 0)
+        /*    if($this->commission > 100 || $this->commission < 0)
                 throw new InvalidParamException("Commission must be more than 0 and less then 100 (0 <= commission <= 100)");
+        */
 
             if($this->corrFactor < 0)
                 throw new InvalidParamException("Correction factor must be more than 0  (0 <= correction factor )");
