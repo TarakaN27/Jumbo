@@ -45,7 +45,7 @@ class PaymentsReportController extends AbstractBaseBackendController{
         $model = new PaymentsReportForm();
         if(!\Yii::$app->user->can('adminRights'))
         {
-            $model->managers = [\Yii::$app->user->id];
+            $model->managers = \Yii::$app->user->id;
             $arContractorMap = CUser::getContractorMapForManager(\Yii::$app->user->id);
         }else{
             $arContractorMap = CUser::getContractorMap();

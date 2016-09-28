@@ -53,7 +53,6 @@ class PaymentsReportForm extends Model{
     protected
         $arPaymentsInByr = [],      //платежи в белорусских рублях
         $arSales = [];              //продажи
-
     /**
      * @return array
      */
@@ -201,12 +200,26 @@ class PaymentsReportForm extends Model{
             Payments::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
             ' AND '.Payments::tableName().'.pay_date <= "'.strtotime($this->dateTo.' 23:59:59').'"'
         );
-
         $data->andFilterWhere([
             Payments::tableName().'.service_id' => $this->services,
             Payments::tableName().'.cuser_id' => $this->contractor,
-            PaymentRequest::tableName().'.manager_id' => $this->managers
         ]);
+        //если массив то значит это смотрит админ, ему показываем только те платежи у которых владелец выбранный менеджер,
+        //иначе покажем менеджеру все платежи которые он должен видеть
+        if($this->managers && !is_array($this->managers)){
+            $cuserIdSales = PaymentsSale::find()->select(['cuser_id'])->where(['buser_id'=>$this->managers])->asArray()->all();
+            if($cuserIdSales) {
+                $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'cuser_id');
+                $data->andWhere(['or', [PaymentRequest::tableName() . '.manager_id' => $this->managers], [CUser::tableName() . '.manager_id' => $this->managers], [Payments::tableName() . '.cuser_id' => $cuserIdSales]]);
+            }else
+                $data->andWhere(['or', [PaymentRequest::tableName() . '.manager_id' => $this->managers], [CUser::tableName() . '.manager_id' => $this->managers], [Payments::tableName() . '.cuser_id' => $cuserIdSales]]);
+        }else{
+                $data->andFilterWhere([
+                    PaymentRequest::tableName().'.manager_id' => $this->managers
+                ]);
+        }
+
+
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
         $data = $data->createCommand()->queryAll();

@@ -640,13 +640,23 @@ class CUser extends AbstractUser
      */
     public static function getContractorForManager($iMngID)
     {
-            return self::find()
+        $query = self::find()
                 ->select([CUser::tableName().'.id', 'type_id', 'j_lname', 'j_fname', 'j_mname', 'corp_name', 'requisites_id'])
-                ->joinWith('requisites')
-                ->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES])
-                ->notArchive()
-                ->asArray()
-                ->all();
+                ->joinWith('requisites');
+        $cuserIdSales = PaymentsSale::find()->select(['cuser_id'])->where(['buser_id'=>$iMngID])->distinct()->asArray()->all();
+        $cuserIdManager = PaymentRequest::find()->select(['cntr_id'])->where(['manager_id'=>$iMngID])->distinct()->asArray()->all();
+        $cuserIds = [];
+        if($cuserIdSales)
+            $cuserIds = ArrayHelper::getColumn($cuserIdSales, 'cuser_id');
+        if($cuserIdManager)
+            $cuserIds =  array_merge(ArrayHelper::getColumn($cuserIdManager, 'cntr_id'), $cuserIds);
+        $cuserIds = array_unique($cuserIds);
+        if($cuserIds) {
+            $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'cuser_id');
+            $query->andWhere(['OR', ['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES],[CUser::tableName().'.id' => $cuserIdSales]]);
+        }else
+            $query->where(['manager_id' => $iMngID,'contractor' => self::CONTRACTOR_YES]);
+        return $query->notArchive()->asArray()->all();
     }
 
     /**

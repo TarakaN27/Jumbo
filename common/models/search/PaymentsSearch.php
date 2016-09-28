@@ -6,6 +6,8 @@ use backend\models\BUser;
 use common\models\CUser;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
+use common\models\PaymentRequest;
+use common\models\PaymentsSale;
 use common\models\Services;
 use Yii;
 use yii\base\Model;
@@ -73,12 +75,12 @@ class PaymentsSearch extends Payments
             ->select([
                 Payments::tableName().'.id',
                 'cuser_id',
-                'service_id',
-                'legal_id',
-                'currency_id',
-                'pay_date',
-                'payment_order',
-                'pay_summ',
+                Payments::tableName().'.service_id',
+                Payments::tableName().'.legal_id',
+                Payments::tableName().'.currency_id',
+                Payments::tableName().'.pay_date',
+                Payments::tableName().'.payment_order',
+                Payments::tableName().'.pay_summ',
                 'act_close',
                 CUser::tableName().'.requisites_id',
                 CUser::tableName().'.manager_id',
@@ -126,7 +128,13 @@ class PaymentsSearch extends Payments
         if(Yii::$app->user->can('only_manager'))
         {
             $query->joinWith('cuser');
-            $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
+            $query->joinWith('payRequest');
+            $cuserIdSales = PaymentsSale::find()->select(['cuser_id'])->where(['buser_id'=>Yii::$app->user->id])->asArray()->all();
+            if($cuserIdSales){
+                $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'cuser_id');
+                $query->andWhere(['or', [CUser::tableName().'.manager_id' => Yii::$app->user->id], [PaymentRequest::tableName().'.manager_id' => Yii::$app->user->id], [static::tableName().'.cuser_id'=>$cuserIdSales]]);
+            }else
+                $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
         }
 
         $query->joinWith('cuser');
@@ -145,9 +153,9 @@ class PaymentsSearch extends Payments
         $query->andFilterWhere([
             'id' => $this->id,
             'cuser_id' => $this->cuser_id,
-            'pay_summ' => $this->pay_summ,
+             static::tableName().'.pay_summ' => $this->pay_summ,
             'currency_id' => $this->currency_id,
-            'service_id' => $this->service_id,
+             static::tableName().'.service_id' => $this->service_id,
             'legal_id' => $this->legal_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -187,7 +195,7 @@ class PaymentsSearch extends Payments
     {
         if(empty($params))
             return [];
-        $query = Payments::find()->select(['pay_summ','currency_id']);
+        $query = Payments::find()->select([static::tableName().'.pay_summ',static::tableName().'.currency_id']);
         $query = $this->queryHelper($query,$params);
         $arTmp = $query->all();
 
