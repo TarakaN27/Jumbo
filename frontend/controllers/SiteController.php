@@ -108,4 +108,14 @@ class SiteController extends Controller
 
         return $obAct->getDocument();
     }
+
+    public function actionGetActsXml($start = false, $end=false){
+        if(!$start|| !$end){
+            throw new NotFoundHttpException('Не заданы параметры (start,end)');
+        }
+        $xml = Acts::generateXmlFor1C($start, $end);
+        header('Content-Type: text/xml');
+        echo  $xml->saveXML();
+        exit();
+    }
 }

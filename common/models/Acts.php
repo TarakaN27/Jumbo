@@ -4,6 +4,7 @@ namespace common\models;
 
 use backend\models\BUser;
 use common\components\acts\ActsDocuments;
+use common\components\acts\ActsDocumentsV2;
 use common\components\acts\PartnerProfitActBehavior;
 use common\components\behavior\acts\ActsActionBehavior;
 use common\components\behavior\UploadBehavior;
@@ -246,5 +247,18 @@ class Acts extends AbstractActiveRecord
     public function getDocumentPath()
     {
         return Yii::getAlias(self::FILE_PATH).'/'.$this->file_name;
+    }
+
+    public static function generateXmlFor1C($start, $end){
+        $dom = new \DOMDocument("1.0", "utf-8");
+        $root = $dom->createElement("Акты"); // Создаём корневой элемент
+        $acts = Acts::find()->andWhere(['>=','act_date', $start])->andWhere(['<=','act_date', $end])->andWhere(['lp_id'=>3])->all();
+        foreach($acts as $act){
+            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id);
+            $actNode = $obActDoc->generateNodeActXml($dom,$act);
+            $root->appendChild($actNode);
+        }
+        $dom->appendChild($root);
+        return $dom;
     }
 }

@@ -489,4 +489,44 @@ class ActsDocumentsV2
         return $this->cuserContractDetail = $obAct->contract_num.' от '.\Yii::$app->formatter->asDate($obAct->contract_date);
     }
 
+    public function generateNodeActXml($dom, $act){
+        $this->getLegalPersonAndActTpl();
+        $this->getCUserDetail();
+        $this->getContractDetail();
+        $this->getCurrencyUnits();
+        $this->getServices();
+        $actNode = $dom->createElement("Акт");
+        $actNumber =$dom->createElement('НомерАкта',$this->actNumber);
+        $actDate = $dom->createElement('ДатаАкта',$this->actDate.'T00:00:00');
+        $cuserName = $dom->createElement('НаименованиеКонтрагента',$this->cuserName);
+        $unp = $dom->createElement('УНПКонтрагента',$this->cuserYnp);
+        $contractNumber = $dom->createElement('НомерДоговора',str_replace("Договор ","", str_replace("№","",$act->contract_num)));
+        $contractDate = $dom->createElement('ДатаАкта',$act->contract_date.'T00:00:00');
+        $actNode->appendChild($actNumber);
+        $actNode->appendChild($actDate);
+        $actNode->appendChild($cuserName);
+        $actNode->appendChild($unp);
+        $actNode->appendChild($contractNumber);
+        $actNode->appendChild($contractDate);
+        $servicesNode = $dom->createElement("СтрокиАкта");
+        foreach($this->arServices as $service){
+            $serviceNode = $dom->createElement("СтрокаАкта");
+            $serviceName = $dom->createElement("НаименованиеУслуги",$service['jobName']);
+            $serviceQuantity = $dom->createElement("Количество",$service['quantity']);
+            $servicePrice = $dom->createElement("Цена",$service['price']);
+            $serviceAmount = $dom->createElement("Сумма",$service['amount']);
+            $serviceVatRate = $dom->createElement("СтавкаНДС",$service['vatRate']);
+            $serviceVatAmount = $dom->createElement("СтоимостьСНДС",$service['amountWithVat']);
+            $serviceNode->appendChild($serviceName);
+            $serviceNode->appendChild($serviceQuantity);
+            $serviceNode->appendChild($servicePrice);
+            $serviceNode->appendChild($serviceAmount);
+            $serviceNode->appendChild($serviceVatRate);
+            $serviceNode->appendChild($serviceVatAmount);
+            $servicesNode->appendChild($serviceNode);
+        }
+        $actNode->appendChild($servicesNode);
+        return $actNode;
+    }
+
 }

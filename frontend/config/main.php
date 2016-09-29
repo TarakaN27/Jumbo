@@ -47,6 +47,9 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'rules' => [
+                'get-acts-xml' => 'site/get-acts-xml',
+            ],
         ],
     ],
     'params' => $params,
