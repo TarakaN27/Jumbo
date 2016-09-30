@@ -501,7 +501,7 @@ class ActsDocumentsV2
         $cuserName = $dom->createElement('НаименованиеКонтрагента',$this->cuserName);
         $unp = $dom->createElement('УНПКонтрагента',$this->cuserYnp);
         $contractNumber = $dom->createElement('НомерДоговора',str_replace("Договор ","", str_replace("№","",$act->contract_num)));
-        $contractDate = $dom->createElement('ДатаАкта',$act->contract_date.'T00:00:00');
+        $contractDate = $dom->createElement('ДатаДоговора',$act->contract_date.'T00:00:00');
         $actNode->appendChild($actNumber);
         $actNode->appendChild($actDate);
         $actNode->appendChild($cuserName);
