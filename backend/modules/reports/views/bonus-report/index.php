@@ -153,6 +153,7 @@ $rowContNum = $admin ? 6 : 12;
 						</div>
 					<?php endif;?>
 				</div>
+				<?if(isset($data['calcProfit'])){?>
 				<div class="row">
 					<h3></h3>
 					<table class="table table-bordered ">
@@ -178,6 +179,7 @@ $rowContNum = $admin ? 6 : 12;
 						</tbody>
 					</table>
 				</div>
+				<?}?>
 
 				<?php if(isset($data['bonusPaymentRecords'],$data['bonusPaymentRecords']['dataProvider']) && !empty($data['bonusPaymentRecords']['dataProvider'])):
 					$arDiffs = isset($data['bonusPaymentRecords']['diffs']) ? $data['bonusPaymentRecords']['diffs'] : [];

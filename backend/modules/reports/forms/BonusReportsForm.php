@@ -122,7 +122,6 @@ class BonusReportsForm extends Model
 			BUserBonus::tableName().'.scheme_id' => $this->scheme,
 			BUserBonus::tableName().'.service_id' => $this->service
 		]);
-
 		return [
 			'dataProvider' => new ActiveDataProvider([
 					'query' => $query,
