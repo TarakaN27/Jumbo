@@ -209,6 +209,7 @@ if(Yii::$app->user->can('adminRights'))
             ):?>
                 <th class="width-8-percent"><?=Yii::t('app/reports','Payment owner')?></th>
             <?php endif;?>
+            <th class="width-8-percent"><?=Yii::t('app/reports','Sale owner')?></th>
             <?php if(
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_MANAGER ||
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_SERVICE ||
@@ -253,7 +254,11 @@ if(Yii::$app->user->can('adminRights'))
             <td class="width-8-percent">
                     <?=($dt['manager_name']  ? $dt['manager_name'] : 'N/A');?>
             </td>
+
             <?php endif;?>
+            <td class="width-8-percent">
+                <?=($dt['sale_manager_name']  ? $dt['sale_manager_name'] : 'N/A');?>
+            </td>
             <?php if(
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_MANAGER ||
                 $modelForm->groupType == PaymentsReportForm::GROUP_BY_SERVICE ||

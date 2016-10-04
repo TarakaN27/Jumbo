@@ -200,6 +200,7 @@ class DefaultController extends AbstractBaseBackendController
                         'cnd_commission' => $obCond->commission,
                         'cnd_sale' => $obCond->sale,
                         'cnd_tax' => $obCond->tax,
+                        'profit_for_manager' => $arCount['profit'] - ($paySumm* PaymentsCalculations::COEF_FOR_PROFIT_MANAGER),
                     ]);
 
                     if($obClc->save())
@@ -240,6 +241,7 @@ class DefaultController extends AbstractBaseBackendController
                     $obCalc -> cnd_commission = $obCond->commission;
                     $obCalc -> cnd_sale = $obCond->sale;
                     $obCalc -> cnd_tax = $obCond->tax;
+                    $obCalc ->profit_for_manager = $arCount['profit'] - ($paySumm* PaymentsCalculations::COEF_FOR_PROFIT_MANAGER);
 
                     if($obCalc->save())
                     {

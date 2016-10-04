@@ -138,6 +138,7 @@ $rowContNum = $admin ? 6 : 12;
 									'visible' => $admin
 								],
 								'amount:decimal',
+								'payment.calculate.profit_for_manager:decimal',
 							]
 						])?>
 						<div class="col-md-4 col-md-offset-8">
@@ -151,6 +152,31 @@ $rowContNum = $admin ? 6 : 12;
 							<?php endif;?>
 						</div>
 					<?php endif;?>
+				</div>
+				<div class="row">
+					<h3></h3>
+					<table class="table table-bordered ">
+						<thead>
+						<tr>
+							<th><?=Yii::t('app/reports','Sum without sale selected period');?></th>
+							<th><?=Yii::t('app/reports','Sum with sale prev month');?></th>
+							<th><?=Yii::t('app/reports','Sum only sale selected period');?></th>
+							<th><?=Yii::t('app/reports','Sum only sale prev month');?></th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td>
+								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumWithoutSaleSelectedPeriod'])?>          </td>
+							<td>
+								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumWithSalePrevMonth'])?>           </td>
+							<td>
+								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumOnlySaleSelectedPeriod'])?>            </td>
+							<td>
+								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumOnlySalePrevMonth'])?>            </td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 
 				<?php if(isset($data['bonusPaymentRecords'],$data['bonusPaymentRecords']['dataProvider']) && !empty($data['bonusPaymentRecords']['dataProvider'])):

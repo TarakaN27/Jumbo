@@ -184,7 +184,8 @@ class Payments extends AbstractActiveRecord
                 ],
                 [
                     'class' => PaymentRecalculatePartnerPercentBehavior::className()    //перерасчет партнерских бонусов(добавление флагов в таблицу для пересчета)
-                ]
+                ],
+                
             ]);
     }
 
@@ -194,6 +195,14 @@ class Payments extends AbstractActiveRecord
     public function getCurrency()
     {
         return $this->hasOne(ExchangeRates::className(), ['id' => 'currency_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSale()
+    {
+        return $this->hasOne(PaymentsSale::className(), ['payment_id' => 'id']);
     }
 
 

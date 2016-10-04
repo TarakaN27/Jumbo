@@ -18,6 +18,8 @@ use common\models\CUser;
 use common\models\CUserRequisites;
 use common\models\ExchangeRates;
 use common\models\Payments;
+use common\models\PaymentsCalculations;
+use common\models\PaymentsSale;
 use common\models\Services;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -97,14 +99,17 @@ class BonusReportsForm extends Model
 				ExchangeRates::tableName().'.code',
 				BonusScheme::tableName().'.type as scheme_type',
 				BonusScheme::tableName().'.name as scheme_name',
+				PaymentsCalculations::tableName().'.profit_for_manager',
 			])
 			->joinWith('buser')
 			->joinWith('cuser')
 			->joinWith('cuser.requisites')
 			->joinWith('service')
 			->joinWith('payment')
+			->joinWith('payment.sale')
 			->joinWith('scheme')
 			->joinWith('payment.currency')
+			->joinWith('payment.calculate')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
 			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
 			->params([
@@ -127,10 +132,87 @@ class BonusReportsForm extends Model
 					//'sort'=> ['defaultOrder' => ['pay_date'=>SORT_ASC]],
 				]),
 			'totalCount' => $query->sum('amount'),
-			'bonusPaymentRecords' => $this->getPaymentsRecordsBonus()
+			'bonusPaymentRecords' => $this->getPaymentsRecordsBonus(),
+			'calcProfit' => $this->calcTotalProfit(),
 		];
 	}
+	protected function calcTotalProfit(){
+		$query = BUserBonus::find()
+			->joinWith('payment.sale')
+			->joinWith('payment.calculate')
+			->joinWith('scheme')
+			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is null')
+			->params([
+				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
+				':endDate' => strtotime($this->endDate.' 23:59:59')
+			]);
+		$query->andFilterWhere([
+			BonusScheme::tableName().'.type' => $this->bonusType,
+			BUserBonus::tableName().'.scheme_id' => $this->scheme,
+			BUserBonus::tableName().'.service_id' => $this->service
+		]);
+		$sumWithoutSaleSelectedPeriod = $query->sum('profit_for_manager');
 
+		$prevBeginDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-01';
+		$prevEndDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-31';
+		$query = BUserBonus::find()
+			->joinWith('payment.sale')
+			->joinWith('payment.calculate')
+			->joinWith('scheme')
+			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
+			->params([
+				':beginDate' => strtotime($prevBeginDate.' 00:00:00'),
+				':endDate' => strtotime($prevEndDate.' 23:59:59')
+			]);
+		$query->andFilterWhere([
+			BonusScheme::tableName().'.type' => $this->bonusType,
+			BUserBonus::tableName().'.scheme_id' => $this->scheme,
+			BUserBonus::tableName().'.service_id' => $this->service
+		]);
+		$sumWithSalePrevMonth = $query->sum('profit_for_manager');
+
+		$query = BUserBonus::find()
+			->joinWith('payment.sale')
+			->joinWith('payment.calculate')
+			->joinWith('scheme')
+			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is not null')
+			->params([
+				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
+				':endDate' => strtotime($this->endDate.' 23:59:59')
+			]);
+		$query->andFilterWhere([
+			BonusScheme::tableName().'.type' => $this->bonusType,
+			BUserBonus::tableName().'.scheme_id' => $this->scheme,
+			BUserBonus::tableName().'.service_id' => $this->service
+		]);
+		$sumOnlySaleSelectedPeriod = $query->sum('profit_for_manager');
+
+		$query = BUserBonus::find()
+			->joinWith('payment.sale')
+			->joinWith('payment.calculate')
+			->joinWith('scheme')
+			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is not null')
+			->params([
+				':beginDate' => strtotime($prevBeginDate.' 00:00:00'),
+				':endDate' => strtotime($prevEndDate.' 23:59:59')
+			]);
+		$query->andFilterWhere([
+			BonusScheme::tableName().'.type' => $this->bonusType,
+			BUserBonus::tableName().'.scheme_id' => $this->scheme,
+			BUserBonus::tableName().'.service_id' => $this->service
+		]);
+		$sumOnlySalePrevMonth = $query->sum('profit_for_manager');
+		return [
+			'sumWithoutSaleSelectedPeriod'=>$sumWithoutSaleSelectedPeriod,
+			'sumWithSalePrevMonth'=>$sumWithSalePrevMonth,
+			'sumOnlySaleSelectedPeriod'=>$sumOnlySaleSelectedPeriod,
+			'sumOnlySalePrevMonth'=>$sumOnlySalePrevMonth,
+		];
+	}
 	/**
 	 * @return ActiveDataProvider
 	 */

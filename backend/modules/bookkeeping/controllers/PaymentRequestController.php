@@ -165,7 +165,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
         }
         else
         {
-
             $model = AbstractModel::createMultiple(AddPaymentForm::classname());
             AbstractModel::loadMultiple($model,Yii::$app->request->post());
             $valid = AbstractModel::validateMultiple($model);
@@ -245,6 +244,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'cnd_commission' => $obCond->commission,
                                 'cnd_sale' => $obCond->sale,
                                 'cnd_tax' => $obCond->tax,
+                                'profit_for_manager' => $arCount['profit'] - ($paySumm* PaymentsCalculations::COEF_FOR_PROFIT_MANAGER),
                             ]);
 
                             if(!$obPayCalc->save())

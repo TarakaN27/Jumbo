@@ -30,6 +30,7 @@ class PaymentsCalculations extends AbstractActiveRecord
     /**
      * @inheritdoc
      */
+    const COEF_FOR_PROFIT_MANAGER = 0.03;
     public static function tableName()
     {
         return '{{%payments_calculations}}';
@@ -67,6 +68,7 @@ class PaymentsCalculations extends AbstractActiveRecord
             'cnd_tax' => Yii::t('app/book', 'Cnd Tax'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
+            'profit_for_manager' =>Yii::t('app/reports', 'Profit for manager'),
         ];
     }
 
