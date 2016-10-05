@@ -92,8 +92,10 @@ class PaymentRequestSearch extends PaymentRequest
 
         $this->load($params);
 
-        if(!empty($this->managerID))
-            $query->andWhere('( manager_id IS NULL OR manager_id = :manID )',[':manID' => $this->managerID]);
+        if(!empty($this->managerID)) {
+            $query->joinWith('cuser c');
+            $query->andWhere('('.PaymentRequest::tableName().'.manager_id IS NULL OR '.PaymentRequest::tableName().'.manager_id = :manID OR c.manager_id = :manID )', [':manID' => $this->managerID]);
+        }
 
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
@@ -109,7 +111,7 @@ class PaymentRequestSearch extends PaymentRequest
             'currency_id' => $this->currency_id,
             'legal_id' => $this->legal_id,
             'dialog_id' => $this->dialog_id,
-            'status' => $this->status,
+             PaymentRequest::tableName().'.status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

@@ -68,11 +68,11 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(Yii::$app->user->can('only_manager'))
             $searchModel->managerID = Yii::$app->user->id;
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,['status' => PaymentRequest::STATUS_NEW]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW]);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;
 
-        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,['status' => PaymentRequest::STATUS_NEW]);
+        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW]);
 
         $arRedisPaymentRequest = RedisNotification::getPaymentRequestListForUser(Yii::$app->user->id);
 
@@ -107,8 +107,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         if(empty($modelP))
             throw new NotFoundHttpException('Payment request not found');
         $modelP->callViewedEvent();
-
-        if(!Yii::$app->user->can('adminRights') && $modelP->manager_id != Yii::$app->user->id)
+        if(!Yii::$app->user->can('adminRights') && ($modelP->manager_id != Yii::$app->user->id && $modelP->cuser->manager_id!=Yii::$app->user->id))
             throw new ForbiddenHttpException('You are not allowed to perform this action');
 
         if($modelP->status != PaymentRequest::STATUS_NEW)
