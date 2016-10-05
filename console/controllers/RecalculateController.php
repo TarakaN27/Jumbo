@@ -12,6 +12,7 @@ namespace console\controllers;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\partners\PartnerPercentCounting;
+use common\models\Acts;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
 use console\components\AbstractConsoleController;
@@ -92,5 +93,20 @@ class RecalculateController extends AbstractConsoleController
             $purse->save();
         }
 
+    }
+
+    public function actionRegenerateActs(){
+        $acts = Acts::find()->all();
+        foreach($acts as $act){
+            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id);
+            $fileName = $obActDoc->generateDocument();
+            if(!$fileName)
+                throw new Exception();
+
+            $act->genFile = Acts::YES;
+            $act->file_name = $fileName;
+            if(!$act->save())
+                throw new ServerErrorHttpException();
+        }
     }
 }
