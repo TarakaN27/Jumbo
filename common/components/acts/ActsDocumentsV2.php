@@ -496,6 +496,8 @@ class ActsDocumentsV2
         $this->getCurrencyUnits();
         $this->getServices();
         $actNode = $dom->createElement("Акт");
+        $this->actNumber = '00000'.$this->actNumber;
+        $this->actNumber = '0000-'.substr($this->actNumber,strlen($this->actNumber)-6);
         $actNumber =$dom->createElement('НомерАкта',$this->actNumber);
         $actDate = $dom->createElement('ДатаАкта',$this->actDate.'T00:00:00');
         $cuserName = $dom->createElement('НаименованиеКонтрагента',$this->cuserName);
