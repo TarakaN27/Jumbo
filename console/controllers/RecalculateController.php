@@ -20,6 +20,7 @@ use yii\console\Controller;
 use common\components\crunchs\denomination\Denomination;
 use yii\helpers\ArrayHelper;
 use common\models\ExchangeCurrencyHistory;
+use common\components\acts\ActsDocumentsV2;
 
 class RecalculateController extends AbstractConsoleController
 {
