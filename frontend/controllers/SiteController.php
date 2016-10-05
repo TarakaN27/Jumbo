@@ -115,6 +115,7 @@ class SiteController extends Controller
         }
         $xml = Acts::generateXmlFor1C($start, $end);
         header('Content-Type: text/xml');
+        header('Content-Disposition: attachment; filename="acts-'.$start.'-'.$end.'.xml"');
         echo  $xml->saveXML();
         exit();
     }
