@@ -175,13 +175,13 @@ $this->registerJs("
 										<td><?=is_object($obRequisite) ? $obRequisite->c_phone : '';?></td>
 									</tr>
 									<tr>
-										<th><?=YII::t('app/crm','Email')?>: </th>
+										<th><?=YII::t('app/crm','Email')?>:</th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_email : '';?></td>
 									</tr>
 									<?php endif;?>
 									<tr>
 										<th><?=YII::t('app/crm','Site')?>: </th>
-										<td><?=is_object($obRequisite) ? "<a target='_blank' href=\"http://$obRequisite->site\">$obRequisite->site</a>" : '';?></td>
+										<td><?=is_object($obRequisite) ? '<a target="_blank" href="'.$obRequisite->getSiteUrl().'">'.$obRequisite->site.'</a>' : '';?></td>
 									</tr>
 									<tr>
 										<th><?=Yii::t('app/crm','Description')?>: </th>

@@ -495,4 +495,14 @@ class CUserRequisites extends AbstractActiveRecord
             $str.=' ('.$arData['site'].')';
         return $str;
     }
+
+    public function getSiteUrl(){
+        if($this->site) {
+            if(strpos($this->site, 'http')!==false)
+                return $this->site;
+            else
+                return 'http://'.$this->site;
+        }
+    }
 }
+
