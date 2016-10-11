@@ -218,7 +218,7 @@ class BillsManager extends Bills{
             {
                 $totalSum = $billTotalSumVat = $this->amount;
                 $vatAmount = round($this->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
-                $price = round($this->amount -$vatAmount,2);
+                $price = $sum = round($this->amount -$vatAmount,2);
 
                 $arFields [] = [
                     'colNum' => 1,
