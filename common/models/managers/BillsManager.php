@@ -173,8 +173,8 @@ class BillsManager extends Bills{
                 foreach ($arServices as $service)
                 {
                     $service->amount = round($service->amount,2);
-                    $price = round($service->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
-                    $vatAmount = round($service->amount -$price,2);
+                    $vatAmount = round($service->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
+                    $price = round($service->amount -$vatAmount,2);
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
@@ -217,8 +217,8 @@ class BillsManager extends Bills{
             if($this->use_vat)
             {
                 $totalSum = $billTotalSumVat = $this->amount;
-                $price = round($this->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
-                $vatAmount = round($this->amount -$price,2);
+                $vatAmount = round($this->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
+                $price = round($this->amount -$vatAmount,2);
 
                 $arFields [] = [
                     'colNum' => 1,
