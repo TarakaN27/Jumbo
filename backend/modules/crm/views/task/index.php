@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
 $this->title = Yii::t('app/crm', 'Crm Tasks');
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css');
+\kartik\datetime\DateTimePickerAsset::register($this);
 $this->registerJsFile(
     '//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js',
     ['depends' => [
@@ -20,8 +21,17 @@ $this->registerJsFile(
         'yii\bootstrap\BootstrapPluginAsset',
     ]]
 );
-
 $this->registerJs("
+$('.editable-deadline').editable({
+    type: 'datetime',
+    datetimepicker:{
+        bootcssVer: 3,
+    },
+    format: 'dd.mm.yyyy hh:ii',
+    clear: false,
+    url: 'save-deadline'          
+});
+
 $('.editable').editable({
     clear: false,
     source: ".\yii\helpers\Json::encode(CrmTask::getStatusArr()).",
@@ -214,6 +224,11 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 }else{
                     return NULL;
                 }
+                if(isset($options['class']))
+                    $options['class'].=' editable-deadline';
+                else
+                    $options['class']='editable-deadline';
+                $options['data-pk'] = $model->id;
                 return Html::tag('span',Yii::$app->formatter->asDatetime($model->deadline),$options);
             }
         ],
@@ -416,6 +431,14 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                 }else{
                     return NULL;
                 }
+                if($model->created_by == Yii::$app->user->id || Yii::$app->user->can('adminRights')) {
+                    if (isset($options['class']))
+                        $options['class'] .= ' editable-deadline';
+                    else
+                        $options['class'] = 'editable-deadline';
+
+                    $options['data-pk'] = $model->id;
+                }
                 return Html::tag('span',Yii::$app->formatter->asDatetime($model->deadline),$options);
             }
         ],
@@ -532,3 +555,9 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         </div>
     </div>
 </div>
+<style>
+    .datetimepicker-inline {
+        width: 231px!important;
+
+    }
+</style>

@@ -80,7 +80,7 @@ class CrmTaskSearch extends CrmTask
      */
     public function search($params,$viewType = self::VIEW_TYPE_ALL,$addQuery = NULL,$addParams = [],$cachePageSize = FALSE,$pageSize = NULL)
     {
-        $query = CrmTask::find()->with('cmp','cmp.requisites');
+        $query = CrmTask::find()->with('cmp','cmp.requisites')->groupBy('id');
         $query = $this->getAdditionQuery($query,$viewType);
         if(!is_null($addQuery)) //дополнительное условие
             $query->andWhere($addQuery,$addParams);

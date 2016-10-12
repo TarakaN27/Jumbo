@@ -846,4 +846,18 @@ class TaskController extends AbstractBaseBackendController
 
         Yii::$app->end(200);
     }
+
+    public function actionSaveDeadline(){
+        $pk = Yii::$app->request->post('pk');
+        $date = Yii::$app->request->post('value');
+        $obTask = CrmTask::findOne($pk);
+        if (!$obTask)
+            throw new NotFoundHttpException('Task not found');
+
+        if ($obTask->created_by != Yii::$app->user->id && !Yii::$app->user->can('adminRights')) //редактировать задачу может только автор
+            throw new ForbiddenHttpException();
+        $obTask->deadline = $date;
+        $obTask->save();
+        Yii::$app->end(200);
+    }
 }
