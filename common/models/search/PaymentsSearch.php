@@ -145,10 +145,10 @@ class PaymentsSearch extends Payments
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
 
         if(!empty($this->from_date))
-            $query->andWhere(" pay_date >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
+            $query->andWhere(Payments::tableName().".pay_date >= :dateFrom",[':dateFrom' => strtotime($this->from_date.' 00:00:00')]);
 
         if(!empty($this->to_date))
-            $query->andWhere(" pay_date <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
+            $query->andWhere(Payments::tableName().".pay_date <= :dateTo",[':dateTo' => strtotime($this->to_date.' 23:59:59')]);
 
         $query->andFilterWhere([
             'id' => $this->id,

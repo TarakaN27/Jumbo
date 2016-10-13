@@ -6355,3 +6355,11 @@ table tr.leadHead{background-color: #F4ECF7 !important;}
 table tr.servHead{background-color: #E6E9ED !important;}
 table tr.incomingPurse{background-color: #ddffd6;}
 table tr.expensePurse{background-color: #ffd7d1;}
+
+.editable{
+    cursor:pointer;
+}
+.datetimepicker-inline {
+    width: 231px!important;
+
+}

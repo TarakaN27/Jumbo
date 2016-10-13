@@ -184,13 +184,19 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
             ])
         ],
         [
+            'attribute' => 'created_by',
+            'value' => function($model){
+                return is_object($obUser = $model->createdBy) ? $obUser->getFio() : $model->created_by;
+            },
+            'filter' => \backend\models\BUser::getAllMembersMap()
+        ],
+        [
             'attribute' => 'type',
             'value' => function($model){
                 return $model->getTypeStr();
             },
             'filter' => \common\models\CrmTask::getTypeArr()
         ],
-
         [
             'attribute' => 'deadline',
             'format' => 'raw',
@@ -274,7 +280,6 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         [
             'attribute' => 'assigned_id',
             'value' => function($model){
-
                 return is_object($obUser = $model->assigned) ? $obUser->getFio() : $model->assigned_id;
             },
             'filter' => \backend\models\BUser::getAllMembersMap()
@@ -389,6 +394,13 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
                     'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
                 ],
             ])
+        ],
+        [
+            'attribute' => 'created_by',
+            'value' => function($model){
+                return is_object($obUser = $model->createdBy) ? $obUser->getFio() : $model->created_by;
+            },
+            'filter' => \backend\models\BUser::getAllMembersMap()
         ],
         [
             'attribute' => 'type',
@@ -555,9 +567,3 @@ if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\Crm
         </div>
     </div>
 </div>
-<style>
-    .datetimepicker-inline {
-        width: 231px!important;
-
-    }
-</style>

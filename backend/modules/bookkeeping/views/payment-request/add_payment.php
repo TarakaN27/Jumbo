@@ -119,7 +119,6 @@ var
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <?php echo Html::hiddenInput('availableSumm',$modelP->pay_summ,['id' => 'aSumm'])?>
                             <h3><?php echo Yii::t('app/book','AvailableSumm');?>: <small id="aSummDispl"><?php echo $modelP->pay_summ; ?></small></h3>
-                            <p class="warning-attention"><?=Yii::t('app/book','Attention. Unit will be enroll for payment request owner!')?></p>
                         </div>
                     </div>
                     <?php foreach ($model as $i => $m): ?>
