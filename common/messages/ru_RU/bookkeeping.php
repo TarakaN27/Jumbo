@@ -250,5 +250,6 @@ return [
     'Enroll yes' => 'Зачислено',
     'Enroll no' => 'Не зачислено',
     'Enroll part' => 'Зачислено частично',
-    'Act implicit payment detail' => 'Детализация неявных платежей'
+    'Act implicit payment detail' => 'Детализация неявных платежей',
+    'Active' => 'Активность'
 ];

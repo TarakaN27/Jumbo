@@ -93,7 +93,8 @@ class PaymentCondition extends AbstractActiveRecord
                 'currency_id',
                 'tax',
                 'type',
-                'cond_currency'
+                'cond_currency',
+                'status'
              ], 'required'],
             [['commission', 'sale', 'tax','summ_from', 'summ_to','corr_factor'],ValidNumber::className()],
             [[
@@ -124,7 +125,7 @@ class PaymentCondition extends AbstractActiveRecord
             [['commission', 'tax','corr_factor'],'number', 'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['commission', 'sale', 'tax'],'number','max' => 100,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             ['is_console','safe'],
-            [['not_use_sale', 'not_use_corr_factor'],'integer']
+            [['not_use_sale', 'not_use_corr_factor','status'],'integer']
         ];
     }
 
@@ -154,6 +155,7 @@ class PaymentCondition extends AbstractActiveRecord
             'not_use_sale' => Yii::t('app/services','Not use sale with counting unit enrollment'),
             'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment'),
             'enroll_unit_id' => Yii::t('app/services','Unit enrollment'),
+            'status' => Yii::t('app/book', 'Status'),
         ];
     }
 
@@ -199,17 +201,7 @@ class PaymentCondition extends AbstractActiveRecord
      */
     public static function getAllCondition()
     {
-        $obDep = new TagDependency([
-            'tags' => [
-                NamingHelper::getCommonTag(self::className()),
-               // ActiveRecordHelper::getCommonTag(ExchangeRates::className())
-            ]
-        ]);
-
-        return self::getDb()->cache(function($db){
-           // return self::find()->with('service','currency','person')->all($db);
-            return self::find()->orderBy(['service_id' => SORT_ASC,'name' => SORT_ASC])->all($db);
-        },24 * 3600,$obDep);
+        return self::find()->where(['status'=>static::YES])->orderBy(['service_id' => SORT_ASC,'name' => SORT_ASC])->all();
     }
 
     /**
@@ -297,7 +289,8 @@ class PaymentCondition extends AbstractActiveRecord
             ->where([
                 'service_id' => (int)$iServiceID,
                 'l_person_id' => $iLegalID,
-                'is_resident' => $isResident
+                'is_resident' => $isResident,
+                'status' => static::YES,
             ])
             ->all();
 

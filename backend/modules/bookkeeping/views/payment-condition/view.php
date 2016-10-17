@@ -85,6 +85,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>['decimal',10]
                         ],
                         [
+                            'attribute' => 'status',
+                            'value' => $model->getStatusStr(),
+                        ],
+                        [
                             'attribute' => 'created_at',
                             'value' => Yii::$app->formatter->asDatetime($model->created_at)
                         ],

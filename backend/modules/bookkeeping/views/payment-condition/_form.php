@@ -123,6 +123,8 @@ $this->registerJs("
         </div>
     </div>
 
+    <?= $form->field($model,'status')->dropDownList($model->getStatusArr());?>
+
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
