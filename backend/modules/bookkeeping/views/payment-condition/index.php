@@ -113,6 +113,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'filter' => \common\models\PaymentCondition::getYesNo()
                         ],
                         [
+                            'attribute'=>'status',
+                            'value'=>'statusStr'
+                        ],
+                        [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}'
                         ],
