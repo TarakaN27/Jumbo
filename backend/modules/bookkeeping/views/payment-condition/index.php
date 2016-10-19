@@ -114,7 +114,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute'=>'status',
-                            'value'=>'statusStr'
+                            'value'=>'statusStr',
+                            'filter' => \common\models\PaymentCondition::getStatusArr()
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
