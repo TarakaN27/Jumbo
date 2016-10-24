@@ -138,7 +138,7 @@
                 'attribute' => 'payment.pay_date',
                 'format' => 'date',
                 'value' => function($model){
-                    return $model->type == \common\models\PartnerPurseHistory::TYPE_EXPENSE ? $model->expense->pay_date : $model->payment->pay_date;
+                    return ($model->type == \common\models\PartnerPurseHistory::TYPE_EXPENSE) ? $model->date : $model->payment->pay_date;
                 }
             ],
             'date:date',
