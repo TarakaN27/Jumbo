@@ -99,6 +99,7 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
     public function getRURcurrencyInBur()
     {
         try{
+
             $sxml = $this->loadFile();
 
             if(!is_object($sxml)) {
@@ -106,8 +107,9 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
             }
             foreach($sxml->Valute as $ar) {
                 $code = CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016',$this->time) ? self::BYN_IN_CBR_CODE : self::BYR_IN_CBR_CODE;
-                if($ar->NumCode == $code)
-                    return  $this->getRateAfterDenomination(round($ar->Nominal/$this->convertValue($ar->Value),6),$this->time);
+                if($ar->NumCode == $code) {
+                    return $this->getRateAfterDenomination(round($ar->Nominal / $this->convertValue($ar->Value), 6), $this->time);
+                }
             }
             return NULL;
         }catch (\Exception $e)

@@ -82,6 +82,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = new BonusScheme();
         $arRates = [];
         $arRecordLpDeduct = [];
+
         if ($model->load(Yii::$app->request->post())) {
             $tr = Yii::$app->db->beginTransaction();
             $arServices = Services::getAllServices();
@@ -89,8 +90,26 @@ class DefaultController extends AbstractBaseBackendController
             $arRecordLpDeduct = Yii::$app->request->post('record-lp',[]);
             if ($model->save())  //сохраняем схему
             {
-
-                if ($model->type != BonusScheme::TYPE_PAYMENT_RECORDS) {
+                if($model->type == BonusScheme::TYPE_PROFIT_PAYMENT){
+                    $monthPersent = Yii::$app->request->post('months', []);
+                    $obBSev = new BonusSchemeService([
+                        'scheme_id' => $model->id,
+                        'month_percent' => $monthPersent['all'],
+                    ]);
+                    if (!$obBSev->save()) {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                    $arRates['exclude_sale'] = Yii::$app->request->post('exclude_sale');
+                    $obRecords = new BonusSchemeRecords([
+                        'scheme_id' => $model->id,
+                        'params' => $arRates,
+                    ]);
+                    if (!$obRecords->save()) {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                }elseif ($model->type != BonusScheme::TYPE_PAYMENT_RECORDS) {
                     $cost = Yii::$app->request->post('costs', []);
                     $multiple = Yii::$app->request->post('multiple', []);
                     $legal = Yii::$app->request->post('legal', []);
@@ -157,10 +176,14 @@ class DefaultController extends AbstractBaseBackendController
         $arBServicesTmp = $model->services;
         $arBServices = [];
         $arRecordLpDeduct = [];
-        foreach ($arBServicesTmp as $value)
-            $arBServices[$value->service_id] = $value;
+        foreach ($arBServicesTmp as $value) {
+            if(!$value->service_id)
+                $arBServices['all'] = $value;
+            else
+                $arBServices[$value->service_id] = $value;
+        }
         $arRates = [];
-        if($model->type == BonusScheme::TYPE_PAYMENT_RECORDS)
+        if($model->type == BonusScheme::TYPE_PAYMENT_RECORDS ||$model->type == BonusScheme::TYPE_PROFIT_PAYMENT)
         {
             $obRate = $model->schemeRecords;
             if($obRate)
@@ -179,9 +202,51 @@ class DefaultController extends AbstractBaseBackendController
             $arRecordLpDeduct = Yii::$app->request->post('record-lp',[]);
             if ($model->save())  //сохраняем схему
             {
+                if($model->type == BonusScheme::TYPE_PROFIT_PAYMENT){
+                    $model->unlinkAll('services', TRUE); //удаляем старые услуги
 
-                if ($model->type != BonusScheme::TYPE_PAYMENT_RECORDS) {
+                    $rows = [];
+                    foreach ($arBServicesTmp as $item) {
+                        $rows [] = [
+                            '',
+                            $model->id,
+                            null,
+                            Json::encode($item->month_percent),
+                            null,
+                            null,
+                            time(),
+                            time(),
+                            null,
+                            null
+                        ];
+                    }
+                    $historyModel = new BonusSchemeServiceHistory();    //пишем историю
+                    if (!Yii::$app->db->createCommand()
+                        ->batchInsert(BonusSchemeServiceHistory::tableName(), $historyModel->attributes(), $rows)
+                        ->execute()
+                    ) {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
 
+
+
+                    $monthPersent = Yii::$app->request->post('months', []);
+                    $obBSev = new BonusSchemeService([
+                        'scheme_id' => $model->id,
+                        'month_percent' => $monthPersent['all'],
+                    ]);
+                    if (!$obBSev->save()) {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                    $arRates['exclude_sale'] = Yii::$app->request->post('exclude_sale');
+                    $obRate->params = $arRates;
+                    if (!$obRate->save()) {
+                        $tr->rollBack();
+                        throw new ServerErrorHttpException();
+                    }
+                }elseif ($model->type != BonusScheme::TYPE_PAYMENT_RECORDS) {
                     $cost = Yii::$app->request->post('costs', []);
                     $multiple = Yii::$app->request->post('multiple', []);
                     $legal = Yii::$app->request->post('legal', []);
@@ -247,7 +312,6 @@ class DefaultController extends AbstractBaseBackendController
             $tr->rollBack();
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
             'arBServices' => $arBServices,
@@ -296,7 +360,7 @@ class DefaultController extends AbstractBaseBackendController
         $obForm = new ConnectBonusToUserForm(['obScheme' => $model]);
         if ($obForm->load(Yii::$app->request->post())) {
             if ($obForm->makeRequest()) {
-                $model->trigger(BonusScheme::EVENT_AFTER_UPDATE);
+             //   $model->trigger(BonusScheme::EVENT_AFTER_UPDATE);
                 Yii::$app->session->setFlash('success', Yii::t('app/bonus', 'User successfully connected'));
                 return $this->redirect('index');
             }

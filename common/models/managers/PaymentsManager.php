@@ -41,25 +41,33 @@ class PaymentsManager extends Payments
 		$arCuser = self::getUserByGroup($iCUserID);     //получаем контрагентов из группы
 
 		$beginDate = CustomHelper::getBeginDayTime($payDate);   //время начала дня на момент платежа
-		if(PaymentsSale::find()     //если были продажи позже даты платежа, то считаем что платеж не продажа
-			->where(['cuser_id' => $arCuser,'service_id' => $iServID])
+		$query = PaymentsSale::find()     //если были продажи позже даты платежа, то считаем что платеж не продажа
+		->where(['cuser_id' => $arCuser,'service_id' => $iServID])
 			->andWhere('sale_date >= :beginDate')
 			->params([':beginDate' => $beginDate])
-			->limit(1)
-			->exists()
-		)
+			->limit(1);
+
+		if($iServID)
+			$query->andWhere(['service_id'=>$iServID]);
+
+		if($query->exists())
 			return FALSE;
 
 		$beginDate = CustomHelper::getDateMinusNumMonth($beginDate,$inActivePeriod);  //отнимаем от даты платежа время бездействия по календарю
 
-		return !Payments::find()   //проверяем , если не было платежей за период бездействия, то считаем платеж продажей
-			->where(['cuser_id' => $arCuser,'service_id' => $iServID])
+
+		$query = Payments::find()   //проверяем , если не было платежей за период бездействия, то считаем платеж продажей
+		->where(['cuser_id' => $arCuser])
 			->andWhere('pay_date >= :beginDate')
 			->params([':beginDate' => $beginDate])
-			->limit(1)
-			->exists();
+			->limit(1);
+		if($iServID)
+			$query->andWhere(['service_id'=>$iServID]);
+
+		return !$query->exists();
 
 	}
+
 
 	/**
 	 * @param $iServID

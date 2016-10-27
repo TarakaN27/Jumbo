@@ -178,17 +178,15 @@ class PaymentRequestController extends AbstractBaseBackendController{
             }
             else
                 $validSumm = TRUE;
-
             if($valid &&  $validSumm)
             {
-
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-
                         $bError = FALSE;
                     /** @var AddPaymentForm $p */
                     foreach($model as $p) // добавляем патежи
                         {
+
                             $obPay = new Payments([
                                 'cuser_id' => $modelP->cntr_id,
                                 'pay_date' => $modelP->pay_date,
@@ -252,8 +250,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 break;
                             }
                             $obPay->callSaveDoneEvent();
-
                             unset($obPay,$obPayCalc,$obCond,$obOp);
+
                         }
 
                         if(!$bError)
@@ -272,7 +270,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 }
             }
         }
-
         return $this->render('add_payment',[
             'model' => $model,
             'modelP' => $modelP,

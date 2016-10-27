@@ -28,6 +28,7 @@ class BonusSchemeService extends AbstractActiveRecord
     /**
      * @inheritdoc
      */
+    public $dublicateLastMonth;
     public static function tableName()
     {
         return '{{%bonus_scheme_service}}';
@@ -120,8 +121,14 @@ class BonusSchemeService extends AbstractActiveRecord
 
     public function afterFind()
     {
-        if(!is_array($this->month_percent) && !empty($this->month_percent))
-            $this->month_percent = Json::decode($this->month_percent);
+        if(!is_array($this->month_percent) && !empty($this->month_percent)) {
+            $monthPercent = Json::decode($this->month_percent);
+            if(isset($monthPercent['dublicateLastMonth'])){
+                $this->dublicateLastMonth = 1;
+                unset($monthPercent['dublicateLastMonth']);
+            }
+            $this->month_percent = $monthPercent;
+        }
 
         if(!is_array($this->legal_person) && !empty($this->legal_person))
             $this->legal_person = Json::decode($this->legal_person);

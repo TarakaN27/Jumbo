@@ -28,13 +28,17 @@ class BonusScheme extends AbstractActiveRecord
     CONST
         BASE_PAYMENT = 0,           //counting bonus by each payment
         BASE_SALE = 1,              //counting bonus by each sale
+        BASE_OWN_PAYMENT = 2,       //начисляются бонусы владельцу платежа
+        BASE_ALL_PAYMENT_SALED_CLENT = 3, //начисляются платежи приведённых клиентов
         TYPE_UNITS = 1,             //тип бонусной схемы unit
         TYPE_SIMPLE_BONUS =2,       //тип бонусной схемы бонусы за продажи(для аккаунтеров)
         TYPE_COMPLEX_TYPE = 3,      //комплексный тип (для АНТОНА!)
         TYPE_COMPLEX_PARTNER = 4,   //комплексный тип для менеджеров партнеров
         TYPE_PAYMENT_RECORDS = 5,           //бонус за рекорды(для аккаунтеров)
+        TYPE_PROFIT_PAYMENT = 6,           //бонус за рекорды(для аккаунтеров)
         GROUP_BY_COMPANY = 1,       //группировка платежей по одной компании
         GROUP_BY_CMP_GROUP =2;      //группировка платежей по группе компаний
+
 
     /**
      * @return array
@@ -43,7 +47,9 @@ class BonusScheme extends AbstractActiveRecord
     {
         return [
             self::BASE_PAYMENT => Yii::t('app/bonus','Base payment'),
-            self::BASE_SALE => Yii::t('app/bonus','Base sale')
+            self::BASE_SALE => Yii::t('app/bonus','Base sale'),
+            self::BASE_OWN_PAYMENT => Yii::t('app/bonus','Base own payment'),
+            self::BASE_ALL_PAYMENT_SALED_CLENT => Yii::t('app/bonus','Base payment client'),
         ];
     }
 
@@ -86,7 +92,8 @@ class BonusScheme extends AbstractActiveRecord
             self::TYPE_SIMPLE_BONUS => Yii::t('app/bonus','Type simple bonus'),
             self::TYPE_COMPLEX_TYPE => Yii::t('app/bonus','Type complex'),
             self::TYPE_COMPLEX_PARTNER => Yii::t('app/bonus','Type complex partner'),
-            self::TYPE_PAYMENT_RECORDS => Yii::t('app/bonus','Type payment records')
+            self::TYPE_PAYMENT_RECORDS => Yii::t('app/bonus','Type payment records'),
+            self::TYPE_PROFIT_PAYMENT => Yii::t('app/bonus','Type profit payment'),
         ];
 
     }

@@ -576,6 +576,17 @@ class CustomHelper {
         return $obDate->getTimestamp();
     }
 
+    public static function getDiffInMonth($data1, $data2){
+        $dateTime1 = new \DateTime();
+        $dateTime1->setTimestamp(strtotime(date("Y-m-02",$data1)));
+        $dateTime2 = new \DateTime();
+        $dateTime2->setTimestamp(strtotime(date("Y-m-01",$data2)));
+        $interval = $dateTime1->diff($dateTime2);
+        if($interval)
+        unset($date1,$date2);
+        return $interval->m;    //вренем разницу в месяцах между двумя датами
+    }
+
     /**
      * Получет массив, собирает массив где ключи переменная массива, а значение - само занчение массива
      * @param array $array

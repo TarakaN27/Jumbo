@@ -81,6 +81,13 @@ return [
 	'Bonus currency ID' => 'Валюта бонуса',
 	'Record Date' => 'Дата рекорда',
 	'Rates record bonus' => 'Диапазоны бонусов за рекорды',
-	'Deduct tax at legal person' => 'Параметры вычета НДС'
+	'Deduct tax at legal person' => 'Параметры вычета НДС',
+	'Type profit payment' => 'Расчётный доход',
+	'Dublicate last month unlim' => 'Дублировать последний месяц бесконечно',
+	'Rates record bonus profit' => 'Изменение процента от суммы платежей',
+	'Divider' => 'Коэффициент в следующем месяце',
+	'Exclude sale'=> 'Не учитывать платежи клиентов, которые пришли в текущем месяце',
+	'Base own payment' => 'Владелец платежа',
+	'Base payment client' => 'Платежи приведенных клиентов',
 
 ];

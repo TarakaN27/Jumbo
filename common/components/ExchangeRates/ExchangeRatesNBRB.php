@@ -38,7 +38,9 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     public function makeRequest()
     {
         try{
+
             $sxml = $this->loadFile();
+
             if(!is_object($sxml)) {
                 return NULL;
             }
@@ -48,6 +50,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
                     return $this->getRateAfterDenomination((float)$ar->Rate/$scale, $this->time);
                 }
            }
+          
            return NULL;
         }catch (\Exception $e)
         {

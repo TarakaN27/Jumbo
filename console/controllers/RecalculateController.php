@@ -13,13 +13,15 @@ use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\partners\PartnerPercentCounting;
 use common\models\Acts;
+use common\models\BonusScheme;
+use common\models\BUserBonus;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
+use common\models\Payments;
 use console\components\AbstractConsoleController;
 use yii\console\Controller;
 use common\components\crunchs\denomination\Denomination;
-use yii\helpers\ArrayHelper;
-use common\models\ExchangeCurrencyHistory;
+use common\components\payment\PaymentBonusBehavior;
 use common\components\acts\ActsDocumentsV2;
 
 class RecalculateController extends AbstractConsoleController
@@ -31,6 +33,22 @@ class RecalculateController extends AbstractConsoleController
         $denomination = new Denomination();
         $denomination->run();
 
+    }
+
+    public function actionProfitBonus(){
+        $payments = Payments::find()->andWhere(['>=','pay_date', strtotime("2016-10-01")])->all();
+        $schemes = BonusScheme::find()->where(['type'=>BonusScheme::TYPE_PROFIT_PAYMENT])->all();
+        foreach($schemes as $item){
+            foreach($item->users as $user){
+                $bonus = BUserBonus::find()->joinWith('payment')->where(['buser_id'=>$user->id])->andWhere(['>=','pay_date',strtotime("2016-10-01")])->all();
+                foreach($bonus as $temp)
+                    $temp->delete();
+            }
+        }
+        foreach($payments as $payment) {
+            $obCount = new PaymentBonusBehavior();
+            $obCount->countingProfitBonus($payment);
+        }
     }
 
     public function actionQuantityHours()

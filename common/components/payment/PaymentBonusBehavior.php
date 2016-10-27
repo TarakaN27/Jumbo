@@ -17,6 +17,7 @@ use common\models\BonusSchemeServiceHistory;
 use common\models\BonusSchemeToBuser;
 use common\models\BonusSchemeToCuser;
 use common\models\BUserBonus;
+use common\models\BUserBonusMonthCoeff;
 use common\models\CUserGroups;
 use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
@@ -34,6 +35,7 @@ use backend\models\BUser;
 use common\models\CUser;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\web\GroupUrlRule;
 use yii\web\NotAcceptableHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -79,6 +81,11 @@ class PaymentBonusBehavior extends Behavior
 		$sDate = $model->pay_date;        // Дата платежа
 		$iService = $model->service_id;   // ID услуги
 
+
+		$this->updateSaleInfoCuser($model);
+		if(date("Y-m-d",$model->pay_date)>="2016-10-01")
+			$this->countingProfitBonus($model);
+		
 		$this->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
 		$this->countingPartnerBonus($model);
 
@@ -94,6 +101,8 @@ class PaymentBonusBehavior extends Behavior
 
 		return TRUE;
 	}
+	
+
 
 	/***
 	 * Начисление юнитов
@@ -287,6 +296,22 @@ class PaymentBonusBehavior extends Behavior
 
 		return $obSale;
 	}
+	public function updateSaleInfoCuser($model){
+		//если продажа то обновим данные для группы компаний
+		if($model->saleUser){
+			$cusersIds = PaymentsManager::getUserByGroup($model->cuser_id);
+			CUser::updateAll(['sale_manager_id'=>$model->saleUser, 'sale_date'=>$model->pay_date],['id'=>$cusersIds]);
+		//если это не продажа, и нет данных о продаже, значит юзер добавлен в группу, у которой уже были продажи
+		}elseif(!$model->cuser->sale_date){
+			$cusersIds = PaymentsManager::getUserByGroup($model->cuser_id);
+			$cuser = CUser::find()->where(['id'=>$cusersIds])->andWhere(['not',['sale_date'=>null]])->one();
+			if($cuser){
+				$model->cuser->sale_date = $cuser->sale_date;
+				$model->cuser->sale_manager_id = $cuser->sale_manager_id;
+				$model->cuser->save(false);
+			}
+		}
+	}
 
 	/**
 	 * @param Payments $model
@@ -424,6 +449,76 @@ class PaymentBonusBehavior extends Behavior
 		return $amount;
 	}
 
+
+	public function countingProfitBonusByType($buserId, $saleDate, $type, $model)
+	{
+		$obScheme = BonusScheme::find()//ищем схему для компании
+		->joinWith('cuserID')
+			->joinWith('usersID')
+			->where([
+				BonusScheme::tableName() . '.type' => BonusScheme::TYPE_PROFIT_PAYMENT,
+				BonusSchemeToBuser::tableName() . '.buser_id' => $buserId,
+				BonusSchemeToCuser::tableName() . '.cuser_id' => $model->cuser_id,
+				'payment_base' => $type
+			]);
+		$arExcept = BonusSchemeExceptCuser::getExceptSchemesForCuser([$model->cuser_id]);    //схемы искллючения для пользователя
+		if (!empty($arExcept))
+			$obScheme->andWhere(['NOT IN', BonusScheme::tableName() . '.id', $arExcept]);
+		$obScheme = $obScheme->orderBy(['payment_base' => SORT_DESC, BonusScheme::tableName() . '.updated_at' => SORT_DESC])->all();
+
+		if(!$obScheme)  //если нет схемы для компании, ищем общую
+		{
+			$obScheme = BonusScheme::find()//получаем схему бонуса для пользователя.
+			->joinWith('cuserID')
+				->joinWith('usersID')
+				->where([
+					BonusScheme::tableName() . '.type' => BonusScheme::TYPE_PROFIT_PAYMENT,
+					'payment_base' => $type
+				])
+				->andWhere([BonusSchemeToBuser::tableName() . '.buser_id' => $buserId]);
+			if (!empty($arExcept))
+				$obScheme->andWhere(['NOT IN', BonusScheme::tableName() . '.id', $arExcept]);
+			$obScheme = $obScheme->andWhere(BonusSchemeToCuser::tableName() . '.scheme_id IS NULL')
+				->orderBy(['payment_base' => SORT_DESC,BonusScheme::tableName() . '.updated_at' => SORT_DESC])
+				->one();
+		}
+
+		if (empty($obScheme))
+			return FALSE;
+		$obBServ = BonusSchemeServiceHistory::getCurrentBonusService($model->pay_date, null, $obScheme->id);    //получаем параметры бонусов на дату платежа
+
+		if (empty($obBServ))
+			return FALSE;
+		$coeff = 1;
+		$coeffModel = BUserBonusMonthCoeff::find()->where(['buser_id' => $buserId, 'year' => date("Y", $model->pay_date), 'month' => date("m", $model->pay_date)])->one();
+		if ($coeffModel)
+			$coeff = $coeffModel->coeff;
+		$percent = NULL; //определим процент для бонуса
+		$payMonth = CustomHelper::getDiffInMonth($model->pay_date,$saleDate);
+		if(is_array($obBServ->month_percent) && ($payMonth+1)<=count($obBServ->month_percent))
+			$percent = $obBServ->month_percent[$payMonth+1];
+		elseif(is_array($obBServ->month_percent) && ($payMonth+1)>count($obBServ->month_percent) && $obBServ->dublicateLastMonth){
+			$percent =$obBServ->month_percent[count($obBServ->month_percent)-1];
+		}
+		if($percent*$coeff>0){
+			$amount = $model->calculate->profit_for_manager;
+			$amount = $amount*($percent*$coeff/100);
+			$this->addBonus($buserId,$model->id,$obScheme->id,null,$model->cuser_id,$amount);  //добавляем бонус
+		}
+
+	}
+	public function countingProfitBonus($model){
+		$salerId = $model->cuser->sale_manager_id;
+		$saleDate = $model->cuser->sale_date;
+		if($salerId && $saleDate) {
+			$this->countingProfitBonusByType($salerId, $saleDate, BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT, $model);
+		}
+		$ownerId = $model->payRequest->manager_id;
+
+		if($saleDate && $ownerId){
+			$this->countingProfitBonusByType($ownerId, $saleDate, BonusScheme::BASE_OWN_PAYMENT, $model);
+		}
+	}
 	/**
 	 * Составной бонус
 	 * @param $model

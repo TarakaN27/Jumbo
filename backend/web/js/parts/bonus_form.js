@@ -15,17 +15,16 @@ function changeBonusType()
 
     switch (type){
         case B_TYPE_UNIT:
-            $('.type2,.type3,.type5').addClass('hide');
+            $('.type2,.type3,.type5,.type6').addClass('hide');
             $('.type1').removeClass('hide');
             groupType.removeAttr('disabled');
             numMonth.attr('disabled','disabled');
             numMonth.val('');
             numMonth.trigger('change');
             break;
-
         case B_TYPE_SIMPLE:
         case B_TYPE_COMPLEX:
-            $('.type1,.type5').addClass('hide');
+            $('.type1,.type5,.type6').addClass('hide');
             $('.type2,.type3').removeClass('hide');
             groupType.removeAttr('disabled');
             if(type == B_TYPE_SIMPLE)
@@ -44,19 +43,25 @@ function changeBonusType()
 
         case B_TYPE_COMPLEX_PARTNER:
             groupType.removeAttr('disabled');
-            $('.type2,.type3,.type1,.type5').addClass('hide');
+            $('.type2,.type3,.type1,.type5,.type6').addClass('hide');
             $('.type4').removeClass('hide');
             break;
 
         case B_TYPE_PAYMENT_RECORDS:
             groupType.val('');
             groupType.attr('disabled','disabled');
-            $('.type2,.type3,.type1,.type4').addClass('hide');
+            $('.type2,.type3,.type1,.type4,.type6').addClass('hide');
             $('.type5').removeClass('hide');
+            break;
+        
+        case B_TYPE_PROFIT_PAYMENT:
+            $('.type1,.type2,.type3,.type4,.type5').addClass('hide');
+            $('.type6').removeClass('hide');
+            numMonth.removeAttr('disabled','disabled');
             break;
 
         default:
-            $('.type1,.type2,.type3,.type4').addClass('hide');
+            $('.type1,.type2,.type3,.type4,.type5,.type6').addClass('hide');
             groupType.removeAttr('disabled');
             numMonth.removeAttr('disabled','disabled');
             numMonth.val('');
@@ -142,7 +147,7 @@ function addRecordRow()
 {
     var
         num = parseInt($(this).attr('data-curr-num'))+1,
-        $containter = $('#recordContainer'),
+        $containter = $(".recordContainer",$(this).parent()),
         row = $('<div></div>',{
             class:'form-group'
         })
@@ -177,13 +182,14 @@ function addRecordRow()
  */
 function removeRecordRow()
 {
+
     var
-        btnAdd = $('#addRecordId'),
+        btnAdd = $('.addRecordId',$(this).parent()),
         num  = parseInt(btnAdd.attr('data-curr-num'));
 
     if(num > 0)
     {
-        $('#recordContainer .form-group:last').remove();
+        $('.recordContainer .form-group:last', $(this).parent()).remove();
         num--;
         btnAdd.attr('data-curr-num',num);
     }
@@ -234,13 +240,14 @@ function initDefault()
 
 //документ реади
 jQuery(document).ready(function(){
+    console.log(1);
     $('#bonusscheme-num_month').on('change',changeSchemeNumMonth);
     $('#bonusscheme-type').on('change',changeBonusType);
     $('#preloader').remove();
     $('.bonus-scheme-form').removeClass('hide');
     $('.legal-check-box').on('change',legalCheckBoxAction);
-    $('#addRecordId').on('click',addRecordRow);
-    $('#removeRecordId').on('click',removeRecordRow);
+    $('.addRecordId').on('click',addRecordRow);
+    $('.removeRecordId').on('click',removeRecordRow);
     $(document).on("submit", "form#bonusFormId", beforeSubmitFormValidation);
     $('.deductRecordCheck').on('change',deductRecordChnage);
     $('.costs').on('change',function(){

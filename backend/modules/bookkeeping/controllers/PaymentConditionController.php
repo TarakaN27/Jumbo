@@ -3,6 +3,8 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\CUser;
+use common\models\CuserToGroup;
 use Yii;
 use common\models\PaymentCondition;
 use common\models\search\PaymentConditionSearch;
