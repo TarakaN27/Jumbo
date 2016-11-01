@@ -137,8 +137,10 @@ $rowContNum = $admin ? 6 : 12;
 									'label' => Yii::t('app/bonus','Scheme name'),
 									'visible' => $admin
 								],
-								'amount:decimal',
 								'payment.calculate.profit_for_manager:decimal',
+								'number_month',
+								'bonus_percent:decimal',
+								'amount:decimal',
 							]
 						])?>
 						<div class="col-md-4 col-md-offset-8">

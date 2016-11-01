@@ -64,7 +64,9 @@ class BUserBonus extends AbstractActiveRecord
             'cuser_id' => Yii::t('app/bonus', 'CUser ID'),
             'service_id' => Yii::t('app/bonus', 'Service ID'),
             'currency_id' => Yii::t('app/bonus','Bonus currency ID'),
-            'record_id' => Yii::t('app/bonus','Record ID')
+            'record_id' => Yii::t('app/bonus','Record ID'),
+            'bonus_percent' => Yii::t('app/bonus','Bonus Percent'),
+            'number_month' => Yii::t('app/bonus','Number month')
         ];
     }
 
@@ -74,6 +76,14 @@ class BUserBonus extends AbstractActiveRecord
     public function getPayment()
     {
         return $this->hasOne(Payments::className(), ['id' => 'payment_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCalculation()
+    {
+        return $this->hasOne(PaymentsCalculations::className(), ['payment_id' => 'payment_id']);
     }
 
     /**

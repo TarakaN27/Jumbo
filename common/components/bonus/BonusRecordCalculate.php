@@ -13,6 +13,7 @@ use common\models\BonusScheme;
 use common\models\BonusSchemeRecordsHistory;
 use common\models\BonusSchemeToBuser;
 use common\models\BUserBonus;
+use common\models\BUserBonusMonthCoeff;
 use common\models\BUserPaymentRecords;
 use common\models\ExchangeCurrencyHistory;
 use common\models\Payments;
@@ -35,6 +36,8 @@ class BonusRecordCalculate
         $arPrevRecords = [],            //предыдущие рекорды пользователй
         $arNewRecordForInsert = [],     //записи для вставки в таблицу рекордов
         $arSchemesParams = [],          //парметры схем
+        $arUserSchemes = [],
+        $arSchemesRecord = [],
         $arBUserBonus,                  //массив с бонусом для пользователя
         $time = NULL;                   //рассчетное время месяца
 
@@ -50,34 +53,51 @@ class BonusRecordCalculate
     {
         $this->beginMonthTime = CustomHelper::getBeginMonthTime($this->time);
         $this->endMonthTime = CustomHelper::getEndMonthTime($this->time);
-        $this->getBUsers();                                     //get Back user id and his bonus scheme
-        if (count($this->arBUsers) == 0)
+        $users = $this->getBUsers();
+        if (count($users) == 0)
             return FALSE;
+        $this->setShemesRecord($users);
 
-        $this->getPayments();                                   //get paymetns for user and current period
-        if (count($this->arPayments) == 0)
-            return FALSE;
-
-        $this->getSales();                                      //get payment is witch was sales
-
-        $this->getSchemesParams();                              //get parameters for bonus scheme
-        if (count($this->arSchemesParams) == 0)
-            return FALSE;
-
-        $this->getAmount();                                     //get payment amount for each buser
-        if (count($this->arAmounts) == 0)
-            return FALSE;
-
-        $this->getPrevRecordsForUser();                         //get prev records for users
-        $tr = \Yii::$app->db->beginTransaction();
-        try {
-            $this->getNewRecordsForBUserRecordPayment();        //
-            $tr->commit();
-        } catch (Exception $e) {
-            $tr->rollBack();
+        foreach($users as $bUser) {
+            $sum = $this->getTotalSumProfit($bUser->buser_id);
+            $this->setMonthCoeff($sum, $bUser->buser_id);
         }
 
         return TRUE;
+    }
+    public function setMonthCoeff($sum, $userId)
+    {
+        $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
+        $koeff = false;
+        foreach ($schemeRecord as $key => $record) {
+            if ($key != 'exclude_sale') {
+                if ($sum >= $record['from'] && $sum < $record['to']) {
+                    $koeff = $record['rate'];
+                    break;
+                }
+            }
+        }
+        if ($koeff) {
+
+            $year = date("Y", $this->endMonthTime);
+            $month = date("m", $this->endMonthTime + 10);
+            BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
+            $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
+            $buserBonusMonthCoeff->buser_id = $userId;
+            $buserBonusMonthCoeff->month = $month;
+            $buserBonusMonthCoeff->year = $year;
+            $buserBonusMonthCoeff->coeff = str_replace(",", ".",$koeff);
+            $buserBonusMonthCoeff->save();
+        }
+    }
+
+    public function setShemesRecord($users){
+        foreach($users as $user){
+            if(!isset($this->arSchemesRecord[$user->scheme->id])){
+                $this->arSchemesRecord[$user->scheme->id] = $user->scheme->schemeRecords->params;
+            }
+            $this->arUserSchemes[$user->buser_id] = $user->scheme->id;
+        }
     }
 
     /**
@@ -103,29 +123,21 @@ class BonusRecordCalculate
      * Получаем платежи
      * @return array
      */
-    protected function getPayments()
+    protected function getTotalSumProfit($userId)
     {
-        $arTmp = Payments::find()
-            ->select([
-                'p.id',
-                'p.pay_date',
-                'p.pay_summ',
-                'p.prequest_id',
-                'p.currency_id',
-                'p.legal_id',
-                'p.cuser_id',
-                'cu.id as cuid',
-                'cu.is_resident',
-                'pr.id  as prid',
-                'pr.manager_id',
-            ])
-            ->alias('p')
-            ->joinWith('payRequest as pr')
-            ->joinWith('cuser as cu')
-            ->where(['pr.manager_id' => array_keys($this->arBUsers)])
-            ->andWhere(['BETWEEN', 'p.pay_date', $this->beginMonthTime, $this->endMonthTime])
-            ->all();
-        return $this->arPayments = ArrayHelper::index($arTmp, 'id', 'payRequest.manager_id');
+        $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
+        $sum = BUserBonus::find()
+            ->select(['totalSum'=>'SUM(profit_for_manager)'])
+            ->alias('b')
+            ->joinWith('calculation as c')
+            ->joinWith('payment as p')
+            ->where(['b.buser_id' => $userId])
+            ->andWhere(['BETWEEN', 'p.pay_date', $this->beginMonthTime, $this->endMonthTime]);
+        if($schemeRecord['exclude_sale'] == 1){
+            $sum->andWhere(['<>','b.is_sale',1]);
+        }
+        $sum = $sum->asArray()->one();
+        return (float)$sum["totalSum"];
     }
 
     /**
@@ -137,7 +149,7 @@ class BonusRecordCalculate
         return $this->arBUsers = BonusSchemeToBuser::find()
             ->alias('bsb')
             ->joinWith('scheme as sc')
-            ->where(['sc.type' => BonusScheme::TYPE_PAYMENT_RECORDS])
+            ->where(['sc.type' => BonusScheme::TYPE_PROFIT_PAYMENT])
             ->indexBy('buser_id')
             ->all();
     }

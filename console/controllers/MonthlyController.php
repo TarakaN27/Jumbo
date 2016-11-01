@@ -16,6 +16,7 @@ use common\components\partners\PartnerPercentCounting;
 use console\components\AbstractConsoleController;
 use yii\base\Exception;
 use yii\helpers\Console;
+use common\models\Payments;
 
 class MonthlyController extends AbstractConsoleController
 {
@@ -24,21 +25,19 @@ class MonthlyController extends AbstractConsoleController
      */
     public function actionRun()
     {
-        try {
+    /*    try {
             $obPartnerPercent = new PartnerPercentCounting();   //считаем проценты для партнеров
             $obPartnerPercent->countPercentByMonth();
         }catch (Exception $e)
         {
             //@todo add cron error notification
         }
-
-        try{
+*/
             $time = CustomHelper::getDateMinusNumMonth(time(),1);   //считаем бонусы по рекордам платежей аккаунтеров
             $obRecordCalculate = new BonusRecordCalculate(date('d.m.Y',$time));
             $obRecordCalculate->run();
-        }catch (Exception $e){
-            //@todo add cron error notification
-        }
+
+        
         return self::EXIT_CODE_NORMAL;
     }
 

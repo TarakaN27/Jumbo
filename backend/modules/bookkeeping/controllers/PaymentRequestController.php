@@ -119,7 +119,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $arCondVisible = [];
 
         if(!Yii::$app->request->post('AddPaymentForm')) {
-
             $formModel = new AddPaymentForm(['fullSumm' => $modelP->pay_summ, 'service' => $modelP->service_id]);
             if(!empty($modelP->service_id))
             {
@@ -137,8 +136,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     $paySumm,
                     $obCntrID->is_resident,
                     $modelP->pay_date);
-
-                if(PaymentsManager::isSale($modelP->service_id,$modelP->cntr_id,$modelP->pay_date))
+                if(PaymentsManager::isSale($modelP->cntr_id,$modelP->pay_date))
                     $formModel->isSale = TRUE;
 
                 /*
@@ -186,7 +184,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     /** @var AddPaymentForm $p */
                     foreach($model as $p) // добавляем патежи
                         {
-
                             $obPay = new Payments([
                                 'cuser_id' => $modelP->cntr_id,
                                 'pay_date' => $modelP->pay_date,
@@ -205,9 +202,11 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
                             if(!$obPay->save())
                             {
+
                                 $bError = TRUE;
                                 break;
                             }
+
                             //производим рассчет по каждому платежу исходя из условия
                             /** @var PaymentCondition $obCond */
                             $obCond = PaymentCondition::findOne($p->condID);
@@ -220,6 +219,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                             {
                                 $bError = TRUE;
                                 break;
+
                             }
 
                             //переведем сумму в бел рубли.
@@ -249,6 +249,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 $bError = TRUE;
                                 break;
                             }
+                          
                             $obPay->callSaveDoneEvent();
                             unset($obPay,$obPayCalc,$obCond,$obOp);
 
@@ -257,6 +258,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                         if(!$bError)
                         {
                             $modelP->status = PaymentRequest::STATUS_FINISHED;
+                            $modelP->manager_id = Yii::$app->user->id;
                             $modelP->save();
                             $transaction->commit();
                             Yii::$app->session->set('success',Yii::t('app/book','Payments added successfully!'));
@@ -533,7 +535,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
      * @throws NotFoundHttpException
      */
     public function actionIsSale()
-    {
+    { 
         $iServID = Yii::$app->request->post('iServID');     //Услуга
         $iContrID = Yii::$app->request->post('iContrID');   //контрагент
         $payDate = Yii::$app->request->post('payDate');     //дата платежа
@@ -542,6 +544,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
             throw new InvalidParamException();
 
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return PaymentsManager::isSale($iServID,$iContrID,$payDate);
+        return PaymentsManager::isSale($iContrID,$payDate);
     }
 } 

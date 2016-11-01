@@ -83,6 +83,8 @@ class BonusReportsForm extends Model
 				BUserBonus::tableName().'.payment_id',
 				BUserBonus::tableName().'.scheme_id',
 				BUserBonus::tableName().'.amount',
+				BUserBonus::tableName().'.number_month',
+				BUserBonus::tableName().'.bonus_percent',
 				BUser::tableName().'.fname',
 				BUser::tableName().'.lname',
 				BUser::tableName().'.mname',

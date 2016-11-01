@@ -76,7 +76,24 @@ class m161025_143243_cuser_saller_info extends Migration
             'month' => Schema::TYPE_INTEGER.' NOT NULL',
             'year' => Schema::TYPE_INTEGER.' NOT NULL',
             'coeff' => $this->decimal(10,5),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
         ],$tableOptions);
+
+        $this->addColumn('{{%b_user_bonus}}','number_month', $this->integer());
+        $this->addColumn('{{%b_user_bonus}}','bonus_percent', $this->decimal(5,2));
+        $this->addColumn('{{%b_user_bonus}}','is_sale', $this->integer());
+
+        $badPayments=[];
+        $badPayments[57] = [3671, 3768, 3854];
+        $badPayments[16] = [3682, 3683, 3684];
+        foreach($badPayments as $userId=> $paymentIds){
+            foreach($paymentIds as $paymentId) {
+                $payment = Payments::findOne($paymentId);
+                $payment->payRequest->manager_id = $userId;
+                $payment->payRequest->save();
+            }
+        }
     }
 
     public function down()

@@ -81,12 +81,13 @@ class PaymentBonusBehavior extends Behavior
 		$sDate = $model->pay_date;        // Дата платежа
 		$iService = $model->service_id;   // ID услуги
 
-
+	
 		$this->updateSaleInfoCuser($model);
 		if(date("Y-m-d",$model->pay_date)>="2016-10-01")
 			$this->countingProfitBonus($model);
-		
+
 		$this->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
+		
 		$this->countingPartnerBonus($model);
 
 		if($model->isSale && !empty($model->saleUser))  //если платеж является продажей
@@ -500,21 +501,22 @@ class PaymentBonusBehavior extends Behavior
 		elseif(is_array($obBServ->month_percent) && ($payMonth+1)>count($obBServ->month_percent) && $obBServ->dublicateLastMonth){
 			$percent =$obBServ->month_percent[count($obBServ->month_percent)-1];
 		}
-		if($percent*$coeff>0){
-			$amount = $model->calculate->profit_for_manager;
-			$amount = $amount*($percent*$coeff/100);
-			$this->addBonus($buserId,$model->id,$obScheme->id,null,$model->cuser_id,$amount);  //добавляем бонус
-		}
 
+		$percent=$percent*$coeff;
+		if($percent>0){
+			$amount = $model->calculate->profit_for_manager;
+			$amount = $amount*($percent/100);
+			$this->addBonus($buserId,$model->id,$obScheme->id,null,$model->cuser_id,$amount,$payMonth+1, $percent, $model->isSale);  //добавляем бонус
+		}
 	}
 	public function countingProfitBonus($model){
 		$salerId = $model->cuser->sale_manager_id;
 		$saleDate = $model->cuser->sale_date;
 		if($salerId && $saleDate) {
+			
 			$this->countingProfitBonusByType($salerId, $saleDate, BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT, $model);
 		}
 		$ownerId = $model->payRequest->manager_id;
-
 		if($saleDate && $ownerId){
 			$this->countingProfitBonusByType($ownerId, $saleDate, BonusScheme::BASE_OWN_PAYMENT, $model);
 		}
@@ -695,7 +697,7 @@ class PaymentBonusBehavior extends Behavior
 	 * @return bool
 	 * @throws ServerErrorHttpException
 	 */
-	protected function addBonus($iUserID,$iPaymentID,$iSchemeID,$iServiceID,$iCuserID,$amount)
+	protected function addBonus($iUserID,$iPaymentID,$iSchemeID,$iServiceID,$iCuserID,$amount, $numberMonth=null, $bonusPercent=null, $isSale=null)
 	{
 		$bExistBonus = BUserBonus::find()
 			->joinWith('scheme')
@@ -717,8 +719,13 @@ class PaymentBonusBehavior extends Behavior
 		$obBonus->scheme_id = $iSchemeID;
 		$obBonus->service_id = $iServiceID;
 		$obBonus->cuser_id = $iCuserID;
-		if(!$obBonus->save())
+		$obBonus->number_month = $numberMonth;
+		$obBonus->bonus_percent = $bonusPercent;
+		$obBonus->is_sale = $isSale;
+
+		if(!$obBonus->save()) {
 			throw new ServerErrorHttpException('Error. Can not save bonus');
+		}
 		return $obBonus;
 	}
 

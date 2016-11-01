@@ -81,16 +81,11 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
      */
     public static function getCurrencyForDate($date,$iCurID)
     {
-        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className())]);
-        $models = self::getDb()->cache(function ($db) use ($date,$iCurID) {
             return self::find()
                 ->where(' date <= :date AND currency_id = :iCurID ')
                 ->params([':date' => $date,':iCurID' => $iCurID])
                 ->orderBy(['date' => SORT_DESC])
-                ->one($db);
-        },86400,$dep);
-
-        return $models;
+                ->one();
     }
 
     /**
@@ -111,7 +106,9 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
             {
                 $returnValue = (float)$obCurr->nbrb_rate;
             }
-        }else{                                          //иначе ищем в истории курсов валют
+        }else{
+
+            //иначе ищем в истории курсов валют
             /** @var ExchangeCurrencyHistory $obECH */
             $obECH = ExchangeCurrencyHistory::getCurrencyForDate($date,$iCurID);    //вытягиеваем курс из истории
             if($obECH)
@@ -126,7 +123,6 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
                 }
             }
         }
-
         return $returnValue;
     }
 
