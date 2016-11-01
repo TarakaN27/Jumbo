@@ -38,6 +38,7 @@ class PaymentsManager extends Payments
 
         if ($inActivePeriod <= 0)    //не задан период бездействия, вернем FALSE
             return FALSE;
+
         $beginDate = CustomHelper::getBeginDayTime($payDate);
         $saleDate = CustomHelper::getDateMinusNumMonth($beginDate, $inActivePeriod);
         $cUser = CUser::findOne($iCUserID);
@@ -58,7 +59,7 @@ class PaymentsManager extends Payments
             $query = Payments::find()//проверяем , если не было платежей за период бездействия
             ->where(['cuser_id' => $arCuser])
                 ->andWhere('pay_date >= :beginDate')
-                ->params([':beginDate' => $beginDate])
+                ->params([':beginDate' => $saleDate])
                 ->limit(1);
             return !$query->exists();
         } else

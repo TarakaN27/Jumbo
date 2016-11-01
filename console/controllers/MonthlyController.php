@@ -32,14 +32,9 @@ class MonthlyController extends AbstractConsoleController
         {
             //@todo add cron error notification
         }
-
-        
-
             $time = CustomHelper::getDateMinusNumMonth(time(),1);   //считаем бонусы по рекордам платежей аккаунтеров
             $obRecordCalculate = new BonusRecordCalculate(date('d.m.Y',$time));
             $obRecordCalculate->run();
-
-        
         return self::EXIT_CODE_NORMAL;
     }
 
