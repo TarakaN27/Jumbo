@@ -60,10 +60,8 @@ class BonusRecordCalculate
 
         foreach($users as $bUser) {
             $sum = $this->getTotalSumProfit($bUser->buser_id);
-            var_dump($sum);
             $this->setMonthCoeff($sum, $bUser->buser_id);
         }
-
         return TRUE;
     }
     public function setMonthCoeff($sum, $userId)
