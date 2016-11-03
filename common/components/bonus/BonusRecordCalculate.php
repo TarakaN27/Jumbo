@@ -59,7 +59,14 @@ class BonusRecordCalculate
         $this->setShemesRecord($users);
 
         foreach($users as $bUser) {
-            $sum = $this->getTotalSumProfit($bUser->buser_id);
+            //если продажник то посчитаем ему только продажи прошлого месяца
+            if($bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
+                $sum = $this->getTotalSumProfit($bUser->buser_id, true);
+            }elseif($bUser->scheme->payment_base == BonusScheme::BASE_OWN_PAYMENT){
+                $sumCurrent = $this->getTotalSumProfit($bUser->buser_id);
+                $sumPrevMonth = $this->getTotalSumProfitPrevMonth($bUser->buser_id);
+                $sum = $sumPrevMonth - $sumCurrent;
+            }
             $this->setMonthCoeff($sum, $bUser->buser_id);
         }
         return TRUE;
@@ -122,7 +129,7 @@ class BonusRecordCalculate
      * Получаем платежи
      * @return array
      */
-    protected function getTotalSumProfit($userId)
+    protected function getTotalSumProfit($userId, $onlySale = false)
     {
         $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
         $sum = BUserBonus::find()
@@ -135,6 +142,24 @@ class BonusRecordCalculate
         if($schemeRecord['exclude_sale'] == 1){
             $sum->andWhere(['<>','b.is_sale',1]);
         }
+        if($onlySale){
+            $sum->andWhere(['b.is_sale'=>1]);
+        }
+        $sum = $sum->asArray()->one();
+        return (float)$sum["totalSum"];
+    }
+
+    protected function getTotalSumProfitPrevMonth($userId)
+    {
+        $beginMonthTime = CustomHelper::getBeginMonthTime($this->beginMonthTime-1);
+        $endMonthTime = CustomHelper::getEndMonthTime($beginMonthTime);
+        $sum = BUserBonus::find()
+            ->select(['totalSum'=>'SUM(profit_for_manager)'])
+            ->alias('b')
+            ->joinWith('calculation as c')
+            ->joinWith('payment as p')
+            ->where(['b.buser_id' => $userId])
+            ->andWhere(['BETWEEN', 'p.pay_date', $beginMonthTime, $endMonthTime]);
         $sum = $sum->asArray()->one();
         return (float)$sum["totalSum"];
     }

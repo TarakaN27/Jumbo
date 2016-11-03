@@ -47,7 +47,7 @@ class PaymentsManager extends Payments
         if (!$cUser->sale_date) {
             $arCuser = self::getUserByGroup($iCUserID);
             $cUserTemp = CUser::find()->where(['id'=>$arCuser])->andWhere(['not',['sale_date'=>null]])->one();
-            if ($cUserTemp->sale_date)
+            if ($cUserTemp && $cUserTemp->sale_date)
                 $cUser->sale_date = $cUserTemp->sale_date;
         }
         if ($cUser->sale_date) {
