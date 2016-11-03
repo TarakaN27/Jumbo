@@ -506,6 +506,8 @@ class PaymentBonusBehavior extends Behavior
 		if($percent>0){
 			$amount = $model->calculate->profit_for_manager;
 			$amount = $amount*($percent/100);
+			if($amount<0)
+				$amount=0;
 			$this->addBonus($buserId,$model->id,$obScheme->id,null,$model->cuser_id,$amount,$payMonth+1, $percent, $model->isSale);  //добавляем бонус
 		}
 	}

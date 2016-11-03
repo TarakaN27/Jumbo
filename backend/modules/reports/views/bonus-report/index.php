@@ -137,7 +137,19 @@ $rowContNum = $admin ? 6 : 12;
 									'label' => Yii::t('app/bonus','Scheme name'),
 									'visible' => $admin
 								],
-								'payment.calculate.profit_for_manager:decimal',
+								[
+									'attribute'=>'payment.calculate.profit_for_manager',
+									'value' =>function ($model){
+										if($model->payment->calculate->profit_for_manager<0){
+											if($model->payment->calculate->profit <0)
+												return Yii::$app->formatter->asDecimal($model->payment->calculate->profit_for_manager);
+											else
+												return Yii::$app->formatter->asDecimal(0);
+										}else
+											return Yii::$app->formatter->asDecimal($model->payment->calculate->profit_for_manager);
+									}
+								],
+
 								'number_month',
 								'bonus_percent:decimal',
 								'amount:decimal',
