@@ -208,10 +208,14 @@ class PaymentCondition extends AbstractActiveRecord
      * Получаем список условий id => название
      * @return array
      */
-    public static function getConditionMap()
+    public static function getConditionMap($current=false)
     {
         $arTemp = self::getAllCondition();
-        return ArrayHelper::map($arTemp,'id','name');
+        $arMap = ArrayHelper::map($arTemp,'id','name');
+        if($current && !isset($arMap[$current])){
+            $arMap[$current] = "";
+        }
+        return $arMap;
     }
 
     /**
@@ -227,10 +231,18 @@ class PaymentCondition extends AbstractActiveRecord
      * @param $date
      * @return array
      */
-    public static function getConditionWithCurrency($date)
+    public static function getConditionWithCurrency($date, $selectedCondition = false)
     {
         $arTmp = self::getAllCondition();
         $arCurrency = [];
+        if($selectedCondition){
+            $ids = ArrayHelper::getColumn($arTmp,'id');
+            if(!in_array($selectedCondition,$ids)){
+                $notActiveCondition = self::findOne($selectedCondition);
+                $notActiveCondition->name = Yii::t('app/book','Not active').' - '.$notActiveCondition->name;
+                $arTmp[]= $notActiveCondition;
+            }
+        }
         foreach($arTmp as $tmp)
             if(!in_array($tmp->cond_currency,$arCurrency))
                 $arCurrency [] = $tmp->cond_currency;
@@ -250,6 +262,9 @@ class PaymentCondition extends AbstractActiveRecord
             $arReturn[$tmp->id] = $tmp->name.$strExh;
         }
 
+        if($selectedCondition && !array_key_exists($selectedCondition, $arReturn)){
+            $arReturn[$selectedCondition] = "Не активно";
+        }
         return $arReturn;
     }
 

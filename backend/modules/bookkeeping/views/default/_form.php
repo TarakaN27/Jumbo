@@ -25,8 +25,8 @@ var
     addPErrorTextServerErr = '".Yii::t('app/book','Server error')."',
     titleBoundsCheck = '".Yii::t('app/book','Bounds checking conditions request')."',
     errorBoundsCheck = '".Yii::t('app/book','Bounds checking conditions FAIL')."',
-    conditions = ".\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$model->pay_date))).",
-    keys = ".\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap())).",
+    conditions = ".\yii\helpers\Json::encode(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$model->pay_date), $model->condition_id)).",
+    keys = ".\yii\helpers\Json::encode(array_keys(\common\models\PaymentCondition::getConditionMap($model->condition_id))).",
     selectedCondVal = ".\yii\helpers\Json::encode($model->condition_id).",
     arCondIdVisible = ".\yii\helpers\Json::encode($arCondVisible)."
     ;
