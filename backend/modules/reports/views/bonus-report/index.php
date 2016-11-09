@@ -186,7 +186,7 @@ $rowContNum = $admin ? 6 : 12;
 								<?=$val['fio']?>
 							</td>
 							<td>
-								<?=Yii::$app->formatter->asDecimal($val['sumWithoutNewClientCurrentPeriod'],2);?>
+								<?=Yii::$app->formatter->asDecimal(isset($val['sumWithoutNewClientCurrentPeriod'])?$val['sumWithoutNewClientCurrentPeriod']:0 ,2);?>
 							</td>
 							<td>
 								<?=Yii::$app->formatter->asDecimal(isset($val['allSumPrevMonth'])?$val['allSumPrevMonth']:0 ,2);?>
@@ -214,7 +214,7 @@ $rowContNum = $admin ? 6 : 12;
 										<?=$val['fio']?>
 									</td>
 									<td>
-										<?=Yii::$app->formatter->asDecimal($val['sumOnlySaleCurrentMonth'],2);?>
+										<?=Yii::$app->formatter->asDecimal(isset($val['sumOnlySaleCurrentMonth'])?$val['sumOnlySaleCurrentMonth']:0 ,2);?>
 									</td>
 								</tr>
 							<?}?>
