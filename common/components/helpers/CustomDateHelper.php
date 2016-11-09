@@ -14,7 +14,20 @@ class CustomDateHelper
     CONST
         DATE_MODIFY_MONTH = 'month',
         DATE_MODIFY_DAY = 'day';
-
+    public static $month = [
+        'Январь',
+        'Февраль',
+        'Март',
+        'Апрель',
+        'Май',
+        'Июнь',
+        'Июль',
+        'Август',
+        'Сентябрь',
+        'Октябрь',
+        'Ноябрь',
+        'Декабрь'
+    ];
     protected static function getInterval($time1,$time2)
     {
         $date1 = new \DateTime();

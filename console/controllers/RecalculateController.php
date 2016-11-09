@@ -36,7 +36,7 @@ class RecalculateController extends AbstractConsoleController
     }
 
     public function actionProfitBonus(){
-        $payments = Payments::find()->andWhere(['>=','pay_date', strtotime("2016-10-01")])->all();
+        $payments = Payments::find()->andWhere(['>=','pay_date', strtotime("2016-09-01")])->all();
         $schemes = BonusScheme::find()->where(['type'=>BonusScheme::TYPE_PROFIT_PAYMENT])->all();
         foreach($schemes as $item){
             foreach($item->users as $user){

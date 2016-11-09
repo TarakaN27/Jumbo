@@ -91,5 +91,6 @@ return [
 	'Base payment client' => 'Платежи приведенных клиентов',
 	'Bonus Percent' => '% от дохода',
 	'Number month' => '№ месяца',
+	'Is sale' => 'Продажа'
 
 ];

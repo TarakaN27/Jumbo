@@ -61,17 +61,19 @@ class BonusRecordCalculate
         foreach($users as $bUser) {
             //если продажник то посчитаем ему только продажи прошлого месяца
             if($bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
-                $sum = $this->getTotalSumProfit($bUser->buser_id, true);
+                $sum = $this->getTotalSumProfit($bUser->buser_id, $this->beginMonthTime, $this->endMonthTime, true);
             }elseif($bUser->scheme->payment_base == BonusScheme::BASE_OWN_PAYMENT){
-                $sumCurrent = $this->getTotalSumProfit($bUser->buser_id);
-                $sumPrevMonth = $this->getTotalSumProfitPrevMonth($bUser->buser_id);
+                $sumCurrent = $this->getTotalSumProfit($bUser->buser_id, $this->beginMonthTime, $this->endMonthTime);
+                $sumPrevMonth = $this->getTotalSumProfitPrevMonth($bUser->buser_id,$this->beginMonthTime);
                 $sum = $sumPrevMonth - $sumCurrent;
             }
-            $this->setMonthCoeff($sum, $bUser->buser_id);
+            if($coeff = $this->getMonthCoeff($sum, $bUser->buser_id)) {
+                $this->saveMonthCoeff($coeff,$bUser->buser_id);
+            }
         }
         return TRUE;
     }
-    public function setMonthCoeff($sum, $userId)
+    public function getMonthCoeff($sum, $userId)
     {
         $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
         $koeff = false;
@@ -83,8 +85,10 @@ class BonusRecordCalculate
                 }
             }
         }
-        if ($koeff) {
+        return $koeff;
+    }
 
+    public function saveMonthCoeff($koeff, $userId){
             $year = date("Y", $this->endMonthTime);
             $month = date("m", $this->endMonthTime + 10);
             BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
@@ -94,7 +98,6 @@ class BonusRecordCalculate
             $buserBonusMonthCoeff->year = $year;
             $buserBonusMonthCoeff->coeff = str_replace(",", ".",$koeff);
             $buserBonusMonthCoeff->save();
-        }
     }
 
     public function setShemesRecord($users){
@@ -129,7 +132,7 @@ class BonusRecordCalculate
      * Получаем платежи
      * @return array
      */
-    protected function getTotalSumProfit($userId, $onlySale = false)
+    public function getTotalSumProfit($userId, $start, $end, $onlySale = false)
     {
         $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
         $sum = BUserBonus::find()
@@ -138,10 +141,11 @@ class BonusRecordCalculate
             ->joinWith('calculation as c')
             ->joinWith('payment as p')
             ->where(['b.buser_id' => $userId])
-            ->andWhere(['BETWEEN', 'p.pay_date', $this->beginMonthTime, $this->endMonthTime]);
+            ->andWhere(['BETWEEN', 'p.pay_date', $start, $end]);
         if($schemeRecord['exclude_sale'] == 1){
-            $sum->andWhere(['<>','b.is_sale',1]);
+            $sum->andWhere(['<>','b.number_month',1]);
         }
+
         if($onlySale){
             $sum->andWhere(['b.is_sale'=>1]);
         }
@@ -149,9 +153,9 @@ class BonusRecordCalculate
         return (float)$sum["totalSum"];
     }
 
-    protected function getTotalSumProfitPrevMonth($userId)
+    public function getTotalSumProfitPrevMonth($userId, $start)
     {
-        $beginMonthTime = CustomHelper::getBeginMonthTime($this->beginMonthTime-1);
+        $beginMonthTime = CustomHelper::getBeginMonthTime($start-1);
         $endMonthTime = CustomHelper::getEndMonthTime($beginMonthTime);
         $sum = BUserBonus::find()
             ->select(['totalSum'=>'SUM(profit_for_manager)'])
@@ -398,5 +402,32 @@ class BonusRecordCalculate
     protected function getPercent($oldAmount,$newAmount)
     {
         return CustomHelper::getDiffTwoNumbersAtPercent($oldAmount,$newAmount);
+    }
+
+    public function getCoeffNextMonth($userIds, $now){
+        $this->beginMonthTime = CustomHelper::getBeginMonthTime($now);
+        $this->endMonthTime = CustomHelper::getEndMonthTime($now);
+        $this->arBUsers = BonusSchemeToBuser::find()
+            ->alias('bsb')
+            ->joinWith('scheme as sc')
+            ->where(['sc.type' => BonusScheme::TYPE_PROFIT_PAYMENT, 'buser_id'=>$userIds])
+            ->indexBy('buser_id')
+            ->all();
+        if (count($this->arBUsers) == 0)
+            return FALSE;
+        $this->setShemesRecord($this->arBUsers);
+        $coeffNextMonth = [];
+        foreach($this->arBUsers as $bUser) {
+            //если продажник то посчитаем ему только продажи прошлого месяца
+            if($bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
+                $sum = $this->getTotalSumProfit($bUser->buser_id, $this->beginMonthTime, $this->endMonthTime, true);
+            }elseif($bUser->scheme->payment_base == BonusScheme::BASE_OWN_PAYMENT){
+                $sumCurrent = $this->getTotalSumProfit($bUser->buser_id, $this->beginMonthTime, $this->endMonthTime);
+                $sumPrevMonth = $this->getTotalSumProfitPrevMonth($bUser->buser_id,$this->beginMonthTime);
+                $sum = $sumPrevMonth - $sumCurrent;
+            }
+            $coeffNextMonth[$bUser->buser_id] = $this->getMonthCoeff($sum,$bUser->buser_id);
+        }
+        return $coeffNextMonth;
     }
 }

@@ -25,13 +25,15 @@ class MonthlyController extends AbstractConsoleController
      */
     public function actionRun()
     {
-        try {
+   /*     try {
             $obPartnerPercent = new PartnerPercentCounting();   //считаем проценты для партнеров
             $obPartnerPercent->countPercentByMonth();
         }catch (Exception $e)
         {
             //@todo add cron error notification
         }
+   */
+
             $time = CustomHelper::getDateMinusNumMonth(time(),1);   //считаем бонусы по рекордам платежей аккаунтеров
             $obRecordCalculate = new BonusRecordCalculate(date('d.m.Y',$time));
             $obRecordCalculate->run();

@@ -153,6 +153,7 @@ $rowContNum = $admin ? 6 : 12;
 								'number_month',
 								'bonus_percent:decimal',
 								'amount:decimal',
+								'is_sale:boolean',
 							]
 						])?>
 						<div class="col-md-4 col-md-offset-8">
@@ -167,72 +168,91 @@ $rowContNum = $admin ? 6 : 12;
 						</div>
 					<?php endif;?>
 				</div>
-				<?if(isset($data['calcProfit'])){?>
+				<?if(isset($data['totalProfitByUserType']['managers'])){?>
 				<div class="row">
-					<h3></h3>
+					<h3><?=Yii::t('app/reports', 'Accounters')?></h3>
 					<table class="table table-bordered ">
 						<thead>
 						<tr>
+							<th><?=Yii::t('app/reports','User mame');?></th>
 							<th><?=Yii::t('app/reports','Sum without sale selected period');?></th>
 							<th><?=Yii::t('app/reports','Sum with sale prev month');?></th>
-							<th><?=Yii::t('app/reports','Sum only sale selected period');?></th>
-							<th><?=Yii::t('app/reports','Sum only sale prev month');?></th>
 						</tr>
 						</thead>
 						<tbody>
+						<?foreach($data['totalProfitByUserType']['managers'] as $key=>$val){?>
 						<tr>
 							<td>
-								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumWithoutSaleSelectedPeriod'])?>          </td>
+								<?=$val['fio']?>
+							</td>
 							<td>
-								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumWithSalePrevMonth'])?>           </td>
+								<?=Yii::$app->formatter->asDecimal($val['sumWithoutNewClientCurrentPeriod'],2);?>
+							</td>
 							<td>
-								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumOnlySaleSelectedPeriod'])?>            </td>
-							<td>
-								<?=Yii::$app->formatter->asDecimal($data['calcProfit']['sumOnlySalePrevMonth'])?>            </td>
+								<?=Yii::$app->formatter->asDecimal($val['allSumPrevMonth'],2);?>
+							</td>
 						</tr>
+						<?}?>
 						</tbody>
 					</table>
 				</div>
 				<?}?>
-
-				<?php if(isset($data['bonusPaymentRecords'],$data['bonusPaymentRecords']['dataProvider']) && !empty($data['bonusPaymentRecords']['dataProvider'])):
-					$arDiffs = isset($data['bonusPaymentRecords']['diffs']) ? $data['bonusPaymentRecords']['diffs'] : [];
-					?>
-					<?=Html::tag('h3',Yii::t('app/bonus','Payment records bonus'))?>
-					<?=\yii\grid\GridView::widget([
-						'dataProvider' => $data['bonusPaymentRecords']['dataProvider'],
-						'columns' => [
-							[
-								'attribute' => 'buser.fio',
-								'visible' => $admin
-							],
-							[
-								'attribute' => 'record_date',
-								'value' => function($model){
-									$tmp = $model->record_date;
-									return empty($tmp) ? NULL : \common\components\helpers\CustomDateHelper::convertEnToRusMonth(Yii::$app->formatter->asDate($tmp,"MMMM Y"));
-								}
-							],
-							'amount:decimal',
-							'is_record:boolean',
-							'record_num',
-							'bonus.amount:decimal',
-							[
-								'attribute' => 'bonus.currency_id',
-								'value' => 'bonus.currency.code'
-							],
-							'percents',
-							[
-								'label' => Yii::t('app/reports','record diffs'),
-								'value' => function($model) use ($arDiffs)
-								{
-									$tmp = isset($arDiffs[$model->id]) ? $arDiffs[$model->id] : NULL;
-									return is_null($tmp) ? NULL : round($tmp,2);
-								}
-							]
-						]
-					])?>
-				<?php endif;?>
+				<?if(isset($data['totalProfitByUserType']['salers'])){?>
+					<div class="row">
+						<h3><?=Yii::t('app/reports', 'Salers')?></h3>
+						<table class="table table-bordered ">
+							<thead>
+							<tr>
+								<th><?=Yii::t('app/reports','User mame');?></th>
+								<th><?=Yii::t('app/reports','Sum only sale selected period');?></th>
+							</tr>
+							</thead>
+							<tbody>
+							<?foreach($data['totalProfitByUserType']['salers'] as $key=>$val){?>
+								<tr>
+									<td>
+										<?=$val['fio']?>
+									</td>
+									<td>
+										<?=Yii::$app->formatter->asDecimal($val['sumOnlySaleCurrentMonth'],2);?>
+									</td>
+								</tr>
+							<?}?>
+							</tbody>
+						</table>
+					</div>
+				<?}?>
+				<?if($data['correctCoeff']){?>
+				<h3><?=Yii::t('app/reports', 'Coeffs')?></h3>
+				<div class="row">
+					<table class="table table-bordered ">
+						<thead>
+						<tr>
+							<th><?=Yii::t('app/reports','User mame');?></th>
+							<th><?=Yii::t('app/reports','Month');?></th>
+							<th><?=Yii::t('app/reports','Coeff');?></th>
+						</tr>
+						</thead>
+						<tbody>
+						<?foreach($data['correctCoeff'] as $userCoeff){?>
+							<?foreach($userCoeff as $item){?>
+								<tr>
+									<td>
+										<?=$item->buser->getFio();?>
+									</td>
+									<td>
+										<?=$item->getMonthName();?>
+									</td>
+									<td>
+										<?=Yii::$app->formatter->asDecimal(str_replace(",", ".",$item->coeff));?>
+									</td>
+								</tr>
+							<?}?>
+						<?}?>
+						</tbody>
+					</table>
+				</div>
+				<?}?>
 			</div>
 		</div>
 	</div>

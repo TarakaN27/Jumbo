@@ -13,6 +13,7 @@ use backend\models\BUser;
 use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
 use common\models\BUserBonus;
+use common\models\BUserBonusMonthCoeff;
 use common\models\BUserPaymentRecords;
 use common\models\CUser;
 use common\models\CUserRequisites;
@@ -23,6 +24,7 @@ use common\models\PaymentsSale;
 use common\models\Services;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 class BonusReportsForm extends Model
 {
@@ -85,6 +87,7 @@ class BonusReportsForm extends Model
 				BUserBonus::tableName().'.amount',
 				BUserBonus::tableName().'.number_month',
 				BUserBonus::tableName().'.bonus_percent',
+				BUserBonus::tableName().'.is_sale',
 				BUser::tableName().'.fname',
 				BUser::tableName().'.lname',
 				BUser::tableName().'.mname',
@@ -124,6 +127,34 @@ class BonusReportsForm extends Model
 			BUserBonus::tableName().'.scheme_id' => $this->scheme,
 			BUserBonus::tableName().'.service_id' => $this->service
 		]);
+		$totalProfitByUser = $this->calcTotalProfit();
+		$totalProfitByUserType = [];
+		$profitSchemes = BonusScheme::find()->where(['type'=>BonusScheme::TYPE_PROFIT_PAYMENT])->all();
+		$correctCoeff = [];
+		$searchCoeff = false;
+		if($profitSchemes){
+			foreach($profitSchemes as $schema) {
+				$busers = $schema->users;
+				foreach($busers as $user){
+					if($schema->payment_base == BonusScheme::BASE_OWN_PAYMENT) {
+						if (isset($totalProfitByUser[$user->id])) {
+							$searchCoeff = true;
+							$totalProfitByUserType['managers'][$user->id] = $totalProfitByUser[$user->id];
+							$totalProfitByUserType['managers'][$user->id]['fio'] = $user->getFio();
+						}
+					}elseif($schema->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT) {
+							if (isset($totalProfitByUser[$user->id])) {
+								$searchCoeff = true;
+								$totalProfitByUserType['salers'][$user->id] = $totalProfitByUser[$user->id];
+								$totalProfitByUserType['salers'][$user->id]['fio'] = $user->getFio();
+							}
+					}
+				}
+			}
+			if($searchCoeff)
+				$correctCoeff = BUserBonusMonthCoeff::getByUserAndDate($this->users, $this->beginDate, $this->endDate);
+		}
+
 		return [
 			'dataProvider' => new ActiveDataProvider([
 					'query' => $query,
@@ -133,36 +164,48 @@ class BonusReportsForm extends Model
 					//'sort'=> ['defaultOrder' => ['pay_date'=>SORT_ASC]],
 				]),
 			'totalCount' => $query->sum('amount'),
-			'bonusPaymentRecords' => $this->getPaymentsRecordsBonus(),
-			'calcProfit' => $this->calcTotalProfit(),
+			'totalProfitByUserType' => $totalProfitByUserType,
+			'correctCoeff' => $correctCoeff,
+//			'bonusPaymentRecords' => $this->getPaymentsRecordsBonus(),
+
 		];
 	}
 	protected function calcTotalProfit(){
+		$totalSumByUsers = [];
+		foreach($this->users as $user){
+			$totalSumByUsers[$user] = [];
+		}
 		$query = BUserBonus::find()
-			->joinWith('payment.sale')
+			->select(['totalSum'=>'SUM(profit_for_manager)', BUserBonus::tableName().'.buser_id'])
 			->joinWith('payment.calculate')
 			->joinWith('scheme')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is null')
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.BUserBonus::tableName().'.number_month >1')
+			->groupBy(BUserBonus::tableName().'.buser_id')
 			->params([
 				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
 				':endDate' => strtotime($this->endDate.' 23:59:59')
 			]);
+
 		$query->andFilterWhere([
 			BonusScheme::tableName().'.type' => $this->bonusType,
 			BUserBonus::tableName().'.scheme_id' => $this->scheme,
 			BUserBonus::tableName().'.service_id' => $this->service
 		]);
-		$sumWithoutSaleSelectedPeriod = $query->sum('profit_for_manager');
-
+		$temp = $query->all();
+		foreach($temp as $item){
+			$totalSumByUsers[$item->buser_id]['sumWithoutNewClientCurrentPeriod'] = $item->totalSum;;
+		}
 		$prevBeginDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-01';
 		$prevEndDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-31';
 		$query = BUserBonus::find()
+			->select(['totalSum'=>'SUM(profit_for_manager)', BUserBonus::tableName().'.buser_id'])
 			->joinWith('payment.sale')
 			->joinWith('payment.calculate')
 			->joinWith('scheme')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
 			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
+			->groupBy(BUserBonus::tableName().'.buser_id')
 			->params([
 				':beginDate' => strtotime($prevBeginDate.' 00:00:00'),
 				':endDate' => strtotime($prevEndDate.' 23:59:59')
@@ -172,14 +215,20 @@ class BonusReportsForm extends Model
 			BUserBonus::tableName().'.scheme_id' => $this->scheme,
 			BUserBonus::tableName().'.service_id' => $this->service
 		]);
-		$sumWithSalePrevMonth = $query->sum('profit_for_manager');
+
+		$temp = $query->all();
+		foreach($temp as $item){
+			$totalSumByUsers[$item->buser_id]['allSumPrevMonth'] =  $item->totalSum;;
+		}
 
 		$query = BUserBonus::find()
+			->select(['totalSum'=>'SUM(profit_for_manager)', BUserBonus::tableName().'.buser_id'])
 			->joinWith('payment.sale')
 			->joinWith('payment.calculate')
 			->joinWith('scheme')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is not null')
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.BUserBonus::tableName().'.is_sale=1')
+			->groupBy(BUserBonus::tableName().'.buser_id')
 			->params([
 				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
 				':endDate' => strtotime($this->endDate.' 23:59:59')
@@ -189,30 +238,11 @@ class BonusReportsForm extends Model
 			BUserBonus::tableName().'.scheme_id' => $this->scheme,
 			BUserBonus::tableName().'.service_id' => $this->service
 		]);
-		$sumOnlySaleSelectedPeriod = $query->sum('profit_for_manager');
-
-		$query = BUserBonus::find()
-			->joinWith('payment.sale')
-			->joinWith('payment.calculate')
-			->joinWith('scheme')
-			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.PaymentsSale::tableName().'.id is not null')
-			->params([
-				':beginDate' => strtotime($prevBeginDate.' 00:00:00'),
-				':endDate' => strtotime($prevEndDate.' 23:59:59')
-			]);
-		$query->andFilterWhere([
-			BonusScheme::tableName().'.type' => $this->bonusType,
-			BUserBonus::tableName().'.scheme_id' => $this->scheme,
-			BUserBonus::tableName().'.service_id' => $this->service
-		]);
-		$sumOnlySalePrevMonth = $query->sum('profit_for_manager');
-		return [
-			'sumWithoutSaleSelectedPeriod'=>$sumWithoutSaleSelectedPeriod,
-			'sumWithSalePrevMonth'=>$sumWithSalePrevMonth,
-			'sumOnlySaleSelectedPeriod'=>$sumOnlySaleSelectedPeriod,
-			'sumOnlySalePrevMonth'=>$sumOnlySalePrevMonth,
-		];
+		$temp = $query->all();
+		foreach($temp as $item){
+			$totalSumByUsers[$item->buser_id]['sumOnlySaleCurrentMonth'] =  $item->totalSum;
+		}
+		return $totalSumByUsers;
 	}
 	/**
 	 * @return ActiveDataProvider

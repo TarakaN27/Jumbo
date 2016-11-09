@@ -25,6 +25,7 @@ use backend\models\BUser;
  */
 class BUserBonus extends AbstractActiveRecord
 {
+    public $totalSum;
     /**
      * @inheritdoc
      */
@@ -66,7 +67,8 @@ class BUserBonus extends AbstractActiveRecord
             'currency_id' => Yii::t('app/bonus','Bonus currency ID'),
             'record_id' => Yii::t('app/bonus','Record ID'),
             'bonus_percent' => Yii::t('app/bonus','Bonus Percent'),
-            'number_month' => Yii::t('app/bonus','Number month')
+            'number_month' => Yii::t('app/bonus','Number month'),
+            'is_sale' => Yii::t('app/bonus','Is sale')
         ];
     }
 
