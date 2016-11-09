@@ -73,6 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->getLogWorkTypeStr()
             ],
             'allow_unit:boolean',
+            'allow_set_sale:boolean',
             [
                 'attribute' => 'status',
                 'value' => $model->getStatusStr()

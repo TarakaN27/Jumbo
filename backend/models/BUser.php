@@ -150,14 +150,14 @@ class BUser extends AbstractUser
             ['log_work_type','default','value' => self::LOG_WORK_TYPE_DEFAULT],
             ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())],
 
-            ['allow_unit','integer'],
-            ['allow_unit','default','value' => 0]
+            [['allow_unit','allow_set_sale'],'integer'],
+            [['allow_unit','allow_set_sale'],'default','value' => 0]
         ];
     }
 
     /**
-     * @inheritdoc
-     */
+ * @inheritdoc
+ */
     public function attributeLabels()
     {
         return [
@@ -179,7 +179,8 @@ class BUser extends AbstractUser
             'log_work_type' => Yii::t('app/crm','Log work type'),
             'allow_unit' => Yii::t('app/users','Allow unit'),
             'roleStr' => Yii::t('app/users','Role Str'),
-            'fio' => Yii::t('app/users','Manager')
+            'fio' => Yii::t('app/users','Manager'),
+            'allow_set_sale' => Yii::t('app/users','Allow set sale'),
         ];
     }
 

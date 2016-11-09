@@ -135,9 +135,15 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     $modelP->legal_id,
                     $paySumm,
                     $obCntrID->is_resident,
-                    $modelP->pay_date);
-                if(PaymentsManager::isSale($modelP->cntr_id,$modelP->pay_date))
-                    $formModel->isSale = TRUE;
+                    $modelP->pay_date); 
+                if(Yii::$app->user->identity->allow_set_sale) {
+                    if (PaymentsManager::isSaleWithService($modelP->service_id, $modelP->cntr_id, $modelP->pay_date))
+                        $formModel->isSale = TRUE;
+                }else {
+                    if (PaymentsManager::isSale($modelP->cntr_id, $modelP->pay_date))
+                        $formModel->isSale = TRUE;
+                }
+
 
                 /*
                 $obPPC = CuserPreferPayCond::find()->where([    //дефолтное условие
@@ -180,6 +186,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
             {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
+                    $modelP->manager_id = Yii::$app->user->id;  
+                    $modelP->save();
                         $bError = FALSE;
                     /** @var AddPaymentForm $p */
                     foreach($model as $p) // добавляем патежи
@@ -272,6 +280,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 }
             }
         }
+
         return $this->render('add_payment',[
             'model' => $model,
             'modelP' => $modelP,
@@ -544,6 +553,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
             throw new InvalidParamException();
 
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return PaymentsManager::isSale($iContrID,$payDate);
+        if(Yii::$app->user->identity->allow_set_sale)
+            return PaymentsManager::isSaleWithService($iServID, $iContrID, $payDate);
+        else
+            return PaymentsManager::isSale($iContrID, $payDate);
     }
 } 

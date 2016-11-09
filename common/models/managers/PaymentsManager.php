@@ -67,6 +67,35 @@ class PaymentsManager extends Payments
 
     }
 
+    public static function isSaleWithService($iServID,$iCUserID,$payDate,$iPRequest = NULL)
+    {
+        $inActivePeriod = (int)Yii::$app->config->get('c_inactivity',0);  //период бездействия в месяцах
+
+        if($inActivePeriod <= 0)    //не задан период бездействия, вернем FALSE
+            return FALSE;
+
+        $arCuser = self::getUserByGroup($iCUserID);     //получаем контрагентов из группы
+
+        $beginDate = CustomHelper::getBeginDayTime($payDate);   //время начала дня на момент платежа
+        if(PaymentsSale::find()     //если были продажи позже даты платежа, то считаем что платеж не продажа
+        ->where(['cuser_id' => $arCuser,'service_id' => $iServID])
+            ->andWhere('sale_date >= :beginDate')
+            ->params([':beginDate' => $beginDate])
+            ->limit(1)
+            ->exists()
+        )
+            return FALSE;
+
+        $beginDate = CustomHelper::getDateMinusNumMonth($beginDate,$inActivePeriod);  //отнимаем от даты платежа время бездействия по календарю
+
+        return !Payments::find()   //проверяем , если не было платежей за период бездействия, то считаем платеж продажей
+        ->where(['cuser_id' => $arCuser,'service_id' => $iServID])
+            ->andWhere('pay_date >= :beginDate')
+            ->params([':beginDate' => $beginDate])
+            ->limit(1)
+            ->exists();
+    }
+
 
     /**
      * @param $iServID
