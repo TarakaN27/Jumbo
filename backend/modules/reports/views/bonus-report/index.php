@@ -222,7 +222,7 @@ $rowContNum = $admin ? 6 : 12;
 						</table>
 					</div>
 				<?}?>
-				<?if($data['correctCoeff']){?>
+				<?if(isset($data['correctCoeff'])&& $data['correctCoeff']){?>
 				<h3><?=Yii::t('app/reports', 'Coeffs')?></h3>
 				<div class="row">
 					<table class="table table-bordered ">
