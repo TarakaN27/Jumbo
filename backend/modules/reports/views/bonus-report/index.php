@@ -189,7 +189,7 @@ $rowContNum = $admin ? 6 : 12;
 								<?=Yii::$app->formatter->asDecimal($val['sumWithoutNewClientCurrentPeriod'],2);?>
 							</td>
 							<td>
-								<?=Yii::$app->formatter->asDecimal($val['allSumPrevMonth'],2);?>
+								<?=Yii::$app->formatter->asDecimal(isset($val['allSumPrevMonth'])?$val['allSumPrevMonth']:0 ,2);?>
 							</td>
 						</tr>
 						<?}?>
