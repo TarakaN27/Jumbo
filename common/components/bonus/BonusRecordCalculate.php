@@ -136,7 +136,7 @@ class BonusRecordCalculate
     {
         $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
         $sum = BUserBonus::find()
-            ->select(['totalSum'=>'SUM(profit_for_manager)'])
+            ->select(['totalSum'=>'SUM(profit_for_manager)', 'payment_id'])
             ->alias('b')
             ->joinWith('calculation as c')
             ->joinWith('payment as p')
@@ -158,7 +158,7 @@ class BonusRecordCalculate
         $beginMonthTime = CustomHelper::getBeginMonthTime($start-1);
         $endMonthTime = CustomHelper::getEndMonthTime($beginMonthTime);
         $sum = BUserBonus::find()
-            ->select(['totalSum'=>'SUM(profit_for_manager)'])
+            ->select(['totalSum'=>'SUM(profit_for_manager)', 'payment_id'])
             ->alias('b')
             ->joinWith('calculation as c')
             ->joinWith('payment as p')
