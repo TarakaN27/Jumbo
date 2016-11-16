@@ -39,7 +39,6 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
     <?php endif;?>
-
     <?= $form->field($model, 'src')->fileInput()?>
 
     <?= $form->field($model, 'is_default')->dropDownList(\common\models\BillDocxTemplate::getYesNo())?>

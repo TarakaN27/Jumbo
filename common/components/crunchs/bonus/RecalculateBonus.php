@@ -92,7 +92,7 @@ class RecalculateBonus
 	{
 		$arPaymentsTmp = Payments::find()->all();
 		$obCount = new PaymentBonusBehavior();
-
+		
 		foreach ($arPaymentsTmp as $payment)
 			$obCount->countingPartnerBonus($payment);
 

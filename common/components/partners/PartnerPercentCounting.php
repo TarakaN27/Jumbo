@@ -57,7 +57,6 @@ class PartnerPercentCounting
     public function countPercentByMonth($beginTime = NULL)
     {
         $this->time = $time = null === $beginTime ? time() : (is_numeric($beginTime) ? $beginTime : strtotime($beginTime));
-
         $arPartners = $this->getPartners();                             //Get partners  (array of objects)
         if (empty($arPartners))
             return TRUE;
@@ -71,7 +70,6 @@ class PartnerPercentCounting
                 $obScheme = $arSchemes[$partner->partner_scheme];           //Scheme for partner
 
                 $arPayTime = $this->getBeginEndPayTime($time, $obScheme->turnover_type);     //begin and end time for payment period
-
                 if (is_null($arPayTime))
                     throw new NotFoundHttpException();
 

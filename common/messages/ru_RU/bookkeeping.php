@@ -252,5 +252,10 @@ return [
     'Enroll part' => 'Зачислено частично',
     'Act implicit payment detail' => 'Детализация неявных платежей',
     'Active' => 'Активность',
-    'Not active'=> 'Не активно'
+    'Not active'=> 'Не активно',
+    'Migrate Expense' => 'Загрузить затраты из файла',
+    'src' => 'Путь к файлу',
+    'Upload' => 'Загрузить',
+    '{count} expenses success saved' => '{count} затрат успещно сохранены',
+    'Dont have expense for loading' => 'Нет затрат для загрузки'
 ];

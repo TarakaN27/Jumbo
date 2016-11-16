@@ -3,13 +3,21 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\components\AbstractBaseBackendController;
+use common\models\CUser;
+use common\models\CUserRequisites;
+use common\models\ExchangeRates;
+use common\models\Expense1CCategories;
+use common\models\Expense1CLink;
 use common\models\ExpenseCategories;
 use common\models\LegalPerson;
 use Yii;
 use common\models\Expense;
 use common\models\search\ExpenseSearch;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use backend\modules\bookkeeping\form\Migrate1CLoadFileForm;
+use common\models\AbstractModel;
 
 /**
  * ExpenseController implements the CRUD actions for Expense model.
@@ -79,6 +87,137 @@ class ExpenseController extends AbstractBaseBackendController
         ]);
     }
 
+    public function actionMigrate1c()
+    {
+        $model = new Migrate1CLoadFileForm();
+        if (Yii::$app->request->isPost) {
+            if($_FILES['Migrate1CLoadFileForm']['tmp_name']){
+                  $models = $this->parseXml($_FILES['Migrate1CLoadFileForm']['tmp_name']['src']);
+                  if($models) {
+                      return $this->render('migrate_1c_form_list', [
+                          'models' => $models,
+                      ]);
+                  }else {
+                      Yii::$app->session->setFlash('danger', Yii::t('app/book', 'Dont have expense for loading'));
+                      return $this->redirect(['index']);
+                  }
+            }else{
+                $savedModels = [];
+                $notSavedmodels = [];
+                foreach(Yii::$app->request->post('Expense') as $item){
+                    $model = new Expense($item);
+                    $model->legal_id =3;
+                    if($model->active) {
+                        if ($model->validate()) {
+                            $model->save(false);
+                            $savedModels[] = $model;
+                        } else {
+                            $notSavedmodels[] = $model;
+                        }
+                    }
+                }
+                if($savedModels){
+                    Yii::$app->session->setFlash('success', Yii::t('app/book', '{count} expenses success saved', ['count'=> count($savedModels)]));
+                    foreach($savedModels as $item){
+                            $sqlPart[] = "($item->cuser_id, $item->category1CId, $item->cat_id, 1)";
+                    }
+                    $sql = "INSERT INTO wm_expense_1c_link (cuser_id, category_1c_id, jumbo_category_id, `count`) VALUES " . implode(',', $sqlPart) . "ON DUPLICATE KEY UPDATE wm_expense_1c_link.count = wm_expense_1c_link.count + VALUES(count)";
+                    $db = Yii::$app->db;
+                    $db->createCommand($sql)->execute();
+                }
+                if($notSavedmodels){
+                    return $this->render('migrate_1c_form_list', [
+                        'models' => $notSavedmodels,
+                    ]);
+                }else{
+                    return $this->redirect(['index']);
+                }
+            }
+        }
+        return $this->render('migrate_1c', [
+            'model' => $model,
+        ]);
+    }
+    protected function parseXml($xml){
+        $expense1CIds = [];
+        $expenses = simplexml_load_file($xml);
+        $unp = [];
+        $currenciesCode = [];
+        foreach($expenses as $expense){
+            $date = strtotime($expense->{"ДатаДокумента"});
+            $id1c = date("Y-m-d",$date).'-'.$expense->{"НомерДокумента"};
+            $expense1CIds[] = $id1c;
+            if(trim($expense->{"УНП"}) != ""){
+                $unp[] = trim($expense->{"УНП"});
+            }
+            $currenciesCode[] = $expense->{"Валюта"};
+            if(trim($expense->{"ДДС"})!=""){
+                $categories1CNames[] = trim($expense->{"ДДС"});
+            }
+        }
+        $extendsExpense =  Expense::find()->where(['id_1c'=>$expense1CIds])->indexBy('id_1c')->all();
+
+        $cusers = CUserRequisites::find()->where(['ynp'=>array_unique($unp)])->indexBy('ynp')->all();
+        foreach($cusers as $item){
+            $cuserIds[] =  $item->id;
+        }
+        $categories1C = Expense1CCategories::find()->where(['name'=>array_unique($categories1CNames)])->indexBy('id')->all();
+        $existName = ArrayHelper::getColumn($categories1C,'name');
+        $notExist1CCategory = array_diff(array_unique($categories1CNames),$existName);
+        foreach($notExist1CCategory as $item){
+            $category1C = new Expense1CCategories();
+            $category1C->name = $item;
+            $category1C->save();
+            $categories1C[$category1C->id] = $category1C;
+        }
+        $arCategories1C = ArrayHelper::getColumn($categories1C,'name');
+
+        $link = [];
+        if($categories1C && $cusers){
+            $link = Expense1CLink::find()
+                ->select(['cuser_id','category_1c_id', 'jumbo_category_id'])
+                ->where(['cuser_id'=>array_unique(ArrayHelper::getColumn($cusers, 'id')), 'category_1c_id'=>array_keys($categories1C)])
+                ->asArray()
+                ->orderBy(['count'=>SORT_ASC])
+                ->indexBy(function($model){
+                    return $model['cuser_id'].'-'.$model['category_1c_id'];
+                })
+                ->all();
+        }
+        $currencies = ExchangeRates::find()->where(['code'=>$currenciesCode])->indexBy('code')->all();
+        $models = [];
+        foreach($expenses as $expense){
+            $date = strtotime($expense->{"ДатаДокумента"});
+            $id1c = date("Y-m-d",$date).'-'.$expense->{"НомерДокумента"};
+            if(!isset($extendsExpense[$id1c])) {
+                $model = new Expense();
+                $model->id_1c = $id1c;
+                $model->pay_date = strtotime($expense->{"ДатаДокумента"});
+                $model->pay_summ = $expense->{"Сумма"};
+                $model->description = $expense->{"НазначениеПлатежа"};
+                $model->cuser_id = isset($cusers[trim($expense->{"УНП"})]->id)?$cusers[trim($expense->{"УНП"})]->id:null;
+                if($model->cuser_id){
+                    $model->cuserName = $cusers[trim($expense->{"УНП"})]->getCorpName();
+                }
+                $key=  $expense->{"Валюта"}.'';
+                $model->currency_id = isset($currencies[$key])?$currencies[$key]->id:null;
+                if($key = array_search(trim($expense->{"ДДС"}), $arCategories1C)) {
+                    $model->category1CId = $key;
+                    if (isset($link[$model->cuser_id.'-'.$key])){
+                        $model->cat_id = $link[$model->cuser_id.'-'.$key]['jumbo_category_id'];
+                    }
+                }
+                if(!$model->cat_id && $model->cuser_id){
+                    $cat = Expense::find()->select(['countCat'=>'COUNT(cat_id)', 'cat_id'])->where(['cuser_id'=>$model->cuser_id])->groupBy('cat_id')->orderBy(['countCat'=>SORT_DESC])->asArray()->one();
+                    if($cat){
+                        $model->cat_id = $cat['cat_id'];
+                    }
+                }
+                $models[] = $model;
+            }
+        }
+        return $models;
+    }
     /**
      * Displays a single Expense model.
      * @param integer $id

@@ -17,6 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <h2><?php echo $this->title?></h2>
                                     <section class="pull-right">
                                         <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <?= Html::a(Yii::t('app/book', 'Migrate Expense'), ['migrate-1c'], ['class' => 'btn btn-danger']) ?>
+                                        <?php endif;?>
+
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
                                             <?= Html::a(Yii::t('app/book', 'Create Expense'), ['create'], ['class' => 'btn btn-success']) ?>
                                         <?php endif;?>
                                     </section>

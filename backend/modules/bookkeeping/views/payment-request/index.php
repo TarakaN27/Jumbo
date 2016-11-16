@@ -32,7 +32,7 @@ if(Yii::$app->user->can('adminRights'))
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
-                <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();;?>
+                <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();?>
                 <?= \common\components\customComponents\gridView\CustomGridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,

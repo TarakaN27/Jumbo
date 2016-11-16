@@ -135,7 +135,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                     $modelP->legal_id,
                     $paySumm,
                     $obCntrID->is_resident,
-                    $modelP->pay_date); 
+                    $modelP->pay_date);
                 if(Yii::$app->user->identity->allow_set_sale) {
                     if (PaymentsManager::isSaleWithService($modelP->service_id, $modelP->cntr_id, $modelP->pay_date))
                         $formModel->isSale = TRUE;

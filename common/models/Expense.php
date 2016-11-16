@@ -30,6 +30,11 @@ class Expense extends AbstractActiveRecord
     /**
      * @inheritdoc
      */
+
+    public $active=1;
+    public $cuserName;
+    public $category1CId;
+
     public static function tableName()
     {
         return '{{%expense}}';
@@ -44,7 +49,13 @@ class Expense extends AbstractActiveRecord
             [[
                 'pay_date', 'pay_summ', 'currency_id',
                 'legal_id',  'cat_id'
-            ], 'required'],
+            ], 'required', 'when' => function($model) {
+                return $model->active == 1;},
+                'whenClient' => "function (attribute, value) {
+                console.log(attribute);
+                return $('#active').val() == 1;
+            }"
+            ],
             [['pay_summ'],ValidNumber::className()],
             [[
                 'pay_date', 'currency_id',
