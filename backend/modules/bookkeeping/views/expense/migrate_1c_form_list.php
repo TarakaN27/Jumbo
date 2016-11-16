@@ -68,7 +68,6 @@ use common\components\helpers\CustomViewHelper;
                             <td>
                                 <?if(!$model->cuser_id){?>
                                 <?= $form->field($model, "[{$key}]cuser_id")->widget(\kartik\select2\Select2::className(), [
-                                    'initValueText' => $cuserDesc, // set the initial display text
                                     'options' => [
                                         'placeholder' => Yii::t('app/crm', 'Search for a company ...')
                                     ],
