@@ -91,7 +91,7 @@ class ExpenseController extends AbstractBaseBackendController
     {
         $model = new Migrate1CLoadFileForm();
         if (Yii::$app->request->isPost) {
-            if($_FILES['Migrate1CLoadFileForm']['tmp_name']){
+            if(isset($_FILES['Migrate1CLoadFileForm']) && $_FILES['Migrate1CLoadFileForm']['tmp_name']){
                   $models = $this->parseXml($_FILES['Migrate1CLoadFileForm']['tmp_name']['src']);
                   if($models) {
                       return $this->render('migrate_1c_form_list', [
