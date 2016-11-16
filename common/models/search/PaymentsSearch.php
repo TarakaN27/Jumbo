@@ -129,9 +129,9 @@ class PaymentsSearch extends Payments
         {
             $query->joinWith('cuser');
             $query->joinWith('payRequest');
-            $cuserIdSales = PaymentsSale::find()->select(['cuser_id'])->where(['buser_id'=>Yii::$app->user->id])->asArray()->all();
+            $cuserIdSales = CUser::find()->select(['id'])->where(['sale_manager_id'=>Yii::$app->user->id])->asArray()->all();
             if($cuserIdSales){
-                $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'cuser_id');
+                $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'id');
                 $query->andWhere(['or', [CUser::tableName().'.manager_id' => Yii::$app->user->id], [PaymentRequest::tableName().'.manager_id' => Yii::$app->user->id], [static::tableName().'.cuser_id'=>$cuserIdSales]]);
             }else
                 $query->where([CUser::tableName().'.manager_id' => Yii::$app->user->id]);
