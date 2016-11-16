@@ -76,7 +76,7 @@ class BonusRecordCalculate
     public function getMonthCoeff($sum, $userId)
     {
         $schemeRecord = $this->arSchemesRecord[$this->arUserSchemes[$userId]];
-        $koeff = false;
+        $koeff = 1;
         foreach ($schemeRecord as $key => $record) {
             if ($key != 'exclude_sale') {
                 if ($sum >= $record['from'] && $sum < $record['to']) {
@@ -145,7 +145,6 @@ class BonusRecordCalculate
         if($schemeRecord['exclude_sale'] == 1){
             $sum->andWhere(['<>','b.number_month',1]);
         }
-
         if($onlySale){
             $sum->andWhere(['b.is_sale'=>1]);
         }
