@@ -119,6 +119,7 @@ class ExpenseController extends AbstractBaseBackendController
                 if($savedModels){
                     Yii::$app->session->setFlash('success', Yii::t('app/book', '{count} expenses success saved', ['count'=> count($savedModels)]));
                     foreach($savedModels as $item){
+                        if($item->category1CId)
                             $sqlPart[] = "($item->cuser_id, $item->category1CId, $item->cat_id, 1)";
                     }
                     $sql = "INSERT INTO wm_expense_1c_link (cuser_id, category_1c_id, jumbo_category_id, `count`) VALUES " . implode(',', $sqlPart) . "ON DUPLICATE KEY UPDATE wm_expense_1c_link.count = wm_expense_1c_link.count + VALUES(count)";
