@@ -61,12 +61,24 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>['decimal',4]
                         ],
                         [
-                            'attribute' => 'caurrency_id',
+                            'attribute' => 'currency_id',
                             'value' => is_object($obCurr = $model->currency) ? $obCurr->code : 'N/A'
                         ],
                         [
                             'attribute' => 'enroll_unit_id',
                             'value' => $model->unitEnroll->name
+                        ],
+                        [
+                            'attribute' => 'is_dub_currency',
+                            'value' => $model->getYesNoStr($model->is_dub_currency)
+                        ],
+                        [
+                            'attribute' => 'dub_cond_currency',
+                            'value' => is_object($obCurr = $model->dubCondCurrency) ? $obCurr->code : 'N/A'
+                        ],
+                        [
+                            'attribute' => 'dub_enroll_unit_id',
+                            'value' => $model->dubUnitEnroll->name
                         ],
                         [
                             'attribute' => 'corr_factor',

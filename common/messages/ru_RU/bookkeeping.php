@@ -257,5 +257,9 @@ return [
     'src' => 'Путь к файлу',
     'Upload' => 'Загрузить',
     '{count} expenses success saved' => '{count} затрат успещно сохранены',
-    'Dont have expense for loading' => 'Нет затрат для загрузки'
+    'Dont have expense for loading' => 'Нет затрат для загрузки',
+    'Is dub currency'=> 'Использовать дублирующие единицы зачисления',
+    'Dub enroll unit id'=> 'Дублирующая единица зачисления',
+    'Dub cond currency id'=> 'Дублирующая валюта условия',
+    'Dub counting unit amount' => "Дублирующее расчетное кол-во единиц",
 ];

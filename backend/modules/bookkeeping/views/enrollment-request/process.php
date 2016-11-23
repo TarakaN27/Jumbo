@@ -23,7 +23,20 @@ var
     erp_errorText = '".Yii::t('app/reports','Can not load promised payments')."'
     ;
 ",View::POS_HEAD);
+$this->registerJs('
+    $("#convBase").on("keyup",function(){
+        var rate = $("#converter").data("rate");
+        var dubVal = $(this).val()/rate;
+        $("#convDub").val(dubVal.toFixed(2));                  
+    });    
+    $("#convDub").on("keyup",function(){
+        var rate = $("#converter").data("rate");
+        var val = $(this).val()*rate;
+        $("#convBase").val(val.toFixed(2));     
+    });
+',View::POS_LOAD);
 ?>
+
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
         <div class = "x_panel">
@@ -66,6 +79,12 @@ var
                                 'label' => Yii::t('app/book','Counting unit amount'),
                                 'value' => Yii::$app->formatter->asDecimal($model->amount) .' '.(is_object($model->unitEnroll) ? $model->unitEnroll->name : NULL)
                             ],
+                            [
+                                'attribute' => 'dubAmount',
+                                'label' => Yii::t('app/book','Dub counting unit amount'),
+                                'visible' =>$obCond->is_dub_currency?1:0,
+                                'value' => Yii::$app->formatter->asDecimal($model->dubAmount) .' '.(is_object($obCond->dubUnitEnroll) ? $obCond->dubUnitEnroll->name : NULL)
+                            ],
                         ]
                     ])?>
                 </div>
@@ -106,7 +125,16 @@ var
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Production'),
-                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYN'. ' <'.Yii::$app->formatter->asDecimal($exchRate).'>' : NULL
+                                    'value' => is_object($obCalc) ? Yii::$app->formatter->asDecimal($obCalc->production).' BYN' : NULL
+                                ],
+                                [
+                                    'label' => Yii::t('app/book','Condition currency'),
+                                    'value' => $obCond->condCurrency->name.' ('.$obCond->condCurrency->code.') <'.Yii::$app->formatter->asDecimal($exchRate).'>'
+                                ],
+                                [
+                                    'label' => Yii::t('app/book','Dub cond currency id'),
+                                    'visible' => $obCond->is_dub_currency?1:0,
+                                    'value' => $obCond->dubCondCurrency->name.' ('.$obCond->dubCondCurrency->code.') <'.Yii::$app->formatter->asDecimal($dubExchRate).'>'
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Description'),
@@ -137,6 +165,7 @@ var
                 </div>
 
                 <div class="row">
+                    <div class="col-md-9">
                         <?=Html::tag('h3',Yii::t('app/book','Enroll request proccess'))?>
                         <?php
                             $form = \yii\bootstrap\ActiveForm::begin([
@@ -144,8 +173,8 @@ var
                                     'class' => 'form-horizontal form-label-left'
                                 ],
                                 'fieldConfig' => [
-                                    'template' => '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
-                                    'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
+                                    'template' => '<div class="form-group">{label}<div class="col-md-8 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+                                    'labelOptions' => ['class' => 'control-label col-md-4 col-sm-3 col-xs-12'],
                                 ],
                             ]);
                             echo Html::activeHiddenInput($obForm,'availableAmount');
@@ -182,7 +211,7 @@ var
                         ?>
                         <?= $form->field($obForm,'enroll')->textInput();?>
                         <div class="form-group">
-                            <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                            <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-4">
                                 <?= $form->field($obForm,'part_enroll')->checkbox()?>
                             </div>
                         </div>
@@ -195,7 +224,24 @@ var
                             </div>
                         </div>
                         <?php \yii\bootstrap\ActiveForm::end();?>
-                </div>
+                    </div>
+                    <?if($obCond->is_dub_currency==1){?>
+                    <div id="converter" data-rate="<?=round($model->amount/$model->dubAmount, 6);?>" class="col-md-3 form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="enrollprocessform-repay"><?=$obCond->condCurrency->code?>: </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="text"  id="convBase" class="form-control" value="<?=round($model->amount,2)?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="enrollprocessform-repay"><?=$obCond->dubCondCurrency->code?>: </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="text" id="convDub" class="form-control" value="<?=round($model->dubAmount,2)?>">
+                            </div>
+                        </div>
+                    </div>
+                        <?}?>
+                    </div>
             </div>
         </div>
     </div>

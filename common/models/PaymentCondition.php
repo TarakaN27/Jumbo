@@ -116,10 +116,27 @@ class PaymentCondition extends AbstractActiveRecord
                     }
                     return true;
                 }"],
+            [[
+                'dub_enroll_unit_id',
+                'dub_cond_currency',
+            ],'required','when' => function($model) {
+                if($this->is_dub_currency == 1) //если компания не контрагнет, то поля можно не заполнять
+                    return true;
+                return false;
+            },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        type = $('#paymentcondition-is_dub_currency').val();
+                    if(type == 1)
+                    {
+                        return true;
+                    }
+                    return false;
+                }"],
             [['name'],'unique','targetClass' => self::className(),
                 'message' => Yii::t('app/book','This name has already been taken.')],
             [['description'], 'string'],
-            [['cond_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type', 'enroll_unit_id'], 'integer'],
+            [['cond_currency','is_dub_currency','service_id', 'l_person_id', 'is_resident', 'created_at', 'updated_at','currency_id','type', 'enroll_unit_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['summ_from', 'summ_to',],'number','min' => 0,'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['commission', 'tax','corr_factor'],'number', 'numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
@@ -156,6 +173,9 @@ class PaymentCondition extends AbstractActiveRecord
             'not_use_corr_factor' => Yii::t('app/services','Not user correcting factor with counting unit enrollment'),
             'enroll_unit_id' => Yii::t('app/services','Unit enrollment'),
             'status' => Yii::t('app/book', 'Status'),
+            'is_dub_currency' => Yii::t('app/book', 'Is dub currency'),
+            'dub_enroll_unit_id' => Yii::t('app/book', 'Dub enroll unit id'),
+            'dub_cond_currency' => Yii::t('app/book', 'Dub cond currency id'),
         ];
     }
 
@@ -170,6 +190,11 @@ class PaymentCondition extends AbstractActiveRecord
     public function getUnitEnroll()
     {
         return $this->hasOne(UnitsEnroll::className(), ['id' => 'enroll_unit_id']);
+    }
+
+    public function getDubUnitEnroll()
+    {
+        return $this->hasOne(UnitsEnroll::className(), ['id' => 'dub_enroll_unit_id']);
     }
 
     /**
@@ -194,6 +219,11 @@ class PaymentCondition extends AbstractActiveRecord
     public function getCondCurrency()
     {
         return $this->hasOne(ExchangeRates::className(),['id' => 'cond_currency']);
+    }
+
+    public function getDubCondCurrency()
+    {
+        return $this->hasOne(ExchangeRates::className(),['id' => 'dub_cond_currency']);
     }
 
     /**

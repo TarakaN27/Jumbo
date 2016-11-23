@@ -6,6 +6,7 @@ use backend\components\AbstractBaseBackendController;
 use backend\models\BUser;
 use backend\modules\bookkeeping\form\EnrollProcessForm;
 use backend\widgets\Alert;
+use common\components\payment\PaymentEnrollmentBehavior;
 use common\models\CUser;
 use common\models\CuserToGroup;
 use common\models\ExchangeCurrencyHistory;
@@ -84,7 +85,6 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             if($obBUser)
                 $buserDesc = $obBUser->getFio();
         }
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -188,12 +188,10 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             Yii::$app->session->setFlash('error',Yii::t('app/book','Request already processed'));
             return $this->redirect(['index']);
         }
-
         if(Yii::$app->user->can('only_bookkeeper') && $model->assigned_id != Yii::$app->user->id)   //if user is bookkeeper , check that he has rights for processed
         {
             throw new ForbiddenHttpException();
         }
-
         $obForm = new EnrollProcessForm();          //create enroll form model
         $obForm->request = $model;
         $obForm->availableAmount = $model->amount;
@@ -206,6 +204,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $arPromised = [];
         $countPromised = NULL;
         $exchRate = NULL;
+        $dubExchRate = NULL;
         if(!empty($model->pr_payment_id))
         {
             $obPrPay = $model->prPayment;
@@ -282,7 +281,6 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             {
                 $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$obPayment->pay_date),$obCond->cond_currency);
             }
-
         }
 
         if($obForm->load(Yii::$app->request->post()) && $obForm->validate())
@@ -301,8 +299,15 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             $obCuser = CUser::find()->where(['id' => $obForm->cuserOP])->joinWith('requisites')->one();
             $cuserDesc = $obCuser->getInfoWithSite();
         }
-
-
+        $dubExchRate = NULL;
+        if($obCond->is_dub_currency) {
+            $enrollBehavior = new PaymentEnrollmentBehavior();
+            $model->dubAmount = $enrollBehavior->countAmoutForEnrollment($obPayment, $obCond, $obCalc, true);
+            if(!empty($obCond) && !empty($obPayment))
+            {
+                $dubExchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$obPayment->pay_date),$obCond->dub_cond_currency);
+            }
+        }
         return $this->render('process',[
             'model' => $model,
             'obPrPay' => $obPrPay,
@@ -313,6 +318,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             'arPromised' => $arPromised,
             'obPayment' => $obPayment,
             'exchRate' => $exchRate,
+            'dubExchRate' =>$dubExchRate,
             'cuserDesc' => $cuserDesc
         ]);
 

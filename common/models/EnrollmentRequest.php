@@ -37,6 +37,8 @@ use yii\helpers\ArrayHelper;
  */
 class EnrollmentRequest extends AbstractActiveRecord
 {
+
+    public $dubAmount;
     CONST
         STATUS_NEW = 5,
         STATUS_PROCESSED = 10;

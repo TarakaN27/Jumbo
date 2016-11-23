@@ -12,19 +12,26 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
 $this->registerJs("
 function initFieldsByType(){
     var
-        type = $('#paymentcondition-type input:checked').val();
-
+        type = $('#paymentcondition-type input:checked').val();    
     if(type != ".\common\models\PaymentCondition::TYPE_CUSTOM.")
         {
             $('.usual_type_block').fadeIn(100);
         }else{
             $('.usual_type_block').fadeOut(100);
         }
+    var is_dub = $('#paymentcondition-is_dub_currency').prop('checked');        
+         if(is_dub==1){
+              $('.dup_exchange').fadeIn(100);
+         }else{
+              $('.dup_exchange').fadeOut(100);
+         }
+         
 }
 ",\yii\web\View::POS_END);
 $this->registerJs("
     initFieldsByType();
     $('#paymentcondition-type').on('click','input',initFieldsByType);
+    $('#paymentcondition-is_dub_currency').on('change',initFieldsByType);
     
     $('#paymentcondition-summ_from,#paymentcondition-summ_to').on('change',function(){
         amountFormatter(this,4);
@@ -111,6 +118,21 @@ $this->registerJs("
     <?= $form->field($model,'enroll_unit_id')->dropDownList(\common\models\UnitsEnroll::getUnitsEnrollsDropDown(),[
         'prompt' => Yii::t('app/services','Choose Units Enroll')
     ])?>
+    <div class="form-group">
+        <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+            <?= $form->field($model,'is_dub_currency')->checkbox()?>
+        </div>
+    </div>
+      <span class="dup_exchange">
+        <?= $form->field($model,'dub_cond_currency')->dropDownList(\common\models\ExchangeRates::getRatesCodes(),[
+            'prompt' => Yii::t('app/book','Choose currency')
+        ])?>
+        <?= $form->field($model,'dub_enroll_unit_id')->dropDownList(\common\models\UnitsEnroll::getUnitsEnrollsDropDown(),[
+            'prompt' => Yii::t('app/services','Choose Units Enroll')
+        ])?>
+    </span>
+
+    
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
@@ -130,7 +152,6 @@ $this->registerJs("
     <div class="form-group">
          <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-
          </div>
     </div>
     <?php ActiveForm::end(); ?>
