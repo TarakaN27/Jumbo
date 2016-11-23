@@ -134,7 +134,7 @@ $this->registerJs('
                                 [
                                     'label' => Yii::t('app/book','Dub cond currency id'),
                                     'visible' => $obCond->is_dub_currency?1:0,
-                                    'value' => $obCond->dubCondCurrency->name.' ('.$obCond->dubCondCurrency->code.') <'.Yii::$app->formatter->asDecimal($dubExchRate).'>'
+                                    'value' => $obCond->is_dub_currency?$obCond->dubCondCurrency->name.' ('.$obCond->dubCondCurrency->code.') <'.Yii::$app->formatter->asDecimal($dubExchRate).'>':""
                                 ],
                                 [
                                     'label' => Yii::t('app/book','Description'),
