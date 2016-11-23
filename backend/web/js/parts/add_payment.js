@@ -16,6 +16,8 @@ function countASumm()
     $.each( pSumm, function( key, value ) {
         var
             val = $(value).val();
+        if(!val)
+            val=0;
         tmpSumm+=convertAmountToValid(val);
     });
 
