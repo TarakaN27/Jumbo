@@ -49,7 +49,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'attribute' => 'buser_id',
                                     'value' => is_object($obBuser = $model->buser) ? $obBuser->getFio() : NULL
                                 ],
-                                'description',
+                                [ 'attribute'=>'description',
+                                    'label' => Yii::t('app/book', 'Enrolls Description'),
+                                ],
+                                [ 'attribute'=>'enrReq.payment.description',
+                                    'label' => Yii::t('app/book', 'Payment Description'),
+                                ],
                                 'created_at:datetime',
                                 'updated_at:datetime',
                             ],

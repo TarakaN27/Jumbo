@@ -262,4 +262,6 @@ return [
     'Dub enroll unit id'=> 'Дублирующая единица зачисления',
     'Dub cond currency id'=> 'Дублирующая валюта условия',
     'Dub counting unit amount' => "Дублирующее расчетное кол-во единиц",
+    'Enrolls Description'=> 'Описание при зачислении',
+    'Payment Description' => 'Описание при проведении платежа'
 ];
