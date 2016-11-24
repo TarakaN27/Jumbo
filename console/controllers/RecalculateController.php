@@ -12,12 +12,17 @@ namespace console\controllers;
 use common\components\crunchs\bonus\RecalculateBonus;
 use common\components\crunchs\Payment\RecalcQuantityHours;
 use common\components\partners\PartnerPercentCounting;
+use common\components\payment\PaymentEnrollmentBehavior;
 use common\models\Acts;
 use common\models\BonusScheme;
 use common\models\BUserBonus;
+use common\models\EnrollmentRequest;
 use common\models\PartnerPurse;
 use common\models\PartnerPurseHistory;
+use common\models\PaymentCondition;
+use common\models\PaymentRequest;
 use common\models\Payments;
+use common\models\PaymentsCalculations;
 use console\components\AbstractConsoleController;
 use yii\console\Controller;
 use common\components\crunchs\denomination\Denomination;
@@ -128,6 +133,17 @@ class RecalculateController extends AbstractConsoleController
             $act->file_name = $fileName;
             if(!$act->save())
                 throw new ServerErrorHttpException();
+        }
+    }
+
+    public function actionChangeCondition(){
+        $enrollmentRequest = EnrollmentRequest::find()->where(['payment_id'=>[4198,4036,4046,4099,4144,4170,4200,4206,4223]])->all();
+        foreach($enrollmentRequest as $item){
+            $cacl = $item->payment->calculate;
+            $enrollBehavior = new PaymentEnrollmentBehavior();
+            $item->amount = $enrollBehavior->countAmoutForEnrollment($item->payment, $cacl->payCond, $cacl);
+            $item->enroll_unit_id = $cacl->payCond->enroll_unit_id;
+            $item->save();
         }
     }
 }
