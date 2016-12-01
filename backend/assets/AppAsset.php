@@ -24,7 +24,7 @@ class AppAsset extends AssetBundle
        'css/animate.min.css',
        'css/icheck/flat/green.css',
        'css/site.css',
-        'css/craftpip-jquery-confirm/css/jquery-confirm.css'
+        'css/craftpip-jquery-confirm/css/jquery-confirm.css',
     ];
     public $js = [
         'js/wm_app/app.js',
@@ -40,10 +40,6 @@ class AppAsset extends AssetBundle
         'js/wm_app/custom_notify.js',
         'js/craftpip-jquery-confirm/js/jquery-confirm.js',
         'js/accounting/accounting.min.js',
-        //'js/jquery-confirm/jquery.confirm.min.js'
-        //'js/tooltips/toltips.js'
-        //'js/socket_io/socket.io.js',
-        //'js/wm_app/notification.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

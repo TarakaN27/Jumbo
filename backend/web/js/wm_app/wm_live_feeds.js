@@ -110,6 +110,7 @@ function sendComment($this,updateComment) {
         success: function(msg){
             if(msg.status)
             {
+                $("#dropzoneCommentpreview"+msg.dialogID).html('');
                 if(msg.newDialog)
                 {
                     $('.msgBoxList').prepend(msg.content);

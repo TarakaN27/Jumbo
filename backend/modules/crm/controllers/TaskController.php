@@ -4,6 +4,7 @@ namespace app\modules\crm\controllers;
 
 use backend\models\BUser;
 use common\components\helpers\CustomHelper;
+use common\components\managers\DialogManager;
 use common\components\notification\RedisNotification;
 use common\models\BuserToDialogs;
 use common\models\CrmCmpContacts;
@@ -18,6 +19,7 @@ use Yii;
 use common\models\CrmTask;
 use common\models\search\CrmTaskSearch;
 use backend\components\AbstractBaseBackendController;
+use yii\base\Exception;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
@@ -159,7 +161,7 @@ class TaskController extends AbstractBaseBackendController
         $modelTask->parent_id = $model->id;
         $modelTask->task_control = CrmTask::YES;    //принять после выполнения по-умолчанию
         $modelTask->repeat_task = CrmTask::NO;
-        
+
         $obTime = CrmTaskLogTime::find()->where([ //занесенное время
             'task_id' => $model->id,
         ])->all();
@@ -218,19 +220,7 @@ class TaskController extends AbstractBaseBackendController
             return $this->redirect(['view', 'id' => $id]);
         }
 
-        /**
-         * Добавление файла
-         */
-        if ($obFile->load(Yii::$app->request->post())) {
-            if ($obFile->save()) {
-                $model->updateUpdatedAt();
-                Yii::$app->session->setFlash('success', Yii::t('app/crm', 'File successfully added'));
-                return $this->redirect(['view', 'id' => $id]);
-            } else {
-                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add file'));
-                return $this->redirect(['view', 'id' => $id]);
-            }
-        }
+
 
         /**
          * Добавление задачи
@@ -247,6 +237,22 @@ class TaskController extends AbstractBaseBackendController
                 return $this->redirect(['view', 'id' => $id, '#' => 'tab_content5']);
             } else {
                 Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add new task'));
+                return $this->redirect(['view', 'id' => $id]);
+            }
+        }
+
+        /**
+         * Добавление файла
+         */
+
+        if (Yii::$app->request->isPost) {
+            if(count($files = CrmTask::addFiles($id))>0){
+                $model->updateUpdatedAt();
+                DialogManager::actionLoadFileToTask($model->dialog,$files);
+                Yii::$app->session->setFlash('success', Yii::t('app/crm', 'File successfully added'));
+                return $this->redirect(['view', 'id' => $id]);
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add file'));
                 return $this->redirect(['view', 'id' => $id]);
             }
         }
@@ -466,8 +472,7 @@ class TaskController extends AbstractBaseBackendController
         $data = [];
         $obFile = new CrmCmpFile();
         $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
-        $obTaskRepeat -> initForCreate();
-
+        $obTaskRepeat->initForCreate();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) { //грузим и валидируем
             $validRepeat = TRUE;
@@ -565,7 +570,7 @@ class TaskController extends AbstractBaseBackendController
                 $obTaskRepeat->end_date = Yii::$app->formatter->asDate($obTaskRepeat->end_date);
         } else {
             $obTaskRepeat = new CrmTaskRepeat();    //task repeat parameters
-            $obTaskRepeat -> initForCreate();
+            $obTaskRepeat->initForCreate();
         }
 
 
@@ -579,20 +584,18 @@ class TaskController extends AbstractBaseBackendController
             }
 
             $transaction = Yii::$app->db->beginTransaction();
-            if($model->isAttributeChanged('repeat_task') && $model->repeat_task != CrmTask::YES)
-            {
+            if ($model->isAttributeChanged('repeat_task') && $model->repeat_task != CrmTask::YES) {
                 CrmTaskRepeat::deleteAll(['task_id' => $model->id]);
             }
 
-            if($validRepeat && $model->save()) {
+            if ($validRepeat && $model->save()) {
                 $saveRepeat = TRUE;
-                if($model->repeat_task)
-                {
-                    if($obTaskRepeat->isNewRecord)
+                if ($model->repeat_task) {
+                    if ($obTaskRepeat->isNewRecord)
                         $obTaskRepeat->task_id = $model->id;
-                    $saveRepeat  = $obTaskRepeat->save();
+                    $saveRepeat = $obTaskRepeat->save();
                 }
-                if($saveRepeat) {
+                if ($saveRepeat) {
                     $model->unlinkAll('busersAccomplices', TRUE);
                     $arAccNew = [];
                     if (!empty($model->arrAcc)) {
@@ -847,7 +850,8 @@ class TaskController extends AbstractBaseBackendController
         Yii::$app->end(200);
     }
 
-    public function actionSaveDeadline(){
+    public function actionSaveDeadline()
+    {
         $pk = Yii::$app->request->post('pk');
         $date = Yii::$app->request->post('value');
         $obTask = CrmTask::findOne($pk);
@@ -859,5 +863,44 @@ class TaskController extends AbstractBaseBackendController
         $obTask->deadline = $date;
         $obTask->save();
         Yii::$app->end(200);
+    }
+
+    public function actionUploadFile()
+    {
+        $_FILES['CrmCmpFile'] = [   //костыль формируем массив с файлами, чтобы скормить Uploadbehavior
+            'name' => [
+                'src' => $_FILES['file']['name']
+            ],
+            'type' => [
+                'src' => $_FILES['file']['type']
+            ],
+            'tmp_name' => [
+                'src' => $_FILES['file']['tmp_name']
+            ],
+            'error' => [
+                'src' => $_FILES['file']['error']
+            ],
+            'size' => [
+                'src' => $_FILES['file']['size']
+            ]
+        ];
+        $obFile = new CrmCmpFile();
+        $obFile->setScenario('insert');
+        if (!$obFile->save()) {
+            throw new ServerErrorHttpException('Error');
+        }
+        return $obFile->id;
+
+    }
+
+    public function actionFileDelete()
+    {
+        $id = Yii::$app->request->post('id');
+        $file = CrmCmpFile::findOne($id);
+        if ($file) {
+            $file->delete();
+        }
+
+        die;
     }
 }

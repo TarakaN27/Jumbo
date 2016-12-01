@@ -10,6 +10,7 @@ use yii\helpers\Html;
 use \vova07\imperavi\Widget as ImperaviWidget;
 use \kartik\select2\Select2;
 use yii\bootstrap\Modal;
+use yii\web\JsExpression;
 $this->registerCssFile('@web/css/editor/index.css');
 //регистрируем переменные для работы скрипта
 $this->registerJs('

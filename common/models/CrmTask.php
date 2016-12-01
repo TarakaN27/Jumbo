@@ -630,12 +630,9 @@ class CrmTask extends AbstractActiveRecord
                         return FALSE;
                     }
                 }
-                if($bNewRecord)
-                    if($this->addFiles()) //добавляем файлы при создании задачи
-                    {
-                        $tr->rollBack();    //если были ошибки откатим базу и вернем FALSE
-                        return FALSE;
-                    }
+                if($bNewRecord) {
+                    static::addFiles($this->id); //добавляем файлы при создании задачи
+                }
 
                 $arBUIDs = [$iUserID,$this->assigned_id]; //пользователя для которых добавляется диалог
                 //соисполнители.
@@ -777,54 +774,16 @@ class CrmTask extends AbstractActiveRecord
     }
 
     /**
-     * @return bool
+     * @return $fileIds
      */
-    protected function addFiles()
+    public static function addFiles($task_id)
     {
-        $bError = FALSE;
-        if(!empty($this->arrFiles))
-            {
-                $fileInfo  = UploadedFile::getInstances($this, 'arrFiles');
-                UploadedFile::reset();  //так как UploadedFile хранит ранее загруженные файлы их нужно сбросить
-                foreach($this->arrFiles as $key => $item)
-                {
-                    if(isset($fileInfo[$key]))
-                    {
-                        $file = $fileInfo[$key];
-                        //@todo дописать функционал UploadBehavior для загрузки нескольких файлов
-                        $_FILES['CrmCmpFile'] = [   //костыль формируем массив с файлами, чтобы скормить Uploadbehavior
-                            'name' => [
-                                'src' => $file->name //'api_manual.doc'
-                            ],
-                            'type' => [
-                                'src' => $file->type//'application/vnd.ms-word'
-                            ],
-                            'tmp_name' => [
-                                'src' => $file->tempName//'/tmp/php6Sgotn'
-                            ],
-                            'error' => [
-                                'src' => $file->error//0
-                            ],
-                            'size' => [
-                                'src' => $file->size//397824
-                            ]
-                        ];
-
-                        //добавляем файлы. Файлы сохраняются через поведение Uploadbehavior
-                        $obFile = new CrmCmpFile();
-                        $obFile->task_id = $this->id;
-                        $obFile->setScenario('insert');
-                        if(!$obFile->save())
-                        {
-                            $bError = TRUE;
-                            break;
-                        }
-                        UploadedFile::reset();
-                    }
-                }
-            }
-
-        return $bError;
+        $files = Yii::$app->request->post('dropZoneFiles');
+        if($files){
+            CrmCmpFile::updateAll(['task_id'=>$task_id],['id'=>$files]);
+            return CrmCmpFile::findAll(['id'=>$files]);
+        }
+        return false;
     }
 
     /**

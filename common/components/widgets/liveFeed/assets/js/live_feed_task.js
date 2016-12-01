@@ -59,8 +59,10 @@ function addCmpMessage()
         success: function(msg){
             if(msg.content)
             {
+                $("#dropzoneCommentpreview"+msg.dialogID).html('');
                 $('.msg_list[data-id="'+id+'"]').append(msg.content);
                 $('.emptyMsg').remove();
+                
             }else{
                 addErrorNotify(DIALOG_ERROR_TITLE,DIALOG_ERROR_ADD_MESSAGE);
                 return false;

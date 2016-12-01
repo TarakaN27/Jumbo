@@ -10,6 +10,7 @@ use vova07\imperavi\Widget as ImperaviWidget;
 use yii\helpers\ArrayHelper;
 use common\models\CrmTask;
 use common\components\helpers\CustomViewHelper;
+use yii\web\JsExpression;
 if(isset($isCmpList))
 $this->registerJs("
 initCmptasks();
@@ -94,6 +95,40 @@ foreach ($models as $obModel)
 						]
 					]
 				]);?>
+				<div style="margin-top: -20px;" class="form-group field-crmtask-priority required">
+					<div class="form-group">
+						<?echo \kato\DropZone::widget([
+							'id'=> 'dropzoneComment'.$model->id,
+							'dropzoneContainer' => 'dropzoneComment'.$model->id,
+							'previewsContainer' => 'dropzoneCommentpreview'.$model->id,
+							'uploadUrl'=>\yii\helpers\Url::to(['/crm/task/upload-file/']),
+							'options'=>
+								['addRemoveLinks'=> 'true',
+									'removedfile' => new JsExpression("function(file) {
+                                    var name = file.name;        
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/service/crm/task/file-delete',
+                                        data: 'id='+file.xhr.response,
+                                        dataType: 'html'
+                                    });
+                                var _ref;
+                                return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;        
+                                }"),
+									'thumbnailWidth'=> 90,
+									'thumbnailHeight'=> 90,
+									'dictDefaultMessage' => Yii::t('app/crm', 'Drop file'),
+									'dictCancelUpload' => Yii::t('app/crm', 'Cancel upload'),
+									'dictRemoveFile'=>Yii::t('app/crm', 'Remove file'),
+								],
+							'clientEvents'=>[
+								'complete' => "function(file){
+                                $('#dropzoneComment".$model->id." .dropzone-previews').append(\"<input type='hidden' name='dropZoneFiles[]' value='\"+file.xhr.response+\"'>\");                           
+                            }",
+							]
+						]);?>
+					</div>
+				</div>
 				<br />
 				<div class = "form-group">
 					<button class = "btn btn-success btn-sm addCmpMsg" data = "<?=$model->id;?>" type = "button">

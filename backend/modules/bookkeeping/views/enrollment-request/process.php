@@ -82,8 +82,8 @@ $this->registerJs('
                             [
                                 'attribute' => 'dubAmount',
                                 'label' => Yii::t('app/book','Dub counting unit amount'),
-                                'visible' =>$obCond->is_dub_currency?1:0,
-                                'value' => Yii::$app->formatter->asDecimal($model->dubAmount) .' '.(is_object($obCond->dubUnitEnroll) ? $obCond->dubUnitEnroll->name : NULL)
+                                'visible' =>($obCond&&$obCond->is_dub_currency)?1:0,
+                                'value' => Yii::$app->formatter->asDecimal($model->dubAmount) .' '.(is_object($obCond)&&is_object($obCond->dubUnitEnroll) ? $obCond->dubUnitEnroll->name : NULL)
                             ],
                         ]
                     ])?>
@@ -225,7 +225,7 @@ $this->registerJs('
                         </div>
                         <?php \yii\bootstrap\ActiveForm::end();?>
                     </div>
-                    <?if($obCond->is_dub_currency==1){?>
+                    <?if($obCond&& $obCond->is_dub_currency==1){?>
                     <div id="converter" data-rate="<?=round($model->amount/$model->dubAmount, 6);?>" class="col-md-3 form-horizontal">
                         <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="enrollprocessform-repay"><?=$obCond->condCurrency->code?>: </label>

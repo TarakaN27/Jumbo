@@ -37,32 +37,43 @@ $this->registerJs('
 
     <?= $form->field($model, 'description')->widget(Imperavi::className(),[]) ?>
 
-    <?php
-        if($model->isNewRecord)
-            echo $form->field($model,'arrFiles')->widget(\common\components\multipleInput\MultipleInput::className(),[
-                'limit' => 4,
-                'columns' => [
-                    [
-                        'name'  => 'title',
-                        'title' => Yii::t('app/crm','File name'),
-                        'options' => [
-                            'class' => 'hide'
-                        ]
-                    ],
+    <?if($model->isNewRecord){?>
+    <div class="form-group field-crmtask-priority required">
+        <div class="form-group">
+            <label class="control-label col-md-3 col-sm-3 col-xs-12"></label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <?echo \kato\DropZone::widget([
+                    'uploadUrl'=>\yii\helpers\Url::to(['/crm/task/upload-file/']),
+                    'options'=>
+                        ['addRemoveLinks'=> 'true',
+                            'removedfile' => new JsExpression("function(file) {
+                                    var name = file.name;        
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/service/crm/task/file-delete',
+                                        data: 'id='+file.xhr.response,
+                                        dataType: 'html'
+                                    });
+                                var _ref;
+                                return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;        
+                                }"),
+                            'thumbnailWidth'=> 90,
+                            'thumbnailHeight'=> 90,
+                            'dictDefaultMessage' => Yii::t('app/crm', 'Drop file'),
+                            'dictCancelUpload' => Yii::t('app/crm', 'Cancel upload'),
+                            'dictRemoveFile'=>Yii::t('app/crm', 'Remove file'),
+                        ],
+                        'clientEvents'=>[
 
-                    [
-                        'name'  => 'fileInput',
-                        'enableError' => true,
-                        'type' => 'fileInput',
-                        'title' => Yii::t('app/crm','Src file'),
-                        'options' => [
-                            'class' => 'wm_border_none'
+                            'complete' => "function(file){
+                                $('#myDropzone').append(\"<input type='hidden' name='dropZoneFiles[]' value='\"+file.xhr.response+\"'>\");                           
+                            }",
                         ]
-                    ],
-
-                ]
-            ]);
-    ?>
+                ]);?>
+            </div>
+        </div>
+    </div>
+    <?}?>
 
     <?= $form->field($model, 'priority')->dropDownList(CrmTask::getPriorityArr(),['prompt' => Yii::t('app/crm','Choose priority')]) ?>
 
@@ -111,7 +122,7 @@ $this->registerJs('
     <?= $form->field($model, 'task_control',['template' => $fieldCheckBoxTmpl])->checkbox() ?>
 
     <?php
-        echo    $form->field($model, 'arrAcc')->widget(\kartik\select2\Select2::className(),[
+        echo $form->field($model, 'arrAcc')->widget(\kartik\select2\Select2::className(),[
                 'initValueText' => $sAssName, // set the initial display text
                 'data' => $data,
                 'options' => [

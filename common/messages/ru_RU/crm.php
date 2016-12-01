@@ -294,5 +294,8 @@ return [
 	'The main task of the chain' => 'Главная задача цепочки',
 	'Recurring tasks' => 'Повторяющиеся задачи',
 	'Load more' => 'Показать еще',
-	'Send letter' => 'Отправка письма'
+	'Send letter' => 'Отправка письма',
+	'Drop file' => "Перетяните файлы для загрузки",
+	'Cancel upload' => 'Отменить загрузку',
+	'Remove file' => 'Удалить файл',
 ];

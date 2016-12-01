@@ -13,7 +13,7 @@ return [
         '{user} изменил ответственного для {forItem} с <span class="bold-item">{oldAss}</span> на <span class="bold-item">{newAss}</span>',
     'Field {field} from {oldValue} to {newValue}' => 'Поле "{field}" c "{oldValue}" на "{newValue}"',
     'User {user} make changes for {task}:' => 'Пользователь "{user}" внес изменения для "{task}"',
-    'User {user} make changes:' => 'Пользователь "{user}" внес изменения: '
-
+    'User {user} make changes:' => 'Пользователь "{user}" внес изменения: ',
+    '{user} add files: {files}' => 'Пользователь {user} добавил файлы к задаче: {files}'
 ];
 

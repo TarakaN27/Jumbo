@@ -291,6 +291,17 @@ class CompanyController extends AbstractBaseBackendController
 			}
 		}
 
+		if (Yii::$app->request->isPost) {
+			if(count($files = CrmCmpContacts::addFiles($id))>0){
+				//DialogManager::actionLoadFileToTask($model->dialog,$files);
+				Yii::$app->session->setFlash('success', Yii::t('app/crm', 'File successfully added'));
+				return $this->redirect(['view', 'id' => $id]);
+			} else {
+				Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Error. Can not add file'));
+				return $this->redirect(['view', 'id' => $id]);
+			}
+		}
+
 		/**
 		 * Смена отвественного
 		 */

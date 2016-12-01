@@ -81,9 +81,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'iDId' => \Yii::$app->request->post('dialog_id'),
             'sMsg' => \Yii::$app->request->post('redactor'),
             'iAthID' => \Yii::$app->request->post('author_id'),
-            'arUsers' => \Yii::$app->request->post('for_users')
+            'arUsers' => \Yii::$app->request->post('for_users'),
         ]);
-
         return $obDlgMng->addCommentAjaxAction();
     }
 
@@ -318,7 +317,14 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $obMsg->lvl = 0;
         if(!$obMsg->save())
             throw new ServerErrorHttpException();
-
+        $files = CrmTask::addFiles($obDialog->crm_task_id);
+        if($files){
+            foreach ($files as $file) {
+                $filesMessage[] = '<a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank">' . $file->getSplitName() . '</a>';
+            }
+            $obMsg->msg.='<hr>'. implode(', ',$filesMessage);
+            $obMsg->save();
+        }
         $obDialog->updateUpdatedAt();
         if(!empty($obDialog->crm_task_id))
             CrmTask::updateUpdatedAtById($obDialog->crm_task_id);
@@ -328,7 +334,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
                 'models' => [$obMsg],
                 'pag' => NULL,
                 'dID' => $iDialogID
-            ]))
+            ])),
+            'dialogId' => $iDialogID,
         ];
 
         return $_POST;

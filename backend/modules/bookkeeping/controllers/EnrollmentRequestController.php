@@ -300,7 +300,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             $cuserDesc = $obCuser->getInfoWithSite();
         }
         $dubExchRate = NULL;
-        if($obCond->is_dub_currency) {
+        if($obCond && $obCond->is_dub_currency) {
             $enrollBehavior = new PaymentEnrollmentBehavior();
             $model->dubAmount = $enrollBehavior->countAmoutForEnrollment($obPayment, $obCond, $obCalc, true);
             if(!empty($obCond) && !empty($obPayment))
@@ -321,7 +321,6 @@ class EnrollmentRequestController extends AbstractBaseBackendController
             'dubExchRate' =>$dubExchRate,
             'cuserDesc' => $cuserDesc
         ]);
-
     }
 
     /**

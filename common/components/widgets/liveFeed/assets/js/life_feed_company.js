@@ -225,6 +225,7 @@ function addCmpMessage()
         success: function(msg){
             if(msg.content)
             {
+                $("#dropzoneCommentpreview"+msg.dialogId).html('');
                 $('.msg_list[data-id="'+id+'"]').append(msg.content);
                 $('.emptyMsg').remove();
             }else{

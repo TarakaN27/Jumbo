@@ -36,6 +36,7 @@ class LiveFeedTaskWidget extends Widget
 			'obDialog' => $obDialog,
 			'arMessages' => array_reverse($arMessages->getModels()),
 			'pag' => $arMessages->getPagination(),
+			'taskId' =>$this->iTaskID,
 			'uniqStr' => 'one_task'
 		]);
 	}

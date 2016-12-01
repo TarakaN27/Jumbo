@@ -203,4 +203,14 @@ class CrmCmpContacts extends AbstractActiveRecord
             ContactNotificationBehavior::className()    //уведомления
         ]);
     }
+
+    public static function addFiles($cmp_id)
+    {
+        $files = Yii::$app->request->post('dropZoneFiles');
+        if($files){
+            CrmCmpFile::updateAll(['cmp_id'=>$cmp_id],['id'=>$files]);
+            return CrmCmpFile::findAll(['id'=>$files]);
+        }
+        return false;
+    }
 }
