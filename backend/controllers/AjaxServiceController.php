@@ -320,9 +320,9 @@ class AjaxServiceController extends AbstractBaseBackendController{
         $files = CrmTask::addFiles($obDialog->crm_task_id);
         if($files){
             foreach ($files as $file) {
-                $filesMessage[] = '<a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank">' . $file->getSplitName() . '</a>';
+                $filesMessage[] = '<li><a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank"><i class="'.$file->getHtmlClassExt().'"></i>' . $file->getSplitName() . '</a></li>';
             }
-            $obMsg->msg.='<hr>'. implode(', ',$filesMessage);
+            $obMsg->msg.='<hr><ul class="fileInComment">'. implode('',$filesMessage).'</ul>';
             $obMsg->save();
         }
         $obDialog->updateUpdatedAt();

@@ -259,7 +259,8 @@ class ActsController extends AbstractBaseBackendController
         if(empty($iLegalPersonId) || empty($iNumber))
             throw new InvalidParamException();
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return ['answer' => !Acts::find()->where(['act_num' => $iNumber,'lp_id' => $iLegalPersonId])->exists()];
+        $exist = Acts::find()->where(['act_num' => $iNumber,'lp_id' => $iLegalPersonId])->andWhere(['>=','act_date', '2016-07-01'])->exists();
+        return ['answer' => !$exist];
     }
 
     /**

@@ -141,9 +141,9 @@ class DialogManager extends Component
             $files = CrmTask::addFiles($dialog->crm_task_id);
             if($files){
                 foreach ($files as $file) {
-                    $filesMessage[] = '<a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank">' . $file->getSplitName() . '</a>';
+                    $filesMessage[] = '<li><a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank"><i class="'.$file->getHtmlClassExt().'"></i>' . $file->getSplitName() . '</a></li>';
                 }
-                $msg->msg.='<hr>'. implode(', ',$filesMessage);
+                $msg->msg.='<hr><ul class="fileInComment">'. implode('',$filesMessage).'</ul>';
                 $msg->save();
             }
             return $msg;
@@ -541,11 +541,11 @@ class DialogManager extends Component
         $files = CrmCmpFile::findAll($fileIds);
         $filesMessage = [];
         foreach ($files as $file) {
-            $filesMessage[] = '<a class="linkFileClass" href="' . \yii\helpers\Url::to(['download-file', 'id' => $file->id]) . '" target="_blank">' . $file->getSplitName() . '</a>';
+            $filesMessage[] = '<li><a class="linkFileClass" href="' . \yii\helpers\Url::to(['/crm/task/download-file', 'id' => $file->id]) . '" target="_blank"><i class="'.$file->getHtmlClassExt().'"></i>' . $file->getSplitName() . '</a></li>';
         }
         $msg = \Yii::t('app/msg', '{user} add files: {files}', [
             'user' => \Yii::$app->user->identity->getFio(),
-            'files' => implode(', ', $filesMessage),
+            'files' => '<ul class="fileInComment">'. implode('',$filesMessage).'</ul>',
         ]);
         return DialogManager::addMessageToDialog($obDialog->id, \Yii::$app->user->id, $msg);
     }
