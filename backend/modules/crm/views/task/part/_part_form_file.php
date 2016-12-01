@@ -53,12 +53,17 @@ use yii\web\JsExpression;
 		</div>
 	</div>
 	<div class="row">
-
-		<div class="col-md-6">
+		<div class="col-md-7">
 			<div class="form-group text-right">
 				<?= Html::submitButton(
 					$model->isNewRecord ? Yii::t('app/documents', 'Create') : Yii::t('app/documents', 'Update'),
-					['class' => $model->isNewRecord ? 'btn btn-success btnContact' : 'btn btn-primary btnContact']
+					[
+						'class' => $model->isNewRecord ? 'btn btn-success btnContact' : 'btn btn-primary btnContact',
+						'onclick'=>new JsExpression('if($("#dropzoneModalpreview .dz-preview").length>0) return true; else {alert("'.Yii::t("app/crm","FILES_NOT_SELECTED").'");return false;}')]
+				) ?>
+				<?= Html::button(
+					Yii::t('app/crm', 'CLOSE'),
+					['class' =>'btn btn-primary btnContact', 'data-dismiss'=>"modal"]
 				) ?>
 			</div>
 		</div>
