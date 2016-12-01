@@ -14,6 +14,7 @@ use common\models\CUser;
 use common\models\CuserProspects;
 use common\models\CuserQuantityHour;
 use common\models\CUserRequisites;
+use common\models\EnrollmentRequest;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
@@ -22,6 +23,7 @@ use common\models\PaymentRequest;
 use common\models\Payments;
 use common\models\PaymentsSale;
 use common\models\Services;
+use common\models\UnitsEnroll;
 use yii\base\Model;
 use Yii;
 use common\models\PaymentsCalculations;
@@ -192,6 +194,12 @@ class PaymentsReportForm extends Model{
             $arSelect['managerFname'] ='manager.fname';
             $arSelect['managerLname'] ='manager.lname';
             $arSelect['managerMname'] ='manager.mname';
+            $data->joinWith('enrollRequest');
+            $data->joinWith('enrollRequest.unitEnroll');
+            $data->andWhere(EnrollmentRequest::tableName().'.parent_id is null');
+            array_push($arSelect,EnrollmentRequest::tableName().'.amount as enroll_amount');
+            array_push($arSelect,UnitsEnroll::tableName().'.name as enroll_unit_name');
+
         }
         $data->joinWith('legal');
         $data->joinWith('service');
@@ -199,7 +207,7 @@ class PaymentsReportForm extends Model{
         $data->joinWith('sale.buser saleBuser');
         $data->joinWith('payRequest.manager managerBuser');
         $data->select($arSelect);
-        $data->where(
+        $data->andWhere(
             Payments::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
             ' AND '.Payments::tableName().'.pay_date <= "'.strtotime($this->dateTo.' 23:59:59').'"'
         );
@@ -221,7 +229,6 @@ class PaymentsReportForm extends Model{
                     PaymentRequest::tableName().'.manager_id' => $this->managers
                 ]);
         }
-
 
 
         $data->orderBy(Payments::tableName().'.pay_date ASC');
@@ -618,6 +625,8 @@ class PaymentsReportForm extends Model{
 
         $objPHPExcel->getActiveSheet()->setCellValue('Z9',Yii::t('app/reports','Currency code'));
         $objPHPExcel->getActiveSheet()->setCellValue('AA9',Yii::t('app/reports','Currency name'));
+        $objPHPExcel->getActiveSheet()->setCellValue('AB9',Yii::t('app/reports','Enroll amount'));
+        $objPHPExcel->getActiveSheet()->setCellValue('AC9',Yii::t('app/reports','Enroll unit name'));
         $i=10;
 
 
@@ -665,7 +674,8 @@ class PaymentsReportForm extends Model{
 
                 $objPHPExcel->getActiveSheet()->setCellValue('Z'.$i,isset($arCond[$d['pay_cond_id']]) ? $arCond[$d['pay_cond_id']]['code'] : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('AA'.$i,isset($arCond[$d['pay_cond_id']]) ? $arCond[$d['pay_cond_id']]['name'] : 'N/A');
-
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$i,$d['enroll_amount'] ? $d['enroll_amount'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$i,$d['enroll_unit_name'] ? $d['enroll_unit_name'] : 'N/A');
                 $i++;
             }
         }

@@ -251,6 +251,14 @@ class Payments extends AbstractActiveRecord
         return $this->hasOne(PaymentRequest::className(),['id' => 'prequest_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEnrollRequest()
+    {
+        return $this->hasOne(EnrollmentRequest::className(),['payment_id' => 'id']);
+    }
+
 
     /**
      * @return bool|string
