@@ -515,7 +515,6 @@ class PaymentBonusBehavior extends Behavior
 		$salerId = $model->cuser->sale_manager_id;
 		$saleDate = $model->cuser->sale_date;
 		if($salerId && $saleDate) {
-			
 			$this->countingProfitBonusByType($salerId, $saleDate, BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT, $model);
 		}
 		$ownerId = $model->payRequest->manager_id;

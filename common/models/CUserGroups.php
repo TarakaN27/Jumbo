@@ -81,12 +81,35 @@ class CUserGroups extends AbstractActiveRecord
             /** @var self $model */
             if($this->save())
             {
+                $oldUser = false;
+                $oldCusers = $this->cuserObjects;
+                // найдём пользователей в группе чтобы проставить дату и менеджера продажи
+                if($oldCusers){
+                    $oldUser = $oldCusers[0];
+                }
                 if($unlinkAll)
                     $this->unlinkAll('cuserObjects',TRUE);
                 $arCusers = CUser::findAll(['id' => $this->cuserIds]);
+                //если в группе не было клиентов, то среди выбранных юзеров найдём раннюю дату
+                if(!$oldUser){
+                    $saleDate = time();
+                    foreach($arCusers as $cuser){
+                        if($cuser->sale_date && $cuser->sale_date<$saleDate){
+                            $saleDate = $cuser->sale_date;
+                            $oldUser = $cuser;
+                        }
+                    }
+                }
+
                 if(!empty($arCusers))
-                    foreach($arCusers as $obCuser)
-                        $this->link('cuserObjects',$obCuser);
+                    foreach($arCusers as $obCuser) {
+                        if($oldUser){
+                            $obCuser->sale_manager_id = $oldUser->sale_manager_id;
+                            $obCuser->sale_date = $oldUser->sale_date;
+                            $obCuser->save();
+                        }
+                        $this->link('cuserObjects', $obCuser);
+                    }
 
                 $tr->commit();
                 return TRUE;
