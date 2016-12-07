@@ -20,13 +20,15 @@ function countDelta()
 }
 
 function initPromisTable(){
-    $("#resortingTable").DataTable({
-        rowReorder: true,
-        "paging":   false,
-        "ordering": true,
-        "info":     false,
-        "searching":     false,
-    });
+    if($("#resortingTable input").length>0) {
+        $("#resortingTable").DataTable({
+            rowReorder: true,
+            "paging": false,
+            "ordering": true,
+            "info": false,
+            "searching": false,
+        });
+    }
     $("#resortingTable input").on('change',function(){
         var sum = 0;
         $("#resortingTable input:checked").each(function(){
