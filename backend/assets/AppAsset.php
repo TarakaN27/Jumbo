@@ -25,6 +25,7 @@ class AppAsset extends AssetBundle
        'css/icheck/flat/green.css',
        'css/site.css',
         'css/craftpip-jquery-confirm/css/jquery-confirm.css',
+        'js/datatables/datatables.min.css'
     ];
     public $js = [
         'js/wm_app/app.js',
@@ -40,6 +41,7 @@ class AppAsset extends AssetBundle
         'js/wm_app/custom_notify.js',
         'js/craftpip-jquery-confirm/js/jquery-confirm.js',
         'js/accounting/accounting.min.js',
+        "js/datatables/datatables.min.js",
     ];
     public $depends = [
         'yii\web\YiiAsset',

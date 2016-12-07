@@ -22,6 +22,7 @@ use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use Yii;
 
 class EnrollProcessForm extends Model{
 
@@ -124,23 +125,24 @@ class EnrollProcessForm extends Model{
                 }
 
                 $arUserID = array_unique($arUserID);
-
-                $arPromised = PromisedPayment::find()
-                    ->where([
-                        'cuser_id' => $arUserID,
-                        'service_id' => $this->request->service_id
-                    ])
-                    ->andWhere('(paid is NULL OR paid = 0)');
-
-                if(!empty($arGroupUsers))
-                {
-                    $arPromised->orderBy(['FIELD(cuser_id,'.implode(',',$arGroupUsers).')' => SORT_DESC]);      //вначе идут ОП контрагента и его группы, затем чужие
-                }else{
-                    $arPromised->orderBy(['cuser_id' => $orderType]);                   //нет группы
+                $promisePayment = Yii::$app->request->post("EnrollProcessForm");
+                if(isset($promisePayment['promise-sort'])){
+                    $arPromisedSort = PromisedPayment::find()
+                        ->where(['id' => $promisePayment['promise-sort']])
+                        ->orderBy(['FIELD(id,'.implode(',',$promisePayment['promise-sort']).')' => SORT_ASC])      //вначе идут ОП контрагента и его группы, затем чужие
+                        ->all();
+                    foreach($arPromisedSort as $key=>$temp){
+                        $temp->sort = $key+1;
+                        $temp->save();
+                    }
                 }
-                    //->orderBy(['cuser_id' => $orderType])
-                    //->prepare(Yii::$app->db->queryBuilder)->createCommand()->rawSql;
-                $arPromised = $arPromised->all();
+                $arPromised = [];
+                if(isset($promisePayment['promise-active'])) {
+                    $arPromised = PromisedPayment::find()
+                        ->where(['id' => $promisePayment['promise-active']])
+                        ->orderBy(['FIELD(id,'.implode(',',$promisePayment['promise-active']).')' => SORT_ASC])      //вначе идут ОП контрагента и его группы, затем чужие
+                        ->all();
+                }
 
                 $arPIds = [];
                 foreach($arPromised as $pr)
@@ -150,15 +152,14 @@ class EnrollProcessForm extends Model{
                     ->select(['amount','pr_pay_id'])
                     ->where(['pr_pay_id' => $arPIds])
                     ->all();
-
                 $arRepay = [];
                 foreach($arRepayTmp as $tmp)
                     if(isset($arRepay[$tmp->pr_pay_id]))
                         $arRepay[$tmp->pr_pay_id]+=$tmp->amount;
                     else
                         $arRepay[$tmp->pr_pay_id]=$tmp->amount;
-
                 /** @var PromisedPayment $pro */
+
                 foreach ($arPromised as $pro) {
                     if ($pro->paid == PromisedPayment::YES)
                         throw new InvalidParamException();

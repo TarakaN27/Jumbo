@@ -33,7 +33,7 @@ $this->registerJs('
         var rate = $("#converter").data("rate");
         var val = $(this).val()*rate;
         $("#convBase").val(val.toFixed(2));     
-    });
+    });    
 ',View::POS_LOAD);
 ?>
 
@@ -153,32 +153,31 @@ $this->registerJs('
                     <?php endif;?>
                 </div>
                 </div>
+                <?php
+                $form = \yii\bootstrap\ActiveForm::begin([
+                    'options' => [
+                        'class' => 'form-horizontal form-label-left'
+                    ],
+                    'fieldConfig' => [
+                        'template' => '<div class="form-group">{label}<div class="col-md-8 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
+                        'labelOptions' => ['class' => 'control-label col-md-4 col-sm-3 col-xs-12'],
+                    ],
+                ]);
+                echo Html::activeHiddenInput($obForm,'availableAmount');
+                ?>
                 <div class="row">
                     <div class="col-md-6">
                         <?php if($model->payment_id):?>
                             <?=Html::tag('h3',Yii::t('app/book','Promised payments'))?>
                             <div id="promised-payment-table">
-                                <?=$this->render('_promised_grid',['arPromised' => $arPromised]);?>
+                                <?=$this->render('_promised_grid',['arPromised' => $arPromised, 'obForm'=>$obForm]);?>
                             </div>
                         <?php endif;?>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-9">
                         <?=Html::tag('h3',Yii::t('app/book','Enroll request proccess'))?>
-                        <?php
-                            $form = \yii\bootstrap\ActiveForm::begin([
-                                'options' => [
-                                    'class' => 'form-horizontal form-label-left'
-                                ],
-                                'fieldConfig' => [
-                                    'template' => '<div class="form-group">{label}<div class="col-md-8 col-sm-6 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul></div>',
-                                    'labelOptions' => ['class' => 'control-label col-md-4 col-sm-3 col-xs-12'],
-                                ],
-                            ]);
-                            echo Html::activeHiddenInput($obForm,'availableAmount');
-                        ?>
 
                         <?php
                             if($obForm->isPayment)
@@ -223,7 +222,6 @@ $this->registerJs('
                                 <?= Html::submitButton(Yii::t('app/book', 'Processing'), ['class' => 'btn btn-success']) ?>
                             </div>
                         </div>
-                        <?php \yii\bootstrap\ActiveForm::end();?>
                     </div>
                     <?if($obCond&& $obCond->is_dub_currency==1){?>
                     <div id="converter" data-rate="<?=round($model->amount/$model->dubAmount, 6);?>" class="col-md-3 form-horizontal">
@@ -242,6 +240,7 @@ $this->registerJs('
                     </div>
                         <?}?>
                     </div>
+                <?php \yii\bootstrap\ActiveForm::end();?>
             </div>
         </div>
     </div>

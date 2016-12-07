@@ -9,7 +9,6 @@ function countDelta()
         amount =  $('#enrollprocessform-availableamount').val(),
         repay = convertAmountToValid($('#enrollprocessform-repay').val()),
         enroll = $('#enrollprocessform-enroll');
-
     delta = amount-repay;
     if(delta < 0)
     {
@@ -20,9 +19,30 @@ function countDelta()
     enroll.triggerHandler('change');
 }
 
-
+function initPromisTable(){
+    $("#resortingTable").DataTable({
+        rowReorder: true,
+        "paging":   false,
+        "ordering": true,
+        "info":     false,
+        "searching":     false,
+    });
+    $("#resortingTable input").on('change',function(){
+        var sum = 0;
+        $("#resortingTable input:checked").each(function(){
+            sum = sum + parseFloat($(this).data('amount'));
+        });
+        var amount =  $('#enrollprocessform-availableamount').val();
+        if(sum > amount){
+            sum = amount;
+        }
+        $('#enrollprocessform-repay').val(sum);
+        $('#enrollprocessform-repay').triggerHandler('change');
+    });
+}
 //documents ready
 $(function(){
+    initPromisTable();
     $('#enrollprocessform-repay').on('change',countDelta);
     $('#enrollprocessform-cuserop').on('change',function(){
         var
@@ -35,6 +55,7 @@ $(function(){
             data: { cuserID: erp_cuserID, cuserOP: value,servID:erp_servID},
             success: function(data){
                 $('#promised-payment-table').html(data.grid);
+                initPromisTable();
                 var ppAmount = parseFloat(data.amount);
                 if(ppAmount > 0)
                 {

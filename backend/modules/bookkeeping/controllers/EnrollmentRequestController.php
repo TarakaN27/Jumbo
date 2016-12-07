@@ -245,6 +245,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                     'service_id' => $model->service_id
                 ])
                 ->andWhere('(paid is NULL OR paid = 0)')
+                ->orderBy(['sort'=>SORT_ASC, 'id'=>SORT_ASC])
                 ->all();
 
             $arPPIDs = [];

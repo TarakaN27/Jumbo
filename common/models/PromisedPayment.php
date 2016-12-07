@@ -31,7 +31,6 @@ class PromisedPayment extends AbstractActiveRecord
     CONST
         OVERDUE_DAYS = 3,
         SCENARIO_NEW = 'add_new';
-
     /**
      * @inheritdoc
      */
@@ -48,7 +47,7 @@ class PromisedPayment extends AbstractActiveRecord
         return [
             ['amount','trim'],
             [['cuser_id', 'amount','service_id'], 'required'],
-            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'created_at', 'updated_at','service_id','owner'], 'integer'],
+            [['cuser_id', 'buser_id_p', 'paid_date', 'paid', 'sort', 'created_at', 'updated_at','service_id','owner'], 'integer'],
             [['amount'], 'number', 'min' => 0],
             ['paid','default', 'value' => self::NO],
             ['description','string','max' => 255]
