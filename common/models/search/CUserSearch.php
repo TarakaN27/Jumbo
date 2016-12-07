@@ -92,7 +92,7 @@ class CUserSearch extends CUser
             ],
             'sort'=> [
                 'defaultOrder' => [
-                    'created_at'=>SORT_DESC
+                    'updated_at'=>SORT_DESC
                 ]
             ]
         ]);
