@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'enroll_unit_id',
-                            'value' => $model->unitEnroll->name
+                            'value' => $model->unitEnroll?$model->unitEnroll->name:"N/A"
                         ],
                         [
                             'attribute' => 'is_dub_currency',
@@ -78,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         [
                             'attribute' => 'dub_enroll_unit_id',
-                            'value' => $model->dubUnitEnroll->name
+                            'value' => $model->dubUnitEnroll?$model->dubUnitEnroll->name:'N/A',
                         ],
                         [
                             'attribute' => 'corr_factor',

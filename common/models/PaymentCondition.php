@@ -102,7 +102,7 @@ class PaymentCondition extends AbstractActiveRecord
                 'sale',
                 'commission'
             ],'required','when' => function($model) {
-                if($this->type == self::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
+                if($model->type == self::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
                     return FALSE;
                 return TRUE;
             },
@@ -120,13 +120,12 @@ class PaymentCondition extends AbstractActiveRecord
                 'dub_enroll_unit_id',
                 'dub_cond_currency',
             ],'required','when' => function($model) {
-                if($this->is_dub_currency == 1) //если компания не контрагнет, то поля можно не заполнять
+                if($model->is_dub_currency == 1)
                     return true;
                 return false;
             },
                 'whenClient' => "function (attribute, value) {
-                    var
-                        type = $('#paymentcondition-is_dub_currency').val();
+                    var type = $('#paymentcondition-is_dub_currency:checked').val();                  
                     if(type == 1)
                     {
                         return true;
