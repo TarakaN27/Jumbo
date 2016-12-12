@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'enr_req_id',
                                 [
                                     'attribute' => 'enroll_unit_id',
-                                    'value' => $model->unitEnroll->name,
+                                    'value' => $model->unitEnroll?$model->unitEnroll->name:NULL,
                                 ],
                                 [
                                     'attribute' => 'cuser_id',

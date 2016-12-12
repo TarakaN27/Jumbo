@@ -23,9 +23,10 @@ $this->params['breadcrumbs'][] = Yii::t('app/book', 'Update');
                 <div class="clearfix"></div>
             </div>
             <div class="x_content enrolls-create">
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+            <?= $this->render('_form', [
+                'model' => $model,
+                'exchRate'=>$exchRate
+            ]) ?>
             </div>
         </div>
     </div>

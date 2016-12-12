@@ -10,6 +10,7 @@ use common\models\search\EnrollsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use common\models\ExchangeCurrencyHistory;
 
 /**
  * EnrollsController implements the CRUD actions for Enrolls model.
@@ -106,12 +107,17 @@ class EnrollsController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $exchRate = null;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            if(!empty($model->enrReq->payment) && !empty($model->enrReq->payment->calculate->payCond))
+            {
+                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->enrReq->payment->pay_date),$model->enrReq->payment->calculate->payCond->cond_currency);
+            }
             return $this->render('update', [
                 'model' => $model,
+                'exchRate' =>$exchRate,
             ]);
         }
     }

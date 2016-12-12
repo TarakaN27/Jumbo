@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use backend\modules\bookkeeping\form\MigrateLoadFileForm;
 use common\models\AbstractModel;
+use common\models\ExchangeCurrencyHistory;
 
 /**
  * ExpenseController implements the CRUD actions for Expense model.
@@ -266,8 +267,10 @@ class ExpenseController extends AbstractBaseBackendController
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
+
             // Get the initial city description
             $cuserDesc = empty($model->cuser_id) ? '' : \common\models\CUser::findOne($model->cuser_id)->getInfoWithSite();
+
             return $this->render('update', [
                 'model' => $model,
                 'cuserDesc' => $cuserDesc

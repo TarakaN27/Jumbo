@@ -19,7 +19,6 @@ $this->registerJs('
 ?>
 
 <div class="enrolls-form">
-
     <?php $form = ActiveForm::begin([
         'options' => [
             'class' => 'form-horizontal form-label-left',
@@ -37,8 +36,22 @@ $this->registerJs('
 
     <?= $form->field($model, 'enroll')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
-
+    <?= $form->field($model, 'description')->textInput(['maxlength' => true])->label(Yii::t('app/book', "Enrolls Description"))?>
+    <?if($model->enrReq && $model->enrReq->payment){?>
+    <div class="form-group">
+        <div class="form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="payments-description"><?=Yii::t('app/book', "Payment Description");?></label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <?=$model->enrReq->payment->description;?>
+            </div></div>
+    <?}?>
+        <?if($model->enrReq->payment){?>
+    <div class="form-group">
+            <div class="form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="payments-description"><?=Yii::t('app/book', "Condition currency");?></label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <?=$model->enrReq->payment->calculate->payCond->condCurrency->name.' ('.$model->enrReq->payment->calculate->payCond->condCurrency->code.') <'.Yii::$app->formatter->asDecimal($exchRate).'>';?>
+                </div></div>
+    </div>
+        <?}?>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
