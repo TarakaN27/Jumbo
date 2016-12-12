@@ -16,7 +16,7 @@ use common\models\search\ExpenseSearch;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
-use backend\modules\bookkeeping\form\Migrate1CLoadFileForm;
+use backend\modules\bookkeeping\form\MigrateLoadFileForm;
 use common\models\AbstractModel;
 
 /**
@@ -89,10 +89,10 @@ class ExpenseController extends AbstractBaseBackendController
 
     public function actionMigrate1c()
     {
-        $model = new Migrate1CLoadFileForm();
+        $model = new MigrateLoadFileForm();
         if (Yii::$app->request->isPost) {
-            if(isset($_FILES['Migrate1CLoadFileForm']) && $_FILES['Migrate1CLoadFileForm']['tmp_name']){
-                  $models = $this->parseXml($_FILES['Migrate1CLoadFileForm']['tmp_name']['src']);
+            if(isset($_FILES['MigrateLoadFileForm']) && $_FILES['MigrateLoadFileForm']['tmp_name']){
+                  $models = $this->parseXml($_FILES['MigrateLoadFileForm']['tmp_name']['src']);
                   if($models) {
                       return $this->render('migrate_1c_form_list', [
                           'models' => $models,

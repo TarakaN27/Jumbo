@@ -44,6 +44,8 @@ class ExchangeRates extends AbstractActiveRecord
     protected
         $_oldModelAttribute;
 
+    public static $arrCurrencyByCode = [643=>3, 840=>1, 933=>2, 978=>11];
+
     /**
      * @inheritdoc
      */
@@ -323,6 +325,13 @@ class ExchangeRates extends AbstractActiveRecord
     {
         $arTmp = self::getN2WMap();
         return isset($arTmp[$this->doc_n2w_type]) ? $arTmp[$this->doc_n2w_type] : NULL;
+    }
+
+
+    public static function getCurrencyByBankCode($code){
+        if(isset(static::$arrCurrencyByCode[$code]) )
+            return static::$arrCurrencyByCode[$code];
+        return false;
     }
 }
 

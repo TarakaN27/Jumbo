@@ -28,7 +28,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\widgets\ActiveForm;
 
-class Migrate1CLoadFileForm extends Model
+class MigrateLoadFileForm extends Model
 {
     public $src;                //Контрагент
 

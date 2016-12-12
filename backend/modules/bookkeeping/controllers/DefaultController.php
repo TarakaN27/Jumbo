@@ -12,8 +12,10 @@ use common\models\ActToPayments;
 use common\models\CUser;
 
 use common\models\CuserPreferPayCond;
+use common\models\CUserRequisites;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
+use common\models\ExchangeRates;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
@@ -29,6 +31,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use backend\modules\bookkeeping\form\MigrateLoadFileForm;
 
 /**
  * DefaultController implements the CRUD actions for Payments model.
@@ -110,6 +113,113 @@ class DefaultController extends AbstractBaseBackendController
             'arTotal' => $arTotal,
             'arActs' => $arActs
         ]);
+    }
+
+    public function actionLoadXml()
+    {
+        $model = new MigrateLoadFileForm();
+        if (Yii::$app->request->isPost) {
+            if(isset($_FILES['MigrateLoadFileForm']) && $_FILES['MigrateLoadFileForm']['tmp_name']){
+                $models = $this->parseXml($_FILES['MigrateLoadFileForm']['tmp_name']['src']);
+                if($models) {
+                    return $this->render('migrate_form_list', [
+                        'models' => $models,
+                    ]);
+                }else {
+                    Yii::$app->session->setFlash('danger', Yii::t('app/book', 'Dont have payments for loading'));
+                    return $this->redirect(['index']);
+                }
+            }else{
+                $savedModels = [];
+                $notSavedmodels = [];
+                foreach(Yii::$app->request->post('PaymentRequest') as $item){
+                    $model = new PaymentRequest($item);
+                    $model->owner_id = Yii::$app->user->id;
+                    if($model->active) {
+                        if ($model->validate()) {
+                            $model->save(false);
+                            $obDlg = new Dialogs();
+                            $obDlg->type = Dialogs::TYPE_REQUEST;
+                            $obDlg->buser_id = Yii::$app->user->id;
+                            $obDlg->status = Dialogs::PUBLISHED;
+                            $obDlg->theme = Yii::t('app/book','New payment request').'<br>'.$model->description;
+                            if($obDlg->save())
+                            {
+                                if(!empty($model->manager_id))//если указан менеджер, то добавляем его к диалогу
+                                {
+                                    $obManager = BUser::findOne($model->manager_id);
+                                    if(empty($obManager))
+                                        throw new NotFoundHttpException('Manager not found');
+                                    $obDlg->link('busers',$obManager);
+                                }else{
+                                    $obManagers = BUser::getManagersArr(); //иначе добавляем всех менеджеров к диалогу
+                                    if(!empty($obManagers))
+                                        foreach($obManagers as $obMan)
+                                            $obDlg->link('busers',$obMan);
+                                }
+                            }else{
+                                Yii::$app->session->setFlash('error',Yii::t('app/common','DIALOG_ERROR_ADD_DIALOG'));
+                            }
+                            $savedModels[] = $model;
+                        } else {
+                            $notSavedmodels[] = $model;
+                        }
+                    }
+                }
+                if($savedModels){
+                    Yii::$app->session->setFlash('success', Yii::t('app/book', '{count} payments success saved', ['count'=> count($savedModels)]));
+                }
+                if($notSavedmodels){
+                    return $this->render('migrate_form_list', [
+                        'models' => $notSavedmodels,
+                    ]);
+                }else{
+                    return $this->redirect(['index']);
+                }
+            }
+        }
+        return $this->render('migrate', [
+            'model' => $model,
+        ]);
+    }
+
+    protected function parseXml($xml){
+        $xmlStr = file_get_contents($xml);
+        $xmlStr = str_replace('<?xml:stylesheet type="text/xsl" ?>','',$xmlStr);
+        $paymentsXml = simplexml_load_string($xmlStr);
+        $models = [];
+        foreach($paymentsXml->STATEMENTBY->CREDITDOCUMENTS->DOCUMENT as $paymentXml){
+            //у основных платежей тип 1, так же платежи от физиков без UNP
+            if($paymentXml->DOCUMENTTYPE==1 || $paymentXml->PAYERUNN==""){
+                $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml->DOCUMENTDATE))])->andWhere(['LIKE', 'payment_order', $paymentXml->DOCUMENTNUMBER])->all();
+                if($existPayment && count($existPayment)==1){
+                       break;
+                }
+                $model = new PaymentRequest();
+                $model->owner_id = Yii::$app->user->id;
+                $model->status = PaymentRequest::STATUS_NEW;
+                $model->pay_date = strval($paymentXml->DOCUMENTDATE);
+                $model->pay_summ = strval($paymentXml->AMOUNT);
+                $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval($paymentXml->CURRCODE));
+                $model->legal_id = 3;
+                $model->payment_order = $paymentXml->DOCUMENTNUMBER.' от '. $paymentXml->DOCUMENTDATE;
+                $model->description = strval($paymentXml->GROUND);
+                $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)'=>$paymentXml->PAYERUNN.""])->one();
+                if($cuserRequisite){
+                    $model->is_unknown = 0;
+                    $model->cntr_id = $cuserRequisite->id;
+                    $cuser = CUser::findOneByIDCached($cuserRequisite->id);
+                    $model->cuserName = $cuserRequisite->getCorpName();
+                    $model->manager_id = $cuser->manager_id;
+                }else{
+                    $model->is_unknown = 1;
+                    echo '1';
+                    die;
+                }
+                $models[] =$model;
+            }
+        }
+        return $models;
     }
 
     /**

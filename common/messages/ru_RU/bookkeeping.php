@@ -256,12 +256,15 @@ return [
     'Migrate Expense' => 'Загрузить затраты из файла',
     'src' => 'Путь к файлу',
     'Upload' => 'Загрузить',
-    '{count} expenses success saved' => '{count} затрат успещно сохранены',
+    '{count} expenses success saved' => '{count} затрат успешно сохранены',
     'Dont have expense for loading' => 'Нет затрат для загрузки',
     'Is dub currency'=> 'Использовать дублирующие единицы зачисления',
     'Dub enroll unit id'=> 'Дублирующая единица зачисления',
     'Dub cond currency id'=> 'Дублирующая валюта условия',
     'Dub counting unit amount' => "Дублирующее расчетное кол-во единиц",
     'Enrolls Description'=> 'Описание при зачислении',
-    'Payment Description' => 'Описание при проведении платежа'
+    'Payment Description' => 'Описание при проведении платежа',
+    'Load payments' => 'Загрузить платежи из XML-файла',
+    'Dont have payments for loading' =>'Нет платежей для загрузки',
+    '{count} payments success saved' =>'{count}запросов на платёж успешно создано'
 ];

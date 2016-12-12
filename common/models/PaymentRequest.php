@@ -45,6 +45,9 @@ class PaymentRequest extends AbstractActiveRecord
     public
         $updateNotifications = FALSE;               //flag if need update notification at update action
 
+    public $active=1;
+    public $cuserName;
+
     /**
      * @return array
      */
