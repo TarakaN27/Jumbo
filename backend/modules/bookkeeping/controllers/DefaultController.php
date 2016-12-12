@@ -193,7 +193,7 @@ class DefaultController extends AbstractBaseBackendController
             if($paymentXml->DOCUMENTTYPE==1 || $paymentXml->PAYERUNN==""){
                 $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml->DOCUMENTDATE))])->andWhere(['LIKE', 'payment_order', $paymentXml->DOCUMENTNUMBER])->all();
                 if($existPayment && count($existPayment)==1){
-                       break;
+                       continue;
                 }
                 $model = new PaymentRequest();
                 $model->owner_id = Yii::$app->user->id;
@@ -213,8 +213,6 @@ class DefaultController extends AbstractBaseBackendController
                     $model->manager_id = $cuser->manager_id;
                 }else{
                     $model->is_unknown = 1;
-                    echo '1';
-                    die;
                 }
                 $models[] =$model;
             }
