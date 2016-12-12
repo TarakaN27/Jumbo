@@ -135,6 +135,7 @@ class DefaultController extends AbstractBaseBackendController
                 foreach(Yii::$app->request->post('PaymentRequest') as $item){
                     $model = new PaymentRequest($item);
                     $model->owner_id = Yii::$app->user->id;
+                    $model->status = PaymentRequest::STATUS_NEW;
                     if($model->active) {
                         if ($model->validate()) {
                             $model->save(false);
