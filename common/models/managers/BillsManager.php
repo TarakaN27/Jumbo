@@ -270,6 +270,7 @@ class BillsManager extends Bills{
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
+            $doc->setValue('validity', $obBillTpl->validity);
             $doc->setValue('jPersonEmail',$jPersonEmail);
             $doc->setValue('billNumber',$this->bill_number);
             $doc->setValue('billDate',Yii::$app->formatter->asDate($this->bill_date));
@@ -279,6 +280,7 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
+            $doc->setValue('validity',$this->buy_target);
 
             $doc->cloneRow('colNum',count($arFields));                  //размножаем таблицу
             $iCounter = 1;

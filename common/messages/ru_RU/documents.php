@@ -80,5 +80,6 @@ return [
     'Add services' => 'Добавление услуг',
     'Serv Title' => 'Предмет счета',
     'Offer' => 'Контракт',
-    'Ordering' => 'Порядок'
+    'Ordering' => 'Порядок',
+    'Validity' => 'Срок действия счета'
 ];

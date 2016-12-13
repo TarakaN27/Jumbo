@@ -41,7 +41,7 @@ class BillTemplate extends AbstractActiveRecord
     {
         return [
             [['name', 'l_person_id', 'service_id', 'object_text','offer_contract'], 'required'],
-            [['object_text', 'description','name','offer_contract'],'trim'],
+            [['object_text', 'description','name','offer_contract','validity'],'trim'],
             [['l_person_id', 'service_id',  'created_at', 'updated_at'], 'integer'],
             [['object_text', 'description'], 'string'],
             [['name','offer_contract'], 'string', 'max' => 255],
@@ -64,7 +64,8 @@ class BillTemplate extends AbstractActiveRecord
             'description' => Yii::t('app/documents', 'Description'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
-            'offer_contract' => Yii::t('app/documents','offer_contract')
+            'offer_contract' => Yii::t('app/documents','offer_contract'),
+            'validity' => Yii::t('app/documents','Validity'),
         ];
     }
 

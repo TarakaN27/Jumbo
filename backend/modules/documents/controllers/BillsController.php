@@ -156,9 +156,7 @@ class BillsController extends AbstractBaseBackendController
                 ]);
             }
         }else{
-
             $modelForm = new BillForm();
-            
             $modelForm->iCuserId = $model->cuser_id;
             $modelForm->iLegalPerson = $model->l_person_id;
             $modelForm->iDocxTpl = $model->docx_tmpl_id;

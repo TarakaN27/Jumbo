@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'object_text:ntext',
                         'description:ntext',
+                        'validity:ntext',
                         'offer_contract',
                         [
                             'attribute' => 'created_at',

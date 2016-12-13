@@ -42,6 +42,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model, 'validity')->textarea(['rows' => 6]) ?>
+
 
 
     <div class="form-group">
