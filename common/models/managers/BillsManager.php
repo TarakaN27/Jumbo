@@ -107,6 +107,7 @@ class BillsManager extends Bills{
 
     protected function generateDocument($name,$tryPath)
     {
+
         /** @var BillDocxTemplate $docxTpl */
         $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
         if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
@@ -142,8 +143,6 @@ class BillsManager extends Bills{
         /** @var CuserServiceContract $obServ */
         $obServ = CuserServiceContract::findOne(['id' => $this->cuser_id,'service_id' => $this->service_id]);
 
-        $obBillTpl = BillTemplate::findOne($this->bill_template);
-
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
             $crp = $obCUser->getInfo();
@@ -160,6 +159,7 @@ class BillsManager extends Bills{
         $billTotalVat = '';
         $totalSummVat = 0;
         $totalSumm = 0;
+        $tplId = false;
         if(empty($this->service_id))
         {
             $arServices = BillServices::find()->where(['bill_id' => $this->id])->orderBy(['ordering' => SORT_ASC])->all();
@@ -172,6 +172,7 @@ class BillsManager extends Bills{
                 /** @var BillServices $service */
                 foreach ($arServices as $service)
                 {
+                    $tplId = $service->serv_tpl_id;
                     $service->amount = round($service->amount,2);
                     $vatAmount = round($service->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
                     $price = round($service->amount -$vatAmount,2);
@@ -195,7 +196,7 @@ class BillsManager extends Bills{
             }else{
                 foreach ($arServices as $service)
                 {
-
+                    $tplId = $service->serv_tpl_id;
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
@@ -250,6 +251,10 @@ class BillsManager extends Bills{
                 ];
             }
         }
+        if($tplId) {
+            $obBillTpl = BillTemplate::findOne($tplId);
+        }else
+            $obBillTpl = false;
         /*
         if($this->use_vat)
         {
@@ -260,9 +265,10 @@ class BillsManager extends Bills{
                 CustomHelper::ciRub((int)$billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
         */
+
         $totalSummInWords =
             CustomHelper::num2str($billTotalSumVat);
-        
+
         $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
         try{
 
@@ -270,7 +276,7 @@ class BillsManager extends Bills{
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
-            $doc->setValue('validity', $obBillTpl->validity);
+            $doc->setValue('validity', $obBillTpl?$obBillTpl->validity:"");
             $doc->setValue('jPersonEmail',$jPersonEmail);
             $doc->setValue('billNumber',$this->bill_number);
             $doc->setValue('billDate',Yii::$app->formatter->asDate($this->bill_date));
@@ -280,7 +286,6 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
-            $doc->setValue('validity',$this->buy_target);
 
             $doc->cloneRow('colNum',count($arFields));                  //размножаем таблицу
             $iCounter = 1;
@@ -299,7 +304,7 @@ class BillsManager extends Bills{
             $doc->setValue('billTotalVat',empty($billTotalVat) ? '' : $this->formatterHelper($billTotalVat));
             if(!empty($this->offer_contract))
                 $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
-            
+
             $doc->saveAs($tryPath);
 
             if(file_exists($tryPath))
@@ -354,4 +359,4 @@ class BillsManager extends Bills{
         return is_array($this->_manError) ? implode(';',$this->_manError) : $this->_manError;
     }
 
-} 
+}
