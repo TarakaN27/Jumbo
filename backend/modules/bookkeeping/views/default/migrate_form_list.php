@@ -42,6 +42,9 @@ use common\components\helpers\CustomViewHelper;
                         <?= Yii::t('app/book', 'Cuser ID'); ?>
                     </th>
                     <th>
+                        <?= Yii::t('app/book', 'Is Unknown'); ?>
+                    </th>
+                    <th>
                         <?= Yii::t('app/book', 'Manager ID'); ?>
                     </th>
                     <th>
@@ -70,6 +73,7 @@ use common\components\helpers\CustomViewHelper;
                             <td><?= $form->field($model, "[{$key}]active")->checkbox(['label' =>""]);?>
                             </td>
                             <td style="max-width: 200px;" width ="15%">
+                                <?if(!$model->is_unknown){?>
                                 <?php  echo $form->field($model, "[{$key}]cntr_id")->widget(Select2::classname(), [
                                     'data' => \common\models\CUser::getContractorMap(),
                                     'options' => ['placeholder' => Yii::t('app/book','BOOK_choose_cuser')],
@@ -77,6 +81,12 @@ use common\components\helpers\CustomViewHelper;
                                         'allowClear' => true
                                     ],
                                 ])->label(false); ?>
+                                <?}else{?>
+                                    <?php echo $form->field($model,"[{$key}]user_name",['options' => ['class' => 'form-group']])->textInput()->label(false);?>
+                                <?}?>
+                            </td>
+                            <td>
+                                <?php echo $form->field($model,"[{$key}]is_unknown")->dropDownList(\common\models\PaymentRequest::getYesNo())->label(false);?>
                             </td>
                             <td>
                                 <?php  echo $form->field($model, "[{$key}]manager_id")->widget(Select2::classname(), [

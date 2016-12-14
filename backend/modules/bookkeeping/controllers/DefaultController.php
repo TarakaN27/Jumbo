@@ -192,7 +192,7 @@ class DefaultController extends AbstractBaseBackendController
         foreach($paymentsXml->STATEMENTBY->CREDITDOCUMENTS->DOCUMENT as $paymentXml){
             //у основных платежей тип 1, так же платежи от физиков без UNP
             if($paymentXml->DOCUMENTTYPE==1 || $paymentXml->PAYERUNN==""){
-                $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml->DOCUMENTDATE))])->andWhere(['LIKE', 'payment_order', $paymentXml->DOCUMENTNUMBER])->all();
+                $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml->DOCUMENTDATE))])->andWhere(['payment_order'=> $paymentXml->DOCUMENTNUMBER.' от '. $paymentXml->DOCUMENTDATE])->all();
                 if($existPayment && count($existPayment)==1){
                        continue;
                 }
@@ -205,16 +205,20 @@ class DefaultController extends AbstractBaseBackendController
                 $model->legal_id = 3;
                 $model->payment_order = $paymentXml->DOCUMENTNUMBER.' от '. $paymentXml->DOCUMENTDATE;
                 $model->description = strval($paymentXml->GROUND);
-                $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)'=>$paymentXml->PAYERUNN.""])->one();
-                if($cuserRequisite){
-                    $model->is_unknown = 0;
-                    $model->cntr_id = $cuserRequisite->id;
-                    $cuser = CUser::findOneByIDCached($cuserRequisite->id);
-                    $model->cuserName = $cuserRequisite->getCorpName();
-                    $model->manager_id = $cuser->manager_id;
-                }else{
+                if(strval($paymentXml->PAYERUNN)) {
+                    $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)' => $paymentXml->PAYERUNN . ""])->one();
+                    if($cuserRequisite){
+                        $model->is_unknown = 0;
+                        $model->cntr_id = $cuserRequisite->id;
+                        $cuser = CUser::findOneByIDCached($cuserRequisite->id);
+                        $model->cuserName = $cuserRequisite->getCorpName();
+                        $model->manager_id = $cuser->manager_id;
+                    }else{
+                        $model->is_unknown = 1;
+                    }
+                }else
                     $model->is_unknown = 1;
-                }
+
                 $models[] =$model;
             }
         }
