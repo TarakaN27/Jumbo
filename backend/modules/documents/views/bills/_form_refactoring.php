@@ -5,6 +5,7 @@
  * Date: 13.6.16
  * Time: 17.47
  */
+
 use yii\bootstrap\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
@@ -102,7 +103,7 @@ $arServiceMap = Services::getServicesMap();
                 <div class="servPreloader loader mrg-auto hide"></div>
                 <ul class="ul-sortable" id="servicesBlock">
                     <?php if(count($model->arServices) > 0)foreach ($model->arServices as $key => $serviceId):?>
-                        <li class="block-sortable" >
+                        <li id="s<?=$serviceId?>" class="block-sortable" >
                             <h4><?=$arServiceMap[$serviceId];?>
                                 <a href="#nogo" data-toggle="tooltip" data-placement="top" data-original-title="Удалить услугу" class="pull-right red  marg-l-10">
                                     <i class="fa fa-minus" data-serv="<?=$serviceId;?>"></i>
@@ -116,7 +117,7 @@ $arServiceMap = Services::getServicesMap();
 
                             <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                 <label class="control-label">Сумма</label>
-                                <?=Html::textInput('"BillForm[arServAmount]['.$serviceId.']"',$model->arServAmount[$serviceId],[
+                                <?=Html::textInput('BillForm[arServAmount]['.$serviceId.']"',$model->arServAmount[$serviceId],[
                                     'class' => 'form-control serv-amount',
                                     'data-serv-id' => $serviceId,
                                     'old-amount' => $model->arServAmount[$serviceId]
@@ -170,7 +171,7 @@ $arServiceMap = Services::getServicesMap();
             <?= $form->errorSummary($model); ?>
         </div>
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-            <?= Html::submitButton(Yii::t('app/documents', 'Create'), ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton(Yii::t('app/documents', 'Save'), ['class' => 'btn btn-success']) ?>
         </div>
     </div>
 

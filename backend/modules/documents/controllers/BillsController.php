@@ -142,12 +142,12 @@ class BillsController extends AbstractBaseBackendController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        
         if($model->service_id)
         {
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
+
                 return $this->render('update', [
                     'model' => $model,
                     'view_form' => '_form',
@@ -180,10 +180,13 @@ class BillsController extends AbstractBaseBackendController
                 $modelForm->arServTpl[$service->service_id] = $service->serv_tpl_id;
             }
             
-            if ($modelForm->load(Yii::$app->request->post())) {
+            if ($modelForm->load(Yii::$app->request->post()) && $modelForm->validate()) {
                 if ($modelForm->makeUpdate($model))
                 {
                     return $this->redirect(['view', 'id' => $model->id]);
+                }
+                else{
+                   
                 }
             }
                 $cuserDesc = '';

@@ -7,7 +7,6 @@ use common\components\widgets\hideShowBlock\HideShowBlockWidget;
 /* @var $this yii\web\View */
 /* @var $model common\models\Bills */
 /* @var $form yii\widgets\ActiveForm */
-
 $this->registerJs("
 function fillBillDetail(obD)
 {

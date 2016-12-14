@@ -283,7 +283,6 @@ function removeService()
         $('#billform-sdescription').text('');
         $('#billform-soffercontract').val('');
     }
-
     $('#s'+servId).remove();                                            //remove service block
     sortUpdateFunction();
 }
