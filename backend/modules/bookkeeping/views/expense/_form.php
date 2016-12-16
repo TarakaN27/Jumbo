@@ -27,10 +27,15 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
             'labelOptions' => ['class' => 'control-label col-md-3 col-sm-3 col-xs-12'],
         ],
     ]); ?>
-
-    <?= $form->field($model, 'cat_id')->dropDownList(
-        \common\models\ExpenseCategories::getExpenseCatMapWithoutParent(),[
-        'prompt' => Yii::t('app/book','BOOK_choose_expense_category')
+    <?= $form->field($model, 'cat_id')->widget(\kartik\select2\Select2::className(),[
+        'data' => \common\models\ExpenseCategories::getExpenseCatTree(),
+        'initValueText' => Yii::t('app/book','BOOK_choose_expense_category'), // set the initial display text
+        'options' => [
+            'placeholder' => Yii::t('app/book','BOOK_choose_expense_category')
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ]
     ]) ?>
 
     <?= $form->field($model, 'cuser_id')->widget(\kartik\select2\Select2::className(),[
