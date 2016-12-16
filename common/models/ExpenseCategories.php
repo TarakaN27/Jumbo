@@ -189,6 +189,30 @@ class ExpenseCategories extends AbstractActiveRecord
         }
         return $arResult;
     }
+    public static function getExpenseCatTreeGroupSelectable()
+    {
+        $isAdmin = Yii::$app->user->can('superRights');
+        $query = ExpenseCategories::find();
+        if(!$isAdmin)
+            $query->where('private = 0 OR private is NULL');
+        $tmp = $query->all();
+        $childs = [];
+        $arResult = [];
+        foreach($tmp as $key => $t) {
+            if ($t->parent_id != 0) {
+                $childs[$t->parent_id][$t->id] = "---".$t->name;
+            }
+        }
+        foreach($tmp as $key => $t){
+            if($t->parent_id == 0){
+                if(isset($childs[$t->id]))
+                    $arResult[$t->id] = $t->name;
+                    $arResult = $arResult + $childs[$t->id];
+            }
+        }
+
+        return $arResult;
+    }
 
 
 

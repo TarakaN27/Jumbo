@@ -56,7 +56,6 @@ class ExpenseSearch extends Expense
     public function search($params,$additionQuery = NULL)
     {
         $query = Expense::find()->with('currency','legal','cat','cuser');
-
         $query->joinWith('legal');
         $query->joinWith('cat');
         $query = $this->queryHelper($query,$params,$additionQuery);
@@ -98,7 +97,7 @@ class ExpenseSearch extends Expense
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
 
         $table = self::tableName();
-        $cats = [$this->cat_id];
+        $cats = $this->cat_id;
         if(!empty($this->cat_id))
         {
             $exCat = ExpenseCategories::find()->select(['id'])->where(['parent_id' => $this->cat_id])->all();

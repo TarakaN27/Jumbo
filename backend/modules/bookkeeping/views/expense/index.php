@@ -70,7 +70,27 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'value' => function($model){
                                                     return is_object($cat = $model->cat) ? $cat->name : 'N/A';
                                                 },
-                                            'filter' => \common\models\ExpenseCategories::getExpenseCatMap()
+                                            'filter' => \kartik\select2\Select2::widget([
+                                                'model' => $searchModel,
+                                                'attribute' => 'cat_id',
+                                                'data' => \common\models\ExpenseCategories::getExpenseCatTreeGroupSelectable(),
+                                                'initValueText' => $cuserDesc, // set the initial display text
+                                                'options' => [
+                                                    'placeholder' => Yii::t('app/book','BOOK_choose_expense_category')
+                                                ],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true,
+                                                    'multiple' => true
+                                                ],
+                                                'options' => [
+                                                    '1' => ['class' => 'is_parent'],
+                                                    '2' => ['class' => 'is_parent'],
+                                                ],
+                                            ]),
+                                            'headerOptions'=>[
+                                                'style'=>[
+                                                    'min-width'=>'300px'
+                                                ]]
                                         ],
 
                                         'pay_summ:decimal',

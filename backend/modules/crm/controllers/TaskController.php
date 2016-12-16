@@ -90,7 +90,6 @@ class TaskController extends AbstractBaseBackendController
         } else {
             Yii::$app->session->set($key_view, $viewType);
         }
-
         $dataProvider = $searchModel->search($query, $viewType, NULL, [], TRUE);
 
         $arNewTasks = RedisNotification::getNewTaskList(Yii::$app->user->id); //получаем новые задачи
