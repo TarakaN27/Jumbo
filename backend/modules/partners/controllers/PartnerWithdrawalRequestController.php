@@ -49,7 +49,7 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                         'create'
                     ],
                     'allow' => true,
-                    'roles' => ['partner_manager']
+                    'roles' => ['only_manager','partner_manager']
                 ],
 
                 [

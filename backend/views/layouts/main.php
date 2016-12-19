@@ -383,27 +383,31 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || Yii::$app->user->can('only_manager')):?>
+                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || Yii::$app->user->can('only_manager')|| Yii::$app->user->can('bookkeeper')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>
                                         <span class="fa fa-chevron-down"></span>
                                     </a>
                                     <ul class="nav child_menu" style="display: none">
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager')|| Yii::$app->user->can('only_manager')|| Yii::$app->user->can('bookkeeper')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/partners/partners/index']); ?>">
                                                     <?php echo Yii::t('app/common', 'Partner'); ?>
                                                 </a>
                                             </li>
+                                            <?if(Yii::$app->user->can('adminRights')){?>
                                             <li>
                                                 <a href="<?= Url::to(['/partners/partner-schemes/index']); ?>">
                                                     <?php echo Yii::t('app/common', 'Partner schemes'); ?>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <?=Html::a(Yii::t('app/common', 'Partner schemes serv group'),['/partners/partner-schemes-serv-group/index']);?>
-                                            </li>
+                                            <?}?>
+                                            <?if(Yii::$app->user->can('adminRights')){?>
+                                                <li>
+                                                    <?=Html::a(Yii::t('app/common', 'Partner schemes serv group'),['/partners/partner-schemes-serv-group/index']);?>
+                                                </li>
+                                            <?}?>
                                         <?php endif;?>
                                         <li>
                                             <?=Html::a(Yii::t('app/common','Partner. Withdrawal request'),['/partners/partner-withdrawal-request/index']);?>

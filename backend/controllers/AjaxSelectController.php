@@ -382,7 +382,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 
 			if(!empty($iBuserId))
 			{
-				$obCUser->andWhere(['partner_manager_id' => $iBuserId]);
+				$obCUser->andWhere(['or',['partner_manager_id' => $iBuserId],['manager_id' => $iBuserId]]);
 			}
 
 			$obCUser = $obCUser->notArchive()
