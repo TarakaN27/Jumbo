@@ -22,6 +22,7 @@ use yii\base\Exception;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
+use Yii;
 
 class BonusRecordCalculate
 {
@@ -68,6 +69,14 @@ class BonusRecordCalculate
                 $sum = $sumPrevMonth - $sumCurrent;
             }
             if($coeff = $this->getMonthCoeff($sum, $bUser->buser_id)) {
+                //у продажников уменьшающий коэфф действует на текущий месяц, а увеличивающий на следующий
+                if($coeff<1 && $bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
+                    Yii::$app->db->createCommand("UPDATE ".BUserBonus::tableName()." b INNER JOIN ".Payments::tableName()." p ON b.payment_id=p.id SET b.amount=b.amount*$coeff, b.bonus_percent=b.bonus_percent*$coeff WHERE b.buser_id=$bUser->buser_id and p.pay_date BETWEEN $this->beginMonthTime AND $this->endMonthTime")->query();
+                    $year = date("Y", $this->endMonthTime-10);
+                    $month = date("m", $this->endMonthTime -10);
+                    $this->updateMonthCoeff($coeff, $bUser->buser_id, $year, $month);
+                    $coeff=1;
+                }
                 $this->saveMonthCoeff($coeff,$bUser->buser_id);
             }
         }
@@ -89,7 +98,8 @@ class BonusRecordCalculate
     }
 
     public function saveMonthCoeff($koeff, $userId){
-            $year = date("Y", $this->endMonthTime);
+
+            $year = date("Y", $this->endMonthTime+10);
             $month = date("m", $this->endMonthTime + 10);
             BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
             $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
@@ -98,6 +108,16 @@ class BonusRecordCalculate
             $buserBonusMonthCoeff->year = $year;
             $buserBonusMonthCoeff->coeff = str_replace(",", ".",$koeff);
             $buserBonusMonthCoeff->save();
+    }
+
+    public function updateMonthCoeff($koeff, $userId, $year, $month){
+        BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
+        $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
+        $buserBonusMonthCoeff->buser_id = $userId;
+        $buserBonusMonthCoeff->month = $month;
+        $buserBonusMonthCoeff->year = $year;
+        $buserBonusMonthCoeff->coeff = str_replace(",", ".",$koeff);
+        $buserBonusMonthCoeff->save();
     }
 
     public function setShemesRecord($users){
