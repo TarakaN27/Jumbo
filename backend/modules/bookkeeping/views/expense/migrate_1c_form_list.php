@@ -113,15 +113,9 @@ use common\components\helpers\CustomViewHelper;
                                 <?= $form->field($model, "[{$key}]description")->textarea(['rows' => 2])->label(false); ?>
                             </td>
                             <td width="15%">
-                                <?= $form->field($model, 'cat_id')->widget(\kartik\select2\Select2::className(),[
-                                    'data' => \common\models\ExpenseCategories::getExpenseCatTree(),
-                                    'initValueText' => Yii::t('app/book','BOOK_choose_expense_category'), // set the initial display text
-                                    'options' => [
-                                        'placeholder' => Yii::t('app/book','BOOK_choose_expense_category')
-                                    ],
-                                    'pluginOptions' => [
-                                        'allowClear' => true,
-                                    ]
+                                <?= $form->field($model, "[{$key}]cat_id")->dropDownList(
+                                    \common\models\ExpenseCategories::getExpenseCatMapWithoutParent(), [
+                                    'prompt' => Yii::t('app/book', 'BOOK_choose_expense_category')
                                 ])->label(false); ?>
                             </td>
                         </tr>
