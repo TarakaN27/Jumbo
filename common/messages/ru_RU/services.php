@@ -94,5 +94,6 @@ return [
     'ATTR_NAME' =>'Название',
     'Update Units Enroll' => 'Редактирование единицы зачисления',
     'Choose Units Enroll' => 'Выберите единицу зачисления',
-    'Fixing exchange' => 'Фиксировать курс'
+    'Fixing exchange' => 'Фиксировать курс',
+    'Disallow create bill' => 'Запретить выставлять счета на юрлицо',
 ];

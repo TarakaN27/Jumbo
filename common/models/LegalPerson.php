@@ -64,7 +64,7 @@ class LegalPerson extends AbstractActiveRecord
         return [
             [['description','doc_requisites','ynp','mailing_address','telephone_number'], 'string'],
             [[
-                'status', 'created_at',
+                'disallow_create_bill', 'status', 'created_at',
                 'updated_at','use_vat',
                 'docx_id','act_tpl_id',
                 'admin_expense','partner_cntr',
@@ -103,7 +103,8 @@ class LegalPerson extends AbstractActiveRecord
             'telephone_number' => Yii::t('app/services','Telephone number'),
             'doc_site' => Yii::t('app/services','Document site'),
             'doc_email' => Yii::t('app/services','Document email'),
-            'letter_tpl_type' => Yii::t('app/services','Letter template type')
+            'letter_tpl_type' => Yii::t('app/services','Letter template type'),
+            'disallow_create_bill' => Yii::t('app/services','Disallow create bill'),
         ];
     }
 
@@ -150,6 +151,15 @@ class LegalPerson extends AbstractActiveRecord
     public static function getLegalPersonMap()
     {
         $tmp = self::getAllLegalPerson();
+        return ArrayHelper::map($tmp,'id','name');
+    }
+    /**
+     * вернем массив id => name
+     * @return array
+     */
+    public static function getLegalPersonMapForBill()
+    {
+        $tmp = LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();
         return ArrayHelper::map($tmp,'id','name');
     }
 

@@ -81,7 +81,7 @@ $arServiceMap = Services::getServicesMap();
         ],
     ]) ?>
     
-    <?= $form->field($model,'iLegalPerson')->dropDownList(LegalPerson::getLegalPersonMap(),[
+    <?= $form->field($model,'iLegalPerson')->dropDownList(LegalPerson::getLegalPersonMapForBill(),[
         'placeholder' => Yii::t('app/documents','Choose legal person')
     ]);?>
 
