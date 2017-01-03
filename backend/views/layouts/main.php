@@ -485,27 +485,7 @@ $menuItems[] = [
         }
     ?>
     <?php $this->endBody() ?>
-    <?php if(!Yii::$app->user->isGuest):?>
-        <!-- jira bug tracking -->
 
-        <script type="text/javascript" src="http://jira.webmartsoft.com/s/d41d8cd98f00b204e9800998ecf8427e/en_USdj7yrs-1988229788/6256/3/1.4.7/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=6d25f919"></script>
-        <script type="text/javascript" src="http://jira.webmartsoft.com/s/d41d8cd98f00b204e9800998ecf8427e/en_USdj7yrs-1988229788/6256/3/1.4.7/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=2fdbcde1"></script>
-        <script>
-            window.ATL_JQ_PAGE_PROPS =  {
-                // ==== we add the code below to set the field values ====
-                fieldValues : {
-                    fullname : '<?php echo Yii::$app->user->identity->username;?>'
-                    , email : '<?php echo Yii::$app->user->identity->email;?>',
-                    versions : '10719'
-                },
-                // ==== Special field config for environment ====
-                environment : {
-                    'YII_DEBUG'  : '<?=YII_DEBUG;?>',
-                    'YII_ENV' : '<?=YII_ENV;?>'
-                }
-            };
-        </script>
-    <?php endif;?>
 
 </body>
 </html>
