@@ -844,7 +844,8 @@ function checkActNumber()
 {
     var
         number = $('#actform-iactnumber').val(),
-        legalId = $('#actform-ilegalperson').val();
+        legalId = $('#actform-ilegalperson').val(),
+        date = $('#actform-actdate').val();
 
     if(customEmpty(number) || customEmpty(legalId))
     {
@@ -858,7 +859,7 @@ function checkActNumber()
             type: "POST",
             async: false,
             dataType: "json",
-            data: {number: number, iLegalId: legalId},
+            data: {number: number, iLegalId: legalId, date:date},
             error: function (msg) {
                 addErrorNotify('Проверка номера акта', 'Не удалось выполнить запрос!');
                 return false;
@@ -879,7 +880,8 @@ function getActsNumber()
 {
     var
         actNumber = $('#actform-iactnumber'),
-        iLegalPerson = $('#actform-ilegalperson').val();
+        iLegalPerson = $('#actform-ilegalperson').val(),
+        date = $("#actform-actdate").val();
 
     if(customEmpty(iLegalPerson))
     {
@@ -890,7 +892,7 @@ function getActsNumber()
             cache: false,
             url: URL_GET_NEXT_ACT_NUMBER,
             dataType: "json",
-            data: {iLegalPerson: iLegalPerson},
+            data: {iLegalPerson: iLegalPerson, date: date},
             success: function (data) {
                 actNumber.val(data);
             },
@@ -975,6 +977,7 @@ $(function () {
     sortList.on('change','.serv-amount',recalculateActFullActAmount);
     $(document).on("submit", "form#act-form", customValidateForm);
     $('#actform-ilegalperson').on('change',getActsNumber);
+    $('#actform-actdate').on('change',getActsNumber);
     $('#actform-icuser').on('change',checkContactor);
     $('#hidePaymentBlock').on('change','.inputHidePayment',hideAmountProcess);      //действие при изменении суммы у неявных платежей
 

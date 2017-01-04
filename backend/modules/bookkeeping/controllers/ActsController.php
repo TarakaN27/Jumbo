@@ -255,11 +255,12 @@ class ActsController extends AbstractBaseBackendController
     {
         $iLegalPersonId = Yii::$app->request->post('iLegalId');
         $iNumber = Yii::$app->request->post('number');
-
+        $date = Yii::$app->request->post('date');
+        $year = date("Y",strtotime($date));
         if(empty($iLegalPersonId) || empty($iNumber))
             throw new InvalidParamException();
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $exist = Acts::find()->where(['act_num' => $iNumber,'lp_id' => $iLegalPersonId])->andWhere(['>=','act_date', '2016-07-01'])->exists();
+        $exist = Acts::find()->where(['act_num' => $iNumber,'lp_id' => $iLegalPersonId])->andWhere(['>=','act_date', $year.'01-01'])->andWhere(['<=','act_date', ($year+1).'01-01'])->exists();
         return ['answer' => !$exist];
     }
 
@@ -269,10 +270,12 @@ class ActsController extends AbstractBaseBackendController
     public function actionGetNextActNumber()
     {
         $iLegalPerson = Yii::$app->request->post('iLegalPerson');
+        $date = Yii::$app->request->post('date');
+        $year = date("Y",strtotime($date));
         if(empty($iLegalPerson))
             throw new InvalidParamException();
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return Acts::getNextActNumber($iLegalPerson);
+        return Acts::getNextActNumber($iLegalPerson,$year);
     }
 
     public function actionCheckContractorFields()
