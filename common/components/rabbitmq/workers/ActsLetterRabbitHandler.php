@@ -84,19 +84,34 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
     protected function sendMail($toEmail,$documentPath,$tplType = '')
     {
         try {
-            return \Yii::$app->salesMailer->compose( // отправялем уведомление по ссылке
+            if($tplType == 2)
+                return \Yii::$app->salesMailerSoft->compose( // отправялем уведомление по ссылке
+                        [                           //указывам шаблон
+                            'html' => 'actNotification-html'.$tplType,
+                            'text' => 'actNotification-text'.$tplType
+                        ]
+                    )
+                    ->setFrom([\Yii::$app->params['salesEmailSoft'] => \Yii::$app->params['salesEmailSoft']])    //от кого уходит письмо
+                    ->setTo($toEmail)                                                                   //кому
+                    //->setTo('motuzdev@gmail.com')
+                    ->setBcc(\Yii::$app->params['salesEmailSoft'])                                          //скрытая копия
+                    ->setSubject(\Yii::$app->params['actLetterSubject'])                                //тема письма
+                    ->attach($documentPath)                                                             //прикрепляем акт к письму
+                    ->send();
+            else
+                return \Yii::$app->salesMailer->compose( // отправялем уведомление по ссылке
                     [                           //указывам шаблон
                         'html' => 'actNotification-html'.$tplType,
                         'text' => 'actNotification-text'.$tplType
                     ]
                 )
-                ->setFrom([\Yii::$app->params['salesEmail'] => \Yii::$app->params['salesName']])    //от кого уходит письмо
-                ->setTo($toEmail)                                                                   //кому
-                //->setTo('motuzdev@gmail.com')
-                ->setBcc(\Yii::$app->params['salesEmail'])                                          //скрытая копия
-                ->setSubject(\Yii::$app->params['actLetterSubject'])                                //тема письма
-                ->attach($documentPath)                                                             //прикрепляем акт к письму
-                ->send();
+                    ->setFrom([\Yii::$app->params['salesEmail'] => \Yii::$app->params['salesName']])    //от кого уходит письмо
+                    ->setTo($toEmail)                                                                   //кому
+                    //->setTo('motuzdev@gmail.com')
+                    ->setBcc(\Yii::$app->params['salesEmail'])                                          //скрытая копия
+                    ->setSubject(\Yii::$app->params['actLetterSubject'])                                //тема письма
+                    ->attach($documentPath)                                                             //прикрепляем акт к письму
+                    ->send();
             }catch (Exception $e)
         {
             return FALSE;

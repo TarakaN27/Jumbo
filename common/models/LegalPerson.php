@@ -35,7 +35,8 @@ class LegalPerson extends AbstractActiveRecord
 {
     CONST
         LETTER_TPL_TYPE_1 = 0,      //шаблон для ООО
-        LETTER_TPL_TYPE_2 = 1;      //шаблон для ИП
+        LETTER_TPL_TYPE_2 = 1,      //шаблон для ИП
+        LETTER_TPL_TYPE_3 = 2;
 
     /**
      * @inheritdoc
@@ -52,7 +53,8 @@ class LegalPerson extends AbstractActiveRecord
     {
         return [
             self::LETTER_TPL_TYPE_1 => Yii::t('app/services','Letter type OOO'),
-            self::LETTER_TPL_TYPE_2 => Yii::t('app/services','Letter type IP')
+            self::LETTER_TPL_TYPE_2 => Yii::t('app/services','Letter type IP'),
+            self::LETTER_TPL_TYPE_3 => Yii::t('app/services','Letter type SOFT'),
         ];
     }
 

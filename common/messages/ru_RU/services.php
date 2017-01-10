@@ -96,4 +96,5 @@ return [
     'Choose Units Enroll' => 'Выберите единицу зачисления',
     'Fixing exchange' => 'Фиксировать курс',
     'Disallow create bill' => 'Запретить выставлять счета на юрлицо',
+    'Letter type SOFT' => 'Шаблон письма для Солюшенс',
 ];
