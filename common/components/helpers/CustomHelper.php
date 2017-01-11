@@ -584,7 +584,7 @@ class CustomHelper {
         $interval = $dateTime1->diff($dateTime2);
         if($interval)
         unset($date1,$date2);
-        return $interval->m;    //вренем разницу в месяцах между двумя датами
+        return $interval->y*12 + $interval->m;    //вренем разницу в месяцах между двумя датами
     }
 
     /**
