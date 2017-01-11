@@ -491,7 +491,7 @@ class PaymentBonusBehavior extends Behavior
 		if (empty($obBServ))
 			return FALSE;
 		$coeff = 1;
-		$coeffModel = BUserBonusMonthCoeff::find()->where(['buser_id' => $buserId, 'year' => date("Y", $model->pay_date), 'month' => date("m", $model->pay_date)])->one();
+		$coeffModel = BUserBonusMonthCoeff::find()->where(['buser_id' => $buserId, 'year' => date("Y", $model->pay_date), 'month' => date("n", $model->pay_date)])->one();
 		if ($coeffModel)
 			$coeff = $coeffModel->coeff;
 		$percent = NULL; //определим процент для бонуса

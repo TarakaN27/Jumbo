@@ -101,7 +101,7 @@ class BonusRecordCalculate
     public function saveMonthCoeff($koeff, $userId){
 
             $year = date("Y", $this->endMonthTime+10);
-            $month = date("m", $this->endMonthTime + 10);
+            $month = date("n", $this->endMonthTime + 10);
             BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
             $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
             $buserBonusMonthCoeff->buser_id = $userId;
@@ -112,12 +112,14 @@ class BonusRecordCalculate
     }
 
     public function updateMonthCoeff($koeff, $userId, $year, $month){
-        BUserBonusMonthCoeff::deleteAll(['buser_id' => $userId, 'month' => $month, 'year' => $year]);
-        $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
-        $buserBonusMonthCoeff->buser_id = $userId;
-        $buserBonusMonthCoeff->month = $month;
-        $buserBonusMonthCoeff->year = $year;
-        $buserBonusMonthCoeff->coeff = str_replace(",", ".",$koeff);
+        $buserBonusMonthCoeff = BUserBonusMonthCoeff::find()->where(['buser_id' => $userId, 'month' => $month, 'year' => $year])->one();
+        if(!$buserBonusMonthCoeff) {
+            $buserBonusMonthCoeff = new BUserBonusMonthCoeff();
+            $buserBonusMonthCoeff->buser_id = $userId;
+            $buserBonusMonthCoeff->month = $month;
+            $buserBonusMonthCoeff->year = $year;
+        }
+        $buserBonusMonthCoeff->coeff *= str_replace(",", ".", $koeff);
         $buserBonusMonthCoeff->save();
     }
 
