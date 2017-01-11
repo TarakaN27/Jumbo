@@ -37,10 +37,10 @@ class BUserBonusMonthCoeff extends AbstractActiveRecord
     }
 
     public static function getByUserAndDate($users, $start, $end){
-        $start = date("Y-m", strtotime($start));
-        $end = date("Y-m", strtotime($end));
+        $start = date("Y-n", strtotime($start));
+        $end = date("Y-n", strtotime($end));
         $coeffs = static::find()->where(['buser_id'=>$users])->andWhere(['>=', "CONCAT(year,'-',month)",$start])->andWhere(['<=', "CONCAT(year,'-',month)",$end])->all();
-        $now = date("Y-m");
+        $now = date("Y-n");
         //если затронута дата из текущего месяца посчитаем текущие коэффициенты
         if($end>=$now){
             $bonusCalculate = new BonusRecordCalculate();
@@ -49,12 +49,18 @@ class BUserBonusMonthCoeff extends AbstractActiveRecord
             foreach($nextMonthCoeffs as $key=>$val){
                 $nextMonthCoeff = new static();
                 $nextMonthCoeff->buser_id = $key;
+                /*у продажников понижающий коэф считается на текущий месяц, а не на следующий*/
+                $buser = BonusSchemeToBuser::find()->where(['buser_id'=>$key])->one();
+                if($buser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT && $val<1){
+                    $val = 1;
+                }
                 $nextMonthCoeff->year = date("Y", $month+10);
-                $nextMonthCoeff->month = date("m", $month+10);
+                $nextMonthCoeff->month = date("n", $month+10);
                 $nextMonthCoeff->coeff = $val;
                 $coeffs[] = $nextMonthCoeff;
             }
         }
+
         $allCoeff = [];
         foreach($coeffs as $coeff){
             $allCoeff[$coeff->buser_id][$coeff->year.'-'.$coeff->month] =  $coeff;
@@ -68,12 +74,12 @@ class BUserBonusMonthCoeff extends AbstractActiveRecord
                     $nextMonthCoeff = new static();
                     $nextMonthCoeff->buser_id = $user;
                     $nextMonthCoeff->year = date("Y", $date);
-                    $nextMonthCoeff->month = date("m", $date);
+                    $nextMonthCoeff->month = date("n", $date);
                     $nextMonthCoeff->coeff = 1;
                     $allCoeff[$user][$keyMonth] = $nextMonthCoeff;
                 }
                 $date = CustomHelper::getEndMonthTime($date);
-                $keyMonth = date("Y-m", $date+10);
+                $keyMonth = date("Y-n", $date+10);
                 if($keyMonth > $end)
                     $next = false;
             }while($next);

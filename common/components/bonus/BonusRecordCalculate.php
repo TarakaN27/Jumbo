@@ -71,6 +71,7 @@ class BonusRecordCalculate
             if($coeff = $this->getMonthCoeff($sum, $bUser->buser_id)) {
                 //у продажников уменьшающий коэфф действует на текущий месяц, а увеличивающий на следующий
                 if($coeff<1 && $bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
+                    $coeff = str_replace(",",'.',$coeff);
                     Yii::$app->db->createCommand("UPDATE ".BUserBonus::tableName()." b INNER JOIN ".Payments::tableName()." p ON b.payment_id=p.id SET b.amount=b.amount*$coeff, b.bonus_percent=b.bonus_percent*$coeff WHERE b.buser_id=$bUser->buser_id and p.pay_date BETWEEN $this->beginMonthTime AND $this->endMonthTime")->query();
                     $year = date("Y", $this->endMonthTime-10);
                     $month = date("m", $this->endMonthTime -10);
