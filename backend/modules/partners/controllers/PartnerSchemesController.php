@@ -154,15 +154,15 @@ class PartnerSchemesController extends AbstractBaseBackendController
                 $group = Yii::$app->request->post('group',[]);
                 $model->unlinkAll('partnerSchemesServices',TRUE); //удаляем старые услуги
                 if(!empty($ranges))
-                    foreach ($ranges as &$rangeItem)
+                    foreach ($ranges as $key=>$rangeItem)
                         if(!empty($rangeItem))
-                            foreach ($rangeItem as &$item)
+                            foreach ($rangeItem as $key2=>$item)
                             {
                                 if(isset($item['left'],$item['right'],$item['percent']))
                                 {
-                                    $item['left'] = CustomHelperMoney::convertNumberToValid($item['left']);
-                                    $item['right'] = CustomHelperMoney::convertNumberToValid($item['right']);
-                                    $item['percent'] = CustomHelperMoney::convertNumberToValid($item['percent']);
+                                    $ranges[$key][$key2]['left'] = CustomHelperMoney::convertNumberToValid($item['left']);
+                                    $ranges[$key][$key2]['right'] = CustomHelperMoney::convertNumberToValid($item['right']);
+                                    $ranges[$key][$key2]['percent'] = CustomHelperMoney::convertNumberToValid($item['percent']);
                                 }
                             }
                 $rows = [];
@@ -187,7 +187,6 @@ class PartnerSchemesController extends AbstractBaseBackendController
                     $transaction->rollBack();
                     throw new ServerErrorHttpException();
                 }
-
                 foreach ($arServices as $serviceID => $serviceName)
                 {
                     $obSchemeServ = new PartnerSchemesServices([
@@ -197,12 +196,12 @@ class PartnerSchemesController extends AbstractBaseBackendController
                         'legal' => isset($legal[$serviceID]) ? $legal[$serviceID] : [],
                         'group_id' => isset($group[$serviceID]) ? $group[$serviceID] : []
                     ]);
-
                     if(!$obSchemeServ->save())
                     {
                         $transaction->rollBack();
                         throw new ServerErrorHttpException();
                     }
+
                 }
 
                 $transaction->commit();
