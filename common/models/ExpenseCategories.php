@@ -205,9 +205,10 @@ class ExpenseCategories extends AbstractActiveRecord
         }
         foreach($tmp as $key => $t){
             if($t->parent_id == 0){
-                if(isset($childs[$t->id]))
+                if(isset($childs[$t->id])) {
                     $arResult[$t->id] = $t->name;
                     $arResult = $arResult + $childs[$t->id];
+                }
             }
         }
 
