@@ -4,10 +4,12 @@ return [
     'supportEmail' => 'motuzdev@gmail.com',
     'salesEmail' => 'sales@webmart.by',
     'salesName' => 'ООО "Вебмарт Групп"',
-    'actLetterSubjectSoft' => 'Акт об оказанных услугах ООО "Вебмарт Групп"',
+    'actLetterSubject' => 'Акт об оказанных услугах ООО "Вебмарт Групп"',
+    
     'salesEmailSoft' => 'info@webmartsoft.ru',
     'salesNameSoft' => 'ООО "Вебмарт Солюшнс"',
-    'actLetterSubject' => 'Акт об оказанных услугах ООО "Вебмарт Солюшнс"',
+    'actLetterSubjectSoft' => 'Акт об оказанных услугах ООО "Вебмарт Солюшнс"',
+    
     'user.passwordResetTokenExpire' => 3600,
     'infoEmail' => 'motuzdev@gmail.com',
     'liveFeedDialogsNumber' => 5,
