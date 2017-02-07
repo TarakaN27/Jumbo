@@ -84,7 +84,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
     protected function sendMail($toEmail,$documentPath,$tplType = '')
     {
         try {
-            if($tplType == 2)
+            if($tplType == '-2')
                 return \Yii::$app->salesMailerSoft->compose( // отправялем уведомление по ссылке
                         [                           //указывам шаблон
                             'html' => 'actNotification-html'.$tplType,
