@@ -95,7 +95,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
                     ->setTo($toEmail)                                                                   //кому
                     //->setTo('motuzdev@gmail.com')
                     ->setBcc(\Yii::$app->params['salesEmailSoft'])                                          //скрытая копия
-                    ->setSubject(\Yii::$app->params['actLetterSubject'])                                //тема письма
+                    ->setSubject(\Yii::$app->params['actLetterSubjectSoft'])                                //тема письма
                     ->attach($documentPath)                                                             //прикрепляем акт к письму
                     ->send();
             else
