@@ -756,6 +756,10 @@ class PaymentBonusBehavior extends Behavior
 		$sDate = $model->pay_date;        // Дата платежа
 		$iService = $model->service_id;   // ID услуги
 
+		$this->updateSaleInfoCuser($model);
+		if(date("Y-m-d",$model->pay_date)>="2016-10-01")
+			$this->countingProfitBonus($model);
+
 		$this->countingUnits($model,$iPayID,$iCUserID,$sDate,$iService);
 		$this->countingPartnerBonus($model);
 
