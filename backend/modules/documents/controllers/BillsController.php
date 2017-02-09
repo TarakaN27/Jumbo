@@ -382,9 +382,8 @@ class BillsController extends AbstractBaseBackendController
         $models = ArrayHelper::index($models,'service_id');
         if(!empty($models))
         {
-            $obServices = CuserServiceContract::find()->where(['cuser_id' => $iCtrId,'service_id' => $arServices])->all();
+            $obServices = CuserServiceContract::find()->where(['cuser_id' => $iCtrId,'service_id' => $arServices])->andWhere('cont_date is not null')->all();
             $obServices = ArrayHelper::index($obServices,'service_id');
-
             foreach ($models as $key => &$value)
             {
                 if(isset($obServices[$key]))
