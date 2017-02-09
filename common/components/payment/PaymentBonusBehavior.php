@@ -508,6 +508,9 @@ class PaymentBonusBehavior extends Behavior
 			$amount = $amount*($percent/100);
 			if($amount<0)
 				$amount=0;
+			if($type == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT && $payMonth == 0){
+				$model->isSale = true;
+			}
 			$this->addBonus($buserId,$model->id,$obScheme->id,$model->service_id,$model->cuser_id,$amount,$payMonth+1, $percent, $model->isSale);  //добавляем бонус
 		}
 	}
