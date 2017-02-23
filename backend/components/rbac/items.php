@@ -32,6 +32,10 @@ return [
         'type' => 2,
         'description' => 'Только для менеджера по партнерам',
     ],
+    'only_teamlead' => [
+        'type' => 2,
+        'description' => 'Только для тимлида',
+    ],
     'user' => [
         'type' => 1,
         'description' => 'Пользователь',
@@ -107,6 +111,17 @@ return [
             'admin',
             'superRights',
             'forAll',
+        ],
+    ],
+    'teamlead' => [
+        'type' => 1,
+        'description' => 'Тимлид',
+        'ruleName' => 'userRole',
+        'children' => [
+            'moder',
+            'only_manager',
+            'forAll',
+            'only_teamlead',
         ],
     ],
 ];

@@ -386,28 +386,46 @@ $this->registerJs("
 					</section>
 					<!--End ответсвенный-->
 					<!--Ответственный специалист CPC -->
-					<section class="wm-side-bar-right">
-						<div class="x_title">
-							<h2><?php echo Yii::t('app/users','CRC manager')?></h2>
-							<ul class="nav navbar-right panel_toolbox">
-								<li>
-								</li>
-							</ul>
-							<div class="clearfix"></div>
-						</div>
-						<div class="media event">
-							<a class="pull-left border-aero profile_thumb">
-								<i class="fa fa-user aero"></i>
-							</a>
-							<div class="media-body" style="height: 50px;vertical-align: middle;">
-								<p class="title"><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getFio() : $model->manager_crc_id;?></p>
-								<?php if(Yii::$app->user->can('superRights')):?>
-								<p> <small><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getRoleStr() : 'N/A';?></small>
-									<?php endif;?>
-								</p>
-							</div>
-						</div>
-					</section>
+                    <section class="wm-side-bar-right">
+                        <div class="x_title">
+                            <h2><?php echo Yii::t('app/users','CRC manager')?></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li>
+                                    <?php
+                                    if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('teamlead')) {
+                                        \common\components\customComponents\Modal\CustomModal::begin([
+                                            'header' => '<h2>' . Yii::t('app/crm', 'Change assigned') . '</h2>',
+                                            'size' => Modal::SIZE_DEFAULT,
+                                            'toggleButton' => [
+                                                'tag' => 'a',
+                                                'class' => 'link-btn-cursor',
+                                                'label' => '<i class="fa fa-pencil"></i> ' . Yii::t('app/crm', 'Change'),
+                                            ]
+                                        ]);
+                                        echo $this->render('_part_form_change_assigned_cpc', [
+                                            'model' => $model,
+                                            'sAssName' => is_object($obMan = $model->managerCrc) ? $obMan->getFio() : $model->manager_crc_id
+                                        ]);
+                                        \common\components\customComponents\Modal\CustomModal::end();
+                                    }
+                                    ?>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="media event">
+                            <a class="pull-left border-aero profile_thumb">
+                                <i class="fa fa-user aero"></i>
+                            </a>
+                            <div class="media-body" style="height: 50px;vertical-align: middle;">
+                                <p class="title"><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getFio() : $model->manager_crc_id;?></p>
+                                <?php if(Yii::$app->user->can('superRights')):?>
+                                <p> <small><?php echo is_object($obMan = $model->managerCrc) ? $obMan->getRoleStr() : 'N/A';?></small>
+                                    <?php endif;?>
+                                </p>
+                            </div>
+                        </div>
+                    </section>
 					<!-- end ответственный специалист-->
 
 					<?php if(

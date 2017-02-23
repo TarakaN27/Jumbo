@@ -48,6 +48,18 @@ use yii\widgets\ActiveForm;
     <?=$form->field($model,'log_work_type')->radioList(\backend\models\BUser::getLogWorkTypeArr())?>
 
     <?= $form->field($model, 'status')->dropDownList(\backend\models\BUser::getStatusArr()) ?>
+
+    <?= $form->field($model, 'group_members')->widget(\kartik\select2\Select2::className(),[
+        'data' => \backend\models\BUser::getAllMembersMap(),
+        'initValueText' => Yii::t('app/users','Chouse_members_in_group'), // set the initial display text
+        'options' => [
+            'multiple' => true,
+            'placeholder' => Yii::t('app/users','Chouse_members_in_group')
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ]
+    ]) ?>
     <div class = "form-group">
         <div class = "col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
             <?= $form->field($model,'allow_unit')->checkbox();?>
@@ -64,6 +76,7 @@ use yii\widgets\ActiveForm;
                     ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary'])?>
             </div>
     </div>
+
 
     <?php ActiveForm::end(); ?>
 </div>

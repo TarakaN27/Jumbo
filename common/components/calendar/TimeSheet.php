@@ -213,6 +213,7 @@ class TimeSheet
 	 */
 	public function getUsersTimeSheetData()
 	{
+
 		$arUsers = $this->getAllUsers();   //получаем всех пользователей;
 		$iTotalNeed = 0;
 		$arDays = $this->getCalendardays();
@@ -345,7 +346,11 @@ class TimeSheet
 	 */
 	protected function getAllUsers()
 	{
-		$tmp = BUser::getAllMembersObj();
+        if(!\Yii::$app->user->can('adminRights') && \Yii::$app->user->can('teamlead')){
+            $tmp = BUser::getAllMembersTeamleadObj();
+        }else {
+            $tmp = BUser::getAllMembersObj();
+        }
 		$arReturn = [];
 		/** @var BUser $t */
 		foreach($tmp as $t)

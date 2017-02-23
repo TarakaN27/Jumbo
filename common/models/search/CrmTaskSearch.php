@@ -38,7 +38,7 @@ class CrmTaskSearch extends CrmTask
             self::VIEW_TYPE_WATCH => Yii::t('app/crm','View type watch')
         ];
 
-        if(Yii::$app->user->can('adminRights'))
+        if(Yii::$app->user->can('adminRights')||Yii::$app->user->can('teamlead'))
             $arType[self::VIEW_TYPE_FULL_TASK] = Yii::t('app/crm','View type users task');
 
         return $arType;
@@ -164,7 +164,7 @@ class CrmTaskSearch extends CrmTask
 
         switch ($viewType)
         {
-            case self::VIEW_TYPE_ALL:       //все таски
+            case self::VIEW_TYPE_ALL:       //все таскиdie;
                 $query
                     ->joinWith('crmTaskAccomplices')                                        //таблица помогаю
                     ->joinWith('crmTaskWatchers')                                           //таблица наблюдаю
@@ -191,10 +191,21 @@ class CrmTaskSearch extends CrmTask
                 break;
 
             case self::VIEW_TYPE_FULL_TASK:
-                if(!Yii::$app->user->can('adminRights'))
+                if(!Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead'))
                 {
                     $query->where('1=0');
                 }
+                if(!Yii::$app->user->can('adminRights') && Yii::$app->user->can('teamlead')){
+
+                    $query
+                        ->joinWith('crmTaskAccomplices')                                        //таблица помогаю
+                        ->joinWith('crmTaskWatchers')                                           //таблица наблюдаю
+                        ->where(['created_by' => Yii::$app->user->identity->getUserIdsInGroup()])                                     //все созданные
+                        ->orWhere(['assigned_id' => Yii::$app->user->identity->getUserIdsInGroup()])                                  //все за которые отвественный
+                        ->orWhere([CrmTaskAccomplices::tableName().'.buser_id' => Yii::$app->user->identity->getUserIdsInGroup()])    //все которым помогаю
+                        ->orWhere([CrmTaskWatcher::tableName().'.buser_id' => Yii::$app->user->identity->getUserIdsInGroup()]);       //все за которыми смотрю
+                }
+
             break;
 
             case self::VIEW_TYPE_FULL_TASK_AND_OWNER:

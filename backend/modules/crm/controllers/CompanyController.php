@@ -28,6 +28,7 @@ use common\models\Services;
 use Yii;
 use common\models\CUserRequisites;
 use yii\base\Exception;
+use yii\db\ActiveQuery;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -78,13 +79,23 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 
 			case BUserCrmRules::RULE_THEMSELF: //только свои. Ответственный и создал компанию
-				$dataProvider = $searchModel->search(
-					Yii::$app->request->queryParams,
-					'('.CUser::tableName().'.manager_id = :userID OR '.CUser::tableName().'.created_by = :userID  OR '.CUser::tableName().'.manager_crc_id = :userID )' ,
-					[
-						':userID' => Yii::$app->user->id
-					]
-				);
+                if(Yii::$app->user->can('teamlead')){
+                    $inUserQuery = implode(',',Yii::$app->user->identity->getUserIdsInGroup());
+                    $dataProvider = $searchModel->search(
+                        Yii::$app->request->queryParams,
+                        '(' . CUser::tableName() . ".manager_id IN ($inUserQuery) OR " . CUser::tableName() . ".created_by IN ($inUserQuery)  OR ". CUser::tableName() . ".manager_crc_id IN ($inUserQuery) )",
+                        [
+                        ]
+                    );
+                }else {
+                    $dataProvider = $searchModel->search(
+                        Yii::$app->request->queryParams,
+                        '(' . CUser::tableName() . '.manager_id = :userID OR ' . CUser::tableName() . '.created_by = :userID  OR ' . CUser::tableName() . '.manager_crc_id = :userID )',
+                        [
+                            ':userID' => Yii::$app->user->id
+                        ]
+                    );
+                }
 				break;
 
 			case BUserCrmRules::RULE_OPENED: //только открытые
@@ -291,8 +302,8 @@ class CompanyController extends AbstractBaseBackendController
 			}
 		}
 
-		if (Yii::$app->request->isPost) {
-			if(count($files = CrmCmpContacts::addFiles($id))>0){
+		if (Yii::$app->request->isPost && Yii::$app->request->post('dropZoneFiles')) {
+			if($files = CrmCmpContacts::addFiles($id)){
 				//DialogManager::actionLoadFileToTask($model->dialog,$files);
 				Yii::$app->session->setFlash('success', Yii::t('app/crm', 'File successfully added'));
 				return $this->redirect(['view', 'id' => $id]);
@@ -328,7 +339,6 @@ class CompanyController extends AbstractBaseBackendController
 			);
 
 		$sAssName = empty($modelTask->assigned_id) ? '' : BUser::findOne($modelTask->assigned_id)->getFio();
-
 		if(!empty($modelTask->contact_id))
 			$contactDesc = \common\models\CrmCmpContacts::findOne($modelTask->contact_id)->fio;
 		else

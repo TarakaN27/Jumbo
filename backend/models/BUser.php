@@ -47,6 +47,7 @@ class BUser extends AbstractUser
         ROLE_BOOKKEEPER = 15,
         ROLE_ADMIN = 20,
         ROLE_SUPERADMIN = 25,
+        ROLE_TEAMLEAD = 30,
         SCENARIO_CHANGE_PASSWORD = 'change_password',
         SCENARIO_REGISTER = 'register';
 
@@ -72,7 +73,8 @@ class BUser extends AbstractUser
             self::ROLE_SUPERADMIN => Yii::t('app/users','USER_role_superadmin'),
             self::ROLE_JURIST => Yii::t('app/users','USER_role_jurist'),
             self::ROLE_E_MARKETER => Yii::t('app/users','USER_role_e_marketer'),
-            self::ROLE_PARTNER_MANAGER => Yii::t('app/users','USER_role_partner_manager')
+            self::ROLE_PARTNER_MANAGER => Yii::t('app/users','USER_role_partner_manager'),
+            self::ROLE_TEAMLEAD =>Yii::t('app/users','USER_role_team_lead'),
         ];
     }
 
@@ -146,7 +148,7 @@ class BUser extends AbstractUser
             ['password', 'string', 'min' => 6],
 
             [['fname','lname','mname'], 'string', 'min' => 2, 'max' => 255],
-
+            [['group_members'],'safe'],
             ['log_work_type','default','value' => self::LOG_WORK_TYPE_DEFAULT],
             ['log_work_type','in', 'range' => array_keys(self::getLogWorkTypeArr())],
 
@@ -181,6 +183,7 @@ class BUser extends AbstractUser
             'roleStr' => Yii::t('app/users','Role Str'),
             'fio' => Yii::t('app/users','Manager'),
             'allow_set_sale' => Yii::t('app/users','Allow set sale'),
+            'group_members' => Yii::t('app/users','Список команды'),
         ];
     }
 
@@ -212,11 +215,20 @@ class BUser extends AbstractUser
      */
     public function beforeSave($insert)
     {
+        if($this->group_members){
+            $this->group_members = json_encode($this->group_members);
+        }
         if($insert && $this->scenario == self::SCENARIO_REGISTER)
         {
             $this->setPassword($this->password);
         }
         return parent::beforeSave($insert);
+    }
+    public function afterFind()
+    {
+        if($this->group_members){
+            $this->group_members = json_decode($this->group_members);
+        }
     }
 
     /**
@@ -260,6 +272,25 @@ class BUser extends AbstractUser
         },86400,$dep);
 
         return $models;
+    }
+
+    public static function getAllMembersTeamleadObj()
+    {
+
+        $dep =  new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
+        $models = self::getDb()->cache(function ($db) {
+            return BUser::find()->where(['status' => self::STATUS_ACTIVE, 'id'=>Yii::$app->user->identity->getUserIdsInGroup()])->all($db);
+        },86400,$dep);
+
+        return $models;
+    }
+
+    public function getUserIdsInGroup(){
+        $usersIds = [Yii::$app->user->id];
+        if($this->group_members){
+            $usersIds= array_merge($usersIds, $this->group_members);
+        }
+        return $usersIds;
     }
 
     /**
@@ -343,6 +374,7 @@ class BUser extends AbstractUser
                     unset($arRole[self::ROLE_SUPERADMIN]);
                 break;
             case self::ROLE_MANAGER:
+            case self::ROLE_TEAMLEAD:
             case self::ROLE_BOOKKEEPER:
                 $arRole = self::getRoleArr();
                 if(array_key_exists(self::ROLE_SUPERADMIN,$arRole))
@@ -444,4 +476,7 @@ class BUser extends AbstractUser
 
         return self::find()->select(['id','fname','lname','mname'])->where(['id' => $pk,'role' => self::ROLE_BOOKKEEPER])->one();
     }
+
+
+
 }

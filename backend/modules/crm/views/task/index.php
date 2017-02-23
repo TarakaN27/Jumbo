@@ -105,7 +105,7 @@ $('.editable').on('save', function(e, params) {
 ",\yii\web\View::POS_READY);
 
 
-if(Yii::$app->user->can('adminRights') && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
+if((Yii::$app->user->can('adminRights')||Yii::$app->user->can('teamlead')) && $viewType == \common\models\search\CrmTaskSearch::VIEW_TYPE_FULL_TASK)
 {
     $columns = [
         [

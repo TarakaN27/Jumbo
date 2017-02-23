@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' 
 $this->params['breadcrumbs'][] = Yii::t('app/users', 'Update');
 ?>
 <div class="page-title">
-                                          <div class="clearfix"></div>
+                <div class="clearfix"></div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="x_panel">
@@ -26,4 +26,5 @@ $this->params['breadcrumbs'][] = Yii::t('app/users', 'Update');
         'model' => $model,
     ]) ?>
 
-</div></div></div>
+</div>
+</div></div>

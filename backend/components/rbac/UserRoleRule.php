@@ -21,7 +21,6 @@ class UserRoleRule extends Rule{
             $role = Yii::$app->user->identity->role;
         else
             return false;
-
         switch ($item->name) {
             case 'superadmin':
                 return $role == User::ROLE_SUPERADMIN;
@@ -33,13 +32,16 @@ class UserRoleRule extends Rule{
                 return $role == User::ROLE_PARTNER_MANAGER ;
                 break;
             case 'moder':
-                return $role == User::ROLE_MANAGER || $role == User::ROLE_PARTNER_MANAGER;
+                return $role == User::ROLE_MANAGER || $role == User::ROLE_PARTNER_MANAGER || $role == User::ROLE_TEAMLEAD;
                 break;
             case 'bookkeeper':
                 return $role == User::ROLE_BOOKKEEPER;
                 break;
             case 'jurist':
                 return $role == User::ROLE_JURIST ;
+                break;
+            case 'teamlead':
+                return $role == User::ROLE_TEAMLEAD;
                 break;
             case 'e_marketer':
                 return $role == User::ROLE_E_MARKETER ;
@@ -53,6 +55,7 @@ class UserRoleRule extends Rule{
                     $role == User::ROLE_PARTNER_MANAGER ||
                     $role == User::ROLE_USER ||
                     $role == User::ROLE_JURIST ||
+                    $role == User::ROLE_TEAMLEAD ||
                     $role == User::ROLE_E_MARKETER;
                 break;
             default:
