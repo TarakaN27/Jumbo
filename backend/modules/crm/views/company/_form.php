@@ -242,6 +242,26 @@ $('#cuser-partner').on('change',function(){
 		<?php endif;?>
 
 	</div>
+    <?if(Yii::$app->user->can('adminRights')||Yii::$app->user->can('only_bookkeeper')){?>
+    <div class="ln_solid"></div>
+    <h4 class = "h4_ml_10">Используемые банковские реквизиты</h4>
+    <div class = "form-group">
+        <?foreach($legalPersons as $legalPerson){?>
+        <div class = "col-md-4 col-sm-4 col-xs-12">
+            <?= $form->field($model, "bankDetails[$legalPerson->id]", [
+                'template' => $fieldTempl,
+                'labelOptions'=>[
+                    'class' => 'control-label'
+                ]])
+                ->dropDownList($legalPerson->getDefaultBankDetailsMap(),[
+                    'prompt' => Yii::t('app/crm','Choose_bank_details')
+                ])->label($legalPerson->name) ?>
+        </div>
+        <?}?>
+    </div>
+    <?}?>
+
+
 	<section class="partnerInfo">
 		<div class="ln_solid"></div>
 		<h4 class = "h4_ml_10">Параметры партнера</h4>

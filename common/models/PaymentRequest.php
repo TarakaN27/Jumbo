@@ -30,6 +30,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property integer $service_id
  * @property string $payment_order
+ * @property integer $bank_id
+ *
  */
 class PaymentRequest extends AbstractActiveRecord
 {
@@ -47,6 +49,7 @@ class PaymentRequest extends AbstractActiveRecord
 
     public $active=1;
     public $cuserName;
+    public $bank;
 
     /**
      * @return array
@@ -89,11 +92,12 @@ class PaymentRequest extends AbstractActiveRecord
             [[
                  'cntr_id', 'manager_id', 'owner_id', 'is_unknown',
                   'currency_id', 'legal_id', 'dialog_id',
-                 'status', 'created_at', 'updated_at','service_id'
+                 'status', 'created_at', 'updated_at','service_id', 'bank_id'
              ], 'integer'],
             [['pay_date', 'pay_summ', 'currency_id', 'legal_id'], 'required'],
             [['pay_summ'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['description'], 'string'],
+            [['bank'],'safe'],
             [['user_name','payment_order'], 'string', 'max' => 255],
             [['cntr_id','manager_id'],'required',
              'when' => function($model) {
@@ -137,7 +141,9 @@ class PaymentRequest extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'payment_order' => Yii::t('app/book','Payment order'),
-            'service_id' => Yii::t('app/book','Service id')
+            'service_id' => Yii::t('app/book','Service id'),
+            'bank_id' => Yii::t('app/book','Bank id'),
+            'bank' => Yii::t('app/book','Bank id'),
         ];
     }
 
@@ -169,6 +175,16 @@ class PaymentRequest extends AbstractActiveRecord
     {
         return $this->hasOne(ExchangeRates::className(), ['id' => 'currency_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBankDetails()
+    {
+        return $this->hasOne(BankDetails::className(), ['id' => 'bank_id']);
+    }
+
+
 
     /**
      * @return \yii\db\ActiveQuery

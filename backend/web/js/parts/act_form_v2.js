@@ -11,6 +11,7 @@ function loadPayments() {
         container = $('#paymentsBlock'),
         iCUser = $('#actform-icuser').val(),
         iLegalPerson = $('#actform-ilegalperson').val(),
+        bankId = $('#bank'+iLegalPerson+' select').val(),
         checkBoxs = container.find('.cbPayment'),
         preloadEntity = getPreloaderEntity('paymentPreloader');
 
@@ -28,7 +29,7 @@ function loadPayments() {
         cache: false,
         url: URL_LOAD_ACTS_PAYMENTS,
         dataType: "json",
-        data: {iCUser: iCUser, iLegalPerson: iLegalPerson},
+        data: {iCUser: iCUser, iLegalPerson: iLegalPerson, bankId:bankId},
         success: function (data) {
             container.html(data.content);
             checkDate();
@@ -882,7 +883,8 @@ function getActsNumber()
         actNumber = $('#actform-iactnumber'),
         iLegalPerson = $('#actform-ilegalperson').val(),
         date = $("#actform-actdate").val();
-
+    $(".legal_banks").hide();
+    $("#bank"+iLegalPerson).show();
     if(customEmpty(iLegalPerson))
     {
         actNumber.val('');
@@ -964,7 +966,7 @@ function showByrInfo(this1)
  * Вешаем обработчики событий в document.ready
  */
 $(function () {
-    $('#actform-ilegalperson,#actform-icuser').on('change', loadPayments);
+    $('#actform-ilegalperson,#actform-icuser, .legal_banks select').on('change', loadPayments);
     $('#paymentsBlock').on('change', '.cbPayment', checkboxPaymentProcessed);
     var
         sortList = $('#servicesBlock');

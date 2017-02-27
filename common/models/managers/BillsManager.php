@@ -117,12 +117,16 @@ class BillsManager extends Bills{
         $jPersonDetail = '';
         $jPersonSite = '';
         $jPersonEmail = '';
+        $billHint = '';
         /** @var LegalPerson $lPerson */
         $lPerson = $this->lPerson;
         if(!empty($lPerson))
         {
+            $bankDetails = $lPerson->getBankDetailsByCUsers($this->cuser_id);
+            if($bankDetails->bill_hint)
+                $billHint = $bankDetails->bill_hint;
             $jPerson = $lPerson->name;
-            $jPersonDetail = $lPerson->doc_requisites.
+            $jPersonDetail = $bankDetails->bank_details.
                 ',УНП:'.$lPerson->ynp.
                 '. Юр.адрес:'.$lPerson->address.
                 '. Почт. адрес:'.$lPerson->mailing_address.
@@ -276,6 +280,7 @@ class BillsManager extends Bills{
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
+            $doc->setValue('billHint',$billHint);
             $doc->setValue('validity', $obBillTpl?$obBillTpl->validity:"");
             $doc->setValue('jPersonEmail',$jPersonEmail);
             $doc->setValue('billNumber',$this->bill_number);

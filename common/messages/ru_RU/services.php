@@ -97,4 +97,9 @@ return [
     'Fixing exchange' => 'Фиксировать курс',
     'Disallow create bill' => 'Запретить выставлять счета на юрлицо',
     'Letter type SOFT' => 'Шаблон письма для Солюшенс',
+    'Create Bank Details' => 'Создание банковских реквизитов',
+    'Bank Details' => 'Банковские реквизиты',
+    'Default bank details' => 'Банковские реквизиты по умолчанию',
+    'SERVICES_bank_details' => 'Банковские реквизиты',
+    'Bill hint' => 'Уведомнение для счетов'
 ];

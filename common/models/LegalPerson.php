@@ -67,7 +67,7 @@ class LegalPerson extends AbstractActiveRecord
             [['description','doc_requisites','ynp','mailing_address','telephone_number'], 'string'],
             [[
                 'disallow_create_bill', 'status', 'created_at',
-                'updated_at','use_vat',
+                'updated_at','use_vat', 'default_bank_id',
                 'docx_id','act_tpl_id',
                 'admin_expense','partner_cntr',
                 'letter_tpl_type'
@@ -107,6 +107,7 @@ class LegalPerson extends AbstractActiveRecord
             'doc_email' => Yii::t('app/services','Document email'),
             'letter_tpl_type' => Yii::t('app/services','Letter template type'),
             'disallow_create_bill' => Yii::t('app/services','Disallow create bill'),
+            'default_bank_id' =>Yii::t('app/services','Default bank details'),
         ];
     }
 
@@ -155,6 +156,12 @@ class LegalPerson extends AbstractActiveRecord
         $tmp = self::getAllLegalPerson();
         return ArrayHelper::map($tmp,'id','name');
     }
+
+    public function getDefaultBankDetailsMap(){
+        $banks = BankDetails::findAll(['status'=>1, 'legal_person_id'=>$this->id]);
+        return ArrayHelper::map($banks, 'id', 'name');
+    }
+
     /**
      * вернем массив id => name
      * @return array
@@ -198,4 +205,19 @@ class LegalPerson extends AbstractActiveRecord
 
         return ArrayHelper::map($models,'id','name');
     }
+
+    public function getBankDetailsByCUsers($cuserId){
+        $bankDetails = CuserBankDetails::findOne(['legal_person_id'=> $this->id, 'cuser_id'=>$cuserId]);
+        if($bankDetails){
+           $bank = BankDetails::findOne($bankDetails->bank_details_id);
+        }else{
+            $bank = BankDetails::findOne($this->default_bank_id);
+        }
+        return $bank;
+    }
+
+    public static function getLegalPersonForBill(){
+        return LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();
+    }
+
 }

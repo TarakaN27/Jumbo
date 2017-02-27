@@ -29,7 +29,7 @@ class ActsSearch extends Acts
             [[
                 'id', 'act_num' ,'cuser_id',
                 'buser_id',
-                'sent', 'created_at', 'updated_at','currency_id','lp_id'
+                'sent', 'created_at', 'updated_at','currency_id','lp_id', 'bank_id'
             ], 'integer'],
             [['amount', 'act_date','from_date','to_date'], 'safe'],
             [['from_date','to_date'],'date','format' => 'php:m.d.Y']
@@ -89,6 +89,7 @@ class ActsSearch extends Acts
             $tn.'.id' => $this->id,
             $tn.'.act_num' => $this->act_num,
             $tn.'.cuser_id' => $this->cuser_id,
+            $tn.'.bank_id' => $this->bank_id,
             $tn.'.buser_id' => $this->buser_id,
             $tn.'.act_date' => $this->act_date,
             $tn.'.sent' => $this->sent,

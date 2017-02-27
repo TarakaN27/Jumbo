@@ -76,6 +76,18 @@ $this->registerJs("
 
 <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap()) ?>
 
+<?foreach(\common\models\LegalPerson::getLegalPersonForBill() as $legalPerson){?>
+    <?
+    if($model->legal_id == $legalPerson->id)
+        $model->bank[$legalPerson->id] = $model->bank_id;
+    else
+        $model->bank[$legalPerson->id] = $legalPerson->default_bank_id;
+        ?>
+    <div style="display: none;" class="legal_banks" id = "bank<?=$legalPerson->id?>">
+    <?= $form->field($model, "bank[$legalPerson->id]")->dropDownList($legalPerson->getDefaultBankDetailsMap());?>
+    </div>
+<?}?>
+<p style="display:none; text-align:center; color:red" id="invalidBank">Банковские реквизиты платежа не соответствуют заданным для контагента</p>
 <?= $form->field($model,'payment_order')->textInput();?>
 
 <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
@@ -92,3 +104,4 @@ $this->registerJs("
             </div>
 
 <?php ActiveForm::end(); ?>
+

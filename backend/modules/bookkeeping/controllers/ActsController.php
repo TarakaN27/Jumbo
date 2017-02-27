@@ -126,6 +126,7 @@ class ActsController extends AbstractBaseBackendController
         $model->actDate = Yii::$app->formatter->asDate('NOW');
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
+
             if($model->makeRequest())
             {
                 Yii::$app->session->addFlash(Alert::TYPE_SUCCESS,Yii::t('app/book','Act successfully created'));

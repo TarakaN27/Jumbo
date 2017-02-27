@@ -146,4 +146,11 @@ class RecalculateController extends AbstractConsoleController
             $item->save();
         }
     }
+    public function actionTest(){
+        $legalPerson = \common\models\LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();
+        foreach($legalPerson as $item){
+            \common\models\PartnerWBookkeeperRequest::updateAll(['bank_id'=>$item->default_bank_id],['legal_id'=>$item->id]);
+        }
+    }
+
 }

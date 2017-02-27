@@ -300,4 +300,5 @@ return [
 	'Remove file' => 'Удалить файл',
 	'CLOSE' => 'Закрыть',
 	'FILES_NOT_SELECTED' => "Файл не выбран",
+    'Choose_bank_details' => 'Выберите банковские реквизиты'
 ];

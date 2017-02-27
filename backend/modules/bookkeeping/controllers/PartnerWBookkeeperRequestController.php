@@ -150,6 +150,9 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
 
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
+            if($model->bank && isset($model->bank[$model->legal_id])) {
+                $model->bank_id = $model->bank[$model->legal_id];
+            }
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $model->status = PartnerWBookkeeperRequest::STATUS_DONE;

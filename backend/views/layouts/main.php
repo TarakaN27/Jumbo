@@ -196,6 +196,11 @@ $menuItems[] = [
                                             <a href = "<?= Url::to(['/services/legal-person/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_legal_person'); ?></a>
                                         </li>
                                         <?php endif; ?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                            <li>
+                                                <a href = "<?= Url::to(['/services/bank-details/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_bank_details'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
                                         <?php if(Yii::$app->user->can('forAll')):?>
                                              <li>
                                                 <a href = "<?= Url::to(['/services/exchange-rates/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_exchange_rates'); ?></a>

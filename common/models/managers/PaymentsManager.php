@@ -173,17 +173,22 @@ class PaymentsManager extends Payments
      * @param $iLegalPerson
      * @return mixed
      */
-    public static function getPaymentsForAct($iCUser, $iLegalPerson)
+    public static function getPaymentsForAct($iCUser, $iLegalPerson, $bankId)
     {
-        $arPayments = Payments::find()
-            ->select(['cuser_id', 'pay_date', 'pay_summ', 'currency_id', 'service_id', 'legal_id', 'id', 'payment_order', 'hide_act_payment'])
-            ->where([
-                'cuser_id' => $iCUser,
-                'legal_id' => $iLegalPerson,
-                'act_close' => self::NO
+        $arPayments = Payments::find()->alias('p')
+            ->select(['p.cuser_id', 'p.pay_date', 'p.pay_summ', 'p.currency_id', 'p.service_id', 'p.legal_id', 'p.id', 'p.payment_order', 'p.hide_act_payment']);
+        $arPayments= $arPayments->where([
+                'p.cuser_id' => $iCUser,
+                'p.legal_id' => $iLegalPerson,
+                'act_close' => self::NO,
             ])
             ->with('currency', 'service')
-            ->all();
+            ->joinWith(['payRequest']);
+        if($bankId) {
+            $arPayments->andWhere(['bank_id' => $bankId]);
+        }
+        $arPayments = $arPayments->all();
+
         if (!$arPayments)
             return [];
 

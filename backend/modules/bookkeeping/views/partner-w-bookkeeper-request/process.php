@@ -8,7 +8,9 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\LegalPerson;
+use common\components\helpers\CustomViewHelper;
 $this->title = Yii::t('app/book','Process partner withdrawal request');
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/partner-w-bookeeper-request.js',$this);
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -102,6 +104,16 @@ $this->title = Yii::t('app/book','Process partner withdrawal request');
                                             ]
                                         ) ?>
                                     </div>
+                                    <?foreach(\common\models\LegalPerson::getLegalPersonForBill() as $legalPerson){?>
+                                        <?
+                                            $model->bank[$legalPerson->id] = $legalPerson->default_bank_id;
+                                        ?>
+                                        <div style="display: none;" class="col-sm-4 legal_banks" id = "bank<?=$legalPerson->id?>">
+                                            <?= $form->field($model, "bank[$legalPerson->id]")->dropDownList($legalPerson->getDefaultBankDetailsMap());?>
+                                        </div>
+                                    <?}?>
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-4">
                                         <?= $form->field($model, "contractor")->dropDownList(
                                             $arContractor,
@@ -125,3 +137,5 @@ $this->title = Yii::t('app/book','Process partner withdrawal request');
         <?php ActiveForm::end();?>
     </div>
 </div>
+
+

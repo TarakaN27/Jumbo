@@ -20,8 +20,10 @@ use common\models\CrmCmpFile;
 use common\models\CrmTask;
 use common\models\CrmTaskRepeat;
 use common\models\CUser;
+use common\models\CuserBankDetails;
 use common\models\CUserGroups;
 use common\models\CuserServiceContract;
+use common\models\LegalPerson;
 use common\models\search\CrmTaskSearch;
 use common\models\search\CUserSearch;
 use common\models\Services;
@@ -29,6 +31,7 @@ use Yii;
 use common\models\CUserRequisites;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -490,6 +493,17 @@ class CompanyController extends AbstractBaseBackendController
 
 		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
 
+
+		    if($model->bankDetails){
+                CuserBankDetails::deleteAll(['cuser_id'=>$model->id]);
+                foreach($model->bankDetails as $legalPerson=>$bank){
+                    $cuserBankDatails = new CuserBankDetails();
+                    $cuserBankDatails->cuser_id = $model->id;
+                    $cuserBankDatails->bank_details_id = $bank;
+                    $cuserBankDatails->legal_person_id = $legalPerson;
+                    $cuserBankDatails->save();
+                }
+            }
 			if($model->is_resident != CUser::RESIDENT_YES)
 				$modelR->isResident = FALSE;
 
@@ -522,9 +536,16 @@ class CompanyController extends AbstractBaseBackendController
 		if(empty($modelR->type_id))
 			$modelR->type_id = CUserRequisites::TYPE_F_PERSON;
 
+		$legalPersons = LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();
+
+        $model->bankDetails = CuserBankDetails::findAll(['cuser_id'=>$model->id]);
+        if($model->bankDetails)
+            $model->bankDetails = ArrayHelper::map($model->bankDetails, 'legal_person_id', 'bank_details_id');
+
 		return $this->render('update', [
 			'model' => $model,
-			'modelR' => $modelR
+			'modelR' => $modelR,
+            'legalPersons' => $legalPersons,
 		]);
 
 	}

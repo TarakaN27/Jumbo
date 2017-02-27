@@ -37,7 +37,7 @@ class PartnerWBookkeeperRequest extends AbstractActiveRecord
     CONST
         STATUS_NEW = 5,
         STATUS_DONE = 10;
-
+    public $bank;
     /**
      * @return array
      */
@@ -66,8 +66,9 @@ class PartnerWBookkeeperRequest extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['buser_id', 'partner_id', 'contractor_id', 'currency_id', 'legal_id', 'request_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['buser_id', 'partner_id', 'contractor_id', 'bank_id', 'currency_id', 'legal_id', 'request_id', 'created_by', 'status', 'created_at', 'updated_at'], 'integer'],
             [['partner_id', 'request_id'], 'required'],
+            [['bank'],'safe'],
             [['legal_id','factual_amount_in_base_currency'],'required', 'on' => 'update'],
             [['amount','factual_amount_in_base_currency'], 'number'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => BUser::className(), 'targetAttribute' => ['created_by' => 'id']],
@@ -101,6 +102,8 @@ class PartnerWBookkeeperRequest extends AbstractActiveRecord
             'updated_at' => Yii::t('app/users', 'Updated At'),
             'description' => Yii::t('app/users', 'Description'),
             'factual_amount_in_base_currency' => Yii::t('app/users', 'Factual amount in base currency'),
+            'bank_id' => Yii::t('app/book','Bank id'),
+            'bank' => Yii::t('app/book','Bank id'),
         ];
     }
 
@@ -173,6 +176,10 @@ class PartnerWBookkeeperRequest extends AbstractActiveRecord
     {
         parent::afterDelete();
         $this->request->processBookkeeper();
-     }
+    }
+    public function getBankDetails()
+    {
+        return $this->hasOne(BankDetails::className(), ['id' => 'bank_id']);
+    }
 
 }

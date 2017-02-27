@@ -11,11 +11,13 @@ use common\models\Acts;
 use common\models\ActToPayments;
 use common\models\CUser;
 
+use common\models\CuserBankDetails;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
 use common\models\Dialogs;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
+use common\models\LegalPerson;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
@@ -132,10 +134,12 @@ class DefaultController extends AbstractBaseBackendController
             }else{
                 $savedModels = [];
                 $notSavedmodels = [];
+                $legalPerson = LegalPerson::findOne(3);
                 foreach(Yii::$app->request->post('PaymentRequest') as $item){
                     $model = new PaymentRequest($item);
                     $model->owner_id = Yii::$app->user->id;
                     $model->status = PaymentRequest::STATUS_NEW;
+                    $model->bank_id = $legalPerson->default_bank_id;
                     if($model->active) {
                         if ($model->validate()) {
                             $model->save(false);
@@ -506,6 +510,7 @@ class DefaultController extends AbstractBaseBackendController
 
         if($model->load(Yii::$app->request->post()))
         {
+            $model->bank_id = $model->bank[$model->legal_id];
             if($model->save())
             {
                 $obDlg = new Dialogs();
@@ -536,7 +541,7 @@ class DefaultController extends AbstractBaseBackendController
             }
         }
         return $this->render('create_payment_request',[
-            'model' => $model
+            'model' => $model,
         ]);
     }
 
@@ -554,7 +559,14 @@ class DefaultController extends AbstractBaseBackendController
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return ['mID' => $obCtr->manager_id];
+        $bankIds = CuserBankDetails::findAll(['cuser_id'=>$cID]);
+        if($bankIds){
+            $bankIds = ArrayHelper::map($bankIds,'legal_person_id','bank_details_id');
+        }else{
+            $bankIds = LegalPerson::getLegalPersonForBill();
+            $bankIds = ArrayHelper::map($bankIds, 'id','default_bank_id');
+        }
+        return ['mID' => $obCtr->manager_id, 'banks'=>$bankIds];
     }
 
     /**

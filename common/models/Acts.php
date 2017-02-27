@@ -49,7 +49,6 @@ class Acts extends AbstractActiveRecord
         $genFile = 0, //сгенерировать файл
         $contNotif = 0, // уведомить контрагента
         $updateFile = 0; // обновить файл
-
     CONST
         FILE_PATH = '@common/upload/docx_acts';
 
@@ -109,7 +108,8 @@ class Acts extends AbstractActiveRecord
             'genFile' => Yii::t('app/documents','Generate document'),
             'contract_num' => Yii::t('app/documents', 'Contract number'),
             'contract_date' => Yii::t('app/documents', 'Contract date'),
-            'currency_id' => Yii::t('app/documents','Currency id')
+            'currency_id' => Yii::t('app/documents','Currency id'),
+            'bank_id' => Yii::t('app/documents','Bank id'),
         ];
     }
 
@@ -263,5 +263,10 @@ class Acts extends AbstractActiveRecord
         }
         $dom->appendChild($root);
         return $dom;
+    }
+
+    public function getBankDetails()
+    {
+        return $this->hasOne(BankDetails::className(), ['id' => 'bank_id']);
     }
 }

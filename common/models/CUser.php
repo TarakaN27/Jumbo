@@ -69,6 +69,8 @@ class CUser extends AbstractUser
         $partner_archive_date = NULL,
         $password;
 
+    public $bankDetails;
+
 
     /**
      * @return array
@@ -248,7 +250,7 @@ class CUser extends AbstractUser
             ['archive','default','value' => self::ARCHIVE_NO],
             ['archive','in','range' => array_keys(self::getArchiveArr())],
 
-            [['entityFields'], 'safe'],
+            [['entityFields', 'bankDetails'], 'safe'],
             ['prospects_id','required',
                 'when' => function($model) {
                     if($this->allow_expense == AbstractActiveRecord::YES && $this->contractor != self::CONTRACTOR_YES)

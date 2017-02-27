@@ -46,7 +46,8 @@ class ActForm extends Model
         $fCustomFileAct,        //Файл кастомного акта
         $sContractNumber,       //Номер Контракта
         $contractDate,          //Дата контракта
-        $arHidePayments;        //Неявные платежи
+        $arHidePayments,        //Неявные платежи
+        $bank;
 
     protected
         $_customErrors = [];    //кастомные ошибки
@@ -64,6 +65,7 @@ class ActForm extends Model
                 'iActNumber','actDate','sContractNumber',
                 'contractDate','bCustomAct'
             ],'required'],
+            [['bank'], 'safe'],
             [['actDate'],'date','format' => 'php:d.m.Y'],
             [['arServices'],'each','rule' => ['integer']],
             [['contractDate'],'each','rule' => ['date','format' => 'php:d.m.Y']],
@@ -90,7 +92,8 @@ class ActForm extends Model
             'bCustomAct' => Yii::t('app/book','Custom act file'),
             'fCustomFileAct' => Yii::t('app/book','Custom file act'),
             'arTemplate' => Yii::t('app/book','Template act field'),
-            'arHidePayments' => Yii::t('app/book','Payment hide block')
+            'arHidePayments' => Yii::t('app/book','Payment hide block'),
+            'bank' => Yii::t('app/book','Bank'),
         ];
     }
 
@@ -154,6 +157,10 @@ class ActForm extends Model
             $obAct->sent = Acts::NO;
             $obAct->lp_id = $this->iLegalPerson;
             $obAct->currency_id = $this->iCurr;
+            if($this->bank && isset($this->bank[$obAct->lp_id])) {
+                $obAct->bank_id = $this->bank[$obAct->lp_id];
+            }
+
             if($this->bCustomAct)
             {
                 $obAct->genFile = Acts::NO;

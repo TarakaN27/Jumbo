@@ -524,11 +524,12 @@ class AjaxServiceController extends AbstractBaseBackendController{
     {
         $iCUser = Yii::$app->request->post('iCUser');
         $iLegalPerson = Yii::$app->request->post('iLegalPerson');
+        $bankId= Yii::$app->request->post('bankId');
         
         if(empty($iCUser) || empty($iLegalPerson))
             throw new InvalidParamException();
         
-        $arPayments = PaymentsManager::getPaymentsForAct($iCUser,$iLegalPerson);        //get payments
+        $arPayments = PaymentsManager::getPaymentsForAct($iCUser,$iLegalPerson,$bankId);        //get payments
         
         return [
             'content' => $this->renderPartial('_part_payment_for_act',[

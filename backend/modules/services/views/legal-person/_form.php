@@ -23,8 +23,10 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'doc_requisites')->textarea(['row' => 6])?>
+    <?
+        if(!$model->isNewRecord){?>
+        <?= $form->field($model, 'default_bank_id')->dropDownList($model->getDefaultBankDetailsMap())?>
+        <?}?>
 
     <?= $form->field($model, 'ynp')->textInput(['maxlength' => true])?>
 

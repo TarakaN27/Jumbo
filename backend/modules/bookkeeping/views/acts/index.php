@@ -85,6 +85,11 @@ var
                             'filter' => \common\models\LegalPerson::getLegalPersonMap()
                         ],
                         [
+                            'attribute' => 'bank_id',
+                            'value' => 'bankDetails.name',
+                            'filter' => \common\models\BankDetails::getActiveBankDetails()
+                        ],
+                        [
                             'attribute' => 'cuser_id',
                             'value' => 'cuser.infoWithSite',
                             'filter' => \kartik\select2\Select2::widget([

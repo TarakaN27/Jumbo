@@ -66,6 +66,12 @@ var
         <?=$form->field($model,'iLegalPerson')->dropDownList(LegalPerson::getLegalPersonMap(),[
             'prompt' => Yii::t('app/book','Choose legal person')
         ])?>
+        <?foreach(\common\models\LegalPerson::getLegalPersonForBill() as $legalPerson){?>
+            <?$model->bank[$legalPerson->id] = $legalPerson->default_bank_id;?>
+            <div style="display: none;" class="legal_banks" id = "bank<?=$legalPerson->id?>">
+                <?= $form->field($model, "bank[$legalPerson->id]")->dropDownList($legalPerson->getDefaultBankDetailsMap());?>
+            </div>
+        <?}?>
 
         <?=$form->field($model,'iActNumber')->textInput();?>
 
