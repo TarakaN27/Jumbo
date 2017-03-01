@@ -14,6 +14,7 @@ namespace common\components\acts;
 use common\components\helpers\CustomHelper;
 use common\models\ActServices;
 use common\models\ActsTemplate;
+use common\models\BankDetails;
 use common\models\CUser;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
@@ -64,7 +65,8 @@ class ActsDocumentsV2
         $amountInWords,
         $vatInWords,
         $bUseVat = FALSE,
-        $vatRate;
+        $vatRate,
+        $bankId;
 
     /**
      * ActsDocumentsV2 constructor.
@@ -73,9 +75,9 @@ class ActsDocumentsV2
      * @param $actDate
      * @param $actNumber
      */
-    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId)
+    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId)
     {
-        if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId))
+        if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId)|| empty($bankId))
             throw new InvalidParamException();
 
         $this->iLegalPerson = $iLegalPerson;
@@ -84,6 +86,7 @@ class ActsDocumentsV2
         $this->actNumber = $actNumber;
         $this->iActId = $iActId;
         $this->iCurrencyId = $iCurrencyId;
+        $this->bankId = $bankId;
     }
 
     /**
@@ -111,7 +114,7 @@ class ActsDocumentsV2
         /** @var LegalPerson $obLegalPerson */
         $obLegalPerson = LegalPerson::find()
             ->select([
-                'id','name','doc_requisites',
+                'id','name',
                 'use_vat','docx_id','act_tpl_id',
                 'address','use_vat','ynp',
                 'mailing_address','telephone_number',
@@ -124,7 +127,11 @@ class ActsDocumentsV2
             throw new NotFoundHttpException();
 
         $this->legalPersonName = $obLegalPerson->name;
-        $this->legalPersonBankDetail = $obLegalPerson->doc_requisites;
+        $bank = BankDetails::findOne($this->bankId);
+        if($bank)
+            $this->legalPersonBankDetail = $bank->bank_details;
+        else
+            $this->legalPersonBankDetail = "";
         $this->legalPersonAddress = $obLegalPerson->address;
         $this->legalPersonYnp = $obLegalPerson->ynp;
         $this->legalPersonMailingAddress = $obLegalPerson->mailing_address;

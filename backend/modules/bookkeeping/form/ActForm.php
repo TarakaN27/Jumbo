@@ -181,7 +181,7 @@ class ActForm extends Model
 
             if(!$this->bCustomAct)
             {
-                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr);
+                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id);
                 $fileName = $obActDoc->generateDocument();
                 if(!$fileName)
                     throw new Exception();

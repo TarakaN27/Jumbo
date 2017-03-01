@@ -510,7 +510,7 @@ class DefaultController extends AbstractBaseBackendController
 
         if($model->load(Yii::$app->request->post()))
         {
-            $model->bank_id = $model->bank[$model->legal_id];
+            $model->bank_id = isset($model->bank[$model->legal_id])?$model->bank[$model->legal_id]:null;
             if($model->save())
             {
                 $obDlg = new Dialogs();

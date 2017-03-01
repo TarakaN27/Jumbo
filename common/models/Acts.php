@@ -257,7 +257,7 @@ class Acts extends AbstractActiveRecord
         $root = $dom->createElement("Акты"); // Создаём корневой элемент
         $acts = Acts::find()->andWhere(['>=','act_date', $start])->andWhere(['<=','act_date', $end])->andWhere(['lp_id'=>3])->all();
         foreach($acts as $act){
-            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id);
+            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id, $act->bank_id);
             $actNode = $obActDoc->generateNodeActXml($dom,$act);
             $root->appendChild($actNode);
         }

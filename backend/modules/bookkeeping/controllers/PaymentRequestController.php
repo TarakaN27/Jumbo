@@ -486,7 +486,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
         if($model->load(Yii::$app->request->post()))
         {
-            $model->bank_id = $model->bank[$model->legal_id];
+            $model->bank_id = isset($model->bank[$model->legal_id])?$model->bank[$model->legal_id]:null;
             if($model->save())
             {
                 Yii::$app->session->setFlash('success',Yii::t('app/book','Payments request successfully updated'));
