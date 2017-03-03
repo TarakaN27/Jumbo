@@ -136,8 +136,7 @@ class BillsManager extends Bills{
                     $billHint = "ВНИМАНИЕ! Изменились банковские реквизиты";
             }
             $jPerson = $lPerson->name;
-            $jPersonDetail = $bankDetails.",
-                \nУНП:".$lPerson->ynp.".\nЮр.адрес:".$lPerson->address.
+            $jPersonDetail = $bankDetails.",\nУНП:".$lPerson->ynp.".\nЮр.адрес:".$lPerson->address.
                 ".\nПочт. адрес:".$lPerson->mailing_address.
                 ".\nтел.:".$lPerson->telephone_number;
             $jPersonEmail = $lPerson->doc_email;
