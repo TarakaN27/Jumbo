@@ -58,7 +58,6 @@ class BonusRecordCalculate
         if (count($users) == 0)
             return FALSE;
         $this->setShemesRecord($users);
-
         foreach($users as $bUser) {
             //если продажник то посчитаем ему только продажи прошлого месяца
             if($bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
@@ -69,8 +68,7 @@ class BonusRecordCalculate
                 $sum = $sumPrevMonth - $sumCurrent;
             }
             if($coeff = $this->getMonthCoeff($sum, $bUser->buser_id)) {
-                //у продажников уменьшающий коэфф действует на текущий месяц, а увеличивающий на следующий
-                if($coeff<1 && $bUser->scheme->payment_base == BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT){
+                if($coeff<1){
                     $coeff = str_replace(",",'.',$coeff);
                     Yii::$app->db->createCommand("UPDATE ".BUserBonus::tableName()." b INNER JOIN ".Payments::tableName()." p ON b.payment_id=p.id SET b.amount=b.amount*$coeff, b.bonus_percent=b.bonus_percent*$coeff WHERE b.buser_id=$bUser->buser_id and p.pay_date BETWEEN $this->beginMonthTime AND $this->endMonthTime")->query();
                     $year = date("Y", $this->endMonthTime-10);
@@ -179,15 +177,7 @@ class BonusRecordCalculate
     {
         $beginMonthTime = CustomHelper::getBeginMonthTime($start-1);
         $endMonthTime = CustomHelper::getEndMonthTime($beginMonthTime);
-        $sum = BUserBonus::find()
-            ->select(['totalSum'=>'SUM(profit_for_manager)', 'b.payment_id'])
-            ->alias('b')
-            ->joinWith('calculation as c')
-            ->joinWith('payment as p')
-            ->where(['b.buser_id' => $userId])
-            ->andWhere(['BETWEEN', 'p.pay_date', $beginMonthTime, $endMonthTime]);
-        $sum = $sum->asArray()->one();
-        return (float)$sum["totalSum"];
+        return $this->getTotalSumProfit($userId, $beginMonthTime, $endMonthTime);
     }
 
     /**
