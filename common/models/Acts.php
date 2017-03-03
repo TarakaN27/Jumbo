@@ -238,7 +238,7 @@ class Acts extends AbstractActiveRecord
     public static function getNextActNumber($legalPersonId,$year)
     {
 
-        $lastNumber = self::find()->where(['lp_id' => $legalPersonId])->andWhere(['>=', 'act_date', $year.'-01-01'])->andWhere(['<=', 'act_date', $year.'-12-31'])->select(['act_num'])->orderBy(['created_at'=>SORT_DESC])->one();
+        $lastNumber = self::find()->select(['act_num'=>"MAX(act_num)"])->where(['lp_id' => $legalPersonId])->andWhere(['>=', 'act_date', $year.'-01-01'])->andWhere(['<=', 'act_date', $year.'-12-31'])->one();
         if(!$lastNumber)
             return 1;
         return $lastNumber->act_num+1;
