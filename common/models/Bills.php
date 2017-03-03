@@ -67,7 +67,7 @@ class Bills extends AbstractActiveRecord
                  'manager_id', 'cuser_id', 'l_person_id',
                  'service_id', 'docx_tmpl_id',
                  'bill_number', 'bill_template', 'use_vat',
-                 'created_at', 'updated_at','external'
+                 'created_at', 'updated_at','external' , 'bank_id'
              ], 'integer'],
             ['amount','number','min' => 1],
             ['bsk','unique'],
@@ -183,10 +183,9 @@ class Bills extends AbstractActiveRecord
      */
     protected function setBillNumberAndDate($insert = TRUE)
     {
-        $this->bill_date = date('Y-m-d');
-
         if($insert)
         {
+            $this->bill_date = date('Y-m-d');
             $iBNmr = (new Query())
                 ->select('MAX(bill_number) as s')
                 ->from(self::tableName())

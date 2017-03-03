@@ -12,6 +12,8 @@ use common\components\customComponents\validation\ValidNumber;
 use common\models\AbstractActiveRecord;
 use common\models\Bills;
 use common\models\BillServices;
+use common\models\CuserBankDetails;
+use common\models\LegalPerson;
 use yii\base\InvalidParamException;
 use yii\base\Model;
 use Yii;
@@ -81,6 +83,10 @@ class BillForm extends Model
         ];
     }
 
+    public function getBankId(){
+        CuserBankDetails::find()->where();
+    }
+
     /**
      * @return bool
      * @throws ServerErrorHttpException
@@ -101,6 +107,7 @@ class BillForm extends Model
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
+        $obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
         if(!$obBill->save()) {
             $tr->rollBack();
             return FALSE;
@@ -252,6 +259,7 @@ class BillForm extends Model
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
+        $obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
         if(!$obBill->save()) {
             $tr->rollBack();
             return FALSE;

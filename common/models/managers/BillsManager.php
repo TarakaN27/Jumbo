@@ -10,6 +10,7 @@ namespace common\models\managers;
 
 
 use common\components\helpers\CustomHelper;
+use common\models\BankDetails;
 use common\models\BillDocxTemplate;
 use common\models\Bills;
 use common\models\BillServices;
@@ -109,10 +110,10 @@ class BillsManager extends Bills{
     {
 
         /** @var BillDocxTemplate $docxTpl */
-        $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
+/*        $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
         if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
             throw new NotFoundHttpException('Docx template not found');
-
+*/
         $jPerson = '';
         $jPersonDetail = '';
         $jPersonSite = '';
@@ -122,11 +123,20 @@ class BillsManager extends Bills{
         $lPerson = $this->lPerson;
         if(!empty($lPerson))
         {
-            $bankDetails = $lPerson->getBankDetailsByCUsers($this->cuser_id);
-            if($bankDetails->bill_hint)
-                $billHint = $bankDetails->bill_hint;
+            $bankDetails = "";
+            if($this->bank_id){
+                $bank = BankDetails::findOne($this->bank_id);
+                if($bank){
+                    $bankDetails = $bank->bank_details;
+                }
+            }
+            if($bank->bill_hint) {
+                $prevBill = Bills::find()->where(['cuser_id'=>$this->cuser_id, $this->l_person_id])->andWhere(['<=','bill_date',$this->bill_date])->andWhere(['<>','id',$this->id])->orderBy(['bill_date'=>SORT_DESC])->one();
+                if($prevBill && $prevBill->bank_id != $this->bank_id)
+                    $billHint = "ВНИМАНИЕ! Изменились банковские реквизиты";
+            }
             $jPerson = $lPerson->name;
-            $jPersonDetail = $bankDetails->bank_details.
+            $jPersonDetail = $bankDetails.
                 ',УНП:'.$lPerson->ynp.
                 '. Юр.адрес:'.$lPerson->address.
                 '. Почт. адрес:'.$lPerson->mailing_address.

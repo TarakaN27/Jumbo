@@ -206,14 +206,15 @@ class LegalPerson extends AbstractActiveRecord
         return ArrayHelper::map($models,'id','name');
     }
 
-    public function getBankDetailsByCUsers($cuserId){
-        $bankDetails = CuserBankDetails::findOne(['legal_person_id'=> $this->id, 'cuser_id'=>$cuserId]);
+    public static function getBankDetailsByCUsers($legalId,$cuserId){
+        $legalPerson = LegalPerson::findOne($legalId);
+        $bankDetails = CuserBankDetails::findOne(['legal_person_id'=> $legalId, 'cuser_id'=>$cuserId]);
         if($bankDetails && $bankDetails->bank_details_id){
            $bank = BankDetails::findOne($bankDetails->bank_details_id);
         }else{
-            $bank = BankDetails::findOne($this->default_bank_id);
+            $bank = BankDetails::findOne($legalPerson->default_bank_id);
         }
-        return $bank;
+        return $bank->id;
     }
 
     public static function getLegalPersonForBill(){
