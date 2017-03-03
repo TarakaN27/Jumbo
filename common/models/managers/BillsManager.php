@@ -131,7 +131,7 @@ class BillsManager extends Bills{
                 }
             }
             if($bank->bill_hint) {
-                $prevBill = Bills::find()->where(['cuser_id'=>$this->cuser_id, $this->l_person_id])->andWhere(['<=','bill_date',$this->bill_date])->andWhere(['<>','id',$this->id])->orderBy(['bill_date'=>SORT_DESC])->one();
+                $prevBill = Bills::find()->where(['cuser_id'=>$this->cuser_id, 'l_person_id'=>$this->l_person_id])->andWhere(['<=','bill_date',$this->bill_date])->andWhere(['<>','id',$this->id])->orderBy(['bill_date'=>SORT_DESC])->one();
                 if($prevBill && $prevBill->bank_id != $this->bank_id)
                     $billHint = "ВНИМАНИЕ! Изменились банковские реквизиты";
             }
