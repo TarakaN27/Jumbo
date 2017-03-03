@@ -110,10 +110,10 @@ class BillsManager extends Bills{
     {
 
         /** @var BillDocxTemplate $docxTpl */
-/*        $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
+        $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
         if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
             throw new NotFoundHttpException('Docx template not found');
-*/
+
         $jPerson = '';
         $jPersonDetail = '';
         $jPersonSite = '';
