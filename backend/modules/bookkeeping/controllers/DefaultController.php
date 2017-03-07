@@ -191,7 +191,7 @@ class DefaultController extends AbstractBaseBackendController
         $models = [];
         foreach($paymentsXml->QUERY->OUTPUT->DOC as $paymentXml){
             //у основных платежей тип 1, так же платежи от физиков без UNP
-            if($paymentXml->VidDoc=='01' || $paymentXml->UNNRec==""){
+            if($paymentXml['Credit']>0 && ($paymentXml->VidDoc=='01' || $paymentXml->UNNRec=="")){
                 $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml['DocDate']))])->andWhere(['payment_order'=> strval($paymentXml['Num']).' от '. $paymentXml['DocDate']])->all();
                 if($existPayment && count($existPayment)==1){
                     continue;
