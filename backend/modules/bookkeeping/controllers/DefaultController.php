@@ -200,7 +200,7 @@ class DefaultController extends AbstractBaseBackendController
                 $model->owner_id = Yii::$app->user->id;
                 $model->status = PaymentRequest::STATUS_NEW;
                 $model->pay_date = strval($paymentXml['DocDate']);
-                $model->pay_summ = strval($paymentXml->CreditS);
+                $model->pay_summ = strval($paymentXml['Credit']);
                 $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval(933));
                 $model->legal_id = 3;
                 $model->payment_order = $paymentXml['Num'].' от '.  $paymentXml['DocDate'];
