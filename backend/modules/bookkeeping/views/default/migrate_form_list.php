@@ -70,7 +70,9 @@ use common\components\helpers\CustomViewHelper;
                     <tbody>
                     <? foreach ($models as $key=>$model) { ?>
                         <tr>
-                            <td><?= $form->field($model, "[{$key}]active")->checkbox(['label' =>""]);?>
+                            <td>
+                                <?= $form->field($model, "[{$key}]active")->checkbox(['label' =>""]);?>
+                                <?= $form->field($model, "[{$key}]bank_id")->hiddenInput()->label(false);?>
                             </td>
                             <td style="max-width: 200px;" width ="15%">
                                 <?if(!$model->is_unknown){?>

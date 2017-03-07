@@ -139,7 +139,6 @@ class DefaultController extends AbstractBaseBackendController
                     $model = new PaymentRequest($item);
                     $model->owner_id = Yii::$app->user->id;
                     $model->status = PaymentRequest::STATUS_NEW;
-                    $model->bank_id = $legalPerson->default_bank_id;
                     if($model->active) {
                         if ($model->validate()) {
                             $model->save(false);
@@ -192,7 +191,7 @@ class DefaultController extends AbstractBaseBackendController
         foreach($paymentsXml->QUERY->OUTPUT->DOC as $paymentXml){
             //у основных платежей тип 1, так же платежи от физиков без UNP
             if($paymentXml['Credit']>0 && ($paymentXml->VidDoc=='01' || $paymentXml->UNNRec=="")){
-                $existPayment = PaymentRequest::find()->andWhere(['pay_date'=>strtotime(strval($paymentXml['DocDate']))])->andWhere(['payment_order'=> strval($paymentXml['Num']).' от '. $paymentXml['DocDate']])->all();
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>1, 'pay_date'=>strtotime(strval($paymentXml['DocDate']))])->andWhere(['payment_order'=> strval($paymentXml['Num']).' от '. $paymentXml['DocDate']])->all();
                 if($existPayment && count($existPayment)==1){
                     continue;
                 }
@@ -201,6 +200,7 @@ class DefaultController extends AbstractBaseBackendController
                 $model->status = PaymentRequest::STATUS_NEW;
                 $model->pay_date = strval($paymentXml['DocDate']);
                 $model->pay_summ = strval($paymentXml['Credit']);
+                $model->bank_id = 1;
                 $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval(933));
                 $model->legal_id = 3;
                 $model->payment_order = $paymentXml['Num'].' от '.  $paymentXml['DocDate'];
@@ -224,8 +224,45 @@ class DefaultController extends AbstractBaseBackendController
         }
         return $models;
     }
-    protected function parseBLRBank($xml){
+    protected function parseBLRBank($paymentsXml){
+        $models = [];
+        $date = str_replace("за ", "", $paymentsXml->ACCOUNTINFO->PERIOD);
+        foreach($paymentsXml->ACCOUNTINFO->OPERINFO->OPER as $paymentXml){
+            //у основных платежей тип 1, так же платежи от физиков без UNP
+            $sum = floatval($paymentXml->SUMOPER['ek']);
+            if($sum>0) {
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>3,'pay_date'=>strtotime($date)])->andWhere(['payment_order'=> strval($paymentXml->DOCN).' от '. $date])->all();
+                if($existPayment && count($existPayment)==1){
+                    continue;
+                }
+                $model = new PaymentRequest();
+                $model->owner_id = Yii::$app->user->id;
+                $model->status = PaymentRequest::STATUS_NEW;
+                $model->pay_date = $date;
+                $model->pay_summ = $sum;
+                $model->bank_id = 3;
+                $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval($paymentXml->RATEINFO['Code']));
+                $model->legal_id = 3;
+                $model->payment_order = $paymentXml->DOCN.' от '.  $date;
+                $model->description = strval($paymentXml->DETPAY);
+                if(strval($paymentXml->UNPKORR)) {
+                    $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)' => $paymentXml->UNPKORR . ""])->one();
+                    if($cuserRequisite){
+                        $model->is_unknown = 0;
+                        $model->cntr_id = $cuserRequisite->id;
+                        $cuser = CUser::findOneByIDCached($cuserRequisite->id);
+                        $model->cuserName = $cuserRequisite->getCorpName();
+                        $model->manager_id = $cuser->manager_id;
+                    }else{
+                        $model->is_unknown = 1;
+                    }
+                }else
+                    $model->is_unknown = 1;
 
+                $models[] =$model;
+            }
+        }
+        return $models;
     }
 
     protected function parseXml($xml){
@@ -234,7 +271,7 @@ class DefaultController extends AbstractBaseBackendController
         $models = [];
         if(isset($paymentsXml->QUERY)){
             $models = $this->parseMTBank($paymentsXml);
-        }elseif(isset($paymentsXml->TURN)){
+        }elseif(isset($paymentsXml->ACCOUNTINFO)){
             $models = $this->parseBLRBank($paymentsXml);
         }
         return $models;
