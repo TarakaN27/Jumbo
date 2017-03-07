@@ -134,7 +134,6 @@ class DefaultController extends AbstractBaseBackendController
             }else{
                 $savedModels = [];
                 $notSavedmodels = [];
-                $legalPerson = LegalPerson::findOne(3);
                 foreach(Yii::$app->request->post('PaymentRequest') as $item){
                     $model = new PaymentRequest($item);
                     $model->owner_id = Yii::$app->user->id;
