@@ -120,6 +120,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                     },
                                 'filter' => \common\models\LegalPerson::getLegalPersonMap()
                             ],
+                            [
+                                'attribute' => 'bank_id',
+                                'label' => Yii::t('app/book', 'Bank'),
+                                'value' => 'payRequest.bankDetails.name',
+                                'filter' => \common\models\BankDetails::getActiveBankDetails()
+                            ],
                             'payment_order',
                             [
                                 'attribute' => 'pay_summ',

@@ -23,6 +23,7 @@ class PaymentsSearch extends Payments
     public
         $manager,
         $from_date,
+        $bank_id,
         $to_date;
 
     protected
@@ -37,7 +38,7 @@ class PaymentsSearch extends Payments
             [[
                 'id', 'cuser_id','currency_id',
                 'service_id', 'legal_id', 'created_at',
-                'updated_at','manager','act_close'
+                'updated_at','manager','act_close', 'bank_id'
             ], 'integer'],
             [['pay_summ'], 'number'],
             [[
@@ -76,6 +77,7 @@ class PaymentsSearch extends Payments
                 Payments::tableName().'.id',
                 'cuser_id',
                 Payments::tableName().'.service_id',
+                Payments::tableName().'.prequest_id',
                 Payments::tableName().'.legal_id',
                 Payments::tableName().'.currency_id',
                 Payments::tableName().'.pay_date',
@@ -94,7 +96,8 @@ class PaymentsSearch extends Payments
             ->joinWith('legal')
             ->joinWith('service')
             ->joinWith('cuser.manager')
-            ->joinWith('currency');
+            ->joinWith('currency')
+            ->joinWith('payRequest');
 
         $query = $this->queryHelper($query,$params);
 
@@ -108,7 +111,6 @@ class PaymentsSearch extends Payments
                 'pageSizeLimit' => [1,1000]
             ],
         ]);
-
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
@@ -128,7 +130,6 @@ class PaymentsSearch extends Payments
         if(Yii::$app->user->can('only_manager'))
         {
             $query->joinWith('cuser');
-            $query->joinWith('payRequest');
             $cuserIdSales = CUser::find()->select(['id'])->where(['sale_manager_id'=>Yii::$app->user->id])->asArray()->all();
             if($cuserIdSales){
                 $cuserIdSales = ArrayHelper::getColumn($cuserIdSales, 'id');
@@ -138,6 +139,7 @@ class PaymentsSearch extends Payments
         }
 
         $query->joinWith('cuser');
+
 
         $this->load($params);
 
@@ -160,6 +162,7 @@ class PaymentsSearch extends Payments
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'act_close' => $this->act_close,
+            PaymentRequest::tableName().'.bank_id' => $this->bank_id,
             CUser::tableName().'.manager_id' => $this->manager
         ]);
 
@@ -195,8 +198,10 @@ class PaymentsSearch extends Payments
     {
         if(empty($params))
             return [];
-        $query = Payments::find()->select([static::tableName().'.pay_summ',static::tableName().'.currency_id']);
+        $query = Payments::find()->select(['pay_summ'=>'SUM('.static::tableName().'.pay_summ)',static::tableName().'.currency_id', static::tableName().'.prequest_id'])->groupBy([static::tableName().'.currency_id'])->joinWith('payRequest');
+
         $query = $this->queryHelper($query,$params);
+
         $arTmp = $query->all();
 
         if(!$this->countTotal)
@@ -204,15 +209,9 @@ class PaymentsSearch extends Payments
 
         if(empty($arTmp))
             return [];
-        $arResultTmp = [];
-        foreach($arTmp as $tmp)
-        {
-            if(isset($arResultTmp[$tmp->currency_id]))
-                $arResultTmp[$tmp->currency_id]+=$tmp->pay_summ;
-            else
-                $arResultTmp[$tmp->currency_id]=$tmp->pay_summ;
-        }
 
+
+        $arResultTmp = ArrayHelper::map($arTmp, 'currency_id', 'pay_summ');
         $arCurrency = ExchangeRates::find()->select(['id','code'])->where(['id' => array_keys($arResultTmp)])->all();
         $arCurrency = ArrayHelper::map($arCurrency,'id','code');
         $arResult = [];
