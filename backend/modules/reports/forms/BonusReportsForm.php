@@ -10,6 +10,7 @@ namespace backend\modules\reports\forms;
 
 
 use backend\models\BUser;
+use common\components\helpers\CustomDateHelper;
 use common\components\helpers\CustomHelper;
 use common\models\BonusScheme;
 use common\models\BUserBonus;
@@ -197,20 +198,18 @@ class BonusReportsForm extends Model
 			$totalSumByUsers[$item->buser_id]['sumWithoutNewClientCurrentPeriod'] = $item->totalSum;;
 		}
 		$prevBeginDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-01';
-
-		$prevEndDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-31';
+		$prevEndDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->format('Y-m').'-01';
 
 		$query = BUserBonus::find()
 			->select(['totalSum'=>'SUM(profit_for_manager)', BUserBonus::tableName().'.buser_id'])
-			->joinWith('payment.sale')
 			->joinWith('payment.calculate')
 			->joinWith('scheme')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate AND '.BUserBonus::tableName().'.number_month >1')
+			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date < :endDate AND '.BUserBonus::tableName().'.number_month >1')
 			->groupBy(BUserBonus::tableName().'.buser_id')
 			->params([
 				':beginDate' => strtotime($prevBeginDate.' 00:00:00'),
-				':endDate' => strtotime($prevEndDate.' 23:59:59')
+				':endDate' => strtotime($prevEndDate.' 00:00:00')
 			]);
 		$query->andFilterWhere([
 			BonusScheme::tableName().'.type' => $this->bonusType,
