@@ -158,7 +158,7 @@ class PaymentsSearch extends Payments
              static::tableName().'.pay_summ' => $this->pay_summ,
             'currency_id' => $this->currency_id,
              static::tableName().'.service_id' => $this->service_id,
-            'legal_id' => $this->legal_id,
+             static::tableName().'.legal_id' => $this->legal_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'act_close' => $this->act_close,
