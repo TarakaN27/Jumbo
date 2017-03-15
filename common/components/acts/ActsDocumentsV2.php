@@ -24,6 +24,7 @@ use yii\web\NotFoundHttpException;
 use common\models\Acts;
 use yii\base\Exception;
 use Gears\Pdf;
+use Yii;
 
 class ActsDocumentsV2
 {
