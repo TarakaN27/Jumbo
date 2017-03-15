@@ -429,7 +429,12 @@ class ActsDocumentsV2
         ];
 
         try{
-            $obDoc =  new TemplateProcessor($this->obActTpl->getFilePath());
+            if($this->iLegalPerson == 3 && $this->actDate>="2017-03-06" && $this->actDate<="2017-03-31"){
+                $obDoc =  new TemplateProcessor(Yii::getAlias("@common/upload/docx_template").'/shlo_act.docx');
+            }else{
+                $obDoc =  new TemplateProcessor($this->obActTpl->getFilePath());
+            }
+
             foreach ($arItems as $item)
                 $obDoc->setValue($item,$this->$item);
 
