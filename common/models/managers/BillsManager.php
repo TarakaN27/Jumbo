@@ -283,8 +283,11 @@ class BillsManager extends Bills{
 
         $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
         try{
-
-            $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
+            if($this->l_person_id == 3 && $this->bill_date>"2017-03-06" && $this->bill_date<"2017-03-31"){
+                $doc = new \PhpOffice\PhpWord\TemplateProcessor(Yii::getAlias(self::FILE_PATH).'/shlo_act.docx');
+            }else {
+                $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
+            }
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
