@@ -124,7 +124,7 @@ class RecalculateController extends AbstractConsoleController
     public function actionRegenerateActs(){
         $acts = Acts::find()->andWhere(['>=','act_date', '2017-03-06'])->andWhere(['<=','act_date', '2017-03-31'])->all();
         foreach($acts as $act){
-            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id);
+            $obActDoc = new ActsDocumentsV2($act->id,$act->lp_id,$act->cuser_id,$act->act_date,$act->act_num,$act->currency_id, $act->bank_id);
             $fileName = $obActDoc->generateDocument();
             if(!$fileName)
                 throw new Exception();
