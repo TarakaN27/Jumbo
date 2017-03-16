@@ -146,12 +146,14 @@ class ActForm extends Model
 
         $transaction = Yii::$app->db->beginTransaction();
         try{
+
             $this->trigger(BaseActiveRecord::EVENT_BEFORE_INSERT);
 
             $obAct = new Acts();
             $obAct->cuser_id = $this->iCUser;
             $obAct->buser_id = Yii::$app->user->id;
-            $obAct->act_date = date('Y-m-d',strtotime($this->actDate));
+            $this->actDate = date('Y-m-d',strtotime($this->actDate));
+            $obAct->act_date = $this->actDate;
             $obAct->act_num = $this->iActNumber;
             $obAct->amount = $this->fAmount;
             $obAct->sent = Acts::NO;
