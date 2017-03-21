@@ -310,7 +310,9 @@ class PaymentBonusBehavior extends Behavior
 				$model->cuser->sale_date = $cuser->sale_date;
 				$model->cuser->sale_manager_id = $cuser->sale_manager_id;
 				$model->cuser->save(false);
-			}
+			}else{
+                CUser::updateAll(['sale_date'=>$model->pay_date],['id'=>$cusersIds]);
+            }
 		}
 	}
 
@@ -520,6 +522,7 @@ class PaymentBonusBehavior extends Behavior
 		if($salerId && $saleDate) {
 			$this->countingProfitBonusByType($salerId, $saleDate, BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT, $model);
 		}
+
 		$ownerId = $model->payRequest->manager_id;
 		if($saleDate && $ownerId){
 			$this->countingProfitBonusByType($ownerId, $saleDate, BonusScheme::BASE_OWN_PAYMENT, $model);
