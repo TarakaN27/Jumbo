@@ -115,6 +115,7 @@ if(!Yii::$app->user->isManager())
         'template' => '{view}'
     ];
 }
+
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -249,7 +250,7 @@ if(!Yii::$app->user->isManager())
                     ],
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'visible' => Yii::$app->user->can('adminRights'),
+                        'visible' => Yii::$app->user->can('adminRights')|| Yii::$app->user->can('only_bookkeeper'),
                         'template' => '{view}'
                     ]
                 ]
