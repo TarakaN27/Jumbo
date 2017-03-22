@@ -366,7 +366,6 @@ class CompanyController extends AbstractBaseBackendController
 			'obQHour' => $obQHour,
 			'arGroups' => $arGroups,
 			'obTaskRepeat' => $obTaskRepeat,
-            'legalPersons' => $legalPersons,
 		]);
 	}
 
