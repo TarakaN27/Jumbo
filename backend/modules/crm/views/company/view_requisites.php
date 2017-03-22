@@ -55,7 +55,26 @@ use yii\widgets\DetailView;
 						'updated_at:datetime',
 					],
 				]) ?>
+                <?if(Yii::$app->user->can('adminRights')||Yii::$app->user->can('only_bookkeeper')||Yii::$app->user->can('only_jurist')){?>
+                <div class = "x_title">
+                    <h2>Используемые банковские реквизиты</h2>
+                    <div class = "clearfix"></div>
+                </div>
+                    <div class = "x_content">
+                        <table class="table table-striped table-bordered detail-view">
+                            <tbody>
+                            <?foreach($legalPersons as $legalPerson){?>
+                                <tr>
+                                    <th><?=$legalPerson->name?></th>
+                                    <td><?=\common\models\LegalPerson::getBankModelDetailsByCUsers($legalPerson->id, $model->id)->name;?>
+                                    </td>
+                                </tr>
+                            <?}?>
+                            </tbody>
+                        </table>
+                    </div>
 
+                <?}?>
 
 				<h4><?php echo Yii::t('app/users','Requisites')?></h4>
 				<div class="ln_solid"></div>

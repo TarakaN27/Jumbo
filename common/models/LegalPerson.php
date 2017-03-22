@@ -188,6 +188,11 @@ class LegalPerson extends AbstractActiveRecord
         return $this->hasOne(ActsTemplate::className(),['id' => 'act_tpl_id']);
     }
 
+    public function getDefaultBank()
+    {
+        return BankDetails::findOne($this->default_bank_id);
+    }
+
     /**
      * @throws \Exception
      */
@@ -216,6 +221,18 @@ class LegalPerson extends AbstractActiveRecord
         }
         return $bank->id;
     }
+
+    public static function getBankModelDetailsByCUsers($legalId,$cuserId){
+        $legalPerson = LegalPerson::findOne($legalId);
+        $bankDetails = CuserBankDetails::findOne(['legal_person_id'=> $legalId, 'cuser_id'=>$cuserId]);
+        if($bankDetails && $bankDetails->bank_details_id){
+            $bank = BankDetails::findOne($bankDetails->bank_details_id);
+        }else{
+            $bank = BankDetails::findOne($legalPerson->default_bank_id);
+        }
+        return $bank;
+    }
+
 
     public static function getLegalPersonForBill(){
         return LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();

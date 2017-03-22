@@ -365,7 +365,8 @@ class CompanyController extends AbstractBaseBackendController
 			'data' => $data,
 			'obQHour' => $obQHour,
 			'arGroups' => $arGroups,
-			'obTaskRepeat' => $obTaskRepeat
+			'obTaskRepeat' => $obTaskRepeat,
+            'legalPersons' => $legalPersons,
 		]);
 	}
 
@@ -492,8 +493,6 @@ class CompanyController extends AbstractBaseBackendController
 			$modelR = new CUserRequisites();
 
 		if ($model->load(Yii::$app->request->post()) && $modelR->load(Yii::$app->request->post())) {
-
-
 		    if($model->bankDetails){
                 CuserBankDetails::deleteAll(['cuser_id'=>$model->id]);
                 foreach($model->bankDetails as $legalPerson=>$bank){
@@ -569,11 +568,18 @@ class CompanyController extends AbstractBaseBackendController
 		foreach($arCSCTmp as $csc)
 			$arCSC[$csc->service_id] = $csc;
 
+
+
+		$legalPersons = LegalPerson::find()->where(['disallow_create_bill'=>0])->orderBy(['id' => SORT_ASC])->all();
+        $model->bankDetails = CuserBankDetails::findAll(['cuser_id'=>$model->id]);
+        if($model->bankDetails)
+            $model->bankDetails = ArrayHelper::map($model->bankDetails, 'legal_person_id', 'bank_details_id');
 		return $this->render('view_requisites',[
 			'model' => $model,
 			'modelR' => $obReq,
 			'arServices' => $arServices,
-			'arCSC' => $arCSC
+			'arCSC' => $arCSC,
+            'legalPersons' => $legalPersons
 		]);
 	}
 
