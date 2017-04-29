@@ -69,8 +69,9 @@ class Process3Form extends Model
      */
     public function makeRequest()
     {
-        if(null == $obExpenceID = $this->saveExpense())         //expanse
-            return FALSE;
+        if(null == $obExpenceID = $this->saveExpense()) {        //expanse
+            \Yii::$app->session->setFlash(\backend\widgets\Alert::TYPE_WARNING, 'Не забудьте внести сумму в затраты.');
+        }
 
         if(!$this->createEnrollment())                          //enrollment
             return FALSE;
