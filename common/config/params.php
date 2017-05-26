@@ -6,7 +6,7 @@ return [
     'salesName' => 'ООО "Вебмарт Групп"',
     'actLetterSubject' => 'Акт об оказанных услугах ООО "Вебмарт Групп"',
     
-    'salesEmailSoft' => 'info@webmartsoft.ru',
+    'salesEmailSoft' => 'info@webmartsoft.com',
     'salesNameSoft' => 'ООО "Вебмарт Солюшнс"',
     'actLetterSubjectSoft' => 'Акт об оказанных услугах ООО "Вебмарт Солюшнс"',
     
