@@ -112,7 +112,8 @@ class CUserRequisites extends AbstractActiveRecord
                     return true;
                 }"
             ],
-
+            [['new_ch_account'],  'string', 'max' => 34,'min' => 34],
+            [['new_ch_account'], 'match', 'pattern' => '/^[a-zA-Z0-9]+$/'],
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
             [['created_at', 'updated_at','type_id','pasp_number'], 'integer'],
@@ -402,6 +403,7 @@ class CUserRequisites extends AbstractActiveRecord
             'reg_number' => Yii::t('app/users', 'Reg Number'),
             'reg_auth' => Yii::t('app/users', 'Reg Auth'),
             'ch_account' => Yii::t('app/users', 'Ch Account'),
+            'new_ch_account' => Yii::t('app/users', 'New ch Account'),
             'b_name' => Yii::t('app/users', 'B Name'),
             'b_code' => Yii::t('app/users', 'B Code'),
             'j_address' => Yii::t('app/users', 'J Address'),

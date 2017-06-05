@@ -347,6 +347,7 @@ return [
     'Show By All Payments' => 'Учитывать все платежи (не только по разрешенным услугам)',
     'Allow set sale' => 'Разрешать отмечать допродажи',
     'USER_role_team_lead' => "Тим-лид",
-    'Chouse_members_in_group'=>"Выберите пользователей в группу"
+    'Chouse_members_in_group'=>"Выберите пользователей в группу",
+    'New ch Account' => 'Новый формат р/с'
     
 ];

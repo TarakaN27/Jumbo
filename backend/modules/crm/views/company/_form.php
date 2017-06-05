@@ -564,6 +564,13 @@ $('#cuser-partner').on('change',function(){
 						'class' => 'control-label'
 					]])->textInput(['maxlength' => TRUE]) ?>
 			</div>
+            <div class = "col-md-4 col-sm-4 col-xs-12">
+                <?= $form->field($modelR, 'new_ch_account', [
+                    'template' => $fieldTempl,
+                    'labelOptions'=>[
+                        'class' => 'control-label'
+                    ]])->textInput(['maxlength' => 34]) ?>
+            </div>
 			<div class = "col-md-4 col-sm-4 col-xs-12">
 				<?= $form->field($modelR, 'b_name', [
 					'template' => $fieldTempl,
