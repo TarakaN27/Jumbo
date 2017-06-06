@@ -95,7 +95,7 @@ class CUserRequisites extends AbstractActiveRecord
     {
         return [
             [
-                ['j_fname', 'j_lname', 'j_mname','type_id'],
+                ['j_fname', 'j_lname', 'j_mname','type_id', 'bik'],
                 'required',
                 'when' => function($model) {
                     if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
@@ -112,8 +112,9 @@ class CUserRequisites extends AbstractActiveRecord
                     return true;
                 }"
             ],
-            [['new_ch_account'],  'string', 'max' => 34,'min' => 34],
-            [['new_ch_account'], 'match', 'pattern' => '/^[a-zA-Z0-9]+$/'],
+            [['new_ch_account'],  'string', 'max' => 28,'min' => 28],
+            [['bik'],  'string', 'max' => 8,'min' => 8],
+            [['new_ch_account', 'bik'], 'match', 'pattern' => '/^[a-zA-Z0-9]+$/'],
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
             [['created_at', 'updated_at','type_id','pasp_number'], 'integer'],
@@ -429,6 +430,7 @@ class CUserRequisites extends AbstractActiveRecord
             'pasp_ident' => Yii::t('app/users', 'Passport_identity_number'),
             'site' => Yii::t('app/users', 'Site'),
             'description' => Yii::t('app/users', 'Description'),
+            'bik' => Yii::t('app/users', 'BIK')
         ];
     }
 

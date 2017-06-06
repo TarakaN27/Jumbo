@@ -569,7 +569,14 @@ $('#cuser-partner').on('change',function(){
                     'template' => $fieldTempl,
                     'labelOptions'=>[
                         'class' => 'control-label'
-                    ]])->textInput(['maxlength' => 34]) ?>
+                    ]])->textInput(['maxlength' => 28]) ?>
+            </div>
+            <div class = "col-md-4 col-sm-4 col-xs-12">
+                <?= $form->field($modelR, 'bik', [
+                    'template' => $fieldTempl,
+                    'labelOptions'=>[
+                        'class' => 'control-label'
+                    ]])->textInput(['maxlength' => 8]) ?>
             </div>
 			<div class = "col-md-4 col-sm-4 col-xs-12">
 				<?= $form->field($modelR, 'b_name', [
