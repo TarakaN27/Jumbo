@@ -65,7 +65,8 @@ class CrmTask extends AbstractActiveRecord
         STATUS_OPENED = 1,
         STATUS_IN_PROGRESS = 2,
         STATUS_NEED_ACCEPT = 3,
-        STATUS_CLOSE  = 4;
+        STATUS_CLOSE  = 4,
+        STATUS_PAUSE = 5;
 
     //приоритет задач
     CONST
@@ -132,7 +133,9 @@ class CrmTask extends AbstractActiveRecord
             self::STATUS_OPENED => Yii::t('app/crm','Status open'),
             self::STATUS_IN_PROGRESS => Yii::t('app/crm','Status in progress'),
             self::STATUS_NEED_ACCEPT => Yii::t('app/crm','Status done'),
-            self::STATUS_CLOSE => Yii::t('app/crm','Status close')
+            self::STATUS_CLOSE => Yii::t('app/crm','Status close'),
+            self::STATUS_PAUSE => Yii::t('app/crm','Status pause'),
+
         ];
     }
 
@@ -503,10 +506,11 @@ class CrmTask extends AbstractActiveRecord
         if(!in_array($iStatus,array_keys($tmp)))
             throw new InvalidParamException('Invalid status');
         $this->setScenario('changeStatus');
+
         switch($iStatus)
         {
             case self::STATUS_IN_PROGRESS: //статус "в процессе" можно перейти из статуса "открыт"
-                if($this->status == self::STATUS_OPENED)
+                if($this->status == self::STATUS_OPENED || $this->status == CrmTask::STATUS_PAUSE)
                 {
                     $this->status = self::STATUS_IN_PROGRESS;
                     if($this->save())
@@ -517,7 +521,7 @@ class CrmTask extends AbstractActiveRecord
             case self::STATUS_OPENED: //статус "открыт" можно перейти из статуса "Закрыт" и "В процессе" или "требуется подтверждение"
                 if($this->status == self::STATUS_IN_PROGRESS || $this->status == self::STATUS_CLOSE || $this->status == self::STATUS_NEED_ACCEPT)
                 {
-                    $this->status = self::STATUS_OPENED;
+                    $this->status = self::STATUS_PAUSE;
                     if($this->save())
                         $rtnStatus = $this->status;
                 }
@@ -557,6 +561,14 @@ class CrmTask extends AbstractActiveRecord
                 if($this->status == self::STATUS_IN_PROGRESS)
                 {
                     $this->status = self::STATUS_NEED_ACCEPT;
+                    if($this->save())
+                        $rtnStatus = $this->status;
+                }
+                break;
+            case self::STATUS_PAUSE:
+                if($this->status == self::STATUS_IN_PROGRESS)
+                {
+                    $this->status = self::STATUS_PAUSE;
                     if($this->save())
                         $rtnStatus = $this->status;
                 }

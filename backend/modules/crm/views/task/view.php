@@ -241,7 +241,7 @@ $this->registerJs("
                                         'data-task-id' => $model->id,
                                     ])?>
                                     <?=Html::button(Yii::t('app/crm','Begin do task'),[
-                                        'class' => 'btn btn-success begin-task '.($model->status == CrmTask::STATUS_OPENED ? '' : 'hide'),
+                                        'class' => 'btn btn-success begin-task '.($model->status == CrmTask::STATUS_OPENED ||$model->status == CrmTask::STATUS_PAUSE? '' : 'hide'),
                                         'data-task-id' => $model->id,
                                     ])?>
                                     <?php
