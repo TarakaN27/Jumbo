@@ -36,6 +36,10 @@ return [
         'type' => 2,
         'description' => 'Только для тимлида',
     ],
+    'only_hr' => [
+        'type' => 2,
+        'description' => 'Только для HR',
+    ],
     'user' => [
         'type' => 1,
         'description' => 'Пользователь',
@@ -122,6 +126,16 @@ return [
             'only_manager',
             'forAll',
             'only_teamlead',
+        ],
+    ],
+    'hr' => [
+        'type' => 1,
+        'description' => 'HR',
+        'ruleName' => 'userRole',
+        'children' => [
+            'user',
+            'forAll',
+            'only_hr',
         ],
     ],
 ];

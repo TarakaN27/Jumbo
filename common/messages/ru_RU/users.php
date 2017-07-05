@@ -349,5 +349,6 @@ return [
     'USER_role_team_lead' => "Тим-лид",
     'Chouse_members_in_group'=>"Выберите пользователей в группу",
     'New ch Account' => 'Новый формат р/с',
-    'BIK' => 'БИК'
+    'BIK' => 'БИК',
+    'USER_role_hr' => 'HR'
 ];

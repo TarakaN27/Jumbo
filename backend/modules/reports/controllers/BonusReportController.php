@@ -40,7 +40,7 @@ class BonusReportController extends AbstractBaseBackendController
 	    if(Yii::$app->user->id == 12)
 	        die;
 		$model = new BonusReportsForm();
-		if(!\Yii::$app->user->can('adminRights'))
+		if(!\Yii::$app->user->can('adminRights')|| !\Yii::$app->user->can('bookkeeper')|| !\Yii::$app->user->can('jurist'))
 			$model->users = [\Yii::$app->user->id];
 
 		$data = [];

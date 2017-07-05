@@ -7,7 +7,9 @@
  */
 Use yii\helpers\Html;
 $this->title = Yii::t('app/bonus','Bonus reports');
-$admin = Yii::$app->user->can('adminRights');
+if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('bookkeeper')||Yii::$app->user->can('jurist'))
+    $admin = true;
+else $admin= false;
 $rowNum = $admin ? 6 : 4;
 $rowContNum = $admin ? 6 : 12;
 ?>

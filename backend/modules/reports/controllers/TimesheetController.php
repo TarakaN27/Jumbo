@@ -26,7 +26,7 @@ class TimesheetController extends AbstractBaseBackendController
 					[
 						'actions' => ['get-timesheet-users'],
 						'allow' => true,
-						'roles' => ['admin', 'teamlead']
+						'roles' => ['admin', 'teamlead', 'hr', 'jurist', 'bookkeeper']
 					],
 					[
 						'actions' => ['index','get-time-sheet'],
@@ -49,7 +49,11 @@ class TimesheetController extends AbstractBaseBackendController
 	 */
 	public function actionIndex()
 	{
-		$viewTemplate = \Yii::$app->user->can('adminRights')||\Yii::$app->user->can('teamlead') ? 'index_admin' : 'index';
+		$viewTemplate = \Yii::$app->user->can('adminRights')
+            ||\Yii::$app->user->can('teamlead')
+            ||\Yii::$app->user->can('hr')
+            ||\Yii::$app->user->can('bookkeeper')
+            ||\Yii::$app->user->can('jurist')? 'index_admin' : 'index';
 		return $this->render($viewTemplate,[]);
 	}
 
@@ -62,7 +66,13 @@ class TimesheetController extends AbstractBaseBackendController
 		$userID = \Yii::$app->request->post('user');
 		$startDate = \Yii::$app->request->post('startDate');
 		$endDate  = \Yii::$app->request->post('endDate');
-		if((!\Yii::$app->user->can('adminRights')&& !\Yii::$app->user->can('teamlead')) && $userID != \Yii::$app->user->id) {
+
+		if((!\Yii::$app->user->can('adminRights')
+                && !\Yii::$app->user->can('teamlead')
+                && !\Yii::$app->user->can('hr')
+                &&!\Yii::$app->user->can('bookkeeper'))
+                &&!\Yii::$app->user->can('jurist')
+		        && $userID != \Yii::$app->user->id) {
 
             throw new ForbiddenHttpException('You are not allowed do this action');
         }

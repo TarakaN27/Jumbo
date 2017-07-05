@@ -48,6 +48,7 @@ class BUser extends AbstractUser
         ROLE_ADMIN = 20,
         ROLE_SUPERADMIN = 25,
         ROLE_TEAMLEAD = 30,
+        ROLE_HR = 35,
         SCENARIO_CHANGE_PASSWORD = 'change_password',
         SCENARIO_REGISTER = 'register';
 
@@ -75,6 +76,7 @@ class BUser extends AbstractUser
             self::ROLE_E_MARKETER => Yii::t('app/users','USER_role_e_marketer'),
             self::ROLE_PARTNER_MANAGER => Yii::t('app/users','USER_role_partner_manager'),
             self::ROLE_TEAMLEAD =>Yii::t('app/users','USER_role_team_lead'),
+            self::ROLE_HR =>Yii::t('app/users','USER_role_hr'),
         ];
     }
 
@@ -375,6 +377,7 @@ class BUser extends AbstractUser
                 break;
             case self::ROLE_MANAGER:
             case self::ROLE_TEAMLEAD:
+            case self::ROLE_HR:
             case self::ROLE_BOOKKEEPER:
                 $arRole = self::getRoleArr();
                 if(array_key_exists(self::ROLE_SUPERADMIN,$arRole))
