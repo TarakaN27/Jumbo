@@ -42,7 +42,7 @@ class BankDetails extends AbstractActiveRecord
                 'updated_at', 'legal_person_id'
             ], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['name','bank_details','legal_person_id'
+            [['name','bank_details','bank_details_act', 'legal_person_id'
             ], 'required'],
         ];
     }
@@ -59,8 +59,9 @@ class BankDetails extends AbstractActiveRecord
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
             'legal_person_id' => Yii::t('app/services', 'Legal person'),
-            'bank_details' => Yii::t('app/services','Requisites for documents'),
+            'bank_details' => Yii::t('app/services','Requisites for bill'),
             'bill_hint' => Yii::t('app/services','Bill hint'),
+            'bank_details_act' => Yii::t('app/services','Requisites for act'),
         ];
     }
     /**

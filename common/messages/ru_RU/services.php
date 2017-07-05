@@ -101,5 +101,7 @@ return [
     'Bank Details' => 'Банковские реквизиты',
     'Default bank details' => 'Банковские реквизиты по умолчанию',
     'SERVICES_bank_details' => 'Банковские реквизиты',
-    'Bill hint' => 'Уведомнение для счетов'
+    'Bill hint' => 'Уведомнение для счетов',
+    'Requisites for bill' => 'Банковские реквизиты для счетов',
+    'Requisites for act' => 'Банковские реквизиты для актов',
 ];

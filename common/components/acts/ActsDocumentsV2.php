@@ -130,7 +130,7 @@ class ActsDocumentsV2
         $this->legalPersonName = $obLegalPerson->name;
         $bank = BankDetails::findOne($this->bankId);
         if($bank)
-            $this->legalPersonBankDetail = $bank->bank_details;
+            $this->legalPersonBankDetail = $bank->bank_details_act;
         else
             $this->legalPersonBankDetail = "";
         $this->legalPersonAddress = $obLegalPerson->address;

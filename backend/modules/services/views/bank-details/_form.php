@@ -25,6 +25,8 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'bank_details')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model, 'bank_details_act')->textarea(['rows' => 6]) ?>
+
     <?= $form->field($model, 'legal_person_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap()); ?>
 
     <?= $form->field($model, 'bill_hint') ?>

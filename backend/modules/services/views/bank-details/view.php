@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id',
                         'name',
                         'bank_details:ntext',
+                        'bank_details_act:ntext',
                         [
                             'attribute' => 'status',
                             'value' => $model->getStatusStr()
