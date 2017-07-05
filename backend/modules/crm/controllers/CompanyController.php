@@ -582,4 +582,51 @@ class CompanyController extends AbstractBaseBackendController
 		]);
 	}
 
+	public function actionGetXml(){
+	    $clients = CUser::find()->joinWith('requisites')->where(['is_resident'=>1, 'contractor'=>1])->all();
+	    $items = [];
+	    foreach($clients as $client){
+            $req = $client->requisites;
+            $req->ch_account = preg_replace("/[^0-9]/", '', $req->ch_account);
+            $req->b_code = trim($req->b_code);
+            if($req->ch_account && $req->b_code){
+                if(strlen($req->b_code.'')==3) {
+                    $req->b_code = '153001'.$req->b_code;
+                }
+                $req->b_code = intval($req->b_code);
+                if(strlen($req->b_code.'')!=9 || strlen($req->ch_account.'') !=13){
+                    continue;
+                }
+                $items[] = ['kodbank'=>$req->b_code, 'kodval'=>933, 'account_old'=> $req->ch_account];
+            }
+	    }
+        Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+        Yii::$app->response->formatters = ['xml' => XmlCustomRootTagFormatter::className() ];
+        Yii::$app->response->headers->add('Content-Type', 'text/xml');
+        return $items;
+    }
+    public function actionSetXml(){
+        $clients = simplexml_load_file($_SERVER['DOCUMENT_ROOT'].'/iban.xml');
+        $count = 0;
+        foreach($clients as $item){
+            $req = CUserRequisites::find()->where(['like', 'ch_account',$item->account_old])->one();
+            if($req){
+                $count++;
+                $req->new_ch_account = $item->accountiban.'';
+                $req->bik = $item->bic.'';
+                if(!$req->save()){
+                }
+            }
+        }
+        echo $count;
+    }
+}
+class XmlCustomRootTagFormatter extends \yii\web\XmlResponseFormatter
+{
+    public function __construct()
+    {
+        $this->rootTag='items';
+
+        parent::__construct();
+    }
 }

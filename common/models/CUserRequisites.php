@@ -113,7 +113,7 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             [['new_ch_account'],  'string', 'max' => 28,'min' => 28],
-            [['bik'],  'string', 'max' => 8,'min' => 8],
+            [['bik'],  'string', 'max' => 11,'min' => 8],
             [['new_ch_account', 'bik'], 'match', 'pattern' => '/^[a-zA-Z0-9]+$/'],
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
