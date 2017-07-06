@@ -155,7 +155,6 @@ class BonusReportsForm extends Model
 			if($searchCoeff)
 				$correctCoeff = BUserBonusMonthCoeff::getByUserAndDate($this->users, $this->beginDate, $this->endDate);
 		}
-
 		return [
 			'dataProvider' => new ActiveDataProvider([
 					'query' => $query,
@@ -177,7 +176,7 @@ class BonusReportsForm extends Model
 			$totalSumByUsers[$user] = [];
 		}
 		$query = BUserBonus::find()
-			->select(['totalSum'=>'SUM(profit_for_manager)', BUserBonus::tableName().'.buser_id'])
+			->select(['totalSum'=>'SUM(profit_for_manager)', 'amount'=>'SUM(amount)',BUserBonus::tableName().'.buser_id'])
 			->joinWith('payment.calculate')
 			->joinWith('scheme')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
@@ -195,7 +194,7 @@ class BonusReportsForm extends Model
 		]);
 		$temp = $query->all();
 		foreach($temp as $item){
-			$totalSumByUsers[$item->buser_id]['sumWithoutNewClientCurrentPeriod'] = $item->totalSum;;
+			$totalSumByUsers[$item->buser_id]['sumWithoutNewClientCurrentPeriod'] = $item->totalSum;
 		}
 		$prevBeginDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->modify("-1 month")->format('Y-m').'-01';
 		$prevEndDate = \DateTime::createFromFormat("d.m.Y", $this->beginDate)->format('Y-m').'-01';
@@ -243,6 +242,32 @@ class BonusReportsForm extends Model
 		foreach($temp as $item){
 			$totalSumByUsers[$item->buser_id]['sumOnlySaleCurrentMonth'] =  $item->totalSum;
 		}
+
+
+		//общая сумма бонуса по юзерам
+        $query = BUserBonus::find()
+            ->select(['totalSum'=>'SUM(amount)', BUserBonus::tableName().'.buser_id'])
+            ->joinWith('payment.calculate')
+            ->joinWith('scheme')
+            ->where([BUserBonus::tableName().'.buser_id' => $this->users])
+            ->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date < :endDate')
+            ->groupBy(BUserBonus::tableName().'.buser_id')
+            ->params([
+                ':beginDate' => strtotime($this->beginDate.' 00:00:00'),
+                ':endDate' => strtotime($this->endDate.' 23:59:59')
+            ]);
+        $query->andFilterWhere([
+            BonusScheme::tableName().'.type' => $this->bonusType,
+            BUserBonus::tableName().'.scheme_id' => $this->scheme,
+            BUserBonus::tableName().'.service_id' => $this->service
+        ]);
+
+        $temp = $query->all();
+        foreach($temp as $item){
+            $totalSumByUsers[$item->buser_id]['totalBonus'] = $item->totalSum;
+        }
+
+
 		return $totalSumByUsers;
 	}
 	/**

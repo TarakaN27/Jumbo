@@ -179,6 +179,7 @@ $rowContNum = $admin ? 6 : 12;
 							<th><?=Yii::t('app/reports','User mame');?></th>
 							<th><?=Yii::t('app/reports','Sum without sale selected period');?></th>
 							<th><?=Yii::t('app/reports','Sum with sale prev month');?></th>
+                            <th><?=Yii::t('app/reports','Total bonus');?></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -193,6 +194,9 @@ $rowContNum = $admin ? 6 : 12;
 							<td>
 								<?=Yii::$app->formatter->asDecimal(isset($val['allSumPrevMonth'])?$val['allSumPrevMonth']:0 ,2);?>
 							</td>
+                            <td>
+                                <?=Yii::$app->formatter->asDecimal(isset($val['totalBonus'])?$val['totalBonus']:0 ,2);?>
+                            </td>
 						</tr>
 						<?}?>
 						</tbody>
@@ -207,6 +211,7 @@ $rowContNum = $admin ? 6 : 12;
 							<tr>
 								<th><?=Yii::t('app/reports','User mame');?></th>
 								<th><?=Yii::t('app/reports','Sum only sale selected period');?></th>
+                                <th><?=Yii::t('app/reports','Total bonus');?></th>
 							</tr>
 							</thead>
 							<tbody>
@@ -218,6 +223,9 @@ $rowContNum = $admin ? 6 : 12;
 									<td>
 										<?=Yii::$app->formatter->asDecimal(isset($val['sumOnlySaleCurrentMonth'])?$val['sumOnlySaleCurrentMonth']:0 ,2);?>
 									</td>
+                                    <td>
+                                        <?=Yii::$app->formatter->asDecimal(isset($val['totalBonus'])?$val['totalBonus']:0 ,2);?>
+                                    </td>
 								</tr>
 							<?}?>
 							</tbody>
