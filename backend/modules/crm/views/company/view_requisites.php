@@ -129,9 +129,9 @@ use yii\widgets\DetailView;
 									'value' => CustomHelper::highlight('dummy',$modelR->reg_auth)
 								],
 								[
-									'attribute' => 'ch_account',
+									'attribute' => 'new_ch_account',
 									'format' => 'html',
-									'value' => CustomHelper::highlight('dummy',$modelR->ch_account)
+									'value' => CustomHelper::highlight('dummy',$modelR->new_ch_account)
 								],
 								[
 									'attribute' => 'b_name',
@@ -144,9 +144,9 @@ use yii\widgets\DetailView;
 									'value' => CustomHelper::highlight('dummy',$modelR->bank_address)
 								],
 								[
-									'attribute' => 'b_code',
+									'attribute' => 'bik',
 									'format' => 'html',
-									'value' => CustomHelper::highlight('dummy',$modelR->b_code)
+									'value' => CustomHelper::highlight('dummy',$modelR->bik)
 								],
 								[
 									'attribute' => 'c_fname',
