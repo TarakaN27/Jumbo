@@ -311,6 +311,12 @@ $menuItems[] = [
                                                 <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                             </li>
                                         <?php endif;?>
+
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights')):?>
+                                            <li>
+                                                <a href="<?= Url::to(['/reports/expense-report/index']); ?>"><?php echo Yii::t('app/common', 'Expense reports'); ?></a>
+                                            </li>
+                                        <?php endif;?>
                                     </ul>
                                 </li>
                                 <?php if(Yii::$app->user->can('adminRights')):?>

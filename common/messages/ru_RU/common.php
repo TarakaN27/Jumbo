@@ -40,6 +40,7 @@ return [
     'DIALOG_ERROR_LOAD_CONTENT' => 'Не удалось загрузить диалог',
     'DIALOG_EMPTY_MSG_TEXT' => 'Вы пытаетесь отправить пустое сообщение',
     'Payments reports' => 'Отчеты по платежам',
+    'Expense reports' => 'Отчеты по затратам',
     'To dashboard' => 'На главную',
     'Messages' => 'Сообщения',
     'Update btn' => 'Сохранить изменения',
