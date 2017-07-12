@@ -7,6 +7,7 @@
  */
 use backend\modules\reports\forms\ExpenseReportForm;
 use miloschuman\highcharts\Highcharts;
+use yii\web\JsExpression;
 
 $this->registerJsFile('@web/js/isotope/isotope.js',[
     'depends' => [
@@ -60,12 +61,7 @@ if(Yii::$app->user->can('adminRights'))
         'date-false' =>  Yii::t('app/reports','Default'),
         'summ-true' =>  Yii::t('app/reports','Summ total A-Z'),
         'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
-        'profit-true' =>  Yii::t('app/reports','Profit total A-Z'),
-        'profit-false' =>  Yii::t('app/reports','Profit total Z-A'),
-        'prod-true' =>  Yii::t('app/reports','Prod total A-Z'),
-        'prod-false' =>  Yii::t('app/reports','Prod total Z-A'),
-        'tax-true' =>  Yii::t('app/reports','Tax total A-Z'),
-        'tax-false' =>  Yii::t('app/reports','Tax total Z-A'),
+
     ];
 }else{
     $arSort = [
@@ -77,31 +73,49 @@ if(Yii::$app->user->can('adminRights'))
 
 ?>
 <?php
-
-//var_dump($seriesData);die;
-if(isset($model['graphArray']['data']))
-echo Highcharts::widget([
-    'options' => [
-        'title' => ['text' => $model['graphArray']['type']],
-        'xAxis' => [
-            'categories' => array_keys($model['graphArray']['data'])
-        ],
-        'yAxis' => [
-            'title' => ['text' => 'Затраты']
-        ],
-        'plotOptions'=> [
-        'column'=> [
-            'stacking'=> 'normal',
-                'dataLabels'=> [
-                'enabled'=> true,
-                ]
-            ]
-        ],
-        'series' => $model['graphArray']['data'],
-
-    ]
-]);
-
+if(isset($model['graphArray']['data'])) {
+    echo Highcharts::widget([
+        'options' => [
+            'chart' => [
+                'style' => [
+                    'fontFamily' => 'Open Sans'
+                ],
+                'plotBorderWidth' => 1,
+                'plotBorderColor' => '#f2f2f2',
+                'animation' => true,
+                'type' => 'column'
+            ],
+            'title' => [
+                'text' => '',
+            ],
+            'plotOptions' => [
+                'series' => [
+                    'fillOpacity' => 0.4
+                ],
+                'column' => [
+                    'stacking' => 'normal'
+                ],
+            ],
+            'xAxis' => [
+                'type' => 'datetime'
+            ],
+            'yAxis' => [
+                'title' => [
+                    'text' => ""
+                ],
+                'showLastLabel' => false
+            ],
+            'tooltip' => [
+                'shared' => true,
+                'crosshairs' => true
+            ],
+            'legend' => [
+                'enabled' => $model['graphArray']['legend'],
+            ],
+            'series' => $model['graphArray']['data']
+        ]
+    ]);
+}
 ?>
 
 <?php if(Yii::$app->user->can('adminRights')):?>
@@ -144,37 +158,6 @@ echo Highcharts::widget([
         ])?>
     </div>
 <table class="table table-bordered container-result width-100-percent">
-    <!--thead>
-        <tr>
-            <?php if($modelForm->groupType != ExpenseReportForm::GROUP_BY_CONTRACTOR):?>
-            <th><?=Yii::t('app/reports','Contractor')?></th>
-            <?php endif;?>
-            <?php if(
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_DATE ||
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_PARENT_CATEGORY ||
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_CONTRACTOR
-            ):?>
-                <th><?=Yii::t('app/reports','Responsibility')?></th>
-            <?php endif;?>
-            <?php if(
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_CATEGORY ||
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_LEGAL_PERSON ||
-                $modelForm->groupType == ExpenseReportForm::GROUP_BY_CONTRACTOR
-            ):?>
-                <th><?=Yii::t('app/reports','Pay date')?></th>
-            <?php endif;?>
-            <th><?=Yii::t('app/reports','Legal person')?></th>
-            <?php if($modelForm->groupType != ExpenseReportForm::GROUP_BY_LEGAL_PERSON):?>
-            <th><?=Yii::t('app/reports','Service')?></th>
-            <?php endif;?>
-            <th><?=Yii::t('app/reports','Payment sum')?></th>
-            <th><?=Yii::t('app/reports','Payment currency')?></th>
-            <th><?=Yii::t('app/reports','Exchange currency')?></th>
-            <?php if(Yii::$app->user->can('adminRights')):?>
-            <th><?=Yii::t('app/reports','Sum BYR')?></th>
-            <?php endif;?>
-        </tr>
-    </thead-->
 
     <?php foreach($model['data'] as $key => $data):?>
         <tbody class="item"
@@ -185,20 +168,7 @@ echo Highcharts::widget([
         <tr style="background-color:#f9f9f9">
             <td colspan="13">
                 <?php
-                    switch($modelForm->groupType)
-                    {
-                        case \backend\modules\reports\forms\ExpenseReportForm::GROUP_BY_DATE:
-                            echo Yii::$app->formatter->asDate($key);
-                            break;
-                        case ExpenseReportForm::GROUP_BY_LEGAL_PERSON:
-                        case ExpenseReportForm::GROUP_BY_LEGAL_PERSON:
-                        case ExpenseReportForm::GROUP_BY_CONTRACTOR:
-                            echo $key;
-                            break;
-                        default:
-                            echo $key;
-                            break;
-                    }
+                    echo Yii::$app->formatter->asDate($key);
                 ?>
 
             </td>
@@ -212,11 +182,11 @@ echo Highcharts::widget([
 
             <th class="width-8-percent"><?=Yii::t('app/reports','Legal person')?></th>
 
-            <th class="width-8-percent"><?=Yii::t('app/reports','Payment sum')?></th>
-            <th class="width-4-percent"><?=Yii::t('app/reports','Payment currency')?></th>
+            <th class="width-8-percent"><?=Yii::t('app/reports','Expense sum')?></th>
+            <th class="width-4-percent"><?=Yii::t('app/reports','Expense currency')?></th>
 
             <?php if(Yii::$app->user->can('adminRights')):?>
-            <th class="width-8-percent"><?=Yii::t('app/reports','Profit BYR')?></th>
+            <th class="width-8-percent"><?=Yii::t('app/reports','Expense BYR')?></th>
             <?php endif;?>
         </tr>
         <?php
@@ -224,7 +194,7 @@ echo Highcharts::widget([
         <tr>
             <td class="width-4-percent">    <?=\yii\helpers\Html::a(
                     $dt['id'],
-                    ['/bookkeeping/default/view','id' => $dt['id']],
+                    ['/bookkeeping/expense/view','id' => $dt['id']],
                     ['target' => '_blank']
                 );?></td>
             <td class="width-8-percent">

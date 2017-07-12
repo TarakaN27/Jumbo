@@ -62,8 +62,6 @@ class ExpenseReportController extends AbstractBaseBackendController{
 
         $arContractorMap[-1] = Yii::t('app/reports','Without contractor');
         ksort($arContractorMap);
-        //array_unshift($arContractorMap, 'Без контрагента');
-        //var_dump(Yii::$app->request->post()); die;
 
         return $this->render('index',[
             'model' => $model,

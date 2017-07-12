@@ -186,7 +186,7 @@ $menuItems[] = [
                                                 <a href = "<?= Url::to(['/services/default/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_services'); ?></a>
                                             </li>
                                         <?php endif; ?>
-                                        <?php if(Yii::$app->user->can('superRights')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/services/expense/index']); ?>"><?php echo Yii::t('app/services', 'SERVICES_expense_categories'); ?></a>
                                             </li>
