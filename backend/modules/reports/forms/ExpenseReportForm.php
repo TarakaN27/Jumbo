@@ -296,6 +296,7 @@ class ExpenseReportForm extends Model{
             foreach ($arResult['graphArray']['data'] as $key => $item) {
                 foreach ($item as $element => $sum) {
                     $day = explode('-', $key);
+                    $day[1] -= 1;
                     $dayForJs = implode(',', $day);
 
                     $graphsData[$element][] = "[Date.UTC($dayForJs)," . $sum . "]";
