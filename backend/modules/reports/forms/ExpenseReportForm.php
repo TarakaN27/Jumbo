@@ -173,7 +173,7 @@ class ExpenseReportForm extends Model{
                 [Expense::tableName().'.cuser_id' => null],
             ]);
             $this->contractor[0] = "-1";
-        }else{
+        }elseif(isset($this->contractor[0])){
             $data->andWhere([
                 Expense::tableName().'.cuser_id' => $this->contractor,
             ]);
