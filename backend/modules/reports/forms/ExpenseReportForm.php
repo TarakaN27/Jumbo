@@ -135,23 +135,23 @@ class ExpenseReportForm extends Model{
     {
         $data = Expense::find();
         $arSelect = [
-            Expense::tableName().'.id',
-            Expense::tableName().'.pay_date',
-            Expense::tableName().'.pay_summ',
-            Expense::tableName().'.currency_id',
-            ExpenseCategories::tableName().'.name as cat_name',
-            ExpenseCategories::tableName().'.ignore_at_report as ignore',
-            ExpenseCategories::tableName().'.parent_id',
-            CUser::tableName().'.requisites_id',
-            CUserRequisites::tableName().'.corp_name',
-            CUserRequisites::tableName().'.j_fname',
-            CUserRequisites::tableName().'.j_lname',
-            CUserRequisites::tableName().'.j_mname',
-            CUserRequisites::tableName().'.type_id',
-            LegalPerson::tableName().'.name as legal_name',
-            ExchangeRates::tableName().'.name as curr_name',
-            ExchangeRates::tableName().'.code',
-            ExchangeRates::tableName().'.nbrb_rate',
+            Expense::tableName() . '.id',
+            Expense::tableName() . '.pay_date',
+            Expense::tableName() . '.pay_summ',
+            Expense::tableName() . '.currency_id',
+            ExpenseCategories::tableName() . '.name as cat_name',
+            ExpenseCategories::tableName() . '.ignore_at_report as ignore',
+            ExpenseCategories::tableName() . '.parent_id',
+            CUser::tableName() . '.requisites_id',
+            CUserRequisites::tableName() . '.corp_name',
+            CUserRequisites::tableName() . '.j_fname',
+            CUserRequisites::tableName() . '.j_lname',
+            CUserRequisites::tableName() . '.j_mname',
+            CUserRequisites::tableName() . '.type_id',
+            LegalPerson::tableName() . '.name as legal_name',
+            ExchangeRates::tableName() . '.name as curr_name',
+            ExchangeRates::tableName() . '.code',
+            ExchangeRates::tableName() . '.nbrb_rate',
         ];
         $data->joinWith('cat');
         $data->joinWith('cuser.requisites');
@@ -161,40 +161,40 @@ class ExpenseReportForm extends Model{
 
         $data->select($arSelect);
         $data->andWhere(
-            Expense::tableName().'.pay_date >= "'.strtotime($this->dateFrom.' 00:00:00 ').'"'.
-            ' AND '.Expense::tableName().'.pay_date <= "'.strtotime($this->dateTo.' 23:59:59').'"'
+            Expense::tableName() . '.pay_date >= "' . strtotime($this->dateFrom . ' 00:00:00 ') . '"' .
+            ' AND ' . Expense::tableName() . '.pay_date <= "' . strtotime($this->dateTo . ' 23:59:59') . '"'
         );
 
         //пункт "Без контрагентов" (ид = -1) добавил в контроллере
-        if(isset($this->contractor[0]) )
-            if($this->contractor[0] == "-1"){
+        if (isset($this->contractor[0]))
+            if ($this->contractor[0] == "-1") {
                 $this->contractor[0] = null;
                 $data->andWhere(['or',
-                    [Expense::tableName().'.cuser_id' => $this->contractor],
-                    [Expense::tableName().'.cuser_id' => null],
+                    [Expense::tableName() . '.cuser_id' => $this->contractor],
+                    [Expense::tableName() . '.cuser_id' => null],
                 ]);
                 $this->contractor[0] = "-1";
-            }else{
+            } else {
                 $data->andWhere([
-                    Expense::tableName().'.cuser_id' => $this->contractor,
+                    Expense::tableName() . '.cuser_id' => $this->contractor,
                 ]);
             }
 
-        if(!isset($this->expenseCategory[0])){
+        if (!isset($this->expenseCategory[0])) {
             $data->andWhere([
-                Expense::tableName().'.cat_id' => array_keys(ExpenseCategories::getExpenseCatTreeGroupSelectable()),
+                Expense::tableName() . '.cat_id' => array_keys(ExpenseCategories::getExpenseCatTreeGroupSelectable()),
             ]);
-        }else{
+        } else {
             $data->andWhere([
-                Expense::tableName().'.cat_id' => $this->ifParentCategory($this->expenseCategory),
+                Expense::tableName() . '.cat_id' => $this->ifParentCategory($this->expenseCategory),
             ]);
         }
 
         $data->andFilterWhere([
-            Expense::tableName().'.legal_id' => $this->legalPerson,
+            Expense::tableName() . '.legal_id' => $this->legalPerson,
         ]);
 
-        $data->orderBy(Expense::tableName().'.pay_date ASC');
+        $data->orderBy(Expense::tableName() . '.pay_date ASC');
         $dataForGraph = clone $data;
         $data = $data->createCommand()->queryAll();
 
@@ -216,19 +216,19 @@ class ExpenseReportForm extends Model{
         $totalGroupProfit = [];
 
         $dateMask = '%Y-%m-%d';
-        if((strtotime($this->dateTo) - strtotime($this->dateFrom)) / 86400 >= self::MONTH){
+        if ((strtotime($this->dateTo) - strtotime($this->dateFrom)) / 86400 >= self::MONTH) {
             $dateMask = '%Y-%m';
         }
 
         $dataForGraph = $dataForGraph->addSelect(
-            new Expression("FROM_UNIXTIME(".Expense::tableName().".pay_date,'".$dateMask."') as pay_date2, sum(".Expense::tableName().".pay_summ*".ExchangeRates::tableName().".nbrb_rate) as day_sum"));
+            new Expression("FROM_UNIXTIME(" . Expense::tableName() . ".pay_date,'" . $dateMask . "') as pay_date2, sum(" . Expense::tableName() . ".pay_summ*" . ExchangeRates::tableName() . ".nbrb_rate) as day_sum"));
         //добавляю группировку по полю, в зависимости от типа группировки
-        switch ($this->groupType){
+        switch ($this->groupType) {
             case self::GROUP_BY_DATE:
                 $dataForGraph = $dataForGraph->groupBy(['pay_date2']);
                 break;
             case self::GROUP_BY_PARENT_CATEGORY:
-                $dataForGraph = $dataForGraph->groupBy(['pay_date2', ExpenseCategories::tableName().'.parent_id']);
+                $dataForGraph = $dataForGraph->groupBy(['pay_date2', ExpenseCategories::tableName() . '.parent_id']);
                 break;
             case self::GROUP_BY_CATEGORY:
                 $dataForGraph = $dataForGraph->groupBy(['pay_date2', 'cat_name']);
@@ -237,7 +237,7 @@ class ExpenseReportForm extends Model{
                 $dataForGraph = $dataForGraph->groupBy(['pay_date2', 'legal_name']);
                 break;
             case self::GROUP_BY_CONTRACTOR:
-                $dataForGraph = $dataForGraph->groupBy(['pay_date2', CUserRequisites::tableName().'.corp_name']);
+                $dataForGraph = $dataForGraph->groupBy(['pay_date2', CUserRequisites::tableName() . '.corp_name']);
                 break;
             default:
                 $dataForGraph = $dataForGraph->groupBy(['pay_date2']);
@@ -247,82 +247,85 @@ class ExpenseReportForm extends Model{
         $dataForGraph = $dataForGraph->createCommand()->queryAll();
 
         $obECH = new ExchangeCurrencyHistory();
-        $arCurrIds = array_unique(ArrayHelper::getColumn($data,'currency_id'));
+        $arCurrIds = array_unique(ArrayHelper::getColumn($data, 'currency_id'));
 
-        if(!empty($arCurrIds))
-            $arCurrInBur = $obECH->getCurrencyInByrForPeriod(strtotime($this->dateFrom),strtotime($this->dateTo),$arCurrIds);
+        if (!empty($arCurrIds))
+            $arCurrInBur = $obECH->getCurrencyInByrForPeriod(strtotime($this->dateFrom), strtotime($this->dateTo), $arCurrIds);
         else
             $arCurrInBur = [];
+        if (!empty($dataForGraph)){
+            foreach ($dataForGraph as $dt) {
+                $date = $dt['pay_date2'];
 
-        foreach ($dataForGraph as $dt){
-            $date = $dt['pay_date2'];
+                switch ($this->groupType) {
+                    case self::GROUP_BY_DATE:
+                        $arResult['graphArray']['data'][$date][$date] = round($dt['day_sum'], 2);
 
-            switch ($this->groupType){
-                case self::GROUP_BY_DATE:
-                    $arResult['graphArray']['data'][$date][$date] = round($dt['day_sum'],2);
+                        break;
+                    case self::GROUP_BY_PARENT_CATEGORY:
+                        $groupValue = ExpenseCategories::getParentCat()[$dt['parent_id']];
+                        $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'], 2);
 
-                    break;
-                case self::GROUP_BY_PARENT_CATEGORY:
-                    $groupValue = ExpenseCategories::getParentCat()[$dt['parent_id']];
-                    $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'],2);
+                        break;
+                    case self::GROUP_BY_CATEGORY:
+                        $groupValue = $dt['cat_name'];
+                        $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'], 2);
 
-                    break;
-                case self::GROUP_BY_CATEGORY:
-                    $groupValue = $dt['cat_name'];
-                    $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'],2);
+                        break;
+                    case self::GROUP_BY_LEGAL_PERSON:
+                        $groupValue = $dt['legal_name'];
+                        $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'], 2);
 
-                    break;
-                case self::GROUP_BY_LEGAL_PERSON:
-                    $groupValue = $dt['legal_name'];
-                    $arResult['graphArray']['data'][$date][$groupValue] = round($dt['day_sum'],2);
+                        break;
+                    case self::GROUP_BY_CONTRACTOR:
+                        if ($dt['requisites_id']) {
+                            $corpName = CUserRequisites::getCorpNameWithSiteByDataArray($dt);
+                        } else {
+                            $corpName = Yii::t('app/reports', 'Without contractor');
+                        }
 
-                    break;
-                case self::GROUP_BY_CONTRACTOR:
-                    if($dt['requisites_id']){
-                        $corpName = CUserRequisites::getCorpNameWithSiteByDataArray($dt);
-                    }else{
-                        $corpName = Yii::t('app/reports','Without contractor');
-                    }
+                        $arResult['graphArray']['data'][$date][$corpName] = round($dt['day_sum'], 2);
 
-                    $arResult['graphArray']['data'][$date][$corpName] = round($dt['day_sum'], 2);
-
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
+
+            $graphsData = [];
+            foreach ($arResult['graphArray']['data'] as $key => $item) {
+                foreach ($item as $element => $sum) {
+                    $day = explode('-', $key);
+                    $dayForJs = implode(',', $day);
+
+                    $graphsData[$element][] = "[Date.UTC($dayForJs)," . $sum . "]";
+                }
+            }
+
+            $seriesData = [];
+            $arResult['graphArray']['legend'] = true;
+
+            if ($this->groupType == ExpenseReportForm::GROUP_BY_DATE) {
+                $seriesData[0]['name'] = Yii::t('app/reports','Expense sum');
+                $arResult['graphArray']['legend'] = false;
+                foreach ($graphsData as $element => $item) {
+                    $seriesData[0]['data'][] = $item[0];
+                }
+
+                $seriesData[0]['data'] = new JsExpression('[' . implode(",", $seriesData[0]['data']) . ']');
+            } else {
+                $i = 0;
+                foreach ($graphsData as $element => $item) {
+                    $seriesData[$i]['name'] = $element;
+                    $seriesData[$i]['data'] = new JsExpression('[' . implode(",", $item) . ']');
+                    $i++;
+                }
+            }
+
+            $arResult['graphArray']['data'] = $seriesData;
         }
 
-        $graphsData = [];
-        foreach ($arResult['graphArray']['data'] as $key => $item) {
-            foreach ($item as $element => $sum) {
-                $day = explode('-', $key);
-                $dayForJs = implode(',', $day);
 
-                $graphsData[$element][] = "[Date.UTC($dayForJs)," . $sum . "]";
-            }
-        }
-
-        $seriesData = [];
-        $arResult['graphArray']['legend'] = true;
-
-        if ($this->groupType == ExpenseReportForm::GROUP_BY_DATE) {
-            $seriesData[0]['name'] = Yii::t('app/reports','Expense sum');
-            $arResult['graphArray']['legend'] = false;
-            foreach ($graphsData as $element => $item) {
-                $seriesData[0]['data'][] = $item[0];
-            }
-
-            $seriesData[0]['data'] = new JsExpression('[' . implode(",", $seriesData[0]['data']) . ']');
-        } else {
-            $i = 0;
-            foreach ($graphsData as $element => $item) {
-                $seriesData[$i]['name'] = $element;
-                $seriesData[$i]['data'] = new JsExpression('[' . implode(",", $item) . ']');
-                $i++;
-            }
-        }
-
-        $arResult['graphArray']['data'] = $seriesData;
 
         /** @var Payments $dt */
         foreach($data as $dt)
