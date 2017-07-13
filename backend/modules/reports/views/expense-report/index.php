@@ -31,7 +31,7 @@ $this->title = Yii::t('app/reports','Expense reports');
                 ]);?>
                     <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                            <?=$form->field($model,'paymentCategory')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                            <?=$form->field($model,'expenseCategory')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
                                 'data' => \common\models\ExpenseCategories::getExpenseCatTreeGroupSelectable(),
                                 'clientOptions' => [
                                     //'selectableHeader' => Yii::t('app/reports','Services'),
@@ -95,7 +95,6 @@ $this->title = Yii::t('app/reports','Expense reports');
                                     <?php if(Yii::$app->user->can('adminRights')):?>
                                         <?=Html::label(Yii::t('app/reports','Documents'))?>
                                         <?=$form->field($model,'generateExcel')->checkbox();?>
-                                        <?php //echo $form->field($model,'generateExtendExcel')->checkbox();?>
                                         <hr/>
                                     <?php endif;?>
                                 </div>

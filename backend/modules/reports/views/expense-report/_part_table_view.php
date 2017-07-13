@@ -158,11 +158,12 @@ if(isset($model['graphArray']['data'])) {
         ])?>
     </div>
 <table class="table table-bordered container-result width-100-percent">
-
     <?php foreach($model['data'] as $key => $data):?>
         <tbody class="item"
                  data-date = "<?= $key;?>"
+
                  data-summ = "<?=isset($model['totalGroupSum'][$key]) ? $model['totalGroupSum'][$key] : 0;?>"
+
                style="width: 100%;"
             >
         <tr style="background-color:#f9f9f9">
@@ -170,6 +171,7 @@ if(isset($model['graphArray']['data'])) {
                 <?php
                     echo Yii::$app->formatter->asDate($key);
                 ?>
+
 
             </td>
         </tr>
@@ -185,7 +187,7 @@ if(isset($model['graphArray']['data'])) {
             <th class="width-8-percent"><?=Yii::t('app/reports','Expense sum')?></th>
             <th class="width-4-percent"><?=Yii::t('app/reports','Expense currency')?></th>
 
-            <?php if(Yii::$app->user->can('adminRights')):?>
+            <?php if(Yii::$app->user->can('superRights')):?>
             <th class="width-8-percent"><?=Yii::t('app/reports','Expense BYR')?></th>
             <?php endif;?>
         </tr>
@@ -217,7 +219,7 @@ if(isset($model['graphArray']['data'])) {
             </td>
             <td class="width-4-percent">    <?=($dt['code']?$dt['code'] : 'N/A');?></td>
 
-            <?php if(Yii::$app->user->can('adminRights')):?>
+            <?php if(Yii::$app->user->can('superRights')):?>
             <td class="width-8-percent">
                     <?=($model['fullAmount'][$dt['id']] ? Yii::$app->formatter->asDecimal($model['fullAmount'][$dt['id']]) : 'N/A');?>
             </td>
@@ -226,14 +228,15 @@ if(isset($model['graphArray']['data'])) {
 
         </tr>
         <?php endforeach;?>
-        <tr class="wm-tr-total">
-            <td colspan="6">
-                <?=Yii::t('app/reports','Group total')?>
+        <?php if(Yii::$app->user->can('superRights')):?>
+            <tr class="wm-tr-total">
+                <td colspan="6">
+                    <?=Yii::t('app/reports','Group total')?>
+                </td>
+                <td>
+                    <?=isset($model['totalGroupSum'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupSum'][$key]) : '-';?>
             </td>
-            <td>
-                <?=isset($model['totalGroupSum'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupSum'][$key]) : '-';?>
-            </td>
-
+        <?php endif;?>
 
         </tr>
     </tbody>

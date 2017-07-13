@@ -48,17 +48,14 @@ class ExpenseReportForm extends Model{
 
     public
         $groupType = self::GROUP_BY_DATE,
-        $paymentCategory,
+        $expenseCategory,
         $services,
         $contractor,
         $managers,
         $legalPerson,
         $dateFrom,
-        $generateExtendExcel,
         $generateExcel,
-        $generateDocx,
-        $dateTo,
-        $showWithoutSale
+        $dateTo
         ;
 
     protected
@@ -72,9 +69,9 @@ class ExpenseReportForm extends Model{
         return [
             [['dateFrom','dateTo'],'required'],
             [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
-            [['paymentCategory','contractor','legalPerson'],'safe'],
-            [['paymentCategory','contractor','legalPerson'],'safe'],
-            [['generateExcel','generateDocx','groupType','generateExtendExcel','showWithoutSale'],'integer'],
+            [['expenseCategory','contractor','legalPerson'],'safe'],
+            [['expenseCategory','contractor','legalPerson'],'safe'],
+            [['generateExcel','groupType'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];
     }
@@ -95,17 +92,13 @@ class ExpenseReportForm extends Model{
     public function attributeLabels()
     {
         return [
-            'paymentCategory' => Yii::t('app/reports','Payment category'),
+            'expenseCategory' => Yii::t('app/reports','Expense category'),
             'contractor' => Yii::t('app/reports','Contractor'),
-            'managers' => Yii::t('app/reports','Managers'),
             'legalPerson' => Yii::t('app/reports','Legal person'),
             'dateFrom' => Yii::t('app/reports','Date from'),
             'dateTo' => Yii::t('app/reports','Date to'),
             'generateExcel' => Yii::t('app/reports','Generate excel'),
-            'generateDocx' => Yii::t('app/reports','Generate docx'),
             'groupType' => Yii::t('app/reports','Group type'),
-            'generateExtendExcel' => Yii::t('app/reports','Generate extend excel'),
-            'showWithoutSale' => Yii::t('app/reports','Show without sale')
         ];
     }
 
@@ -173,18 +166,30 @@ class ExpenseReportForm extends Model{
         );
 
         //пункт "Без контрагентов" (ид = -1) добавил в контроллере
-        if($this->contractor[0] == "-1"){
-            $data->andWhere([
-                Expense::tableName().'.cuser_id' => null,
+        if(isset($this->contractor[0]) && $this->contractor[0] == "-1"){
+            $this->contractor[0] = null;
+            $data->andWhere(['or',
+                [Expense::tableName().'.cuser_id' => $this->contractor],
+                [Expense::tableName().'.cuser_id' => null],
             ]);
-        }elseif(isset($this->contractor[0])){
+            $this->contractor[0] = "-1";
+        }else{
             $data->andWhere([
                 Expense::tableName().'.cuser_id' => $this->contractor,
             ]);
         }
 
+        if(!isset($this->expenseCategory[0])){
+            $data->andWhere([
+                Expense::tableName().'.cat_id' => array_keys(ExpenseCategories::getExpenseCatTreeGroupSelectable()),
+            ]);
+        }else{
+            $data->andWhere([
+                Expense::tableName().'.cat_id' => $this->ifParentCategory($this->expenseCategory),
+            ]);
+        }
+
         $data->andFilterWhere([
-            Expense::tableName().'.cat_id' => $this->ifParentCategory($this->paymentCategory),
             Expense::tableName().'.legal_id' => $this->legalPerson,
         ]);
 
@@ -248,7 +253,6 @@ class ExpenseReportForm extends Model{
         else
             $arCurrInBur = [];
 
-
         foreach ($dataForGraph as $dt){
             $date = $dt['pay_date2'];
 
@@ -275,10 +279,10 @@ class ExpenseReportForm extends Model{
                 case self::GROUP_BY_CONTRACTOR:
                     if($dt['requisites_id']){
                         $corpName = CUserRequisites::getCorpNameWithSiteByDataArray($dt);
-                    }
-                    if($corpName == ""){
+                    }else{
                         $corpName = Yii::t('app/reports','Without contractor');
                     }
+
                     $arResult['graphArray']['data'][$date][$corpName] = round($dt['day_sum'], 2);
 
                     break;

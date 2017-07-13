@@ -31,7 +31,7 @@ class ExpenseReportController extends AbstractBaseBackendController{
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['admin','moder']
+                    'roles' => ['admin']
                 ]
             ]
         ];
@@ -46,11 +46,8 @@ class ExpenseReportController extends AbstractBaseBackendController{
     {
 
         $model = new ExpenseReportForm();
-        if(!\Yii::$app->user->can('adminRights'))
+        if(Yii::$app->user->can('adminRights'))
         {
-            $model->managers = \Yii::$app->user->id;
-            $arContractorMap = CUser::getContractorMapForManager(\Yii::$app->user->id);
-        }else{
             $arContractorMap = CUser::getExpenseUserMap();
         }
 
