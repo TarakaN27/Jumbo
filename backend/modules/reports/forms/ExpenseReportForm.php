@@ -166,18 +166,19 @@ class ExpenseReportForm extends Model{
         );
 
         //пункт "Без контрагентов" (ид = -1) добавил в контроллере
-        if(isset($this->contractor[0]) && $this->contractor[0] == "-1"){
-            $this->contractor[0] = null;
-            $data->andWhere(['or',
-                [Expense::tableName().'.cuser_id' => $this->contractor],
-                [Expense::tableName().'.cuser_id' => null],
-            ]);
-            $this->contractor[0] = "-1";
-        }elseif(isset($this->contractor[0])){
-            $data->andWhere([
-                Expense::tableName().'.cuser_id' => $this->contractor,
-            ]);
-        }
+        if(isset($this->contractor[0]) )
+            if($this->contractor[0] == "-1"){
+                $this->contractor[0] = null;
+                $data->andWhere(['or',
+                    [Expense::tableName().'.cuser_id' => $this->contractor],
+                    [Expense::tableName().'.cuser_id' => null],
+                ]);
+                $this->contractor[0] = "-1";
+            }else{
+                $data->andWhere([
+                    Expense::tableName().'.cuser_id' => $this->contractor,
+                ]);
+            }
 
         if(!isset($this->expenseCategory[0])){
             $data->andWhere([
