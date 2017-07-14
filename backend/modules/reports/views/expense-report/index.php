@@ -95,6 +95,9 @@ $this->title = Yii::t('app/reports','Expense reports');
                                     <?php if(Yii::$app->user->can('adminRights')):?>
                                         <?=Html::label(Yii::t('app/reports','Documents'))?>
                                         <?=$form->field($model,'generateExcel')->checkbox();?>
+
+                                        <?=Html::label(Yii::t('app/reports','Expense type'))?>
+                                        <?=$form->field($model,'onlyExpenseCategory')->checkbox();?>
                                         <hr/>
                                     <?php endif;?>
                                 </div>
@@ -118,15 +121,6 @@ $this->title = Yii::t('app/reports','Expense reports');
                             <?php if(!empty($arData['excelLink'])):?>
                                 <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get excel report'),[
                                     '/site/get-document','name' => $arData['excelLink'],'hidfold' => 'reports'],
-                                    [
-                                        'target' => '_blank',
-                                        'class' => "btn btn-default"
-                                    ]
-                                )?>
-                            <?php endif;?>
-                            <?php if(!empty($arData['excelExtendLink'])):?>
-                                <?=Html::a('<i class="fa fa-download"></i> '.Yii::t('app/reports','Get extended excel report'),[
-                                    '/site/get-document','name' => $arData['excelExtendLink'],'hidfold' => 'reports'],
                                     [
                                         'target' => '_blank',
                                         'class' => "btn btn-default"

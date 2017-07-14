@@ -129,6 +129,8 @@ return [
     'Spend hour' => 'Затрачено часов',
     'Balance hour' => 'Баланс трудозатрат',
     'Documents' => 'Документы',
+    'Expense type' => 'Тип затрат',
+    'Ignore at report' => 'Только отчетные затраты',
     'Show without sale' => 'Общая информация о продажах',
     'Addition settings' => 'Дополнительные настройки',
     'saleAmount' => 'Сумма платежей-продаж',

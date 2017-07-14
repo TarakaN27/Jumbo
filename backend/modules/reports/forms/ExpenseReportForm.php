@@ -49,6 +49,7 @@ class ExpenseReportForm extends Model{
     public
         $groupType = self::GROUP_BY_DATE,
         $expenseCategory,
+        $onlyExpenseCategory,
         $services,
         $contractor,
         $managers,
@@ -71,7 +72,7 @@ class ExpenseReportForm extends Model{
             [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
             [['expenseCategory','contractor','legalPerson'],'safe'],
             [['expenseCategory','contractor','legalPerson'],'safe'],
-            [['generateExcel','groupType'],'integer'],
+            [['generateExcel','groupType', 'onlyExpenseCategory'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];
     }
@@ -98,6 +99,7 @@ class ExpenseReportForm extends Model{
             'dateFrom' => Yii::t('app/reports','Date from'),
             'dateTo' => Yii::t('app/reports','Date to'),
             'generateExcel' => Yii::t('app/reports','Generate excel'),
+            'onlyExpenseCategory' => Yii::t('app/reports','Ignore at report'),
             'groupType' => Yii::t('app/reports','Group type'),
         ];
     }
@@ -165,6 +167,13 @@ class ExpenseReportForm extends Model{
             ' AND ' . Expense::tableName() . '.pay_date <= "' . strtotime($this->dateTo . ' 23:59:59') . '"'
         );
 
+        if($this->onlyExpenseCategory){
+            $data->andWhere(['or',
+                [ExpenseCategories::tableName() . '.ignore_at_report' => ExpenseCategories::NOT_IGNORED],
+                [ExpenseCategories::tableName() . '.ignore_at_report' => null],
+            ]);
+        }
+
         //пункт "Без контрагентов" (ид = -1) добавил в контроллере
         if (isset($this->contractor[0]))
             if ($this->contractor[0] == "-1") {
@@ -196,6 +205,7 @@ class ExpenseReportForm extends Model{
 
         $data->orderBy(Expense::tableName() . '.pay_date ASC');
         $dataForGraph = clone $data;
+        //var_dump($data->createCommand()->rawSql);die;
         $data = $data->createCommand()->queryAll();
 
         $arResult = [

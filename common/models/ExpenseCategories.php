@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  */
 class ExpenseCategories extends AbstractActiveRecord
 {
+    const NOT_IGNORED = 0;
     const IGNORED = 1;
     private
         $changeParentId = false;
