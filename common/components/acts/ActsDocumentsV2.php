@@ -168,7 +168,7 @@ class ActsDocumentsV2
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
             $this->cuserName = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
-            $this->cuserBankDetail = $obR->ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' код '.$obR->b_code;
+            $this->cuserBankDetail = $obR->new_ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' БИК '.$obR->bik;
             $this->cuserAddress = $obR->j_address;
             $this->cuserEmail = $obR->c_email;
             $this->cuserWebsite = $obR->site;
