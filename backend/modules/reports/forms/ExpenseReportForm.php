@@ -49,7 +49,7 @@ class ExpenseReportForm extends Model{
     public
         $groupType = self::GROUP_BY_DATE,
         $expenseCategory,
-        $onlyExpenseCategory,
+        $onlyExpenseCategory = true,
         $services,
         $contractor,
         $managers,
