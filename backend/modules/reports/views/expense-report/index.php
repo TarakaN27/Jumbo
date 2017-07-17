@@ -136,7 +136,8 @@ $this->title = Yii::t('app/reports','Expense reports');
                     <?php if(!empty($arData)):?>
                         <?= $this->render('_part_table_view', [
                             'model' => $arData,
-                            'modelForm' => $model
+                            'modelForm' => $model,
+                            'onlyExpenseCategory' => $model->onlyExpenseCategory,
                         ]) ?>
                     <?php else:?>
                         <p><?=Yii::t('app/reports','No data');?></p>

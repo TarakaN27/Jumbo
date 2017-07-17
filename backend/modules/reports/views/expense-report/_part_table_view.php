@@ -125,7 +125,9 @@ if(isset($model['graphArray']['data'])) {
     <thead>
         <tr>
             <th><?=Yii::t('app/reports','Expense total')?></th>
-            <th><?=Yii::t('app/reports','Reported total')?></th>
+            <?php if(!$onlyExpenseCategory):?>
+                <th><?=Yii::t('app/reports','Reported total')?></th>
+            <?php endif;?>
         </tr>
     </thead>
     <tbody>
@@ -134,9 +136,11 @@ if(isset($model['graphArray']['data'])) {
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iExpenseTotal']);?>
             </td>
+            <?php if(!$onlyExpenseCategory):?>
                 <td>
                     <?=Yii::$app->formatter->asDecimal($model['iExpenseReportsTotal']);?>
                 </td>
+            <?php endif;?>
         </tr>
     </tbody>
 </table>
