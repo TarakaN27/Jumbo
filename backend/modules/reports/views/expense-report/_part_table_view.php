@@ -63,12 +63,6 @@ if(Yii::$app->user->can('adminRights'))
         'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
 
     ];
-}else{
-    $arSort = [
-        'date-false' =>  Yii::t('app/reports','Default'),
-        'summ-true' =>  Yii::t('app/reports','Summ total A-Z'),
-        'summ-false' =>  Yii::t('app/reports','Summ total Z-A'),
-    ];
 }
 
 ?>

@@ -42,12 +42,16 @@ class ExpenseReportForm extends Model{
         GROUP_BY_PARENT_CATEGORY = 2,
         GROUP_BY_CATEGORY = 3,
         GROUP_BY_LEGAL_PERSON = 4,
-        GROUP_BY_CONTRACTOR = 5;
+        GROUP_BY_CONTRACTOR = 5,
+        GROUP_GRAPH_BY_DEFAULT = 6,
+        GROUP_GRAPH_BY_DAY = 7,
+        GROUP_GRAPH_BY_MONTH = 8;
 
     const MONTH = 31;
 
     public
         $groupType = self::GROUP_BY_DATE,
+        $graphGroupType = self::GROUP_GRAPH_BY_DEFAULT,
         $expenseCategory,
         $onlyExpenseCategory = true,
         $services,
@@ -72,7 +76,7 @@ class ExpenseReportForm extends Model{
             [['dateFrom','dateTo'],'date','format' => 'php:d.m.Y'],
             [['expenseCategory','contractor','legalPerson'],'safe'],
             [['expenseCategory','contractor','legalPerson'],'safe'],
-            [['generateExcel','groupType', 'onlyExpenseCategory'],'integer'],
+            [['generateExcel','groupType', 'graphGroupType', 'onlyExpenseCategory'],'integer'],
             [['dateFrom','dateTo'],'validatePeriodDate'],
         ];
     }
@@ -101,6 +105,7 @@ class ExpenseReportForm extends Model{
             'generateExcel' => Yii::t('app/reports','Generate excel'),
             'onlyExpenseCategory' => Yii::t('app/reports','Ignore at report'),
             'groupType' => Yii::t('app/reports','Group type'),
+            'graphGroupType' => Yii::t('app/reports','Graph group type'),
         ];
     }
 
@@ -115,6 +120,20 @@ class ExpenseReportForm extends Model{
             self::GROUP_BY_CATEGORY => Yii::t('app/reports','Group by category'),
             self::GROUP_BY_LEGAL_PERSON => Yii::t('app/reports','Group by legal'),
             self::GROUP_BY_CONTRACTOR => Yii::t('app/reports','Group by contractor')
+        ];
+
+        return $arGroup;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getGraphDetailTypes()
+    {
+        $arGroup = [
+            self::GROUP_GRAPH_BY_DEFAULT => Yii::t('app/reports','Group by default'),
+            self::GROUP_GRAPH_BY_MONTH => Yii::t('app/reports','Group by month'),
+            self::GROUP_GRAPH_BY_DAY => Yii::t('app/reports','Group by day'),
         ];
 
         return $arGroup;
@@ -225,10 +244,17 @@ class ExpenseReportForm extends Model{
         $totalGroupSum = [];
         $totalGroupProfit = [];
 
-        $dateMask = '%Y-%m-%d';
-        if ((strtotime($this->dateTo) - strtotime($this->dateFrom)) / 86400 >= self::MONTH) {
+        if($this->graphGroupType == self::GROUP_GRAPH_BY_MONTH){
             $dateMask = '%Y-%m';
+        }elseif ($this->graphGroupType == self::GROUP_GRAPH_BY_DAY){
+            $dateMask = '%Y-%m-%d';
+        }else{
+            $dateMask = '%Y-%m-%d';
+            if ((strtotime($this->dateTo) - strtotime($this->dateFrom)) / 86400 >= self::MONTH) {
+                $dateMask = '%Y-%m';
+            }
         }
+
 
         $dataForGraph = $dataForGraph->addSelect(
             new Expression("FROM_UNIXTIME(" . Expense::tableName() . ".pay_date,'" . $dateMask . "') as pay_date2, sum(" . Expense::tableName() . ".pay_summ*" . ExchangeRates::tableName() . ".nbrb_rate) as day_sum"));
