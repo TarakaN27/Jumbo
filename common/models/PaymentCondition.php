@@ -234,6 +234,14 @@ class PaymentCondition extends AbstractActiveRecord
     }
 
     /**
+     * @return mixed
+     */
+    public static function getAllConditionArray()
+    {
+        return ArrayHelper::map(static::find()->all(), 'id','name');
+    }
+
+    /**
      * Получаем список условий id => название
      * @return array
      */

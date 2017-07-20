@@ -333,6 +333,14 @@ class ExchangeRates extends AbstractActiveRecord
             return static::$arrCurrencyByCode[$code];
         return false;
     }
+
+    /**
+     * @return mixed
+     */
+    public static function getAllRatesArray()
+    {
+        return ArrayHelper::map(static::find()->all(), 'id','name');
+    }
 }
 
 /**

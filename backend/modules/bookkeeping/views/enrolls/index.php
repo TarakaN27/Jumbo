@@ -75,6 +75,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'filter' => \common\models\UnitsEnroll::getUnitsEnrollsDropDown()
                                     ],
                                     [
+                                        'attribute' => 'payName',
+                                        'value' => 'payName',
+                                        'filter' => \common\models\PaymentCondition::getAllConditionArray()
+                                    ],
+                                    [
+                                        'attribute' => 'rateName',
+                                        'value' => 'rateName',
+                                        'filter' => \common\models\ExchangeRates::getAllRatesArray()
+                                    ],
+                                    [
+                                        'attribute' => 'rate_nbrb',
+                                        'value' =>function($model){
+                                            return number_format($model->rate_nbrb,5,',','');
+                                        },
+                                    ],
+                                    [
                                         'attribute' => 'created_at',
                                         'format' => 'datetime',
                                         'label' => Yii::t('app/book','Processing date'),

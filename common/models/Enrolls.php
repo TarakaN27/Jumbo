@@ -27,6 +27,9 @@ use common\components\customComponents\validation\ValidNumber;
  */
 class Enrolls extends AbstractActiveRecord
 {
+    public  $payName,
+            $rateName,
+            $rate_nbrb;
     /**
      * @inheritdoc
      */
@@ -75,6 +78,9 @@ class Enrolls extends AbstractActiveRecord
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
             'enroll_unit_id' =>  Yii::t('app/services','Unit enrollment'),
+            'payName' =>  Yii::t('app/services','Payment condition'),
+            'rateName' =>  Yii::t('app/services','Rate name'),
+            'rate_nbrb' =>  Yii::t('app/services','Nbrb Rate'),
         ];
     }
 

@@ -104,4 +104,6 @@ return [
     'Bill hint' => 'Уведомнение для счетов',
     'Requisites for bill' => 'Банковские реквизиты для счетов',
     'Requisites for act' => 'Банковские реквизиты для актов',
+    'Payment condition' => 'Условие',
+    'Rate name' => 'Название валюты',
 ];
