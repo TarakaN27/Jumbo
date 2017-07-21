@@ -18,6 +18,7 @@ return [
 	'Dropdown' => 'Список',
 	'Data' => 'Дата',
 	'Email' => 'Емаил',
+	'Extra email' => 'Доп. емаил',
 	'Phone' => 'Телефон',
 	'Acts' => 'Акты',
 	'Choose entity' => 'Выберите сущность',

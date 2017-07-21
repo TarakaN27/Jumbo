@@ -406,6 +406,13 @@ $('#cuser-partner').on('change',function(){
 						'class' => 'control-label'
 					]])->textInput(['maxlength' => TRUE]) ?>
 			</div>
+            <div class = "col-md-4 col-sm-4 col-xs-12">
+                <?= $form->field($modelR, 'ext_email', [
+                    'template' => $fieldTempl,
+                    'labelOptions'=>[
+                        'class' => 'control-label'
+                    ]])->textInput(['maxlength' => TRUE]) ?>
+            </div>
 			<div class = "col-md-4 col-sm-4 col-xs-12">
 				<?= $form->field($modelR, 'c_phone', [
 					'template' => $fieldTempl,
@@ -420,6 +427,7 @@ $('#cuser-partner').on('change',function(){
 						'class' => 'control-label'
 					]])->textInput(['maxlength' => TRUE]) ?>
 			</div>
+
 		</div>
 	</section>
 	<section class="contactSite">

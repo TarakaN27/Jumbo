@@ -691,6 +691,22 @@ class CUser extends AbstractUser
         return ArrayHelper::map($tmp,'id','c_email');
     }
 
+    /**
+     * Получаем емаилы контрагентов по их ID
+     * @param $ids
+     * @return array
+     */
+    public static function getCUserExtEmails($ids)
+    {
+        $tmp = self::find()
+            ->select([self::tableName().'.id','cur.ext_email'])
+            ->leftJoin(CUserRequisites::tableName().' cur','cur.id = '.self::tableName().'.requisites_id')
+            ->where([self::tableName().'.id' => $ids])
+            ->asArray()
+            ->all();
+        return ArrayHelper::map($tmp,'id','ext_email');
+    }
+
 
     /**
      * @return array
