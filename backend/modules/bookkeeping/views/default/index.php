@@ -188,7 +188,7 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                                 'class' => 'yii\grid\ActionColumn',
                                 'buttons'=>[
                                     'delete'=>function ($url, $model) {
-                                        return "<span id='payDelete' data-id='$model->id' class='glyphicon glyphicon-trash' style='cursor:pointer;'></span>";
+                                        return "<span data-id='$model->id' class='glyphicon glyphicon-trash payDelete' style='cursor:pointer;'></span>";
                                     }
                                 ],
                                 'template' =>  $tpl

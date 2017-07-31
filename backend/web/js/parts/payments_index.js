@@ -2,10 +2,10 @@
  * Created by zhenya on 27.6.16.
  */
 "use strict";
-function deletePayments(button)
+function deletePayments()
 {
     var
-        element_id = button.attr('data-id'),
+        element_id = $(this).attr('data-id'),
         post_data = {'id':element_id,'approve':false},
         result_string;
 
@@ -72,8 +72,8 @@ function deletePayments(button)
 
 
 $(function () {
-    $('#payDelete').on('click',function () {
-        console.log('Click!');
-        deletePayments($('#payDelete'));
-    });
+    var i,delBtns = document.getElementsByClassName('payDelete');
+    for (i = 0; i < delBtns.length; i++){
+        delBtns[i].addEventListener("click", deletePayments);
+    }
 });
