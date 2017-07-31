@@ -15,6 +15,8 @@ use common\models\CuserBankDetails;
 use common\models\CuserPreferPayCond;
 use common\models\CUserRequisites;
 use common\models\Dialogs;
+use common\models\EnrollmentRequest;
+use common\models\Enrolls;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
@@ -22,6 +24,8 @@ use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
 
+use common\models\PromisedPayment;
+use common\models\PromisedPayRepay;
 use Yii;
 use common\models\Payments;
 use common\models\search\PaymentsSearch;
@@ -305,6 +309,7 @@ class DefaultController extends AbstractBaseBackendController
      */
     public function actionUpdate($id)
     {
+        return $this->redirect(['index']);
         $model = $this->findModel($id);
         $oldSumm = $model->pay_summ;
 
@@ -525,11 +530,105 @@ class DefaultController extends AbstractBaseBackendController
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
-        $this->findModel($id)->delete();
+        $id = Yii::$app->request->post('id');
+        $approve = Yii::$app->request->post('approve');
 
-        return $this->redirect(['index']);
+        switch($approve){
+            case 'true':
+                $paymentRequestId = $this->findModel($id)->prequest_id;
+                $result = ['approve'=>'error'];
+                if($paymentRequestId){
+                    $trans = Yii::$app->db->beginTransaction();
+                    try{
+                        $this->deleteEnrollByPaymentRequestId($paymentRequestId);
+                        $this->deletePaymentsByPaymentRequestId($paymentRequestId);
+                        $this->changePaymentRequestStatus($paymentRequestId);
+
+                        $trans->commit();
+
+                        $result = ['approve'=>'done'];
+                    }catch (\Exception $e){
+                        $trans->rollBack();
+                        throw $e;
+                    }
+                }
+                return json_encode($result);
+                break;
+            case 'false':
+                $result = [];
+                $paymentsRows = Payments::find()
+                    ->select(Payments::tableName().'.id as pay_id, table3.id as enr_req_id, table4.id as enroll_id, table5.id as prom_pay_rep_id, table5.pr_pay_id')
+                    ->leftJoin(Payments::tableName().'as table2 ',Payments::tableName().'.prequest_id = table2.prequest_id ')
+                    ->leftJoin(EnrollmentRequest::tableName().'as table3 ',Payments::tableName().'.id = table3.payment_id')
+                    ->leftJoin(Enrolls::tableName().'as table4 ','table3.id = table4.enr_req_id')
+                    ->leftJoin(PromisedPayRepay::tableName().'as table5 ',Payments::tableName().'.id = table5.payment_id and table4.id = table5.enroll_id')
+                    ->where(['table2.id'=>$id])
+                    ->asArray()
+                    ->all();
+
+                $i = 0;
+                foreach ($paymentsRows as $row){
+                    $result['payments'][$i]['id'] = $row['pay_id'];
+                    $result['payments'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/default/view','id'=>$row['pay_id']]);
+
+                    $result['enrolls_req'][$i]['id'] = $row['enr_req_id'];
+                    $result['enrolls_req'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/enrollment-request/process','id'=>$row['enr_req_id']]);
+
+                    if($row['enroll_id']){
+                        $result['enrolls'][$i]['id'] = $row['enroll_id'];
+                        $result['enrolls'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/enrolls/view','id'=>$row['enroll_id']]);
+                    }
+
+                    if($row['prom_pay_rep_id']){
+                        $result['prom_pays'][$i]['id'] = $row['prom_pay_rep_id'];
+                        $result['prom_pays'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/promised-payment/view','id'=>$row['pr_pay_id']]);
+                    }
+
+
+                    $i++;
+                }
+
+                return json_encode($this->renderPartial('_del_pay_records', [
+                    'result' => $result,
+                ]));
+                break;
+            case 'done':
+                return $this->redirect(['index']);
+                break;
+            default:
+                return $this->redirect(['index']);
+                break;
+        }
+    }
+
+    protected function deleteEnrollByPaymentRequestId($id){
+        $enrolls = Enrolls::find()
+            ->leftJoin(EnrollmentRequest::tableName().'as table2','table2.id = '.Enrolls::tableName().'.enr_req_id')
+            ->leftJoin(Payments::tableName().'as table3',' table3.id = table2.payment_id')
+            ->leftJoin(PaymentRequest::tableName().'as table4', ' table4.id = table3.prequest_id')
+            ->where(['table4.id'=> $id])
+            ->all();
+
+        foreach ($enrolls as $enroll){
+            $enroll->delete();
+        }
+    }
+
+    protected function deletePaymentsByPaymentRequestId($id){
+        $paymentsRow = Payments::find()->where(['prequest_id'=>$id])->all();
+
+        foreach ($paymentsRow as $payment){
+            $payment->delete();
+        }
+    }
+
+    protected function changePaymentRequestStatus($id){
+        $request = PaymentRequest::find()->where(['id' => $id])->one();
+
+        $request->status = 5;
+        $request->update();
     }
 
     /**
