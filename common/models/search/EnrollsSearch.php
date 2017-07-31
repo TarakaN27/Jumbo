@@ -135,7 +135,7 @@ class EnrollsSearch extends Enrolls
             'enroll' => $this->enroll,
             Enrolls::tableName().'.enr_req_id' => $this->enr_req_id,
             Enrolls::tableName().'.service_id' => $this->service_id,
-            'cuser_id' => $this->cuser_id,
+            Enrolls::tableName().'.cuser_id' => $this->cuser_id,
             'buser_id' => $this->buser_id,
             //'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
