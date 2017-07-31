@@ -42,6 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => $model->unitEnroll?$model->unitEnroll->name:NULL,
                                 ],
                                 [
+                                    'attribute' => 'rate_nbrb',
+                                    'value' =>number_format($model->rate_nbrb,5,',','')
+                                ],
+                                [
                                     'attribute' => 'cuser_id',
                                     'value' => is_object($obCuser = $model->cuser) ? $obCuser->getInfo() : NULL
                                 ],

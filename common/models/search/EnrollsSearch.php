@@ -96,6 +96,20 @@ class EnrollsSearch extends Enrolls
         return $dataProvider;
     }
 
+    public function getEnrollInfoWithRate($id){
+        $data = Enrolls::find()
+            ->addSelect(Enrolls::tableName().'.*, '.ExchangeCurrencyHistory::tableName().'.rate_nbrb')
+            ->joinWith('enrReq req')
+            ->leftJoin(PaymentsCalculations::tableName(),PaymentsCalculations::tableName().'.payment_id = req.payment_id')
+            ->leftJoin(PaymentCondition::tableName(),PaymentCondition::tableName().'.id = '.PaymentsCalculations::tableName().'.pay_cond_id')
+            ->leftJoin(ExchangeCurrencyHistory::tableName(),ExchangeCurrencyHistory::tableName().'.currency_id = '.PaymentCondition::tableName().'.cond_currency')
+            ->where(ExchangeCurrencyHistory::tableName().".date = DATE_FORMAT(FROM_UNIXTIME(`req`.`pay_date`), '%Y-%m-%d')")
+            ->andWhere([Enrolls::tableName().'.id'=>$id])
+            ->one();
+
+        return $data;
+    }
+
     /**
      * @param $query
      * @param $params

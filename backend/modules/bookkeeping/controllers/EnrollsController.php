@@ -93,8 +93,9 @@ class EnrollsController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new EnrollsSearch();
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $searchModel->getEnrollInfoWithRate($id),
         ]);
     }
 
