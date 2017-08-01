@@ -573,9 +573,10 @@ class DefaultController extends AbstractBaseBackendController
                     $result['payments'][$i]['id'] = $row['pay_id'];
                     $result['payments'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/default/view','id'=>$row['pay_id']]);
 
-                    $result['enrolls_req'][$i]['id'] = $row['enr_req_id'];
-                    $result['enrolls_req'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/enrollment-request/process','id'=>$row['enr_req_id']]);
-
+                    if($row['enrolls_req']) {
+                        $result['enrolls_req'][$i]['id'] = $row['enr_req_id'];
+                        $result['enrolls_req'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/enrollment-request/process', 'id' => $row['enr_req_id']]);
+                    }
                     if($row['enroll_id']){
                         $result['enrolls'][$i]['id'] = $row['enroll_id'];
                         $result['enrolls'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/enrolls/view','id'=>$row['enroll_id']]);
