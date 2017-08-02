@@ -3,12 +3,16 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\web\JsExpression;
+
+use common\components\helpers\CustomViewHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\PaymentsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app/book', 'Payments');
 $this->params['breadcrumbs'][] = $this->title;
+
+CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js',$this);
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -51,14 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'html',
                                 'value' => function($model){
                                         $name = is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
-                                        if(
-                                            Yii::$app->user->can('adminRights') ||
-                                            Yii::$app->user->can('only_bookkeeper') ||
-                                            Yii::$app->user->can('only_manager')
-                                        )
-                                            return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);
-                                        else
-                                            return $name;
+
+                                        return $name;
                                     },
                                 'filter' => \kartik\select2\Select2::widget([
                                     'model' => $searchModel,
@@ -188,7 +186,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',
-                                'template' => $tpl
+                                'buttons'=>[
+                                    'delete'=>function ($url, $model) {
+                                        return "<span data-id='$model->id' class='glyphicon glyphicon-trash payDelete' style='cursor:pointer;'></span>";
+                                    }
+                                ],
+                                'template' =>  $tpl
                             ],
                         ],
                     ]); ?>
