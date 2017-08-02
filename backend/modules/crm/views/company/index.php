@@ -92,6 +92,20 @@ $columns = [
 			return CustomHelper::highlight('dummy',$obR->c_email);
 		}
 	],
+    [
+        'attribute' => 'ext_email',
+        'label' => Yii::t('app/users','Extra email'),
+        'format' => 'html',
+        'visible' => Yii::$app->user->getIdentity()->role != \backend\models\BUser::ROLE_USER,
+        'value' => function($model)
+        {
+            /** @var CUserRequisites $obR */
+            $obR = $model->requisites;
+            if(empty($obR))
+                return 'N/A';
+            return CustomHelper::highlight('dummy',$obR->ext_email);
+        }
+    ],
 	[
 		'attribute' => 'manager.fio',
 		'filter' => \kartik\select2\Select2::widget([

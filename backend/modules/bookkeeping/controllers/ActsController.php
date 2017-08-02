@@ -216,6 +216,7 @@ class ActsController extends AbstractBaseBackendController
                 $arCUser [] = $act->cuser_id;
 
         $arCUserEmail = CUser::getCUserEmails($arCUser); //получаем емаил пользователя
+        $arCUserExtEmail = CUser::getCUserExtEmails($arCUser); //получаем емаил пользователя
         //$arSKUsers = CuserExternalAccount::getSKByCUserIDs($arCUser,CuserExternalAccount::TYPE_CSDA); // получаем внешние аккаунты
         if(!$arCUserEmail)
             throw new NotFoundHttpException('Contractor not found');
@@ -232,6 +233,7 @@ class ActsController extends AbstractBaseBackendController
                 $arMsg = [
                     'iActId' => $act->id,
                     'toEmail' => $arCUserEmail[$act->cuser_id],
+                    'toExtEmail' => $arCUserExtEmail[$act->cuser_id],
                     'iBUserId' => Yii::$app->user->id
                 ];
                 if(Yii::$app->rabbit->sendMessage(Rabbit::QUEUE_ACTS_SEND_LETTER,$arMsg))

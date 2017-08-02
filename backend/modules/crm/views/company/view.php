@@ -178,6 +178,10 @@ $this->registerJs("
 										<th><?=YII::t('app/crm','Email')?>:</th>
 										<td><?=is_object($obRequisite) ? $obRequisite->c_email : '';?></td>
 									</tr>
+                                    <tr>
+                                        <th><?=YII::t('app/crm','Extra email')?>:</th>
+                                        <td><?=is_object($obRequisite) ? $obRequisite->ext_email : '';?></td>
+                                    </tr>
 									<?php endif;?>
 									<tr>
 										<th><?=YII::t('app/crm','Site')?>: </th>

@@ -40,6 +40,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
         $iActId = (int)$params['iActId'];
         $iBUSerId = (int)$params['iBUserId'];
         $toEmail = trim($params['toEmail']);
+        $toExtEmail = trim($params['toExtEmail']);
 
         /** @var Acts $obAct */
         $obAct = Acts::find()->where(['id' => $iActId])->with('legalPerson')->andWhere('sent is NULL OR sent = 0')->one();
@@ -60,6 +61,16 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
             $this->addError($iBUSerId, $errorText);
             $this->messagesProcessed($msg);
             return TRUE;
+        }
+
+        if($toExtEmail != ""){
+            if(!$this->sendMail($toExtEmail,$obAct->getDocumentPath(),$tmpType))
+            {
+                $errorText = 'Ошибка отправки акта '.$iActId.' . Не удалось отправить письмо';
+                $this->addError($iBUSerId, $errorText);
+                $this->messagesProcessed($msg);
+                return TRUE;
+            }
         }
 
         $obAct->sent = Acts::YES;

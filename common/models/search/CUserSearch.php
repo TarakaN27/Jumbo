@@ -20,6 +20,7 @@ class CUserSearch extends CUser
         $quantityHour,
         $corp_name,
         $c_email,
+        $ext_email,
         $phone,
         $fio;
 
@@ -35,7 +36,7 @@ class CUserSearch extends CUser
                 'role', 'status', 'created_at', 'updated_at','contractor','manager_crc_id','source_id','partner_manager_id'
             ], 'integer'],
             [[
-                'phone','c_email','fio','username',
+                'phone','c_email','ext_email','fio','username',
                 'auth_key', 'password_hash', 'password_reset_token',
                 'email','corp_name'
             ], 'safe'],
@@ -78,6 +79,7 @@ class CUserSearch extends CUser
         $query = CUser::find()->with('manager','userType','requisites','quantityHour','managerCrc','source');
         $query->joinWith('requisites');
         $query->joinWith('quantityHour');
+
         if(!is_null($addQuery))
             $query->where($addQuery,$addParams);
 
@@ -151,6 +153,7 @@ class CUserSearch extends CUser
 
         $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_phone',$this->phone]);
         $query->andFilterWhere(['like',CUserRequisites::tableName().'.c_email',$this->c_email]);
+        $query->andFilterWhere(['like',CUserRequisites::tableName().'.ext_email',$this->ext_email]);
 
         return $dataProvider;
     }

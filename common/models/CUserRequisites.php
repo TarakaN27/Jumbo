@@ -45,6 +45,7 @@ use yii\helpers\ArrayHelper;
  * @property string $site
  * @property string $description
  * @property string $bank_address
+ * @property string $ext_email
  */
 class CUserRequisites extends AbstractActiveRecord
 {
@@ -121,11 +122,11 @@ class CUserRequisites extends AbstractActiveRecord
             [[
                  'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
                  'reg_number', 'reg_auth', 'ch_account', 'b_name', 'b_code',
-                 'c_fname', 'c_lname', 'c_mname', 'c_email', 'c_phone', 'c_fax',
+                 'c_fname', 'c_lname', 'c_mname', 'c_email', 'ext_email', 'c_phone', 'c_fax',
                  'ynp', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident','site','bank_address'
              ], 'string', 'max' => 255],
             [['pasp_series'], 'string', 'max' => 4],
-            ['c_email', 'email'],
+            [['c_email', 'ext_email'], 'email'],
             [['reg_date','pasp_date'], 'date', 'format' => 'yyyy-m-d'],
 
             // обязательные поля для физика
@@ -413,6 +414,7 @@ class CUserRequisites extends AbstractActiveRecord
             'c_lname' => Yii::t('app/users', 'C Lname'),
             'c_mname' => Yii::t('app/users', 'C Mname'),
             'c_email' => Yii::t('app/users', 'C Email'),
+            'ext_email' => Yii::t('app/users', 'C extra email'),
             'c_phone' => Yii::t('app/users', 'C Phone'),
             'c_fax' => Yii::t('app/users', 'C Fax'),
             'ynp' => Yii::t('app/users', 'Ynp'),
