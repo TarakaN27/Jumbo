@@ -185,6 +185,10 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',
+                                'template' => $viewTpl
+                            ],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
                                 'template' => $updateTpl
                             ],
                             [

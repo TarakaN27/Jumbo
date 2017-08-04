@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'method' => 'post',
                         ],
                     ]) ?>
-                    <?php elseif(Yii::$app->user->can('only_manager')):?>
+                    <?php elseif(Yii::$app->user->can('only_manager') && false):?>
                     <?= Html::a(Yii::t('app/book', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                     <?php endif;?>
                 </section>
