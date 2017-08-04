@@ -70,7 +70,8 @@ class EnrollsSearch extends Enrolls
             ->leftJoin(PaymentCondition::tableName(),PaymentCondition::tableName().'.id = '.PaymentsCalculations::tableName().'.pay_cond_id')
             ->leftJoin(ExchangeRates::tableName(),ExchangeRates::tableName().'.id = '.PaymentCondition::tableName().'.cond_currency')
             ->leftJoin(ExchangeCurrencyHistory::tableName(),ExchangeCurrencyHistory::tableName().'.currency_id = '.PaymentCondition::tableName().'.cond_currency')
-            ->where(ExchangeCurrencyHistory::tableName().".date = DATE_FORMAT(FROM_UNIXTIME(`req`.`pay_date`), '%Y-%m-%d')");
+            ->where(ExchangeCurrencyHistory::tableName().".date = DATE_FORMAT(FROM_UNIXTIME(`req`.`pay_date`), '%Y-%m-%d')")
+            ->groupBy(Enrolls::tableName().'.id');
 
         $query = $this->queryHelper($query,$params,$additionQuery,$addParams);
 
@@ -86,7 +87,6 @@ class EnrollsSearch extends Enrolls
                 ]
             ]
         ]);
-
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');

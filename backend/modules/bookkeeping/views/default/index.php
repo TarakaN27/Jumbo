@@ -33,14 +33,17 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                 <?
                 $tpl = '';
                 $viewTpl = '';
+                $updateTpl = '';
                     if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'))
                     {
                         $tpl = '{delete}';
                         $viewTpl = '{view}';
+                        $updateTpl = '{update}';
                     }
                     elseif(Yii::$app->user->can('only_manager'))
                     {
                         $viewTpl = '{view}';
+                        $updateTpl = '{update}';
                     }
                     echo \common\components\widgets\WMCPageSize\WMCPageSize::widget();
                     echo GridView::widget([
@@ -182,7 +185,7 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',
-                                'template' => $viewTpl
+                                'template' => $updateTpl
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',

@@ -309,7 +309,7 @@ class DefaultController extends AbstractBaseBackendController
      */
     public function actionUpdate($id)
     {
-        return $this->redirect(['index']);
+        //return $this->redirect(['index']);
         $model = $this->findModel($id);
         $oldSumm = $model->pay_summ;
 

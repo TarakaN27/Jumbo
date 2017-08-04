@@ -59,7 +59,8 @@ $this->registerJs('
             'placeholder' => Yii::t('app/book','BOOK_choose_cuser')
         ],
         'pluginOptions' => [
-            'allowClear' => true
+            'allowClear' => true,
+            'disabled' => true
         ],
         ]); ?>
 
@@ -69,7 +70,8 @@ $this->registerJs('
             'defaultDate' => date('d.m.Y',time())
         ],
         'options' => [
-            'class' => 'form-control'
+            'class' => 'form-control',
+            'disabled' => true
         ]
     ]) ?>
 
@@ -83,34 +85,38 @@ $this->registerJs('
             ]])
                 ->textInput([
                     'maxlength' => true,
-                    'onchange' => 'boundsCheckingConditions();'
+                    'onchange' => 'boundsCheckingConditions();',
+                    'disabled' => true
                 ])->label(false)
             ?>
             <?= $form->field($model, 'currency_id',['template' => $fieldTpl,'options' => [
                 'class' => 'col-md-4 col-sm-4 col-xs-12',
                 'style' => 'padding-right:0px;'
             ]])
-                ->dropDownList(\common\models\ExchangeRates::getRatesCodes())->label(false) ?>
+                ->dropDownList(\common\models\ExchangeRates::getRatesCodes(),['disabled' => true])->label(false) ?>
         </div>
     </div>
     <?= $form->field($model,'customProd')->textInput()?>
 
     <?= $form->field($model, 'service_id')->dropDownList(\common\models\Services::getServicesMap(),[
         'prompt' => Yii::t('app/book','BOOK_choose_service'),
-        'onchange' => 'findCondition()'
+        'onchange' => 'findCondition()',
+        'disabled' => true
     ]) ?>
 
     <?= $form->field($model, 'legal_id')->dropDownList(\common\models\LegalPerson::getLegalPersonMap(),[
-        'onchange' => 'findCondition();'
+        'onchange' => 'findCondition();',
+        'disabled' => true
     ]) ?>
 
     <?= $form->field($model, 'condition_id')->dropDownList([],[
         'prompt' => Yii::t('app/book','BOOK_choose_payment_condition'),
-        'onchange' => 'boundsCheckingConditions();'
+        'onchange' => 'boundsCheckingConditions();',
+        'disabled' => true
     ]) ?>
     <div class="row">
         <div class="col-md-offset-3 pdd-left-15">
-            <?php if(Yii::$app->user->can('adminRights')):?>
+            <?php if(false):?>
             <div class="col-md-6">
                 <?= $form->field($model,"showAll")->checkbox([
                     'class' => 'showAllBtn',
@@ -126,8 +132,8 @@ $this->registerJs('
         </div>
     </div>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-
+    <?= $form->field($model, 'description')->textarea(['rows' => 6,'disabled' => true]) ?>
+<?php if(false):?>
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?php if(!$model->isNewRecord):?>
@@ -135,7 +141,7 @@ $this->registerJs('
             <?php endif;?>
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app/book', 'Create') : Yii::t('app/book', 'Update btn'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div></div>
-
+<?php endif;?>
     <?php ActiveForm::end(); ?>
 
 </div>
