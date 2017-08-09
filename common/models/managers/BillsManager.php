@@ -278,8 +278,7 @@ class BillsManager extends Bills{
         }
         */
 
-        $totalSummInWords =
-            CustomHelper::num2str($billTotalSumVat);
+        $totalSummInWords = $billTotalSumVat.' '.CustomHelper::num2str($billTotalSumVat);
 
         $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
         try{
