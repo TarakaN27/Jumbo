@@ -43,4 +43,9 @@ use yii\helpers\Url;
         <br>
         <br>
     <?}?>
+    <?php if(!empty($result['pur_hist'])){?>
+        <p><b>Также будут удалены данные о зачслениях для партнеров!</b></p>
+        <br>
+        <br>
+    <?}?>
 </div>

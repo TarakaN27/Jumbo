@@ -20,6 +20,7 @@ use common\models\Enrolls;
 use common\models\ExchangeCurrencyHistory;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
+use common\models\PartnerPurseHistory;
 use common\models\PaymentCondition;
 use common\models\PaymentRequest;
 use common\models\PaymentsCalculations;
@@ -559,11 +560,12 @@ class DefaultController extends AbstractBaseBackendController
             case 'false':
                 $result = [];
                 $paymentsRows = Payments::find()
-                    ->select(Payments::tableName().'.id as pay_id, table3.id as enr_req_id, table4.id as enroll_id, table5.id as prom_pay_rep_id, table5.pr_pay_id')
+                    ->select(Payments::tableName().'.id as pay_id, table3.id as enr_req_id, table4.id as enroll_id, table5.id as prom_pay_rep_id, table5.pr_pay_id, table6.id as pur_hist')
                     ->leftJoin(Payments::tableName().'as table2 ',Payments::tableName().'.prequest_id = table2.prequest_id ')
                     ->leftJoin(EnrollmentRequest::tableName().'as table3 ',Payments::tableName().'.id = table3.payment_id')
                     ->leftJoin(Enrolls::tableName().'as table4 ','table3.id = table4.enr_req_id')
                     ->leftJoin(PromisedPayRepay::tableName().'as table5 ',Payments::tableName().'.id = table5.payment_id and table4.id = table5.enroll_id')
+                    ->leftJoin(PartnerPurseHistory::tableName().'as table6 ',Payments::tableName().'.id = table6.payment_id')
                     ->where(['table2.id'=>$id])
                     ->asArray()
                     ->all();
@@ -585,6 +587,10 @@ class DefaultController extends AbstractBaseBackendController
                     if(isset($row['prom_pay_rep_id'])){
                         $result['prom_pays'][$i]['id'] = $row['prom_pay_rep_id'];
                         $result['prom_pays'][$i]['url'] = Yii::$app->getUrlManager()->createUrl(['bookkeeping/promised-payment/view','id'=>$row['pr_pay_id']]);
+                    }
+
+                    if(isset($row['pur_hist'])){
+                        $result['pur_hist'][$i]['pur_hist'] = true;
                     }
 
 
