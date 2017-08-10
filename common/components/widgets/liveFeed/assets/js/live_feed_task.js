@@ -80,42 +80,40 @@ function deleteMsg(this1)
     $.confirm({
         title:MESSAGE,
         content: CONFIRM_DELETE_MSG,
-        confirm: function() {
-            var
-                pk = $(this1).attr('data-id');
-            if(pk == undefined)
-            {
-                addErrorNotify(MESSAGE,MSG_ERROR_DEL);
-            }else{
-                $.ajax({
-                    type: "POST",
-                    cache: false,
-                    url:DIALOG_DEL_MSG_URL,
-                    dataType: "json",
-                    data: {pk:pk},
-                    success: function(msg){
-                        if(msg)
-                        {
-                            $('.message_wrapper .li-msg[data-id='+pk+']').remove();
-                            return true;
-                        }else{
+        buttons: {
+            Да: function() {
+                var
+                    pk = $(this1).attr('data-id');
+                if(pk == undefined)
+                {console.log('pk == undefined');
+                    addErrorNotify(MESSAGE,MSG_ERROR_DEL);
+                }else{
+                    $.ajax({
+                        type: "POST",
+                        cache: false,
+                        url:DIALOG_DEL_MSG_URL,
+                        dataType: "json",
+                        data: {pk:pk},
+                        success: function(msg){
+                            if(msg)
+                            {
+                                $('.message_wrapper .li-msg[data-id='+pk+']').remove();
+                                return true;
+                            }else{
+                                addErrorNotify(MESSAGE,MSG_ERROR_DEL);
+                                return false;
+                            }
+                        },
+                        error: function(msg){
                             addErrorNotify(MESSAGE,MSG_ERROR_DEL);
                             return false;
                         }
-                    },
-                    error: function(msg){
-                        addErrorNotify(MESSAGE,MSG_ERROR_DEL);
-                        return false;
-                    }
-                })
+                    })
+                }
+            },
+            Нет: function() {
             }
-        },
-        cancel: function() {
-        },
-        confirmButton: "Да",
-        cancelButton: "Нет",
-        confirmButtonClass: "btn-success ",
-        cancelButtonClass: "btn-default mrg-bottom-5",
+        }
     });
 }
 function updateMsg(this1)

@@ -190,7 +190,7 @@ class EnrollsSearch extends Enrolls
      */
     public function totalCount($params,$additionQuery = [],$addParams = [])
     {
-        $query = Enrolls::find()->select(['sumAmount'=>'SUM('.Enrolls::tableName().'.amount)','sumRepay'=>'SUM('.Enrolls::tableName().'.repay)','sumEnroll'=>'SUM('.Enrolls::tableName().'.enroll)', 'unitEnrollName'=>'ue.name', Enrolls::tableName().'.service_id', Enrolls::tableName().'.cuser_id', 'servName'=>'serv.name',Enrolls::tableName().'.enroll_unit_id'])
+        $query = Enrolls::find()->select(['sumAmount'=>'SUM('.Enrolls::tableName().'.amount)','sumRepay'=>'SUM('.Enrolls::tableName().'.repay)','sumEnroll'=>'SUM('.Enrolls::tableName().'.enroll)', 'unitEnrollName'=>'ue.name', Enrolls::tableName().'.service_id', Enrolls::tableName().'.cuser_id', 'servName'=>'serv.name',Enrolls::tableName().'.enroll_unit_id','rateValue'=> ExchangeRates::tableName().'.nbrb_rate'])
             ->joinWith('cuser')
             ->joinWith('service serv')
             ->joinWith('unitEnroll ue')
@@ -214,7 +214,7 @@ class EnrollsSearch extends Enrolls
 
 
         foreach($arEnroll as $enroll)
-            $arResult[$enroll['service_id'].'-'.$enroll['enroll_unit_id']]=['amount'=>$enroll['sumAmount'],'repay'=>$enroll['sumRepay'],'enroll'=>$enroll['sumEnroll'], 'nameServiceWithUnitEnroll' => $enroll['servName'].'['.$enroll['unitEnrollName'].']'];
+            $arResult[$enroll['service_id'].'-'.$enroll['enroll_unit_id']]=['amount'=>$enroll['sumAmount'],'repay'=>$enroll['sumRepay'],'enroll'=>$enroll['sumEnroll'],'rateValue'=>$enroll['rateValue'], 'nameServiceWithUnitEnroll' => $enroll['servName'].'['.$enroll['unitEnrollName'].']'];
         return $arResult;
     }
 }
