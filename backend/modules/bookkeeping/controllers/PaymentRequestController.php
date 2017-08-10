@@ -102,6 +102,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     public function actionAddPayment($pID)
     {
+        $now = strtotime(Date('Y-m-d H:i:s'));
+        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00'))))
+        {
+            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:00 AM!');
+        }
+
         /** @var PaymentRequest $modelP */
         $modelP = PaymentRequest::findOne($pID);
         if(empty($modelP))
@@ -476,10 +482,16 @@ class PaymentRequestController extends AbstractBaseBackendController{
      */
     public function actionUpdate($id)
     {
+        $now = strtotime(Date('Y-m-d H:i:s'));
+        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00'))))
+        {
+            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:00 AM!');
+        }
+
         $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
         if(empty($model))
             throw new NotFoundHttpException('Payment request not found');
-        
+
         $model->updateNotifications = TRUE;
         if(!Yii::$app->user->can('adminRights') && $model->owner_id != Yii::$app->user->id)
             throw new ForbiddenHttpException('You are not allowed to perform this action.');

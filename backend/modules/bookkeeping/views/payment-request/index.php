@@ -192,29 +192,33 @@ if(Yii::$app->user->can('adminRights'))
                             'template' => '{view}{process}',
                             'buttons' => [
                                 'process' =>function ($url, $model, $key) {
-                                    if(empty($model->manager_id) && $model->is_unknown == PaymentRequest::YES)
-                                    {
-                                        $options = [
-                                            'title' => Yii::t('yii', 'Make mine payment'),
-                                            'aria-label' => Yii::t('yii', 'Make mine payment'),
-                                        ];
-                                        return Html::a(
-                                            '<span class="glyphicon glyphicon-pushpin"></span>',
-                                            \yii\helpers\Url::to(['pin-payment-to-manager','pID' => $model->id]),
-                                            $options);
-                                    }
-                                    elseif(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
-                                        $options = [
-                                            'title' => Yii::t('yii', 'Add payments'),
-                                            'aria-label' => Yii::t('yii', 'Add payments'),
-                                        ];
-                                        if(
-                                            (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights')))
+                                    $now = strtotime(Date('Y-m-d H:i:s'));
+                                    if(!($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00')))){
+                                        if(empty($model->manager_id) && $model->is_unknown == PaymentRequest::YES)
+                                        {
+                                            $options = [
+                                                'title' => Yii::t('yii', 'Make mine payment'),
+                                                'aria-label' => Yii::t('yii', 'Make mine payment'),
+                                            ];
                                             return Html::a(
-                                                '<span class="glyphicon glyphicon-credit-card"></span>',
-                                                \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                                '<span class="glyphicon glyphicon-pushpin"></span>',
+                                                \yii\helpers\Url::to(['pin-payment-to-manager','pID' => $model->id]),
                                                 $options);
+                                        }
+                                        elseif(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
+                                            $options = [
+                                                'title' => Yii::t('yii', 'Add payments'),
+                                                'aria-label' => Yii::t('yii', 'Add payments'),
+                                            ];
+                                            if(
+                                            (Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights')))
+                                                return Html::a(
+                                                    '<span class="glyphicon glyphicon-credit-card"></span>',
+                                                    \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                                    $options);
+                                        }
                                     }
+
 
                                     return '';
                                 }
