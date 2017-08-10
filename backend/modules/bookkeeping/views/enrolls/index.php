@@ -126,10 +126,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php if(!empty($arTotal)):?>
                         <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
                         <table class="table table-striped table-bordered">
+                            <tr>
+                                <th></th>
+                                <th>РКЕ</th>
+                                <th>П ОП</th>
+                                <th>КЗЕ</th>
+                            </tr>
                             <?php foreach($arTotal as $value):?>
                                 <tr>
                                     <th><?=$value['nameServiceWithUnitEnroll'];?></th>
                                     <td><?=Yii::$app->formatter->asDecimal($value['amount']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['repay']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['enroll']);?></td>
                                 </tr>
                             <?php endforeach;?>
                         </table>
