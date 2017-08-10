@@ -2,6 +2,7 @@
 
 namespace common\models\search;
 
+use common\models\CUser;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -55,6 +56,11 @@ class ActsSearch extends Acts
     public function search($params)
     {
         $query = Acts::find()->with('legalPerson','currency','cuser.requisites');
+        if(Yii::$app->user->can('only_manager')){
+            $query = $query
+                ->leftJoin(CUser::tableName().'as cuser','cuser.id = '.Acts::tableName().'.cuser_id')
+                ->andWhere(['cuser.manager_id'=>Yii::$app->user->id]);
+        }
         $query = $this->queryHelper($query,$params);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

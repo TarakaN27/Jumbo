@@ -18,14 +18,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     <h2><?= Html::encode($this->title) ?></h2>
                     <section class="pull-right">
                         <?=  Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
-                        <?= Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']) ?>
-                        <?= Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                            'confirm' => Yii::t('app/book', 'Are you sure you want to delete this item?'),
-                            'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?php
+                        if(!Yii::$app->user->can('only_manager')){
+                            echo Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']);
+                            echo Html::a(Yii::t('app/book', 'Delete'), ['delete', 'id' => $model->id], [
+                                'class' => 'btn btn-danger',
+                                'data' => [
+                                    'confirm' => Yii::t('app/book', 'Are you sure you want to delete this item?'),
+                                    'method' => 'post',
+                                ],
+                            ]);
+                        }
+                         ?>
                     </section>
                     <div class = "clearfix"></div>
                 </div>

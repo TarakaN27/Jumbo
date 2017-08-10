@@ -37,12 +37,24 @@ var
             <div class = "x_title">
                 <h2><?= Html::encode($this->title) ?></h2>
                 <section class="pull-right">
-                    <?= Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']) ?>
-                    <?= Html::button(Yii::t('app/book', 'Send acts'),['class' => 'btn btn-warning', 'id' => 'sendActID'])?>
+                    <?php
+                    if(!Yii::$app->user->can('only_manager')){
+                        echo Html::a(Yii::t('app/book', 'Create Acts'), ['create'], ['class' => 'btn btn-success']);
+                        echo Html::button(Yii::t('app/book', 'Send acts'),['class' => 'btn btn-warning', 'id' => 'sendActID']);
+                    }
+                    ?>
                 </section>
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
+                <?php
+                if(!Yii::$app->user->can('only_manager')){
+                    $checkboxVisible = true;
+                }else{
+                    $checkboxVisible = false;
+                }
+
+                ?>
                 <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget(); ?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -57,7 +69,8 @@ var
                                     'class' => 'selectedActs'.($model->sent ? ' hide' : ''),
                                     'value' => $model->id
                                 ];
-                            }
+                            },
+                            'visible' => $checkboxVisible,
                         ],
                         [
                             'attribute' => 'id'
@@ -117,16 +130,20 @@ var
                             'attribute' => 'cuser.requisites.c_email',
                             'format' => 'raw',
                             'value' => function($model){
-                                return Html::a(ArrayHelper::getValue($model,'cuser.requisites.c_email'),'#',[
-                                    'class' => 'editable',
-                                    'data-value' => ArrayHelper::getValue($model,'cuser.requisites.c_email'),
-                                    'data-type' => "text",
-                                    'data-pk' => $model->cuser_id,
-                                    //'data-created_by' => $model->created_by,
-                                    // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
-                                    'data-url' => \yii\helpers\Url::to(['update-cuser-email']),
-                                    'data-title' => Yii::t('app/common','Изменить емаил')
-                                ]);
+                                if(!Yii::$app->user->can('only_manager')){
+                                    return Html::a(ArrayHelper::getValue($model,'cuser.requisites.c_email'),'#',[
+                                        'class' => 'editable',
+                                        'data-value' => ArrayHelper::getValue($model,'cuser.requisites.c_email'),
+                                        'data-type' => "text",
+                                        'data-pk' => $model->cuser_id,
+                                        //'data-created_by' => $model->created_by,
+                                        // 'data-source' => \yii\helpers\Json::encode(CrmTask::getStatusArr()),
+                                        'data-url' => \yii\helpers\Url::to(['update-cuser-email']),
+                                        'data-title' => Yii::t('app/common','Изменить емаил')
+                                    ]);
+                                }else{
+                                    return ArrayHelper::getValue($model,'cuser.requisites.c_email');
+                                }
                             }
                         ],
                         [
@@ -184,7 +201,8 @@ var
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{delete}'
+                            'template' => '{delete}',
+                            'visible' => !Yii::$app->user->can('only_manager')
                         ],
                     ],
                 ]); ?>

@@ -287,7 +287,7 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
                                         <!---Акты и вывод средст партнера--------->
-                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('superRights') || Yii::$app->user->can('only_bookkeeper')|| Yii::$app->user->can('only_manager')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/acts/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_acts'); ?></a>
                                             </li>
