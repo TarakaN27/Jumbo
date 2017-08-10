@@ -37,7 +37,7 @@ class EnrollsSearch extends Enrolls
         return [
             [['id', 'enr_req_id', 'service_id', 'cuser_id', 'buser_id',  'updated_at','enroll_unit_id'], 'integer'],
             [['amount', 'repay', 'enroll'], 'number'],
-            [['created_at','description','from_date','to_date','payName','rateName','rate_nbrb'], 'safe'],
+            [['created_at','description','from_date','to_date','payName','rateName','rate_nbrb', 'b_user_enroll'], 'safe'],
             ['unitname','string'],
             [['from_date','to_date'],'date','format' => 'php:m.d.Y']
         ];
@@ -62,7 +62,7 @@ class EnrollsSearch extends Enrolls
     public function search($params,$additionQuery = [],$addParams = [])
     {
         $query = Enrolls::find()
-            ->addSelect(Enrolls::tableName().'.*, '.PaymentCondition::tableName().'.name as payName, '.ExchangeRates::tableName().'.name as rateName, '.ExchangeCurrencyHistory::tableName().'.rate_nbrb')
+            ->addSelect(Enrolls::tableName().'.*, '.PaymentCondition::tableName().'.name as payName, '.ExchangeRates::tableName().'.name as rateName, '.ExchangeCurrencyHistory::tableName().'.rate_nbrb, '.Services::tableName().'.b_user_enroll')
             ->joinWith('cuser')
             ->joinWith('service serv')
             ->joinWith('enrReq req')
@@ -70,6 +70,7 @@ class EnrollsSearch extends Enrolls
             ->leftJoin(PaymentCondition::tableName(),PaymentCondition::tableName().'.id = '.PaymentsCalculations::tableName().'.pay_cond_id')
             ->leftJoin(ExchangeRates::tableName(),ExchangeRates::tableName().'.id = '.PaymentCondition::tableName().'.cond_currency')
             ->leftJoin(ExchangeCurrencyHistory::tableName(),ExchangeCurrencyHistory::tableName().'.currency_id = '.PaymentCondition::tableName().'.cond_currency')
+            ->leftJoin(Services::tableName(),Services::tableName().'.id = '.Enrolls::tableName().'.service_id')
             ->where(ExchangeCurrencyHistory::tableName().".date = DATE_FORMAT(FROM_UNIXTIME(`req`.`pay_date`), '%Y-%m-%d')")
             ->groupBy(Enrolls::tableName().'.id');
 
@@ -98,11 +99,12 @@ class EnrollsSearch extends Enrolls
 
     public function getEnrollInfoWithRate($id){
         $data = Enrolls::find()
-            ->addSelect(Enrolls::tableName().'.*, '.ExchangeCurrencyHistory::tableName().'.rate_nbrb')
+            ->addSelect(Enrolls::tableName().'.*, '.ExchangeCurrencyHistory::tableName().'.rate_nbrb, '.Services::tableName().'.b_user_enroll')
             ->joinWith('enrReq req')
             ->leftJoin(PaymentsCalculations::tableName(),PaymentsCalculations::tableName().'.payment_id = req.payment_id')
             ->leftJoin(PaymentCondition::tableName(),PaymentCondition::tableName().'.id = '.PaymentsCalculations::tableName().'.pay_cond_id')
             ->leftJoin(ExchangeCurrencyHistory::tableName(),ExchangeCurrencyHistory::tableName().'.currency_id = '.PaymentCondition::tableName().'.cond_currency')
+            ->leftJoin(Services::tableName(),Services::tableName().'.id = '.Enrolls::tableName().'.service_id')
             ->where(ExchangeCurrencyHistory::tableName().".date = DATE_FORMAT(FROM_UNIXTIME(`req`.`pay_date`), '%Y-%m-%d')")
             ->andWhere([Enrolls::tableName().'.id'=>$id])
             ->one();

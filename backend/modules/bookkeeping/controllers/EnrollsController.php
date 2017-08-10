@@ -8,6 +8,7 @@ use Yii;
 use common\models\Enrolls;
 use common\models\search\EnrollsSearch;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use common\models\ExchangeCurrencyHistory;
@@ -30,12 +31,18 @@ class EnrollsController extends Controller
             'rules' => [
                 [
                     'actions' => [
-                        'view',
                         'update',
                         'delete'
                     ],
                     'allow' => true,
                     'roles' => ['admin']
+                ],
+                [
+                    'actions' => [
+                        'view',
+                    ],
+                    'allow' => true,
+                    'roles' => ['@']
                 ],
                 [
                     'actions' => [
@@ -94,9 +101,14 @@ class EnrollsController extends Controller
     public function actionView($id)
     {
         $searchModel = new EnrollsSearch();
-        return $this->render('view', [
-            'model' => $searchModel->getEnrollInfoWithRate($id),
-        ]);
+        $enrollInfo = $searchModel->getEnrollInfoWithRate($id);
+        if((isset($enrollInfo->b_user_enroll) && $enrollInfo->b_user_enroll == Yii::$app->user->id) || Yii::$app->user->can('adminRights')){
+            return $this->render('view', [
+                'model' => $enrollInfo,
+            ]);
+        }else{
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
     }
 
     /**

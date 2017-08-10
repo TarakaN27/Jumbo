@@ -29,7 +29,8 @@ class Enrolls extends AbstractActiveRecord
 {
     public  $payName,
             $rateName,
-            $rate_nbrb;
+            $rate_nbrb,
+            $b_user_enroll;
     /**
      * @inheritdoc
      */

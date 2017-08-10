@@ -111,8 +111,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',
-                                        'template' => '{update}{view}',
+                                        'template' => '{update}',
                                         'visible' => Yii::$app->user->can('adminRights')
+                                    ],
+                                    [
+                                        'content' => function ($model) {
+                                            if ($model->b_user_enroll == Yii::$app->user->id || Yii::$app->user->can('adminRights')) {
+                                                return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'id' => $model->id]);
+                                            }else return false;
+                                        },
                                     ],
                                     [
                                         'class' => 'yii\grid\ActionColumn',
