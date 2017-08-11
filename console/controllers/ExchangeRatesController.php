@@ -24,26 +24,27 @@ class ExchangeRatesController extends AbstractConsoleController{
      * @return int
      * @throws \yii\web\NotFoundHttpException
      */
-    public function actionRun()
+    public function actionRun($failCount = 5)
     {
+        $failCount--;
         /** @var ExchangeRates $arCurrency */
         $arCurrency = ExchangeRates::find()->where(['need_upd' => ExchangeRates::YES])->all();
         if(empty($arCurrency))
             return $this->log(TRUE);
-
-        $obNBRB = new ExchangeRatesNBRB();
-        $arCurrNBRB = $obNBRB->getAllCurrency();
-
-        $obCBRF = new ExchangeRatesCBRF();
-        $arCurrCBRF = $obCBRF->getAllCurrency();
-        unset($obCBRF,$obNBRB);
-
-        $bHasError = FALSE;
-        /**
-         * вначале обновляем курсы валют , которые получаем из центр. банков
-         */
         $trans = \Yii::$app->db->beginTransaction();
         try{
+            $obNBRB = new ExchangeRatesNBRB();
+            $arCurrNBRB = $obNBRB->getAllCurrency();
+
+            $obCBRF = new ExchangeRatesCBRF();
+            $arCurrCBRF = $obCBRF->getAllCurrency();
+            unset($obCBRF,$obNBRB);
+
+            $bHasError = FALSE;
+            /**
+             * вначале обновляем курсы валют , которые получаем из центр. банков
+             */
+
             /** @var  ExchangeRates $model*/
             foreach($arCurrency as $key => $model)
             {
@@ -144,6 +145,8 @@ class ExchangeRatesController extends AbstractConsoleController{
             $trans->rollBack();
             $bHasError = TRUE;
             var_dump($e->getCode().' '.$e->getMessage());
+            if($failCount > 0)
+                $this->actionRun($failCount);
         }
 
         return $this->log(!$bHasError);
