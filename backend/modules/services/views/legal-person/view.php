@@ -38,7 +38,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id',
                         'name',
                         'description:ntext',
-                        'doc_requisites:ntext',
+                        [
+                            'attribute' => 'default_bank_id',
+                            'value' => $model->getDefaultBank()->name
+                        ],
                         'ynp',
                         'address:ntext',
                         'mailing_address:ntext',
