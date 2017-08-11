@@ -396,4 +396,21 @@ jQuery(function(){
         showByrInfo(this);
     });
     initAmountFormater();
+    $("#ap_sale_checkbox").change(function(){
+        var inputs, input, select;
+        inputs = this.getElementsByTagName('input');
+        for(var i = 0; i < inputs.length; i++) {
+            if(inputs[i].type.toLowerCase() == 'checkbox') {
+                input = inputs[i];
+            }
+        }
+        select = $("#ap_salers_dropdown select");
+            if(!input.checked) {
+                select.prop( "disabled", true );
+
+            }else{
+                select.prop( "disabled", false );
+            }
+        }
+    )
 });
