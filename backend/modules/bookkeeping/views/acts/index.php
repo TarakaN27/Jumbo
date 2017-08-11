@@ -47,14 +47,6 @@ var
                 <div class = "clearfix"></div>
             </div>
             <div class = "x_content">
-                <?php
-                if(!Yii::$app->user->can('only_manager')){
-                    $checkboxVisible = true;
-                }else{
-                    $checkboxVisible = false;
-                }
-
-                ?>
                 <?php echo \common\components\widgets\WMCPageSize\WMCPageSize::widget(); ?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -70,7 +62,7 @@ var
                                     'value' => $model->id
                                 ];
                             },
-                            'visible' => $checkboxVisible,
+                            'visible' => !Yii::$app->user->can('only_manager'),
                         ],
                         [
                             'attribute' => 'id'
