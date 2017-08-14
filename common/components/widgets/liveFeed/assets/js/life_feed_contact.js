@@ -243,7 +243,8 @@ function deleteMsg(this1)
     $.confirm({
         title:MESSAGE,
         content: CONFIRM_DELETE_MSG,
-        confirm: function() {
+        buttons: {
+            Да: function() {
             var
                 pk = $(this1).attr('data-id');
             if(pk == undefined)
@@ -272,13 +273,10 @@ function deleteMsg(this1)
                     }
                 })
             }
-        },
-        cancel: function() {
-        },
-        confirmButton: "Да",
-        cancelButton: "Нет",
-        confirmButtonClass: "btn-success ",
-        cancelButtonClass: "btn-default mrg-bottom-5",
+            },
+            Нет: function() {
+            }
+        }
     });
 }
 function updateMsg(this1)

@@ -129,16 +129,40 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                         ]); ?>
 
-                <div class="col-md-4 col-md-offset-8">
+                <div class="col-md-6 col-md-offset-6">
                     <?php if(!empty($arTotal)):?>
                         <?=Html::tag('h3',Yii::t('app/crm','Total'))?>
                         <table class="table table-striped table-bordered">
-                            <?php foreach($arTotal as $value):?>
+                            <tr>
+                                <th></th>
+                                <th>РКЕ</th>
+                                <th>П ОП</th>
+                                <th>КЗЕ</th>
+                                <th>РКЕ - КЗЕ</th>
+                                <th>РКЕ - КЗЕ(BYN)</th>
+                            </tr>
+                            <?php
+                            $rkeKzeBynSum = 0;
+                            foreach($arTotal as $value):
+                                $rkeKzeBynSum += ($value['amount'] - $value['enroll']) * $value['rateValue'];
+                                ?>
                                 <tr>
                                     <th><?=$value['nameServiceWithUnitEnroll'];?></th>
                                     <td><?=Yii::$app->formatter->asDecimal($value['amount']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['repay']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['enroll']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal($value['amount'] - $value['enroll']);?></td>
+                                    <td><?=Yii::$app->formatter->asDecimal(($value['amount'] - $value['enroll']) * $value['rateValue']);?></td>
                                 </tr>
                             <?php endforeach;?>
+                            <tr>
+                                <th>Итого</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th><?=Yii::$app->formatter->asDecimal($rkeKzeBynSum,2)?></th>
+                            </tr>
                         </table>
                     <?php endif;?>
                 </div>
