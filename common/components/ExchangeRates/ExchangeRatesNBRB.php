@@ -16,10 +16,10 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     protected
         $time = NULL,
         $internalCurrCode = [
-            '980' => '224',         //гривна
+            '980' => '290',         //гривна
             '840' => '145',         //usd
-            '978' => '19',          //euro
-            '643' => '190'          //ruble
+            '978' => '292',          //euro
+            '643' => '298'          //ruble
         ];
 
     /**
@@ -103,6 +103,26 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
             $date = (string)$items->attributes()->Date;
             $dateTmp = (float)$items->Rate;
             $arResult [date('Y-m-d',strtotime($date))] = $this->getRateAfterDenomination($dateTmp,$this->time);
+        }
+
+        return $arResult;
+    }
+
+    public function getCurrencyRateByDate($date)
+    {
+        $onDate = date('m/d/Y',$date);
+        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.$onDate;
+        $sxml = $this->loadFile();
+        if(!is_object($sxml)){
+            return NULL;
+        }
+        $arResult = [];
+
+        foreach ($sxml->Currency as $items)
+        {
+            $rateId = $items->NumCode;
+            $dateTmp = (float)$items->Rate;
+            $arResult[(string)$rateId] = $this->getRateAfterDenomination($dateTmp,$this->time);
         }
 
         return $arResult;

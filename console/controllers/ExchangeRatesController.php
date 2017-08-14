@@ -146,6 +146,7 @@ class ExchangeRatesController extends AbstractConsoleController{
             $bHasError = TRUE;
             var_dump($e->getCode().' '.$e->getMessage());
             if($failCount > 0)
+                sleep(30);
                 $this->actionRun($failCount);
         }
 
@@ -188,6 +189,173 @@ class ExchangeRatesController extends AbstractConsoleController{
         }
 
         return self::EXIT_CODE_NORMAL;
+    }
+
+    public function actionGetExchangeRatesByDate($date){
+        $searchDate = strtotime($date);
+        $oldDate = $searchDate - 86400;
+        $curses = [];
+        $updatedCurCodes = [2 => 933,1 => 840,11 => 978, 3 => 643];
+        $resultNbrb = new ExchangeRatesNBRB();
+        $resultCbrf = new ExchangeRatesCBRF();
+
+        $curses['nbrb'] = $resultNbrb->getCurrencyRateByDate($searchDate);
+        $curses['cbrf']= $resultCbrf->getCurrencyRateByDate($searchDate);
+
+        $fromDb = true;
+
+        $oldRates = ExchangeCurrencyHistory::find()->andWhere(['date'=>date('Y-m-d',$oldDate)])->all();
+        $arCurrency = ExchangeRates::find()->all();
+        $result = [];
+
+        if(!empty($oldRates) && count($oldRates) == 12){
+            foreach ($oldRates as $rate){
+                $result['old_nbrb'][$rate->currency_id] = $rate->rate_nbrb;
+                $result['old_cbrf'][$rate->currency_id] = $rate->rate_cbr;
+            }
+        }else{
+            $fromDb = false;
+            $curses['old_nbrb'] = $resultNbrb->getCurrencyRateByDate($oldDate);
+            $curses['old_cbrf']= $resultCbrf->getCurrencyRateByDate($oldDate);
+
+
+            foreach ($arCurrency as $cur){
+                if(isset($curses['old_nbrb'][$updatedCurCodes[$cur->id]])){
+                    $result['old_nbrb'][$cur->id] = $curses['old_nbrb'][$updatedCurCodes[$cur->id]];
+                }else{
+                    $result['old_nbrb'][$cur->id] = (float)1;
+                }
+                if(isset($curses['old_cbrf'][$cur->nbrb][$updatedCurCodes[$cur->id]])){
+                    $result['old_cbrf'][$cur->id] = $curses['old_cbrf'][$updatedCurCodes[$cur->id]];
+                }else{
+                    $result['old_cbrf'][$cur->id] = (float)1;
+                }
+            }
+
+        }
+
+        foreach ($arCurrency as $cur){
+            if(isset($updatedCurCodes[$cur->id]) && isset($curses['nbrb'][$updatedCurCodes[$cur->id]])){
+                if($cur->id != 3){
+                    $result['nbrb'][$cur->id] = $curses['nbrb'][$updatedCurCodes[$cur->id]];
+                }else{
+                    $result['nbrb'][$cur->id] = $curses['nbrb'][$updatedCurCodes[$cur->id]]/100;
+                }
+            }elseif(isset($updatedCurCodes[$cur->id])){
+                $result['nbrb'][$cur->id] = (float)1;
+            }elseif($cur->id == 13){
+                $result['nbrb'][$cur->id] = $curses['nbrb'][$updatedCurCodes[3]]/100;
+            }
+            if(isset($updatedCurCodes[$cur->id]) && isset($curses['cbrf'][$cur->nbrb][$updatedCurCodes[$cur->id]])){
+                $result['cbrf'][$cur->id] = $curses['cbrf'][$updatedCurCodes[$cur->id]];
+            }elseif(isset($updatedCurCodes[$cur->id])){
+                $result['cbrf'][$cur->id] = (float)1;
+            }elseif($cur->id == 13){
+                $result['cbrf'][$cur->id] = (float)1;
+            }
+        }
+
+
+        foreach($arCurrency as $item)
+        {
+            if($item->use_base) //так как основные валюты уже обновили, обновим зависимые валюты
+            {
+                /** @var ExchangeRates $obBase */
+                $obBase = ExchangeRates::findOne(['id' => $item->base_id]);
+                if(empty($obBase))
+                    throw new NotFoundHttpException('Base currency not found');
+
+                $result['nbrb'][$item->id] = round($result['nbrb'][$obBase->id]*$item->factor,4);
+                $result['cbrf'][$item->id] = round($result['cbrf'][$obBase->id]*$item->factor,4);
+
+                if(!$fromDb){
+
+                    $result['old_nbrb'][$item->id] = round($result['old_nbrb'][$obBase->id]*$item->factor,4);
+                    $result['old_cbrf'][$item->id] = round($result['old_cbrf'][$obBase->id]*$item->factor,4);
+                }
+
+
+                $this->saveHistoryRate($item->id,$searchDate,$result);
+
+            }elseif($item->use_exchanger) //обновим фиксированные валюты
+            {
+                $data = $this->parseObmennikByDate($searchDate);
+
+                if(empty($data))
+                    throw new NotFoundHttpException('Cant get currency from obmennik.by');
+
+                $factor = empty($item->factor) ? 1 : $item->factor;
+
+                $result['cbrf'][$item->id] = $data['rur']*$factor;
+                $result['nbrb'][$item->id] = $data['usd']*$factor;
+
+                $this->saveHistoryRate($item->id,$searchDate,$result);
+
+            }elseif($item->fix_exchange){
+                $result['nbrb'][$item->id] = $item->nbrb_rate;
+                $result['cbrf'][$item->id] = $item->cbr_rate;
+
+                if(!$fromDb){
+                    $result['old_nbrb'][$item->id] = $item->nbrb_rate;
+                    $result['old_cbrf'][$item->id] = $item->cbr_rate;
+                }
+
+                $this->saveHistoryRate($item->id,$searchDate,$result);
+            }else{
+                $this->saveHistoryRate($item->id,$searchDate,$result);
+            }
+
+        }
+    }
+
+    private function parseObmennikByDate($date){
+        $url = 'http://obmennik.by/archivesbanksofbelarus.php?date='.date('Y-m-d',$date);
+        $ch = curl_init();
+        $timeout = 5;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $html = curl_exec($ch);
+        curl_close($ch);
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+
+        $internalErrors = libxml_use_internal_errors(true);
+        $dom->loadHTML($html);
+        $dom->encoding = 'UTF-8';
+        libxml_use_internal_errors($internalErrors);
+
+        $tables = $dom->getElementsByTagName('table');
+
+        $myTabbleRow = $tables->item(6)->getElementsByTagName('tr')->item(11)->getElementsByTagName('td');
+
+        return ['usd' => $myTabbleRow->item(3)->textContent, 'rur' => (float)$myTabbleRow->item(7)->textContent/100];
+    }
+
+    private function saveHistoryRate($curId,$tmstmpDate, $curData){
+        $date = date('Y-m-d',$tmstmpDate);
+        $obH = ExchangeCurrencyHistory::findOne(['currency_id' => $curId,'date' => $date]);
+        if(empty($obH))
+            $obH = new ExchangeCurrencyHistory();
+
+        $userID = NULL;
+        $app = \Yii::$app;
+        if(property_exists($app,'user') && !\Yii::$app->user->isGuest)
+            $userID = \Yii::$app->user->id;
+
+        $obH->currency_id = $curId;
+        $obH->date = $date;
+        $obH->user_id = $userID;
+        $obH->old_rate_nbrb = $curData['old_nbrb'][$curId];
+        $obH->old_rate_cbr = $curData['old_cbrf'][$curId];
+        $obH->rate_nbrb = $curData['nbrb'][$curId];
+        $obH->rate_cbr = $curData['cbrf'][$curId];
+        //сохраняем историю
+        if($obH->save()){
+            echo 'save: '.$obH->currency_id."\n";
+        }else{
+            echo 'not saved: '.$obH->currency_id."\n";
+        }
     }
 
     public function actionRecoveryExchangeRates()

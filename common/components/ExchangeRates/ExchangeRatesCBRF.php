@@ -23,7 +23,13 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
         $codeID;
 
     protected
-        $time;
+        $time,
+        $internalCurrCode = [
+        '980' => 'R01720',         //гривна
+        '840' => 'R01235',         //usd
+        '978' => 'R01239',          //euro
+        '933' => 'R01090'          //ruble
+        ];
 
     public function __construct($codeID = NULL,$time = NULL)
     {
@@ -118,5 +124,45 @@ class ExchangeRatesCBRF extends AbstractExchangeRates{
         }
     }
 
+    public function getCurrencyRateByPeriod($iCurrId,$beginDate,$endDate)
+    {
+        $iCurrId = $this->internalCurrCode[$iCurrId];
+        $fromDate = date('d/m/Y',$beginDate);
+        $toDate = date('d/m/Y',$endDate);
+        $this->url = 'http://www.cbr.ru/scripts/XML_dynamic.asp?VAL_NM_RQ='.$iCurrId.'&date_req1='.$fromDate.'&date_req2='.$toDate;
+        $sxml = $this->loadFile();
+        if(!is_object($sxml)){
+            return NULL;
+        }
+        $arResult = [];
+
+        foreach ($sxml->Record as $items)
+        {
+            $date = (string)$items->attributes()->Date;
+            $arResult [date('Y-m-d',strtotime($date))] = (float)str_replace(',','.',$items->Value);
+        }
+
+        return $arResult;
+    }
+
+    public function getCurrencyRateByDate($date)
+    {
+        $onDate = date('d/m/Y',$date);
+        $this->url = 'http://www.cbr.ru/scripts/XML_daily.asp?date_req='.$onDate;
+        $sxml = $this->loadFile();
+        if(!is_object($sxml)){
+            return NULL;
+        }
+        $arResult = [];
+
+        foreach ($sxml->Valute as $items)
+        {
+            $rateId = $items->NumCode;
+            $arResult[(string)$rateId] = (float)str_replace(',','.',$items->Value);
+
+        }
+
+        return $arResult;
+    }
 
 } 
