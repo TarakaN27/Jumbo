@@ -47,6 +47,9 @@ function loadPayments() {
  * @returns {boolean}
  */
 function checkboxPaymentProcessed() {
+    if($('.select-on-check-all').is(':checked')){
+        $('.select-on-check-all').prop('checked', false);
+    }
     var
         currency = $('#actform-icurr'),
         checkedVal = $('#paymentsBlock .cbPayment:checked'),
@@ -962,12 +965,27 @@ function showByrInfo(this1)
 
     $(this1).after( $('<div></div>',{class:'amountInfo'}).html(convertAmountToInvalid(amount*10000) + ' BYR'));
 }
+
+function checkboxPaymentProcessedAll()
+{
+    if($(this).is(':checked')){
+        $('.cbPayment').prop('checked',true);
+    }else{
+        $('.cbPayment').prop( "checked", false );
+    }
+
+    unfillServices();
+    fillServices();
+    showByrInfo('#actform-famount');
+}
 /**
  * Вешаем обработчики событий в document.ready
  */
 $(function () {
     $('#actform-ilegalperson,#actform-icuser, .legal_banks select').on('change', loadPayments);
     $('#paymentsBlock').on('change', '.cbPayment', checkboxPaymentProcessed);
+    $('#paymentsBlock').on('change', '.select-on-check-all', checkboxPaymentProcessedAll);
+
     var
         sortList = $('#servicesBlock');
     sortList.sortable();
