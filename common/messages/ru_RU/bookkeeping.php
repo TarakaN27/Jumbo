@@ -208,7 +208,7 @@ return [
     'Sale user' => 'Кто продал',
     'Is sale' => 'Это продажа',
     'Maybe payment is sale' => 'Возможно платеж является продажей!',
-    'Choose user' => 'Выбрать пользователя',
+    'Choose user' => 'Выбрать продавшего',
     'Check is sale' => 'Проверка продажи',
     'Attention. Unit will be enroll for payment request owner!' => 'Внимание! Юниты будут зачислены владельцу запроса на платеж',
     'Payment request owner' => 'Владелец платежа',

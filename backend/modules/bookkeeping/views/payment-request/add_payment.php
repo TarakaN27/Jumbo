@@ -189,19 +189,20 @@ var
                                             <span class="warning "><?=Yii::t('app/book','Maybe payment is sale');?></span>
                                              </div>
                                             <div>
-                                                <div class="col-md-3 col-md-offset-2 pdd-left-15">
+                                                <div id="ap_sale_checkbox" class="col-md-3 col-md-offset-2 pdd-left-15">
                                                     <?= $form->field($m,"[{$i}]isSale",[])->checkbox([
                                                         'class' => ''
                                                     ])?>
                                                 </div>
-                                                <div class="col-md-7" >
+                                                <div id="ap_salers_dropdown" class="col-md-7" >
                                                         <?=$form->field($m,"[{$i}]saleUser",[
                                                                 'template' => '<div class="col-md-12 col-sm-12 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
                                                                 //'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
                                                             ])
                                                             ->dropDownList(\backend\models\BUser::getAllMembersMap(),[
                                                                 'class' => 'selectDrop',
-                                                                'prompt' => Yii::t('app/book','Choose user')
+                                                                'prompt' => Yii::t('app/book','Choose user'),
+                                                                'disabled' => true,
                                                             ])?>
                                                 </div>
                                             </div>
