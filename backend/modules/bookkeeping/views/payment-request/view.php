@@ -36,10 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'aria-label' => Yii::t('app/crm', 'Add payments'),
                                 'class' => 'btn btn-info'
                             ];
-                            if(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
-                                echo Html::a('<span class="color-white glyphicon glyphicon-credit-card"></span> '.Yii::t('app/crm', 'Add payments'),
-                                \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
-                                $options);
+                            $now = strtotime(Date('Y-m-d H:i:s'));
+                            if(!($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00'))))
+                                if(Yii::$app->user->can('only_manager') || Yii::$app->user->can('adminRights'))
+                                    echo Html::a('<span class="color-white glyphicon glyphicon-credit-card"></span> '.Yii::t('app/crm', 'Add payments'),
+                                    \yii\helpers\Url::to(['add-payment','pID' => $model->id]),
+                                    $options);
                         }
                         ?>
                         <?= Html::a(Yii::t('app/book', 'To list'), ['index'], ['class' => 'btn btn-warning']) ?>
