@@ -17,7 +17,6 @@ use yii\helpers\ArrayHelper;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $doc_requisites
  * @property string $doc_site
  * @property string $doc_email
  * @property integer $use_vat
@@ -64,7 +63,7 @@ class LegalPerson extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['description','doc_requisites','ynp','mailing_address','telephone_number'], 'string'],
+            [['description','ynp','mailing_address','telephone_number'], 'string'],
             [[
                 'disallow_create_bill', 'status', 'created_at',
                 'updated_at','use_vat', 'default_bank_id',
@@ -93,7 +92,6 @@ class LegalPerson extends AbstractActiveRecord
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
             'updated_at' => Yii::t('app/services', 'Updated At'),
-            'doc_requisites' => Yii::t('app/services','Requisites for documents'),
             'use_vat' => Yii::t('app/services', 'Use vat'),
             'docx_id' => Yii::t('app/services', 'Docx ID'),
             'act_tpl_id' => Yii::t('app/services', 'Act template'),
