@@ -47,7 +47,7 @@ class ActsController extends AbstractBaseBackendController
             'rules' => [
                 [
                     'allow' => true,
-                    'roles' => ['superadmin','bookkeeper']
+                    'roles' => ['superadmin','bookkeeper','moder']
                 ]
             ]
         ];
