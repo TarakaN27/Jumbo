@@ -59,7 +59,7 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                                 'value' => function($model){
                                         $name = is_object($cuser = $model->cuser) ? $cuser->getInfo() : 'N/A';
 
-                                        return $name;
+                                        return Html::a($name,['update','id'=>$model->id],['class'=>'link-upd']);;
                                     },
                                 'filter' => \kartik\select2\Select2::widget([
                                     'model' => $searchModel,
