@@ -179,13 +179,13 @@ $this->registerJs('
         </div>
     </div>
 
-    <?= $form->field($model, 'deadline')->widget(\kartik\datetime\DateTimePicker::className(),[
+    <?= $form->field($model, 'deadline')->widget(\kartik\date\DatePicker::className(),[
         'options' => ['placeholder' => 'Select operating time ...'],
         //'convertFormat' => true,
         'pluginOptions' => [
             'autoclose'=>true,
-            'format' => 'd.m.yyyy h:i:s',
-            'startDate' => date('d.m.yyyy h:i',time()),
+            'format' => 'd.m.yyyy',
+            'startDate' => date('d.m.yyyy',time()),
             'todayHighlight' => true
         ]
     ]) ?>

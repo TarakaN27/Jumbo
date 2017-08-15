@@ -152,7 +152,7 @@ $template3 = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-x
     </div>
     <div class="col-md-12 col-sm-12 col-xs-12">
         <hr>
-        <?= $form->field($obTaskRepeat,'start_date')->widget(\kartik\datetime\DateTimePicker::className(),[
+        <?= $form->field($obTaskRepeat,'start_date')->widget(\kartik\date\DatePicker::className(),[
             'options' => ['placeholder' => 'Select operating time ...'],
             //'convertFormat' => true,
             'pluginOptions' => [
@@ -168,7 +168,7 @@ $template3 = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-x
         ])->radioList(\common\models\CrmTaskRepeat::getEndTypeMap(),['class' => 'label-margin-right-10']);?>
 
         <?=$form->field($obTaskRepeat,'count_occurrences')->textInput()?>
-        <?=$form->field($obTaskRepeat,'end_date')->widget(\kartik\datetime\DateTimePicker::className(),[
+        <?=$form->field($obTaskRepeat,'end_date')->widget(\kartik\date\DatePicker::className(),[
             'options' => ['placeholder' => 'Select operating time ...'],
             //'convertFormat' => true,
             'pluginOptions' => [
