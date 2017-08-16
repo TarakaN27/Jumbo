@@ -55,25 +55,27 @@ class DialogMessagesBehavior extends Behavior
 			RedisNotification::addNewDialogToListForUsers($arUsers,$obDialog->id);   //добавляем балун
 
 			$title = strip_tags(CustomHelper::cuttingString($this->owner->msg));
+			if(empty($title)){
+			    if(isset($this->owner->msg)){
+			        $text = $this->owner->msg;
+                }else{
+                    $text = 'message not set';
+                }
+                $title = 'empty title: '.$text;
+            }
 			if(!empty($obDialog->crm_task_id))
 			{
-				if(empty($title))
+				if(empty($title) || $title == '… ')
 					$title = Yii::t('app/crm','Go to task');
 				$title = Html::a($title,['/crm/task/view','id' => $obDialog->crm_task_id]);
-			}
-
-
-			if(!empty($obDialog->crm_cmp_contact_id))
+			}elseif(!empty($obDialog->crm_cmp_contact_id))
 			{
-				if(empty($title))
+				if(empty($title) || $title == '… ')
 					$title = Yii::t('app/crm','Go to contact');
 				$title = Html::a($title,['/crm/contact/view','id' => $obDialog->crm_cmp_contact_id]);
-			}
-
-
-			if(!empty($obDialog->crm_cmp_id))
+			}elseif(!empty($obDialog->crm_cmp_id))
 			{
-				if(empty($title))
+				if(empty($title) || $title == '… ')
 					$title = Yii::t('app/crm','Go to company');
 				$title = Html::a($title,['/crm/company/view','id' => $obDialog->crm_cmp_id]);
 			}
