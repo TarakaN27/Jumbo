@@ -453,7 +453,9 @@ class CustomHelper {
             $string = strip_tags($string);
             $string = mb_substr($string, 0, $len,'UTF-8');
             $string = rtrim($string, "!,.-");
-            $string = mb_substr($string, 0, mb_strrpos($string, ' ','UTF-8'),'UTF-8');
+            $borderSymb = mb_strrpos($string, ' ','UTF-8') > mb_strrpos($string, '.','UTF-8')? ' ': '.';
+            $borderSymb = mb_strrpos($string, ',','UTF-8') > mb_strrpos($string, $borderSymb,'UTF-8') ? ',':$borderSymb;
+            $string = mb_substr($string, 0, mb_strrpos($string, $borderSymb,'UTF-8'),'UTF-8');
             $string = $string."… ";
         }
         return  $string;
