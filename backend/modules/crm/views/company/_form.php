@@ -309,7 +309,8 @@ $('#cuser-partner').on('change',function(){
 								'pluginOptions' => [
 									'autoclose' => TRUE,
 									'format' => 'dd.mm.yyyy',
-									'defaultDate' => date('Y.m.d', time())
+									'defaultDate' => date('Y.m.d', time()),
+                                    'weekStart' => '1',
 								]
 							]);
 					?>
@@ -484,7 +485,8 @@ $('#cuser-partner').on('change',function(){
 						'pluginOptions' => [
 							'autoclose' => TRUE,
 							'format' => 'yyyy-mm-dd',
-							'defaultDate' => date('Y-m-d', time())
+							'defaultDate' => date('Y-m-d', time()),
+                            'weekStart' => '1',
 						]
 				]);?>
 			</div>
@@ -539,7 +541,8 @@ $('#cuser-partner').on('change',function(){
 						'pluginOptions' => [
 							'autoclose' => TRUE,
 							'format' => 'yyyy-mm-dd',
-							'defaultDate' => date('Y-m-d', time())
+							'defaultDate' => date('Y-m-d', time()),
+                            'weekStart' => '1',
 						]
 				]);?>
 			</div>

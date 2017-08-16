@@ -70,7 +70,8 @@ $gridView = [
             'pluginOptions' => [
                 //'autoclose' => true,
                 'format' => 'dd.mm.yyyy',
-                'defaultDate' => date('d.m.Y',time())
+                'defaultDate' => date('d.m.Y',time()),
+                'weekStart' => '1',
             ],
         ]),
     ],
@@ -244,7 +245,8 @@ if(!Yii::$app->user->isManager())
                                 'pluginOptions' => [
                                     //'autoclose' => true,
                                     'format' => 'dd.mm.yyyy',
-                                    'defaultDate' => date('d.m.Y',time())
+                                    'defaultDate' => date('d.m.Y',time()),
+                                    'weekStart' => '1',
                                 ],
                             ]),
                     ],

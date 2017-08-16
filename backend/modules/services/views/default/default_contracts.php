@@ -43,7 +43,8 @@ $this->title = Yii::t('app/services', 'Services default contacts');
 													(empty($arDC[$key]->cont_date) ? NULL : Yii::$app->formatter->asDate($arDC[$key]->cont_date)) : NULL,
 												'pluginOptions' => [
 													'autoclose'=>true,
-													'format' => 'dd.m.yyyy'
+													'format' => 'dd.m.yyyy',
+                                                    'weekStart' => '1',
 												]
 											]);?></td>
 									</tr>

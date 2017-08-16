@@ -55,7 +55,8 @@ echo Html::activeHiddenInput($model,'task_id');
 			'type' => DatePicker::TYPE_COMPONENT_APPEND,
 			'pluginOptions' => [
 				'autoclose'=>true,
-				'format' => 'dd.mm.yyyy'
+				'format' => 'dd.mm.yyyy',
+                'weekStart' => '1',
 			],
 		])?>
 	</div>

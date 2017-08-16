@@ -288,7 +288,8 @@ class EntityFields extends AbstractActiveRecord
                     'type' => \kartik\date\DatePicker::TYPE_COMPONENT_PREPEND,
                     'pluginOptions' => [
                         'autoclose'=>true,
-                        'format' => 'yyyy-m-dd'
+                        'format' => 'yyyy-m-dd',
+                        'weekStart' => '1',
                     ]
                 ])->label($this->name);
 

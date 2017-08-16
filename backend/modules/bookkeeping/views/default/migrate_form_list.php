@@ -111,6 +111,9 @@ use common\components\helpers\CustomViewHelper;
                                     ],
                                     'options' => [
                                         'class' => 'form-control'
+                                    ],
+                                    'pluginOptions' => [
+                                        'weekStart' => '1',
                                     ]
                                 ])->label(false); ?>
                             </td>

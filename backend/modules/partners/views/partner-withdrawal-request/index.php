@@ -131,7 +131,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'pluginOptions' => [
                                                 //'autoclose' => true,
                                                 'format' => 'dd.mm.yyyy',
-                                                'defaultDate' => date('d.m.Y',time())
+                                                'defaultDate' => date('d.m.Y',time()),
+                                                'weekStart' => '1',
                                             ],
                                         ]),
                                     ],
@@ -154,7 +155,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'pluginOptions' => [
                                                 //'autoclose' => true,
                                                 'format' => 'dd.mm.yyyy',
-                                                'defaultDate' => date('d.m.Y',time())
+                                                'defaultDate' => date('d.m.Y',time()),
+                                                'weekStart' => '1',
                                             ],
                                         ]),
                                     ],

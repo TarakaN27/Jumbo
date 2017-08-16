@@ -27,7 +27,8 @@ use yii\helpers\Html;
                                 'pluginOptions' => [
                                     'autoclose' => TRUE,
                                     'format' => 'dd.mm.yyyy',
-                                    'defaultDate' => date('d.m.Y', time())
+                                    'defaultDate' => date('d.m.Y', time()),
+                                    'weekStart' => '1',
                                 ]
                             ])?>
                         </div>
@@ -39,7 +40,8 @@ use yii\helpers\Html;
                                 'pluginOptions' => [
                                     'autoclose' => TRUE,
                                     'format' => 'dd.mm.yyyy',
-                                    'defaultDate' => date('d.m.Y', time())
+                                    'defaultDate' => date('d.m.Y', time()),
+                                    'weekStart' => '1',
                                 ]
                             ])?>
                         </div>

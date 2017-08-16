@@ -183,7 +183,8 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
                         'pluginOptions' => [
                             'autoclose' => TRUE,
                             'format' => 'yyyy-mm-dd',
-                            'defaultDate' => date('Y-m-d', time())
+                            'defaultDate' => date('Y-m-d', time()),
+                            'weekStart' => '1',
                         ]
                     ]);?>
                 </div>
@@ -219,7 +220,8 @@ $('#cuserrequisites-type_id input').on('click',blockRequisitesTypes);
                         'pluginOptions' => [
                             'autoclose' => TRUE,
                             'format' => 'yyyy-mm-dd',
-                            'defaultDate' => date('Y-m-d', time())
+                            'defaultDate' => date('Y-m-d', time()),
+                            'weekStart' => '1',
                         ]
                     ]);?>
                 </div>

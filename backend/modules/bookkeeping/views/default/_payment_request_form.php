@@ -53,7 +53,8 @@ $this->registerJs("
     'pluginOptions' => [
         'autoclose' => TRUE,
         'format' =>'dd.mm.yyyy', //'yyyy-mm-dd',
-        'defaultDate' => date('d.m.Y', time())
+        'defaultDate' => date('d.m.Y', time()),
+        'weekStart' => '1',
     ]
 ]) ?>
 

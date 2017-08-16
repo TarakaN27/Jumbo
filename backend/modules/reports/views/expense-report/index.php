@@ -69,7 +69,8 @@ $this->title = Yii::t('app/reports','Expense reports');
                                         'pluginOptions' => [
                                             'autoclose' => TRUE,
                                             'format' => 'dd.mm.yyyy',
-                                            'defaultDate' => date('d.m.Y', time())
+                                            'defaultDate' => date('d.m.Y', time()),
+                                            'weekStart' => '1',
                                         ]
                                     ])?>
                                 </div>
@@ -81,7 +82,8 @@ $this->title = Yii::t('app/reports','Expense reports');
                                         'pluginOptions' => [
                                             'autoclose' => TRUE,
                                             'format' => 'dd.mm.yyyy',
-                                            'defaultDate' => date('d.m.Y', time())
+                                            'defaultDate' => date('d.m.Y', time()),
+                                            'weekStart' => '1',
                                         ]
                                     ])?>
                                 </div>

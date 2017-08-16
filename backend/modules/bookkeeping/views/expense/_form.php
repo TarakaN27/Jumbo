@@ -86,6 +86,9 @@ $fieldTpl = '<div>{input}</div><ul class="parsley-errors-list" >{error}</ul>';
         ],
         'options' => [
             'class' => 'form-control'
+        ],
+        'pluginOptions' => [
+            'weekStart' => '1',
         ]
     ]) ?>
 

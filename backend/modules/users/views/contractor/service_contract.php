@@ -45,7 +45,8 @@ $this->title = Yii::t('app/services', 'Services contract');
 												'pluginOptions' => [
 													'autoclose'=>true,
 													'format' => 'dd.mm.yyyy',
-													 'defaultDate' => date('d-m-Y', time())
+													 'defaultDate' => date('d-m-Y', time()),
+                                                    'weekStart' => '1',
 												]
 											]);?></td>
 									</tr>
