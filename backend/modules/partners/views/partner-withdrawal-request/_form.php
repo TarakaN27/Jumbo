@@ -85,9 +85,6 @@ var
         ],
         'options' => [
             'class' => 'form-control'
-        ],
-        'pluginOptions' => [
-            'weekStart' => '1',
         ]
     ]) ?>
 

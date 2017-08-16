@@ -159,7 +159,8 @@ $template3 = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-x
                 'autoclose'=>true,
                 'format' => '  d.m.yyyy',
                 'startDate' => date('d.m.yyyy',time()),
-                'todayHighlight' => true
+                'todayHighlight' => true,
+                'weekStart' => '1',
             ]
         ])?>
         
@@ -175,7 +176,8 @@ $template3 = '<div class="form-group">{label}<div class="col-md-6 col-sm-6 col-x
                 'autoclose'=>true,
                 'format' => '  d.m.yyyy',
                 'startDate' => date('d.m.yyyy',time()),
-                'todayHighlight' => true
+                'todayHighlight' => true,
+                'weekStart' => '1',
             ]
         ])?>
         
