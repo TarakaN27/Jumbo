@@ -38,6 +38,11 @@ $rowContNum = $admin ? 6 : 12;
 							'data' => \backend\models\BUser::getAllMembersMap(),
 						])?>
 				</div>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <?=$form->field($model,'cusers')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                            'data' => \common\models\CUser::getContractorMap(),
+                        ])?>
+                    </div>
 				<?php endif;?>
 
 				<div class="col-md-<?=$rowContNum;?> col-sm-<?=$rowContNum;?> col-xs-12">

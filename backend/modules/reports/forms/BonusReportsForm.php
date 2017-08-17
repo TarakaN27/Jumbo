@@ -35,7 +35,8 @@ class BonusReportsForm extends Model
 		$service,
 		$beginDate,
 		$endDate,
-		$users;
+		$users,
+		$cusers;
 
 	/**
 	 * @return array
@@ -67,6 +68,7 @@ class BonusReportsForm extends Model
 			'beginDate' => \Yii::t('app/bonus','Begin date'),
 			'endDate' => \Yii::t('app/bonus','End date'),
 			'users' => \Yii::t('app/bonus','Users'),
+			'cusers' => \Yii::t('app/bonus','Cusers'),
 			'bonusType' => \Yii::t('app/bonus','Bonus type'),
 			'scheme' => \Yii::t('app/bonus','Scheme'),
 			'service' => \Yii::t('app/bonus','Service')
@@ -117,6 +119,7 @@ class BonusReportsForm extends Model
 			->joinWith('payment.currency')
 			->joinWith('payment.calculate')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
+			->andWhere([BUserBonus::tableName().'.cuser_id' => $this->cusers])
 			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
 			->params([
 				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
