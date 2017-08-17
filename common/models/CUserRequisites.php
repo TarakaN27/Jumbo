@@ -99,14 +99,16 @@ class CUserRequisites extends AbstractActiveRecord
                 ['j_fname', 'j_lname', 'j_mname','type_id', 'bik'],
                 'required',
                 'when' => function($model) {
-                    if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                    if($this->contructor != CUser::CONTRACTOR_YES || $this->type_id == self::TYPE_F_PERSON) //если компания не контрагнет, то поля можно не заполнять
                         return FALSE;
                     return TRUE;
                 },
                 'whenClient' => "function (attribute, value) {
                     var
-                        cntr = $('#cuser-contractor').val();
-                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                        cntr = $('#cuser-contractor').val(),
+                        cntrt = $('#cuserrequisites-type_id label input').val();
+
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."' || cntrt == '".self::TYPE_F_PERSON."')
                     {
                         return false;
                     }
