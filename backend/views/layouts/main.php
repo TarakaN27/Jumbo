@@ -75,8 +75,8 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('superRights'))
 */
     $subItems[] = ['label' => Yii::t('app/common', 'Config'), 'url' => ['/config/default/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Entity fields'), 'url' => ['/config/entity-fields/index']];
-    $subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
-    $subItems[] = ['label' => Yii::t('app/book', 'BOOK_payment_condition'), 'url' => ['/bookkeeping/payment-condition/index']];
+    //$subItems[] = ['label' => Yii::t('app/common', 'Units'), 'url' => ['/units/default/index']];
+    //$subItems[] = ['label' => Yii::t('app/book', 'BOOK_payment_condition'), 'url' => ['/bookkeeping/payment-condition/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill template'), 'url' => ['/documents/bill-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Bill docx template'), 'url' => ['/documents/bill-docx-template/index']];
     $subItems[] = ['label' => Yii::t('app/common', 'Acts template'), 'url' => ['/documents/acts-template/index']];
