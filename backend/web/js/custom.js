@@ -16,11 +16,11 @@ $(function () {
             $(this).removeClass('nv');
             $(this).addClass('vn');
         } else {
-            $('#sidebar-menu li ul').slideUp();
+            //$('#sidebar-menu li ul').slideUp();
             $(this).removeClass('vn');
             $(this).addClass('nv');
             $('ul', this).slideDown();
-            $('#sidebar-menu li').removeClass('active');
+            //$('#sidebar-menu li').removeClass('active');
             $(this).addClass('active');
         }
     });
