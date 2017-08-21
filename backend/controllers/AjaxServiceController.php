@@ -366,14 +366,20 @@ class AjaxServiceController extends AbstractBaseBackendController{
      */
     public function actionLoadExchangeRates()
     {
-        $arRates = ExchangeRatesManager::getCurrencyForWidget();
+        if(isset(Yii::$app->request->post()['date'])){
+            $date = Yii::$app->request->post()['date'];
+        }else{
+            $date = date('Y-m-d');
+        }
+
+        $arRates = ExchangeRatesManager::getCurrencyForWidget($date);
         $maxUpdate = NULL;
         foreach($arRates as $rate)
         {
             if(is_null($maxUpdate))
-                $maxUpdate = $rate->updated_at;
+                $maxUpdate = $rate['updated_at'];
             else
-                $maxUpdate = $maxUpdate > $rate->updated_at ? $maxUpdate : $rate->updated_at;
+                $maxUpdate = $maxUpdate > $rate['updated_at'] ? $maxUpdate : $rate['updated_at'];
         }
         return $this->renderPartial('load_exchange_rates',[
             'arRates' => $arRates,
