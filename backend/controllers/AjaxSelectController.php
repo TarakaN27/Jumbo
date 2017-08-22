@@ -169,7 +169,7 @@ class AjaxSelectController extends AbstractBaseBackendController
 				->orWhere(['like',CUserRequisites::tableName().'.j_fname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.j_mname',$q])
 				->orWhere(['like',CUserRequisites::tableName().'.site',$q])
-				->andWhere(['contractor' => CUser::CONTRACTOR_YES])
+				//->andWhere(['contractor' => CUser::CONTRACTOR_YES])
 				->notArchive()
 				->limit(10)
 				->all()
