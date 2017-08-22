@@ -34,9 +34,16 @@ $rowContNum = $admin ? 6 : 12;
 				]);?>
 				<?php if($admin):?>
 				<div class="col-md-6 col-sm-6 col-xs-12">
-						<?=$form->field($model,'users')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
-							'data' => \backend\models\BUser::getAllMembersMap(),
-						])?>
+						<?=
+                        $form->field($model, 'users')->widget(\kartik\select2\Select2::classname(), [
+                            'data' => \backend\models\BUser::getAllMembersMap(),
+                            'language' => 'de',
+                            'options' => ['multiple' => true],
+                            'pluginOptions' => [
+                                'allowClear' => true
+                            ],
+                        ])
+                        ?>
 				</div>
 				<?php endif;?>
 

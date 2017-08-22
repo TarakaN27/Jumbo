@@ -31,32 +31,41 @@ $this->title = Yii::t('app/reports','Payments reports');
                 ]);?>
                     <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                            <?=$form->field($model,'services')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                            <?=
+                            $form->field($model, 'services')->widget(\kartik\select2\Select2::classname(), [
                                 'data' => \common\models\Services::getServicesMap(),
-                                'clientOptions' => [
-                                    //'selectableHeader' => Yii::t('app/reports','Services'),
-                                    //'selectionHeader' => Yii::t('app/reports','Selected services')
-                                ]
-                            ])?>
+                                'language' => 'de',
+                                'options' => ['multiple' => true],
+                                'pluginOptions' => [
+                                    'allowClear' => true
+                                ],
+                            ])
+                            ?>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                             <?=$form->field($model,'contractor')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                             <?=
+                             $form->field($model, 'contractor')->widget(\kartik\select2\Select2::classname(), [
                                  'data' => $arContractorMap,
-                                 'clientOptions' => [
-                                     //'selectableHeader' => Yii::t('app/reports','Contractors'),
-                                     //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
-                                 ]
-                             ])?>
+                                 'language' => 'de',
+                                 'options' => ['multiple' => true],
+                                 'pluginOptions' => [
+                                     'allowClear' => true
+                                 ],
+                             ])
+                             ?>
                         </div>
                         <?php if(Yii::$app->user->can('adminRights')):?>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                                <?=$form->field($model,'managers')->widget(\common\components\multiSelect\MultiSelectWidget::className(),[
+                                <?=
+                                $form->field($model, 'managers')->widget(\kartik\select2\Select2::classname(), [
                                     'data' => \backend\models\BUser::getAllMembersMap(),
-                                    'clientOptions' => [
-                                        //'selectableHeader' => Yii::t('app/reports','Contractors'),
-                                        //'selectionHeader' => Yii::t('app/reports','Selected Contractors')
-                                    ]
-                                ])?>
+                                    'language' => 'de',
+                                    'options' => ['multiple' => true],
+                                    'pluginOptions' => [
+                                        'allowClear' => true
+                                    ],
+                                ])
+                                ?>
                             </div>
                         <?php endif;?>
                         <div class="col-md-6 col-sm-6 col-xs-12">
