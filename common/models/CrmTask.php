@@ -449,6 +449,19 @@ class CrmTask extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
+        $usersGroupId = 3; //Пользователи
+        $mainUserInGroupId = 26; //Волкова Светлана
+        $groupId = BUser::findOne(['id'=>$this->assigned_id])->crm_group_id;
+
+        if($groupId == $usersGroupId && $this->assigned_id != $mainUserInGroupId){
+            if($this->arrAcc == ""){
+                $this->arrAcc = [$mainUserInGroupId];
+            }
+            elseif(!in_array($mainUserInGroupId,$this->arrAcc)){
+                $this->arrAcc[] = $mainUserInGroupId;
+            }
+        }
+
         if(!empty($this->hourEstimate) || !empty($this->minutesEstimate))
             $this->time_estimate = (int)$this->minutesEstimate*60 + (int)$this->hourEstimate*3600;
 
