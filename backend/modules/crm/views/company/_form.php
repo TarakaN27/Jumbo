@@ -568,13 +568,13 @@ $('#cuser-partner').on('change',function(){
 		<div class="ln_solid"></div>
 		<h4 class = "h4_ml_10">Банковские реквизиты</h4>
 		<div class = "form-group">
-			<div class = "col-md-4 col-sm-4 col-xs-12">
-				<?= $form->field($modelR, 'ch_account', [
-					'template' => $fieldTempl,
-					'labelOptions'=>[
-						'class' => 'control-label'
-					]])->textInput(['maxlength' => TRUE]) ?>
-			</div>
+            <div style="visibility: hidden">
+                <?= $form->field($modelR, 'ch_account', [
+                    'template' => $fieldTempl,
+                    'labelOptions'=>[
+                        'class' => 'control-label'
+                    ]])->hiddenInput(['maxlength' => TRUE])->label(false) ?>
+            </div>
             <div class = "col-md-4 col-sm-4 col-xs-12">
                 <?= $form->field($modelR, 'new_ch_account', [
                     'template' => $fieldTempl,

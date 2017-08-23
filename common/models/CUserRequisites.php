@@ -153,12 +153,11 @@ class CUserRequisites extends AbstractActiveRecord
                 }"
             ],
             // обязательные поля для юриков
-            [['corp_name', 'j_post', 'j_doc','ch_account', 'b_name',
-              'b_code','j_address', 'p_address'],
-             'required',
-             'when' => function($model) {
-                     if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
-                         return FALSE;
+            [['corp_name', 'j_post', 'j_doc','new_ch_account', 'bik', 'b_name','j_address', 'p_address'],
+                'required',
+                'when' => function($model) {
+                    if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                        return FALSE;
                     return $model->type_id == CUserRequisites::TYPE_J_PERSON;
             },
              'whenClient' => "function (attribute, value) {
