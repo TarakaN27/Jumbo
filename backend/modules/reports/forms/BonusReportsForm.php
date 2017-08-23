@@ -119,12 +119,13 @@ class BonusReportsForm extends Model
 			->joinWith('payment.currency')
 			->joinWith('payment.calculate')
 			->where([BUserBonus::tableName().'.buser_id' => $this->users])
-			->andWhere([BUserBonus::tableName().'.cuser_id' => $this->cusers])
 			->andWhere(Payments::tableName().'.pay_date >= :beginDate AND '.Payments::tableName().'.pay_date <= :endDate')
 			->params([
 				':beginDate' => strtotime($this->beginDate.' 00:00:00'),
 				':endDate' => strtotime($this->endDate.' 23:59:59')
 			]);
+        if($this->cusers != null)
+            $query->andWhere([BUserBonus::tableName().'.cuser_id' => $this->cusers]);
 
 		$query->andFilterWhere([
 			BonusScheme::tableName().'.type' => $this->bonusType,
