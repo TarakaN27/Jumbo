@@ -97,14 +97,14 @@ function findCondition($this){
         amount = $("#" + lineID.replace(/-service/gi,"-summ")).val(),
         condID = lineID.replace(/-service/gi,"-condid"),
         condContainer = $(".field-"+condID);
-
+/*
     if(serviceID == "" || amount == " " || amount == undefined || amount == "")
     {
         $("#"+condID).val("");
         $($this).val("");
         addErrorNotify(addPErrorTitle,addPErrorTextFullSetAmountAndService);
         return false;
-    }
+    }*/
     let
         preloader = getPreloaderEntity(lineID+"preloader");
 
