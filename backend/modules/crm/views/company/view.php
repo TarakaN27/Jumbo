@@ -444,6 +444,9 @@ $this->registerJs("
 											Modal::begin([
 												'header' => '<h2>'.Yii::t('app/crm','Quick adding a contact').'</h2>',
 												'size' => Modal::SIZE_LARGE,
+                                                'options' => [
+                                                    'tabindex' => false // important for Select2 to work properly
+                                                ],
 												'toggleButton' => [
 													'tag' => 'a',
 													'class' => 'link-btn-cursor',
