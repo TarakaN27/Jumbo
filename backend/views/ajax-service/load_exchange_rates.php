@@ -11,19 +11,25 @@
 		'allModels' => $arRates
 	]),
 	'columns' => [
-		'name',
-		'code',
+        [
+            'label' => Yii::t('app/common','Rate name'),
+            'attribute' => 'name',
+        ],
+        [
+            'label' => Yii::t('app/common','Rate code'),
+            'attribute' => 'code',
+        ],
 		[
 			'label' => Yii::t('app/common','Rate BYN'),
 			'value' => function($model){
-				return Yii::$app->formatter->asDecimal($model->nbrb_rate, 4);
+				return Yii::$app->formatter->asDecimal($model['rate_nbrb'], 4);
 			}
 		],
 		[
-			'attribute' => 'nbrb_rate',
+			'attribute' => 'rate_nbrb',
 			'label' => Yii::t('app/common','Rate BYR'),
 			'value' => function($model){
-				return Yii::$app->formatter->asDecimal(round((float)$model->nbrb_rate*10000),0);
+				return Yii::$app->formatter->asDecimal(round((float)$model['rate_nbrb']*10000),0);
 			}
 		],
 	]

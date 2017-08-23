@@ -118,6 +118,8 @@ return [
     'No entity values' => 'Дополнительных полей не найдено',
     'Act fields template' => 'Акты. Шаблоны полей',
     'Update task status' => 'Изменить статус задачи',
+    'Rate name' => 'Название валюты',
+    'Rate code' => 'Код влюты',
     'Rate BYN' => 'Курс BYN',
     'Rate BYR' => 'Курс BYR'
 ];
