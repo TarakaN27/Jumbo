@@ -47,7 +47,7 @@ class BonusReportsForm extends Model
 			[['bonusType','scheme','service'],'integer'],
 			['users','required'],
 			[['beginDate','endDate'],'required'],
-			['users','each','rule' => ['integer']],
+			[['users','cusers'],'each','rule' => ['integer']],
 			[['beginDate','endDate'],'date','format' => 'php:d.m.Y'],
 			[['beginDate','endDate'],'customValidate'],
 		];
