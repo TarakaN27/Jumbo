@@ -13,8 +13,11 @@ $form = ActiveForm::begin([
 		<div class="col-md-6">
 			<?php echo $form->field($model,'buser_id')->widget(\kartik\select2\Select2::className(),[
 				//'initValueText' => $sAssName, // set the initial display text
+                'data' => $arAddedWatchers,
 				'options' => [
-					'placeholder' => Yii::t('app/crm','Search for a users ...')
+					'placeholder' => Yii::t('app/crm','Search for a users ...'),
+                    'multiple' => true,
+                    'value' => array_keys($arAddedWatchers),
 				],
 				'pluginOptions' => [
 					'allowClear' => true,
