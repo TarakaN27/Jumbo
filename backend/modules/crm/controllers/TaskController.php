@@ -180,20 +180,52 @@ class TaskController extends AbstractBaseBackendController
         $arAccomplIds = [];
         foreach ($arAccompl as $item)
             $arAccomplIds[] = $item->id;
-        if ($obAccmpl->load(Yii::$app->request->post())) {
-            if (in_array($obAccmpl->buser_id, $arAccomplIds)) {
-                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already accomplices'));
-                return $this->redirect(['view', 'id' => $id]);
-            }
 
-            if ($obAccmpl->save()) {
-                $model->updateUpdatedAt();
-                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Accomplice successfully added'));
-                return $this->redirect(['view', 'id' => $id]);
-            }
+        if(isset(Yii::$app->request->post()['CrmTaskAccomplices']['buser_id'])){
+            $accArrKeys = array_values(Yii::$app->request->post()['CrmTaskAccomplices']['buser_id']);
 
-            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add accomplice'));
+            if (!empty($accArrKeys)) {
+                //соисполнители.
+                foreach ($accArrKeys as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                    if ($value == $model->assigned_id)
+                        unset($accArrKeys[$key]);
+
+                $accToAdd = array_diff($accArrKeys, $arAccomplIds);
+                $accToDel = array_diff($arAccomplIds, $accArrKeys);
+
+                $transaction = \Yii::$app->db->beginTransaction();
+
+                try{
+                    if(!empty($accToDel)){
+                        CrmTaskAccomplices::deleteAll(['task_id' => $id, 'buser_id' => $accToDel]);
+                    }
+
+                    foreach ($accToAdd as $accompl){
+                        $obAccmpl = new CrmTaskAccomplices();
+                        $obAccmpl->task_id = $id;
+                        $obAccmpl->buser_id = $accompl;
+
+                        if (in_array($obAccmpl->buser_id, $arAccomplIds)) {
+                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already accomplices'));
+                        }
+
+                        if ($obAccmpl->save()) {
+                            $model->updateUpdatedAt();
+                            $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
+                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Accomplice successfully added'));
+                        }else{
+                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add accomplice'));
+                        }
+                    }
+
+                    $transaction->commit();
+                }catch(Exception $exception){
+                    Yii::$app->session->setFlash('error', $exception->getMessage());
+                    $transaction->rollBack();
+                    return $this->redirect(['view', 'id' => $id]);
+                }
+
+            }
             return $this->redirect(['view', 'id' => $id]);
         }
         /**
@@ -283,6 +315,13 @@ class TaskController extends AbstractBaseBackendController
                 'defaultOrder' => ['status' => SORT_ASC]
             ],
         ]);
+
+        $arAddedAccompl = [];
+        foreach ($arAccompl as $item){
+            $arAddedAccompl[$item->id] = $item->lname.' '.$item->fname;
+            //$arAddedAccompl[$item->id] = $item->fname.' '.$item->lname;
+        }
+
         $dataWatchers = [];
         return $this->render('view', [
             'model' => $this->findModel($id),
@@ -305,7 +344,8 @@ class TaskController extends AbstractBaseBackendController
             'modelTask' => $modelTask,
             'dataProviderChildtask' => $dataProviderChildtask,
             'dataWatchers' => $dataWatchers,
-            'obTaskRepeat' => $obTaskRepeat
+            'obTaskRepeat' => $obTaskRepeat,
+            'arAddedAccompl' => $arAddedAccompl,
         ]);
     }
 

@@ -639,6 +639,7 @@ $this->registerJs("
 
                                         echo $this->render('part/_form_add_accomplice',[
                                             'model' => $obAccmpl,
+                                            'arAddedAccompl' => $arAddedAccompl,
                                         ]);
 
                                     \common\components\customComponents\Modal\CustomModal::end();
