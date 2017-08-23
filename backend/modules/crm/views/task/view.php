@@ -226,14 +226,20 @@ $this->registerJs("
                     </div>
                     <div class="company-time-control">
                         <div class="row">
-                            <div class="col-md-2 col-sm-2 col-xs-12 text-center time-block">
-                                <span class="user-time">
-                                    <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)?>
-                                </span> /
-                                <span class="time_estimate">
-                                    <?=$model->getFormatedTimeEstimate()?>
-                                </span>
-                            </div>
+                                <div class="col-md-2 col-sm-2 col-xs-12 text-center time-block">
+                                    <div class="row">
+                                        <span class="user-time">
+                                            <?=Yii::t('app/crm','Spend')?>
+                                            <?=\common\components\helpers\CustomHelper::getFormatedTaskTime($timeSpend)?>
+                                        </span>
+                                    </div>
+                                    <div class="row">
+                                        <span class="user-time">
+                                           <?=Yii::t('app/crm','Planed')?>
+                                           <?=$model->getFormatedTimeEstimate()?>
+                                        </span>
+                                    </div>
+                                </div>
                             <div class="col-md-7 col-sm-7 col-xs-12 ">
 
                                     <?=Html::button(Yii::t('app/crm','Pause task'),[

@@ -132,6 +132,8 @@ return [
 	'Can not change assign' => 'Не удалось сменить ответственного',
 	'Comments' => 'Комментарии',
 	'Spend time' => 'Затраченное время',
+	'Spend' => 'Затр.',
+	'Planed' => 'План.',
 	'Task successfully added' => 'Задача успешно добавлена',
 	'Error. Can not add new task' => 'Ошибка. Не удалось добавить новую задачу',
 	'User {user} create new task' => 'Пользователь {user} добавил новую задачу',
