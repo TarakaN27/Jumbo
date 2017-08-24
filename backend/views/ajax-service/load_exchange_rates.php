@@ -6,6 +6,62 @@
  * Time: 17.11
  */
 ?>
+
+<?php
+
+$this->registerJs("$(function() {
+    
+    $('#curr-date').on('change',function(){
+        var
+            containter = $('#exchange-rates-modal');
+        
+        containter.removeClass('loaded');
+
+        getCurRates();
+    });
+});
+
+function getCurRates(){
+    var
+        containter = $('#exchange-rates-modal'),
+        currDate = $('#curr-date').val();
+
+    if(containter && containter.hasClass('loaded'))
+    {
+        containter.modal();
+    }else
+    if(containter && !containter.hasClass('loaded'))
+    {
+        $.ajax({
+            url: containter.attr('data-url'),
+            method: \"POST\",
+            data: {date:currDate},
+            dataType: \"json\",
+            success: function(msg){
+                if(msg)
+                {
+                    containter.find('.modal-body').html(msg);
+                    containter.addClass('loaded');
+                    containter.modal();
+                }
+            },
+            error: function(msgError){
+            }
+        });
+    }
+}");
+
+echo kartik\date\DatePicker::widget([
+    'name' => 'curr-date1',
+    'id' => 'curr-date',
+    'value' => $date,
+    'pluginOptions' => [
+        'autoclose'=>true,
+        'format' => 'yyyy-mm-dd',
+        'weekStart' => '1',
+    ]
+]);
+?>
 <?=\yii\grid\GridView::widget([
 	'dataProvider' => new \yii\data\ArrayDataProvider([
 		'allModels' => $arRates

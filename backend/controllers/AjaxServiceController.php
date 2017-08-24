@@ -381,9 +381,10 @@ class AjaxServiceController extends AbstractBaseBackendController{
             else
                 $maxUpdate = $maxUpdate > $rate['updated_at'] ? $maxUpdate : $rate['updated_at'];
         }
-        return $this->renderPartial('load_exchange_rates',[
+        return $this->renderAjax('load_exchange_rates',[
             'arRates' => $arRates,
-            'maxUpdate' => $maxUpdate
+            'maxUpdate' => $maxUpdate,
+            'date' => $date,
         ]);
     }
 
