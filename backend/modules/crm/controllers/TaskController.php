@@ -212,7 +212,7 @@ class TaskController extends AbstractBaseBackendController
                         if ($obAccmpl->save()) {
                             $model->updateUpdatedAt();
                             $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Accomplice successfully added'));
+                            Yii::$app->session->setFlash('success', Yii::t('app/crm', 'Accomplice successfully added'));
                         }else{
                             Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add accomplice'));
                         }
@@ -234,24 +234,54 @@ class TaskController extends AbstractBaseBackendController
         $arWatchIDs = [];
         foreach ($arWatchers as $watch)
             $arWatchIDs[] = $watch->id;
-        if ($obWatcher->load(Yii::$app->request->post())) {
-            if (in_array($obWatcher->buser_id, $arWatchIDs)) {
-                Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already watching'));
-                return $this->redirect(['view', 'id' => $id]);
-            }
 
-            if ($obWatcher->save()) {
-                $model->updateUpdatedAt();
-                $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
-                Yii::$app->session->setFlash('success', Yii::t('app/crm', 'Watcher successfully added'));
-                return $this->redirect(['view', 'id' => $id]);
-            }
+        if(isset(Yii::$app->request->post()['CrmTaskWatcher']['buser_id'])){
+            $watArrKeys = array_values(Yii::$app->request->post()['CrmTaskWatcher']['buser_id']);
 
-            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add watcher'));
+            if (!empty($watArrKeys)) {
+                //соисполнители.
+                foreach ($watArrKeys as $key => $value) //проверим, чтобы ответсвенный не был соисполнителем
+                    if ($value == $model->assigned_id)
+                        unset($watArrKeys[$key]);
+
+                $watToAdd = array_diff($watArrKeys, $arWatchIDs);
+                $watToDel = array_diff($arWatchIDs, $watArrKeys);
+
+                $transaction = \Yii::$app->db->beginTransaction();
+
+                try{
+                    if(!empty($watToDel)){
+                        CrmTaskWatcher::deleteAll(['task_id' => $id, 'buser_id' => $watToDel]);
+                    }
+
+                    foreach ($watToAdd as $watcher){
+                        $obWatch = new CrmTaskWatcher();
+                        $obWatch->task_id = $id;
+                        $obWatch->buser_id = $watcher;
+
+                        if (in_array($obWatch->buser_id, $arWatchIDs)) {
+                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'You are trying to add user, witch already watching'));
+                        }
+
+                        if ($obWatch->save()) {
+                            $model->updateUpdatedAt();
+                            $model->callTriggerUpdateDialog();  //обновление пользователй причастных к диалогу
+                            Yii::$app->session->setFlash('success', Yii::t('app/crm', 'Watcher successfully added'));
+                        }else{
+                            Yii::$app->session->setFlash('error', Yii::t('app/crm', 'Can not add watcher'));
+                        }
+                    }
+
+                    $transaction->commit();
+                }catch(Exception $exception){
+                    Yii::$app->session->setFlash('error', $exception->getMessage());
+                    $transaction->rollBack();
+                    return $this->redirect(['view', 'id' => $id]);
+                }
+
+            }
             return $this->redirect(['view', 'id' => $id]);
         }
-
-
 
         /**
          * Добавление задачи
@@ -319,7 +349,11 @@ class TaskController extends AbstractBaseBackendController
         $arAddedAccompl = [];
         foreach ($arAccompl as $item){
             $arAddedAccompl[$item->id] = $item->lname.' '.$item->fname;
-            //$arAddedAccompl[$item->id] = $item->fname.' '.$item->lname;
+        }
+
+        $arAddedWatchers = [];
+        foreach ($arWatchers as $item){
+            $arAddedWatchers[$item->id] = $item->lname.' '.$item->fname;
         }
 
         $dataWatchers = [];
@@ -346,6 +380,7 @@ class TaskController extends AbstractBaseBackendController
             'dataWatchers' => $dataWatchers,
             'obTaskRepeat' => $obTaskRepeat,
             'arAddedAccompl' => $arAddedAccompl,
+            'arAddedWatchers' => $arAddedWatchers,
         ]);
     }
 

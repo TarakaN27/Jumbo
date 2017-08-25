@@ -690,6 +690,7 @@ $this->registerJs("
 
                                     echo $this->render('part/_form_add_watcher',[
                                         'model' => $obWatcher,
+                                        'arAddedWatchers' => $arAddedWatchers,
                                     ]);
 
                                     \common\components\customComponents\Modal\CustomModal::end();
