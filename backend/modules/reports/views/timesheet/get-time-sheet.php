@@ -77,6 +77,9 @@ use common\components\helpers\CustomHelper;
 		<th>
 			Описание
 		</th>
+        <th>
+            Всего
+        </th>
 		<?php foreach($data['arDays'] as $day):?>
 		<th class="date-title text-center calendar_day _calendar_<?=$day['class']?>">
 			<?=$day['title'];?>
@@ -88,6 +91,19 @@ use common\components\helpers\CustomHelper;
 			<td colspan="2">
 				<?php echo $key == 'no_cmp' ? Yii::t('app/reports','Other') : (isset($data['arCmp'][$key]) ? $data['arCmp'][$key] : 'N/A')?>
 			</td>
+            <td>
+                <b>
+                <?php
+                $cmpSum = 0;
+                foreach($cmp as $item){
+                    foreach($data['arDays'] as $key2 => $day){
+                        $cmpSum += isset($item['log']) && isset($item['log'][$key2]) ? round($item['log'][$key2]/3600,2) : NULL;
+                    }
+                }
+                echo $cmpSum;
+                ?>
+                </b>
+            </td>
 			<td colspan="<?=count($data['arDays']);?>">
 			</td>
 		</tr>
@@ -95,6 +111,18 @@ use common\components\helpers\CustomHelper;
 			<tr>
 				<td class="text-center"><?=\yii\helpers\Html::a($item['taskID'],['/crm/task/view','id' =>$item['taskID']],['target' => '_blank'])?></td>
 				<td><?=\yii\helpers\Html::a(CustomHelper::cuttingString($item['title']),['/crm/task/view','id' =>$item['taskID']],['target' => '_blank'])?></td>
+                <td>
+                    <b>
+                    <?php
+                        $taskSum = 0;
+                        foreach($data['arDays'] as $key => $day){
+                            $taskSum += isset($item['log']) && isset($item['log'][$key]) ? round($item['log'][$key]/3600,2) : NULL;
+                        }
+
+                        echo $taskSum;
+                    ?>
+                    </b>
+                </td>
 				<?php foreach($data['arDays'] as $key => $day):?>
 					<td class="date-row-task text-center calendar_day _calendar_<?=$day['class']?>">
 						<?=isset($item['log']) && isset($item['log'][$key]) ? round($item['log'][$key]/3600,2) : NULL?>
