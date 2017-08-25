@@ -449,11 +449,11 @@ class CrmTask extends AbstractActiveRecord
      */
     public function beforeSave($insert)
     {
-        $usersGroupId = 3; //Пользователи ppc группы
-        $teamLead = BUser::findOne(['role'=>BUser::ROLE_TEAMLEAD,'crm_group_id' => $usersGroupId]);
+        $usersGroupId = 3; //Пользователи ppc входят в группу Пользователи, т.к. для других групп такое поведение не нужно
         $groupId = BUser::findOne(['id'=>$this->assigned_id])->crm_group_id;
+        $teamLead = BUser::findOne(['role'=>BUser::ROLE_TEAMLEAD,'crm_group_id' => $groupId]);
 
-        if($groupId == $usersGroupId && $this->assigned_id != $teamLead->id){
+        if(isset($teamLead->group_members) && $groupId == $usersGroupId && in_array($this->assigned_id,$teamLead->group_members ) && $this->assigned_id != $teamLead->id){
             if($this->arrAcc == ""){
                 $this->arrAcc = [$teamLead->id];
             }
