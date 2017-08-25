@@ -99,7 +99,7 @@ class CUserRequisites extends AbstractActiveRecord
                 ['j_fname', 'j_lname', 'j_mname','type_id', 'bik'],
                 'required',
                 'when' => function($model) {
-                    if($this->contructor != CUser::CONTRACTOR_YES || $this->type_id == self::TYPE_F_PERSON) //если компания не контрагнет, то поля можно не заполнять
+                    if($this->contructor != CUser::CONTRACTOR_YES || $this->type_id == self::TYPE_F_PERSON || $this->type_id == self::TYPE_I_PERSON) //если компания не контрагнет, то поля можно не заполнять
                         return FALSE;
                     return TRUE;
                 },
