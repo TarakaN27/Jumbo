@@ -177,7 +177,7 @@ if(Yii::$app->user->can('adminRights'))
                style="width: 100%;"
             >
         <tr style="background-color:#f9f9f9">
-            <td colspan="13">
+            <td colspan="14">
                 <?php
                     switch($modelForm->groupType)
                     {
@@ -306,7 +306,7 @@ if(Yii::$app->user->can('adminRights'))
         </tr>
         <?php endforeach;?>
         <tr class="wm-tr-total">
-            <td colspan="5">
+            <td colspan="6">
                 <?=Yii::t('app/reports','Group total')?>
             </td>
             <td>
