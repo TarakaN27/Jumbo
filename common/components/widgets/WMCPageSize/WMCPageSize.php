@@ -10,6 +10,7 @@ namespace common\components\widgets\WMCPageSize;
 
 use nterms\pagesize\PageSize;
 use Yii;
+use yii\helpers\Html;
 
 class WMCPageSize extends PageSize{
 
@@ -33,6 +34,32 @@ class WMCPageSize extends PageSize{
             500 => 500,
             1000 => 1000
         ];
-        $this->defaultPageSize = Yii::$app->params['defaultPageSize'];
+        if(Yii::$app->session->get('per-page')){
+            $this->defaultPageSize = Yii::$app->session->get('per-page');
+        }else{
+            $this->defaultPageSize = Yii::$app->params['defaultPageSize'];
+        }
+
+    }
+
+    public function run(){
+        if(empty($this->options['id'])) {
+            $this->options['id'] = $this->id;
+        }
+
+        if($this->encodeLabel) {
+            $this->label = Html::encode($this->label);
+        }
+
+        $perPage = !empty($_GET[$this->pageSizeParam]) ? $_GET[$this->pageSizeParam] : $this->defaultPageSize;
+        Yii::$app->session->set('per-page',$perPage);
+
+        $listHtml = Html::dropDownList('per-page', $perPage, $this->sizes, $this->options);
+        $labelHtml = Html::label($this->label, $this->options['id'], $this->labelOptions);
+
+        $output = str_replace(['{list}', '{label}'], [$listHtml, $labelHtml], $this->template);
+
+        return $output;
+
     }
 } 
