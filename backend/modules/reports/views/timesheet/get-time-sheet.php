@@ -135,6 +135,16 @@ use common\components\helpers\CustomHelper;
 	<tr>
 		<th colspan="2">
 		</th>
+        <td>
+            <span>
+                <?php
+                $total = 0;
+                foreach($data['arDays'] as $day):
+                    $total += round($day['total']/3600,2); ?>
+                <?php endforeach;?>
+                <?=$total;?>
+            </span>
+        </td>
 		<?php foreach($data['arDays'] as $day):   $total = round($day['total']/3600,2); ?>
 			<td class="date-title calendar_day _calendar_<?=$day['class']?>">
 				<span class="<?php if($total > $day['need'])echo 'ts_green';elseif($total < $day['need'])echo 'ts_red';?>"><?=$total;?></span>/<?=$day['need'];?>
