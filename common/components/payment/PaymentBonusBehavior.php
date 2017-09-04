@@ -81,8 +81,9 @@ class PaymentBonusBehavior extends Behavior
 		$sDate = $model->pay_date;        // Дата платежа
 		$iService = $model->service_id;   // ID услуги
 
-	
+
 		$this->updateSaleInfoCuser($model);
+
 		if(date("Y-m-d",$model->pay_date)>="2016-10-01")
 			$this->countingProfitBonus($model);
 
@@ -518,12 +519,17 @@ class PaymentBonusBehavior extends Behavior
 	}
 	public function countingProfitBonus($model){
 		$salerId = $model->cuser->sale_manager_id;
+
+		if(!$model->cuser->sale_date){
+            $model->cuser->sale_date = $model->pay_date;
+        }
 		$saleDate = $model->cuser->sale_date;
+
 		if($salerId && $saleDate) {
 			$this->countingProfitBonusByType($salerId, $saleDate, BonusScheme::BASE_ALL_PAYMENT_SALED_CLENT, $model);
 		}
-
 		$ownerId = $model->payRequest->manager_id;
+
 		if($saleDate && $ownerId){
 			$this->countingProfitBonusByType($ownerId, $saleDate, BonusScheme::BASE_OWN_PAYMENT, $model);
 		}
