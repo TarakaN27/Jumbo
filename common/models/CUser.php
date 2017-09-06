@@ -62,7 +62,8 @@ class CUser extends AbstractUser
         RESIDENT_NO = 0,
         SCENARIO_ARCHIVE = 'archive',
         SCENARIO_REGISTER = 'register',
-        SCENARIO_CHANGE_ASSIGNE = 'change_assigne';
+        SCENARIO_CHANGE_ASSIGNE = 'change_assigne',
+        FROM_RUSSIA = 'Россия';
 
     public
         $isNew = FALSE,

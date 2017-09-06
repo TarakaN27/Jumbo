@@ -22,15 +22,29 @@ function modeResident()
     var
         rrb = $(".RRB"),
         norrb = $(".NORRB"),
+        norus = $(".NORUS"),
+        persInfoBlock = $(".regPersonInfo").find("h4"),
+        country = $("#cuser-r_country").val(),
         resMode = $("#cuser-is_resident").val();
-    if(resMode == '.\common\models\CUser::RESIDENT_NO.')
+
+    if(resMode == '.\common\models\CUser::RESIDENT_NO.' && country != "'.\common\models\CUser::FROM_RUSSIA.'")
         {
             rrb.hide();
-            norrb.show();
+            norrb.hide();
+            norus.show();
+            persInfoBlock.text("Регистрационный номер компании");
             $("#cuserrequisites-isresident").val("false");
-        }else{
+        }else if(resMode == '.\common\models\CUser::RESIDENT_NO.' && country == "'.\common\models\CUser::FROM_RUSSIA.'"){
+            rrb.hide();
+            norrb.show();
+            norus.show();
+            persInfoBlock.text("Свидетельство о регистрации юр. лица(ЕГР)");
+            $("#cuserrequisites-isresident").val("false");
+        }else {
             rrb.show();
             norrb.hide();
+            norus.show();
+            persInfoBlock.text("Регистрационный номер компании");
             $("#cuserrequisites-isresident").val("true");
         }
 }
@@ -40,6 +54,7 @@ function modeResident()
 $this->registerJs('
 modeResident();
 $("#cuser-is_resident").on("change",modeResident);
+$("#cuser-r_country").on("change",modeResident);
 ',\yii\web\View::POS_READY);
 
 
@@ -546,14 +561,14 @@ $('#cuser-partner').on('change',function(){
 						]
 				]);?>
 			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
+			<div class = "col-md-4 col-sm-4 col-xs-12 NORUS">
 				<?= $form->field($modelR, 'reg_number', [
 					'template' => $fieldTempl,
 					'labelOptions'=>[
 						'class' => 'control-label'
 					]])->textInput(['maxlength' => TRUE]) ?>
 			</div>
-			<div class = "col-md-4 col-sm-4 col-xs-12">
+			<div class = "col-md-4 col-sm-4 col-xs-12 NORUS">
 				<?= $form->field($modelR, 'reg_auth', [
 					'template' => $fieldTempl,
 					'labelOptions'=>[

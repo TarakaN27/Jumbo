@@ -58,7 +58,8 @@ class CUserRequisites extends AbstractActiveRecord
     public
         $allow_expense = AbstractActiveRecord::NO,  //разрешить затраты по пользователю
         $contructor = CUser::CONTRACTOR_NO,         //пользователь является контрагентом
-        $isResident = true;                         //пользователь резидент
+        $isResident = true,                         //пользователь резидент
+        $rCountry = CUser::FROM_RUSSIA;
 
     /**
      * @inheritdoc
@@ -115,8 +116,42 @@ class CUserRequisites extends AbstractActiveRecord
                     return true;
                 }"
             ],
-            [['new_ch_account'],  'string', 'max' => 28,'min' => 28],
-            [['bik'],  'string', 'max' => 11,'min' => 8],
+            [['new_ch_account'],  'string', 'max' => 28,'min' => 28,
+                'when' => function($model) {
+                    if($this->isResident == CUser::RESIDENT_NO)
+                        return FALSE;
+                    return TRUE;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-is_resident').val();
+
+                    console.log(cntr);
+                    if(cntr == '".CUser::RESIDENT_NO."')
+                    {
+                        return false;
+                    }
+                    return true;
+                }"
+            ],
+            [['bik'],  'string', 'max' => 11,'min' => 8,
+                'when' => function($model) {
+                    if($this->isResident == CUser::RESIDENT_NO)
+                        return FALSE;
+                    return TRUE;
+                },
+                'whenClient' => "function (attribute, value) {
+                    var
+                        cntr = $('#cuser-is_resident').val();
+
+                    console.log(cntr);
+                    if(cntr == '".CUser::RESIDENT_NO."')
+                    {
+                        return false;
+                    }
+                    return true;
+                }"
+            ],
             [['new_ch_account', 'bik'], 'match', 'pattern' => '/^[a-zA-Z0-9]+$/'],
             [['reg_date'], 'safe'],
             [['j_address', 'p_address'], 'string'],
@@ -213,7 +248,7 @@ class CUserRequisites extends AbstractActiveRecord
              'required',
              'when' => function($model) {
 
-                 if($this->contructor != CUser::CONTRACTOR_YES) //если компания не контрагнет, то поля можно не заполнять
+                 if($this->contructor != CUser::CONTRACTOR_YES || !($this->isResident == CUser::RESIDENT_NO && $this->rCountry == CUser::FROM_RUSSIA)) //если компания не контрагнет, то поля можно не заполнять
                      return FALSE;
 
                  return (
@@ -223,8 +258,11 @@ class CUserRequisites extends AbstractActiveRecord
                 },
              'whenClient' => "function (attribute, value) {
                     var
-                        cntr = $('#cuser-contractor').val();
-                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."')
+                        cntr = $('#cuser-contractor').val(),
+                        cntrC = $('#cuser-r_country').val(),
+                        cntrR = $('#cuser-is_resident').val();
+                        
+                    if(cntr != undefined && cntr != '".CUser::CONTRACTOR_YES."'|| !(cntrR == '".CUser::RESIDENT_NO."' && cntrC == '".CUser::FROM_RUSSIA."'))
                     {
                         return false;
                     }
