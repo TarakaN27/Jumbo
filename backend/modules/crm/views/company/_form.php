@@ -26,19 +26,18 @@ function modeResident()
         persInfoBlock = $(".regPersonInfo").find("h4"),
         country = $("#cuser-r_country").val(),
         resMode = $("#cuser-is_resident").val();
-
-    if(resMode == '.\common\models\CUser::RESIDENT_NO.' && country != "'.\common\models\CUser::FROM_RUSSIA.'")
+    if(resMode == '.\common\models\CUser::RESIDENT_NO.' && (country == "'.\common\models\CUser::FROM_RUSSIA.'" || country == "")){
+            rrb.hide();
+            norrb.show();
+            norus.show();
+            persInfoBlock.text("Свидетельство о регистрации юр. лица(ЕГР)");
+            $("#cuserrequisites-isresident").val("false");
+        }else if(resMode == '.\common\models\CUser::RESIDENT_NO.' && country != "'.\common\models\CUser::FROM_RUSSIA.'")
         {
             rrb.hide();
             norrb.hide();
             norus.show();
             persInfoBlock.text("Регистрационный номер компании");
-            $("#cuserrequisites-isresident").val("false");
-        }else if(resMode == '.\common\models\CUser::RESIDENT_NO.' && country == "'.\common\models\CUser::FROM_RUSSIA.'"){
-            rrb.hide();
-            norrb.show();
-            norus.show();
-            persInfoBlock.text("Свидетельство о регистрации юр. лица(ЕГР)");
             $("#cuserrequisites-isresident").val("false");
         }else {
             rrb.show();
