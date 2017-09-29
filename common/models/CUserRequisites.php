@@ -158,7 +158,7 @@ class CUserRequisites extends AbstractActiveRecord
             [['created_at', 'updated_at','type_id','pasp_number'], 'integer'],
             [[
                  'corp_name', 'j_fname', 'j_lname', 'j_mname', 'j_post', 'j_doc',
-                 'reg_number', 'reg_auth', 'ch_account', 'b_name', 'b_code',
+                 'reg_number', 'reg_auth', 'ch_account','new_ch_account', 'b_name', 'b_code',
                  'c_fname', 'c_lname', 'c_mname', 'c_email', 'ext_email', 'c_phone', 'c_fax',
                  'ynp', 'inn', 'kpp', 'ogrn','pasp_auth','pasp_ident','site','bank_address'
              ], 'string', 'max' => 255],
@@ -275,7 +275,7 @@ class CUserRequisites extends AbstractActiveRecord
             [
                 [
                 //    'pasp_date','pasp_auth','pasp_ident','pasp_number', 'pasp_series',
-                    'ch_account', 'b_name','b_code', 'p_address'
+                    'new_ch_account', 'b_name','b_code', 'p_address'
                 ],
              'required',
              'when' => function($model) {
@@ -374,7 +374,7 @@ class CUserRequisites extends AbstractActiveRecord
 
             ],
             [
-                ['ch_account', 'b_name','b_code', 'p_address','bank_address'],
+                ['new_ch_account', 'b_name','b_code', 'p_address','bank_address'],
                 'required',
                 'when' => function($model) {
                     if(
