@@ -19,7 +19,7 @@ $this->registerJs("
 function initCmptasks()
 {
 
-$('.fake-datetimepicker').datetimepicker('remove');
+$('.fake-datetimepicker').datepicker('remove');
 
 $('.editable').editable({
     clear: false,
@@ -90,7 +90,7 @@ $('.editable').on('save', function(e, params) {
          $('.x_content tr[data-key=\"'+pk+'\"] .link-upd').removeClass('line-through');
     }
 });
-$('.fake-datetimepicker').datetimepicker({
+$('.fake-datetimepicker').datepicker({
         format: 'dd.MM.yyyy hh:ii',
         autoclose:true,
         maxView: 3,
