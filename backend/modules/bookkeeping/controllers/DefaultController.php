@@ -9,6 +9,7 @@ use common\components\payment\PaymentEnrollmentBehavior;
 use common\components\payment\PaymentOperations;
 use common\models\Acts;
 use common\models\ActToPayments;
+use common\models\BankDetails;
 use common\models\CUser;
 
 use common\models\CuserBankDetails;
@@ -111,7 +112,7 @@ class DefaultController extends AbstractBaseBackendController
                 else
                     $arActs[$key]=(float)$item->amount;
         }
-        
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -127,7 +128,7 @@ class DefaultController extends AbstractBaseBackendController
         $model = new MigrateLoadFileForm();
         if (Yii::$app->request->isPost) {
             if(isset($_FILES['MigrateLoadFileForm']) && $_FILES['MigrateLoadFileForm']['tmp_name']){
-                $models = $this->parseXml($_FILES['MigrateLoadFileForm']['tmp_name']['src']);
+                $models = $this->parseFile($_FILES['MigrateLoadFileForm']['tmp_name']['src']);
                 if($models) {
                     return $this->render('migrate_form_list', [
                         'models' => $models,
@@ -228,6 +229,70 @@ class DefaultController extends AbstractBaseBackendController
         }
         return $models;
     }
+    protected function parseAlfaBank($file){
+        $lines = file($file);
+        $payments=[];
+        $paymentCounter = 0;
+        $isFinish = false;
+        foreach($lines as $key=>$line){
+            $lines[$key] = $line = trim(str_replace("^", "",$line));
+            if(strpos($line, "Header4=")!== false){
+                $account = str_replace("Header4=", "", $line);
+            }
+            if(strpos($line, "DocDate")!== false){
+                ++$paymentCounter;
+            }
+            if(strpos($line, "DB")!==false){
+                $isFinish = true;
+            }
+            if($paymentCounter && !$isFinish){
+                $line = explode("=", $line);
+                if(count($line) == 2)
+                    $payments[$paymentCounter][$line[0]] = $line[1];
+            }
+        }
+        if($account) {
+            $bankDetail = BankDetails::find()->where(['LIKE', 'bank_details', $account])->one();
+        }
+
+        $models = [];
+        foreach($payments as $payment){
+            //у основных платежей тип 1, так же платежи от физиков без UNP
+            if($payment['Credit']>0){
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>$bankDetail->id, 'pay_date'=>strtotime(strval($payment['DocDate']))])->andWhere(['payment_order'=> strval($payment['Num']).' от '. $payment['DocDate']])->all();
+                if($existPayment && count($existPayment)==1){
+                    continue;
+                }
+                $model = new PaymentRequest();
+                $model->owner_id = Yii::$app->user->id;
+                $model->status = PaymentRequest::STATUS_NEW;
+                $model->pay_date = strval($payment['DocDate']);
+                $model->pay_summ = strval($payment['Credit']);
+                $model->bank_id = $bankDetail->id;
+                $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval(933));
+                $model->legal_id = $bankDetail->legal_person_id;
+                $model->payment_order = $payment['Num'].' от '.  $payment['DocDate'];
+                $model->description = iconv("windows-1251", "UTF-8", strval($payment['Nazn'].$payment['Nazn2']));
+                if(strval($payment['KorUNP'])) {
+                    $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)' => $payment['KorUNP'] . ""])->one();
+                    if($cuserRequisite){
+                        $model->is_unknown = 0;
+                        $model->cntr_id = $cuserRequisite->id;
+                        $cuser = CUser::findOneByIDCached($cuserRequisite->id);
+                        $model->cuserName = $cuserRequisite->getCorpName();
+                        $model->manager_id = $cuser->manager_id;
+                    }else{
+                        $model->is_unknown = 1;
+                    }
+                }else
+                    $model->is_unknown = 1;
+
+                $models[] =$model;
+            }
+        }
+        return $models;
+    }
+
     protected function parseBLRBank($paymentsXml){
         $models = [];
         $date = str_replace("за ", "", $paymentsXml->ACCOUNTINFO->PERIOD);
@@ -269,17 +334,22 @@ class DefaultController extends AbstractBaseBackendController
         return $models;
     }
 
-    protected function parseXml($xml){
-        $xmlStr = file_get_contents($xml);
-        $paymentsXml = simplexml_load_string($xmlStr);
-        $models = [];
-        if(isset($paymentsXml->QUERY)){
-            $models = $this->parseMTBank($paymentsXml);
-        }elseif(isset($paymentsXml->ACCOUNTINFO)){
-            $models = $this->parseBLRBank($paymentsXml);
+    protected function parseFile($file){
+        $fileContent = file_get_contents($file);
+        if(strpos($fileContent, '[OUT_PARAM]')){
+            $models = $this->parseAlfaBank($file);
+        }else{
+            $paymentsXml = simplexml_load_string($fileContent);
+            $models = [];
+            if (isset($paymentsXml->QUERY)) {
+                $models = $this->parseMTBank($paymentsXml);
+            } elseif (isset($paymentsXml->ACCOUNTINFO)) {
+                $models = $this->parseBLRBank($paymentsXml);
+            }
         }
         return $models;
     }
+
 
     /**
      * Displays a single Payments model.
