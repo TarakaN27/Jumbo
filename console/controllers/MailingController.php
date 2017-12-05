@@ -14,11 +14,12 @@ use Yii;
 
 class MailingController extends AbstractConsoleController
 {
-    public function actionSendMailToCuser(){
+    public function actionSendMailToCuser($offset = 0){
         $clients = PaymentRequest::find()->where(['legal_id'=>3])->groupBy(['cntr_id'])->all();
         foreach($clients as $key=>$item) {
             echo $key."\n";
-            if($item->cuser->requisites && $item->cuser->requisites->c_email && !strpos($item->cuser->requisites->c_email, "webmart.by")) {
+            if($key >= $offset) {
+                if ($item->cuser->requisites && $item->cuser->requisites->c_email && !strpos($item->cuser->requisites->c_email, "webmart.by")) {
                     $attach = Yii::getAlias("@common") . '/upload/Webmart_notice.pdf';
                     Yii::$app->salesMailer->compose()
                         ->setFrom([Yii::$app->params['salesEmail'] => Yii::$app->params['salesName']])//от кого уходит письмо
@@ -27,6 +28,7 @@ class MailingController extends AbstractConsoleController
                         ->setSubject("УВЕДОМЛЕНИЕ Об изменении банковских реквизитов")//тема письма
                         ->attach($attach)//прикрепляем акт к письму
                         ->send();
+                }
             }
         }
     }
