@@ -247,8 +247,10 @@ class DefaultController extends AbstractBaseBackendController
             }
             if($paymentCounter && !$isFinish){
                 $line = explode("=", $line);
-                if(count($line) == 2)
-                    $payments[$paymentCounter][$line[0]] = $line[1];
+                if(count($line) >= 2) {
+                    $key = array_shift($line);
+                    $payments[$paymentCounter][$key] = implode('=',$line);
+                }
             }
         }
         if($account) {
@@ -256,6 +258,7 @@ class DefaultController extends AbstractBaseBackendController
         }
 
         $models = [];
+
         foreach($payments as $payment){
             //у основных платежей тип 1, так же платежи от физиков без UNP
             if($payment['Credit']>0){
@@ -272,6 +275,10 @@ class DefaultController extends AbstractBaseBackendController
                 $model->currency_id = ExchangeRates::getCurrencyByBankCode(intval(933));
                 $model->legal_id = $bankDetail->legal_person_id;
                 $model->payment_order = $payment['Num'].' от '.  $payment['DocDate'];
+                if(!isset($payment['Nazn'])){
+                    var_dump($payment);
+                    die;
+                }
                 $model->description = iconv("windows-1251", "UTF-8", strval($payment['Nazn'].$payment['Nazn2']));
                 if(strval($payment['KorUNP'])) {
                     $cuserRequisite = CUserRequisites::find()->where(['TRIM(ynp)' => $payment['KorUNP'] . ""])->one();
