@@ -9,113 +9,8 @@ use yii\web\JsExpression;
 
 $this->title = Yii::t('app/book', 'Promised Payments');
 $this->params['breadcrumbs'][] = $this->title;
+\common\components\helpers\CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js',$this);
 
-$gridView = [
-    ['class' => 'yii\grid\SerialColumn'],
-    [
-        'attribute' => 'amount',
-        'format' => 'html',
-        'value' => function($model){
-            if($model->paid == \common\models\PromisedPayment::YES)
-                return $model->amount;
-            else{
-                $obRepay = $model->repay;
-                $paid = 0;
-                foreach($obRepay as $rep)
-                {
-                    $paid+=$rep->amount;
-                }
-                return $model->amount.'<span class="pp_paid">/'.$paid.'</span>';
-            }
-        }
-    ],
-    [
-        'attribute' => 'service_id',
-        'value' => function($model){
-            return is_object($obServ = $model->service) ? $obServ->name : 'N/A';
-        },
-        'filter' => \common\models\Services::getServicesMap()
-    ],
-    [
-        'attribute' => 'paid_date',
-        'format' => 'html',
-        'value' => function($model){
-            return Yii::$app->formatter->asDatetime($model->paid_date);
-        }
-    ],
-    [
-        'attribute' => 'paid',
-        'format' => 'raw',
-        'value' => function($model){
-            return Html::tag('i','',[
-                'class' => "fa fa-check-circle " . ($model->paid ? "paid-green" : "paid-red"),
-                'data' => $model->paid ? 1 : 0,
-                'data-id' => $model->id
-            ]);
-        },
-        'filter' => \common\models\PromisedPayment::getYesNo(),
-        'contentOptions' => ['class' => 'text-center'],
-    ],
-    [
-        'attribute' => 'created_at',
-        'format' => 'datetime',
-        'filter' => \kartik\date\DatePicker::widget([
-            'model' => $searchModel,
-            'attribute' => 'from_date',
-            'attribute2' => 'to_date',
-            'options' => ['placeholder' => Yii::t('app/crm','Begin date')],
-            'options2' => ['placeholder' => Yii::t('app/crm','End date')],
-            'type' => \kartik\date\DatePicker::TYPE_RANGE,
-            'separator' => '-',
-            'pluginOptions' => [
-                //'autoclose' => true,
-                'format' => 'dd.mm.yyyy',
-                'defaultDate' => date('d.m.Y',time()),
-                'weekStart' => '1',
-            ],
-        ]),
-    ],
-];
-
-if(!Yii::$app->user->isManager())
-{
-    $gridView  [] = [
-        'attribute' => 'cuser_id',
-        'value' => function($model){
-            return is_object($obUser = $model->cuser) ? $obUser->getInfo() : 'N/A';
-        },
-        'filter' => \kartik\select2\Select2::widget([
-                'model' => $searchModel,
-                'attribute' => 'cuser_id',
-                'initValueText' => $cuserDesc, // set the initial display text
-                'options' => [
-                    'placeholder' => Yii::t('app/crm','Search for a company ...')
-                ],
-                'pluginOptions' => [
-                    'allowClear' => true,
-                    'minimumInputLength' => 3,
-                    'ajax' => [
-                        'url' => \yii\helpers\Url::to(['/ajax-select/get-contractor']),
-                        'dataType' => 'json',
-                        'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                    ],
-                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                    'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
-                    'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
-                ],
-            ]),
-    ];
-    $gridView  [] = [
-        'attribute' => 'buser_id_p',
-        'value' => function($model){
-            return is_object($obBuser = $model->buser) ? $obBuser->getFio() : 'N/A';
-        }
-    ];
-    $gridView  [] = [
-        'class' => 'yii\grid\ActionColumn',
-        'template' => '{view}'
-    ];
-}
 
 ?>
 <div class = "row">
@@ -254,7 +149,17 @@ if(!Yii::$app->user->isManager())
                         'class' => 'yii\grid\ActionColumn',
                         'visible' => Yii::$app->user->can('adminRights')|| Yii::$app->user->can('only_bookkeeper'),
                         'template' => '{view}'
-                    ]
+                    ],
+                    [
+                        'class' => 'yii\grid\ActionColumn',
+                        'buttons'=>[
+                            'delete'=>function ($url, $model) {
+                                return "<span data-id='$model->id' class='glyphicon glyphicon-trash promisePayDelete' style='cursor:pointer;'></span>";
+                            }
+                        ],
+                        'visible' => Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper'),
+                        'template' =>  '{delete}'
+                    ],
                 ]
             ]); ?>
                 <div class="col-md-4 col-md-offset-8">
