@@ -46,7 +46,7 @@ class Services extends AbstractActiveRecord
                 'allow_enrollment'
             ], 'integer'],
             [['name'], 'string', 'max' => 255],
-            ['rate','number','min' => 100],
+            ['rate','number','min' => 10],
             [['description'], 'string', 'max' => 32],
             [['name'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
