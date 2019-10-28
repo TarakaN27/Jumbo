@@ -370,7 +370,7 @@ class PaymentsReportForm extends Model
                 $arCondition [] = $dt['pay_cond_id'];
             }
 
-            if($actedPayment[$dt['id']]) {
+            if(isset($actedPayment[$dt['id']])) {
                 $dt['acted_sum'] = $actedPayment[$dt['id']]['amount'];
             } else{
                 $dt['acted_sum'] = 0;
