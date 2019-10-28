@@ -647,7 +647,11 @@ class PaymentsReportForm extends Model
             ->setCellValue('A6', 'Общий налог:')
             ->setCellValue('B6', $data['iTaxTotal'])
             ->setCellValue('A7', 'Общие производственные затраты:')
-            ->setCellValue('B7', $data['iProdTotal']);
+            ->setCellValue('B7', $data['iProdTotal'])
+            ->setCellValue('D4', 'Актированно в выбранном периоде:')
+            ->setCellValue('E4', $data['iActedSumTotal'])
+            ->setCellValue('D5', 'Актировано в выбранном периоде, но платежи не входят в выбранный период')
+            ->setCellValue('E5', $data['totalSumOtherPeriod']);
 
 
         $objPHPExcel->getActiveSheet()
@@ -689,6 +693,8 @@ class PaymentsReportForm extends Model
         $objPHPExcel->getActiveSheet()->setCellValue('AB9', Yii::t('app/reports', 'Currency name'));
         $objPHPExcel->getActiveSheet()->setCellValue('AC9', Yii::t('app/reports', 'Enroll amount'));
         $objPHPExcel->getActiveSheet()->setCellValue('AD9', Yii::t('app/reports', 'Enroll unit name'));
+        $objPHPExcel->getActiveSheet()->setCellValue('AE9', Yii::t('app/reports', 'Acted sum'));
+
         $i = 10;
 
 
@@ -737,6 +743,7 @@ class PaymentsReportForm extends Model
                 $objPHPExcel->getActiveSheet()->setCellValue('AB' . $i, isset($arCond[$d['pay_cond_id']]) ? $arCond[$d['pay_cond_id']]['name'] : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('AC' . $i, $d['enroll_amount'] ? $d['enroll_amount'] : 'N/A');
                 $objPHPExcel->getActiveSheet()->setCellValue('AD' . $i, $d['enroll_unit_name'] ? $d['enroll_unit_name'] : 'N/A');
+                $objPHPExcel->getActiveSheet()->setCellValue('AE' . $i, $d['acted_sum'] ? $d['acted_sum'] : 'N/A');
                 $i++;
             }
         }
