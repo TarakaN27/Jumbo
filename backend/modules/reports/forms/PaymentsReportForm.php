@@ -288,6 +288,7 @@ class PaymentsReportForm extends Model
             'condCurr' => [],
             'docxLink' => '',
             'iSumTotal' => 0,
+            'iActedSumTotal' => 0,
             'iProfitTotal' => 0,
             'iTaxTotal' => 0,
             'iProdTotal' => 0,
