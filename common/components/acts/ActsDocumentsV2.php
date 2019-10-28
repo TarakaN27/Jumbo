@@ -12,10 +12,12 @@
 namespace common\components\acts;
 
 use common\components\helpers\CustomHelper;
+use common\components\helpers\CustomViewHelper;
 use common\models\ActServices;
 use common\models\ActsTemplate;
 use common\models\BankDetails;
 use common\models\CUser;
+use common\models\CUserRequisites;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -66,7 +68,9 @@ class ActsDocumentsV2
         $amountInWords,
         $vatInWords,
         $bUseVat = FALSE,
+        $cNotResident = FALSE,
         $vatRate,
+        $contactDetail,
         $bankId;
 
     /**
@@ -98,7 +102,7 @@ class ActsDocumentsV2
     {
         $this->getLegalPersonAndActTpl();
         $this->getCUserDetail();
-        $this->getContractDetail();
+   #     $this->getContractDetail();
 
         $this->getCurrencyUnits();
         $this->getServices();
@@ -141,15 +145,16 @@ class ActsDocumentsV2
         $this->legalPersonSite = $obLegalPerson->doc_site;
 
         $this->bUseVat = $obLegalPerson->use_vat;
+
         $this->vatRate = CustomHelper::getVat();
 
         if(empty($obLegalPerson->act_tpl_id))
             throw new NotFoundHttpException('template id not found');
 
         $this->obActTpl = ActsTemplate::findOne($obLegalPerson->act_tpl_id);
-        
-        if(!$this->obActTpl || ($this->obActTpl && !file_exists($this->obActTpl->getFilePath())))
+        if(!$this->obActTpl || ($this->obActTpl && !file_exists($this->obActTpl->getFilePath()))) {
             throw new NotFoundHttpException('Template not found');
+        }
 
         return $obLegalPerson;
     }
@@ -167,12 +172,43 @@ class ActsDocumentsV2
 
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
-            $this->cuserName = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
-            $this->cuserBankDetail = $obR->new_ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' БИК '.$obR->bik;
-            $this->cuserAddress = $obR->j_address;
-            $this->cuserEmail = $obR->c_email;
-            $this->cuserWebsite = $obR->site;
-            $this->cuserYnp = $obR->ynp;
+            $obAct = Acts::findOne($this->iActId);
+            if (!$obAct)
+                throw new NotFoundHttpException();
+
+            $cuserContractDetail = $obAct->contract_num . ' от ' . \Yii::$app->formatter->asDate($obAct->contract_date);
+            if($obCUser->is_resident == 0){
+                $this->cNotResident = true;
+            }
+
+            if($obCUser->requisites->type_id == CUserRequisites::TYPE_F_PERSON) {
+                $cuserName = $obCUser->requisites->j_lname.' '.  $obCUser->requisites->j_fname . ' '. $obCUser->requisites->j_mname;
+                $adsress =  $obCUser->requisites->p_address;
+                $passportNumber = $obCUser->requisites->pasp_series.$obCUser->requisites->pasp_number;
+                $passportDate = Yii::$app->formatter->asDate($obCUser->requisites->pasp_date);
+
+                $passportAuth = $obCUser->requisites->pasp_auth;
+                $cuserContractDetail = $obAct->contract_num . ' от ' . \Yii::$app->formatter->asDate($obAct->contract_date);
+                $template = "Заказчик: $cuserName<w:br/>
+Адрес: $adsress<w:br/>
+Паспортные данные: Номер $passportNumber выдан $passportDate, $passportAuth <w:br/>
+Основание: договор $cuserContractDetail";
+            } else {
+                $cuserName = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
+                $cuserBankDetail = $obR->new_ch_account . ' в ' . $obR->b_name . ' ' . $obR->bank_address . ' БИК ' . $obR->bik;
+                $cuserAddress = $obR->j_address;
+                $cuserEmail = $obR->c_email;
+                $cuserWebsite = $obR->site;
+                $cuserYnp = $obR->ynp;
+
+
+                $template = "Заказчик: $cuserName, УНП: $cuserYnp<w:br/>
+Р/сч: $cuserBankDetail<w:br/>
+Основание: договор $cuserContractDetail<w:br/>
+Юр. адрес: $cuserAddress<w:br/>
+E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
+            }
+            $this->contactDetail = $template;
         }
         return $obCUser;
     }
@@ -196,15 +232,19 @@ class ActsDocumentsV2
         {
             $amountWithVat = $serv->amount;
             $vatRate = $this->bUseVat ? $this->vatRate : '';
-            $amount = $this->bUseVat ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
+
+            $amount = ($this->bUseVat && !$this->cNotResident) ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
             $amount = round($amount,2);
             $price = round($amount/$serv->quantity, 2);
 
             $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
-
+            if($this->cNotResident){
+                $vatRate = "-*";
+                $vatAmount = "-*";
+            }
             $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat);
             $this->totalAmount+= $amount;
-            if($this->bUseVat)
+            if($this->bUseVat && !$this->cNotResident)
                 $this->totalVatAmount = (float)$this->totalVatAmount + $vatAmount;
 
             $this->totalAmountWithVat+= $amountWithVat;
@@ -283,17 +323,23 @@ class ActsDocumentsV2
                 default:
                     break;
             }
-        else{
+        else {
             $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+
             $strVatAmount = '';
             if($this->bUseVat)
             {
                 $strVatAmount = CustomHelper::num2str($this->totalVatAmount,$this->n2wUnit);
             }
 
-            $this->vatInWords = $this->bUseVat ?
+           /* $this->vatInWords = $this->bUseVat ?
                 ' в т.ч.: НДС - '.$strVatAmount :
                 ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+           */
+
+            $this->vatInWords = " <w:br/>
+Сумма НДС*: Согласно п. 2 ст. 72 Договор о ЕАЭС от 29.05.2014;<w:br/>
+Подп. 2 П. 28, Подп. 4 П. 29 Раздел IV Протокола о порядке взимания косвенных налогов и механизме контроля за их уплатой при экспорте и импорте товаров, выполнении работ, оказании услуг (приложение 18 к Договору о ЕАЭС от 29.05.2014)";
 
             $this->totalAmount = $this->formatterHelper($this->totalAmount);
 
@@ -352,7 +398,7 @@ class ActsDocumentsV2
                 $arResult['price'] = $this->formatterHelper($price);
                 $arResult['amount'] = $this->formatterHelper($amount);
                 $arResult['vatRate'] = $vatRate;
-                $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->formatterHelper($vatAmount);
+                $arResult['vatAmount'] = empty($vatAmount) || $vatAmount == "-*"  ? $vatAmount : $this->formatterHelper($vatAmount);
                 $arResult['amountWithVat'] = $this->formatterHelper($amountWithVat);
                 break;
             default:
@@ -427,6 +473,7 @@ class ActsDocumentsV2
             'totalFiniteAmount',
             'amountInWords',
             'vatInWords',
+            'contactDetail'
         ];
 
         try{
@@ -436,9 +483,9 @@ class ActsDocumentsV2
                 $obDoc =  new TemplateProcessor($this->obActTpl->getFilePath());
             }
 
-            foreach ($arItems as $item)
-                $obDoc->setValue($item,$this->$item);
-
+            foreach ($arItems as $item) {
+                $obDoc->setValue($item, $this->$item);
+            }
             $obDoc->cloneRow('colNum',count($this->arServices));
             $iCounter = 1;
             foreach ($this->arServices as  $value)
@@ -486,6 +533,9 @@ class ActsDocumentsV2
             throw new NotFoundHttpException('Currency not found');
 
         $this->n2wUnit = $obCurr->getUnitsForN2W();
+        if($obCurr->id ==3) {
+            $this->n2wUnit[1] = ['российский рубль'   ,'российских рубля'   ,'российских рублей',0];
+        }
     }
 
     /**

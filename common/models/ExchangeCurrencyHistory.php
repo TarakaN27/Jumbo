@@ -154,4 +154,35 @@ class ExchangeCurrencyHistory extends AbstractActiveRecord
         return $arItems;
     }
 
+
+    /**
+     * @param $beginDate
+     * @param $endDate
+     * @param array $arCurIds
+     * @return array
+     */
+    public static function getCurrencyInByrForDates($dates,array $arCurIds)
+    {
+        foreach($dates as $key=>$item){
+            $dates[$key] = date('Y-m-d',$item);
+        }
+
+
+        $arItems = self::find()
+            ->select(['id','currency_id','date','rate_nbrb'])
+            ->where(['currency_id' => $arCurIds])
+            ->andWhere(['date'=>$dates])
+            ->orderBy(['date' => SORT_ASC])
+            ->asArray()
+            ->all();
+
+        $arItems = ArrayHelper::index($arItems,'date',['currency_id']);
+
+        foreach ($arItems as &$item)
+            foreach ($item as &$it)
+                $it = (float)$it['rate_nbrb'];
+
+        return $arItems;
+    }
+
 }

@@ -268,5 +268,6 @@ return [
     'Dont have payments for loading' =>'Нет платежей для загрузки',
     '{count} payments success saved' =>'{count}запросов на платёж успешно создано',
     'Bank id' => 'Банк',
-    'Bank' => 'Банковские реквизиты'
+    'Bank' => 'Банковские реквизиты',
+    'Post payment' => 'Постоплата'
 ];

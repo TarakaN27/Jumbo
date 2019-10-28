@@ -80,6 +80,8 @@ if(Yii::$app->user->can('adminRights'))
     <thead>
         <tr>
             <th><?=Yii::t('app/reports','iSumTotal')?></th>
+            <th><?=Yii::t('app/reports','Acted sum')?></th>
+            <th><?=Yii::t('app/reports','Other Period Sum')?></th>
             <?php if($modelForm->showWithoutSale):?>
                 <th><?=Yii::t('app/reports','saleAmount')?></th>
                 <th><?=Yii::t('app/reports','paymentAmountWithoutSale')?></th>
@@ -96,6 +98,12 @@ if(Yii::$app->user->can('adminRights'))
         <tr>
             <td>
                 <?=Yii::$app->formatter->asDecimal($model['iSumTotal']);?>
+            </td>
+            <td>
+                <?=Yii::$app->formatter->asDecimal($model['iActedSumTotal']);?>
+            </td>
+            <td>
+                <?=Yii::$app->formatter->asDecimal($model['totalSumOtherPeriod']);?>
             </td>
             <?php if($modelForm->showWithoutSale):?>
                 <td><?=is_null($model['saleAmount']) ? NULL : Yii::$app->formatter->asDecimal($model['saleAmount']);?></td>
@@ -155,6 +163,7 @@ if(Yii::$app->user->can('adminRights'))
             <th><?=Yii::t('app/reports','Service')?></th>
             <?php endif;?>
             <th><?=Yii::t('app/reports','Payment sum')?></th>
+            <th><?=Yii::t('app/reports','Acted sum')?></th>
             <th><?=Yii::t('app/reports','Payment currency')?></th>
             <th><?=Yii::t('app/reports','Exchange currency')?></th>
             <?php if(Yii::$app->user->can('adminRights')):?>
@@ -171,6 +180,7 @@ if(Yii::$app->user->can('adminRights'))
         <tbody class="item"
                  data-date = "<?= $key;?>"
                  data-summ = "<?=isset($model['totalGroupSum'][$key]) ? $model['totalGroupSum'][$key] : 0;?>"
+                 data-acted-summ = "<?=isset($model['totalGroupActedSum'][$key]) ? $model['totalGroupActedSum'][$key] : 0;?>"
                  data-profit = "<?=isset($model['totalGroupProfit'][$key]) ? $model['totalGroupProfit'][$key] : 0;?>"
                  data-tax = "<?=isset($model['totalGroupTax'][$key]) ? $model['totalGroupTax'][$key] : 0;?>"
                  data-prod = "<?=isset($model['totalGroupProd'][$key]) ? $model['totalGroupProd'][$key] : 0;?>"
@@ -222,6 +232,7 @@ if(Yii::$app->user->can('adminRights'))
                 <th class="<?php if($isAdmin):?>width-8-percent<?php else:?>width-12-percent <?php endif;?>"><?=Yii::t('app/reports','Service')?></th>
             <?php endif;?>
             <th class="width-8-percent"><?=Yii::t('app/reports','Payment sum')?></th>
+            <th class="width-8-percent"><?=Yii::t('app/reports','Acted sum')?></th>
             <th class="width-4-percent"><?=Yii::t('app/reports','Payment currency')?></th>
             <th class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>"><?=Yii::t('app/reports','Exchange currency')?></th>
             <?php if(Yii::$app->user->can('adminRights')):?>
@@ -276,11 +287,17 @@ if(Yii::$app->user->can('adminRights'))
                      <?=($dt['service_name'] ? $dt['service_name'] : 'N/A');?>
             </td>
             <?php endif;?>
-            <td class="width-8-percent">
+            <td class="width-4-percent">
                     <?=\yii\helpers\Html::a(Yii::$app->formatter->asDecimal($dt['pay_summ']),
                         ['/bookkeeping/default/view','id' => $dt['id']],
                         ['target' =>'_blank']
                         );?>
+            </td>
+            <td class="width-4-percent">
+                <?=\yii\helpers\Html::a(Yii::$app->formatter->asDecimal($dt['acted_sum']),
+                    ['/bookkeeping/default/view','id' => $dt['id']],
+                    ['target' =>'_blank']
+                );?>
             </td>
             <td class="width-4-percent">    <?=($dt['code']?$dt['code'] : 'N/A');?></td>
             <td class="<?php if($isAdmin):?>width-4-percent<?php else:?>width-8-percent <?php endif;?>">
@@ -311,6 +328,9 @@ if(Yii::$app->user->can('adminRights'))
             </td>
             <td>
                 <?=isset($model['totalGroupSum'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupSum'][$key]) : '-';?>
+            </td>
+            <td>
+                <?=isset($model['totalGroupActedSum'][$key]) ? Yii::$app->formatter->asDecimal($model['totalGroupActedSum'][$key]) : '-';?>
             </td>
             <td colspan="2">
 

@@ -152,7 +152,8 @@ class Payments extends AbstractActiveRecord
             'act_close' => Yii::t('app/book','Act close'),
             'actAmount' => Yii::t('app/book','Act amount'),
             'hide_act_payment' => Yii::t('app/book','Hide payment at act'),
-            'enrollStatus' => Yii::t('app/book','Enrollment status')
+            'enrollStatus' => Yii::t('app/book','Enrollment status'),
+            'post_payment' => Yii::t('app/book','Post payment'),
         ];
     }
 

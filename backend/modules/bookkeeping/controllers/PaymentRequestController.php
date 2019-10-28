@@ -124,7 +124,11 @@ class PaymentRequestController extends AbstractBaseBackendController{
 
         $arCondVisible = [];
 
+        $postPayments = Payments::find()->where(['post_payment'=>1, 'cuser_id'=>$modelP->cntr_id])->all();
+        $postPayments = [];
         if(!Yii::$app->request->post('AddPaymentForm')) {
+
+
             $formModel = new AddPaymentForm(['fullSumm' => $modelP->pay_summ, 'service' => $modelP->service_id]);
             if(!empty($modelP->service_id))
             {
@@ -169,7 +173,6 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 }
                 */
             }
-
              $model = [$formModel];
         }
         else
@@ -211,7 +214,8 @@ class PaymentRequestController extends AbstractBaseBackendController{
                                 'payment_order' => $modelP->payment_order,
                                 'isSale' => $p->isSale,
                                 'saleUser' => $p->saleUser,
-                                'hide_act_payment' => $p->hide_act_payment
+                                'hide_act_payment' => $p->hide_act_payment,
+                                'post_payment' => $p->post_payment
                             ]);
 
                             if(!$obPay->save())
@@ -290,6 +294,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         return $this->render('add_payment',[
             'model' => $model,
             'modelP' => $modelP,
+            'postPayments' => $postPayments,
             'arCondVisible' => $arCondVisible
         ]);
     }

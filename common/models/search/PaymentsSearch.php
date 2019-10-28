@@ -83,6 +83,7 @@ class PaymentsSearch extends Payments
                 Payments::tableName().'.pay_date',
                 Payments::tableName().'.payment_order',
                 Payments::tableName().'.pay_summ',
+                'post_payment',
                 'act_close',
                 CUser::tableName().'.requisites_id',
                 CUser::tableName().'.manager_id',
@@ -162,6 +163,7 @@ class PaymentsSearch extends Payments
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'act_close' => $this->act_close,
+            'post_payment' => $this->post_payment,
             PaymentRequest::tableName().'.bank_id' => $this->bank_id,
             CUser::tableName().'.manager_id' => $this->manager
         ]);

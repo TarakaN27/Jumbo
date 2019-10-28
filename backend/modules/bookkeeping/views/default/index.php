@@ -184,6 +184,11 @@ CustomViewHelper::registerJsFileWithDependency('@web/js/parts/payments_index.js'
                                 'filter' => \common\models\Payments::getYesNo()
                             ],
                             [
+                                'attribute' => 'post_payment',
+                                'format' => 'boolean',
+                                'filter' => \common\models\Payments::getYesNo()
+                            ],
+                            [
                                 'class' => 'yii\grid\ActionColumn',
                                 'template' => $viewTpl
                             ],
