@@ -172,6 +172,7 @@ class ActsDocumentsV2
 
         if(!empty($obCUser) && is_object($obR = $obCUser->requisites))
         {
+
             $obAct = Acts::findOne($this->iActId);
             if (!$obAct)
                 throw new NotFoundHttpException();
@@ -180,7 +181,7 @@ class ActsDocumentsV2
             if($obCUser->is_resident == 0){
                 $this->cNotResident = true;
             }
-
+            $cuserYnp = "";
             if($obCUser->requisites->type_id == CUserRequisites::TYPE_F_PERSON) {
                 $cuserName = $obCUser->requisites->j_lname.' '.  $obCUser->requisites->j_fname . ' '. $obCUser->requisites->j_mname;
                 $adsress =  $obCUser->requisites->p_address;
@@ -202,12 +203,15 @@ class ActsDocumentsV2
                 $cuserYnp = $obR->ynp;
 
 
+
                 $template = "Заказчик: $cuserName, УНП: $cuserYnp<w:br/>
 Р/сч: $cuserBankDetail<w:br/>
 Основание: договор $cuserContractDetail<w:br/>
 Юр. адрес: $cuserAddress<w:br/>
 E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             }
+            $this->cuserName =$cuserName;
+            $this->cuserYnp = $cuserYnp;
             $this->contactDetail = $template;
         }
         return $obCUser;
