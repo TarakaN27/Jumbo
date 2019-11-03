@@ -253,6 +253,7 @@ class ActedPaymentsReportForm extends Model
             'iSumTotal' => 0,
             'iActedSumTotal' => 0,
             'iProfitTotal' => 0,
+            'iActedProfitTotal' =>0,
             'iTaxTotal' => 0,
             'iProdTotal' => 0,
             'summControll' => 0,
