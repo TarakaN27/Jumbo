@@ -310,6 +310,9 @@ $menuItems[] = [
                                             <li>
                                                 <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                             </li>
+                                            <li>
+                                                <a href="<?= Url::to(['/reports/acted-payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Отчет по актированным платежам'); ?></a>
+                                            </li>
                                         <?php endif;?>
 
                                         <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights')):?>
