@@ -29,7 +29,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     {
         $this->time = is_null($time) ? time() : $time; //текущая дата
         $this->codeID = $codeID;
-        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('m',  $this->time) . '/' . date('d',  $this->time) . '/' . date('Y',  $this->time);
+        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('Y-m-d',  $this->time);
     }
 
     /**
@@ -89,8 +89,8 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     public function getCurrencyRateByPeriod($iCurrId,$beginDate,$endDate)
     {
         $iCurrId = $this->internalCurrCode[$iCurrId];
-        $fromDate = date('m/d/Y',$beginDate);
-        $toDate = date('m/d/Y',$endDate);
+        $fromDate = date('Y-m-d',$beginDate);
+        $toDate = date('Y-m-d',$endDate);
         $this->url = 'http://www.nbrb.by/Services/XmlExRatesDyn.aspx?curId='.$iCurrId.'&fromDate='.$fromDate.'&toDate='.$toDate;
         $sxml = $this->loadFile();
         if(!is_object($sxml)){
@@ -110,7 +110,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
 
     public function getCurrencyRateByDate($date)
     {
-        $onDate = date('m/d/Y',$date);
+        $onDate = date('Y-m-d',$date);
         $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.$onDate;
         $sxml = $this->loadFile();
         if(!is_object($sxml)){
