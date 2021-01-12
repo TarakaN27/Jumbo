@@ -63,7 +63,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
             return TRUE;
         }
 
-        if($toExtEmail != ""){
+        if($toExtEmail != "") {
             if(!$this->sendMail($toExtEmail,$obAct->getDocumentPath(),$tmpType))
             {
                 $errorText = 'Ошибка отправки акта '.$iActId.' . Не удалось отправить письмо';
@@ -94,6 +94,7 @@ class ActsLetterRabbitHandler extends AbstractRabbitHandler
      */
     protected function sendMail($toEmail,$documentPath,$tplType = '')
     {
+        sleep(10);
         try {
             if($tplType == '-2')
                 return \Yii::$app->salesMailerSoft->compose( // отправялем уведомление по ссылке
