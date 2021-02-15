@@ -278,7 +278,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 
                         $this->vatInWords = $this->bUseVat ?
                             ' в т.ч.: НДС - '.$strVatAmount :
-                            ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+                            ' Без НДС согласно статьи 326 Налогового кодекса Республики Беларусь.';
                         $this->totalAmount = round($this->totalAmount);
                         $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
                         if($this->bUseVat)
@@ -296,7 +296,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 
                 $this->vatInWords = $this->bUseVat ?
                     ' в т.ч.: НДС - '.$strVatAmount :
-                    ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+                    ' Без НДС согласно статьи 326 Налогового кодекса Республики Беларусь.';
 
                 $this->totalAmount = $this->formatterHelper($this->totalAmount).'  ('.$this->getNewByr($this->totalAmount).')';
                 $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount).'  ('.$this->getNewByr($this->totalFiniteAmount).')';
@@ -315,7 +315,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 
                     $this->vatInWords = $this->bUseVat ?
                         ' в т.ч.: НДС - '.$strVatAmount :
-                        ' Без НДС согласно статьи 286 Налогового кодекса Республики Беларусь.';
+                        ' Без НДС согласно статьи 326 Налогового кодекса Республики Беларусь.';
 
                     $this->totalAmount = $this->formatterHelper($this->totalAmount);
                     $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
