@@ -308,7 +308,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         }
     }
 
-    private function parseObmennikByDate($date){
+    private function parseObmennikByDate($date) {
         $url = 'http://obmennik.by/archivesbanksofbelarus.php?date='.date('Y-m-d',$date);
         $ch = curl_init();
         $timeout = 5;
