@@ -16,6 +16,6 @@
 	<p>https://webmart.by/oferta-kontekstnaya-reklama</p>
 	<p>С уважением, ООО «Вебмарт Групп»</p>
 	<p>Phone:  +375(29)313-47-04</p>
-	<p>E-mail: sales@webmart.by</p> 
-	<hr>
+	<p>E-mail: sales@webmart.by</p>
+	<hr/>
 </div>
