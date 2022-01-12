@@ -31,124 +31,120 @@ class ExchangeRatesController extends AbstractConsoleController{
         $arCurrency = ExchangeRates::find()->where(['need_upd' => ExchangeRates::YES])->all();
         if(empty($arCurrency))
             return $this->log(TRUE);
-        $trans = \Yii::$app->db->beginTransaction();
-        try{
-            $obNBRB = new ExchangeRatesNBRB();
-            $arCurrNBRB = $obNBRB->getAllCurrency();
+        do {
+            $trans = \Yii::$app->db->beginTransaction();
+            try {
+                $obNBRB = new ExchangeRatesNBRB();
+                $arCurrNBRB = $obNBRB->getAllCurrency();
 
-            $obCBRF = new ExchangeRatesCBRF();
-            $arCurrCBRF = $obCBRF->getAllCurrency();
-            unset($obCBRF,$obNBRB);
+                $obCBRF = new ExchangeRatesCBRF();
+                $arCurrCBRF = $obCBRF->getAllCurrency();
+                unset($obCBRF, $obNBRB);
 
-            $bHasError = FALSE;
-            /**
-             * вначале обновляем курсы валют , которые получаем из центр. банков
-             */
+                $bHasError = FALSE;
+                /**
+                 * вначале обновляем курсы валют , которые получаем из центр. банков
+                 */
 
-            /** @var  ExchangeRates $model*/
-            foreach($arCurrency as $key => $model)
-            {
-                if($model->fix_exchange || $model->use_base || $model->use_exchanger)
-                    continue;
+                /** @var  ExchangeRates $model */
+                foreach ($arCurrency as $key => $model) {
+                    if ($model->fix_exchange || $model->use_base || $model->use_exchanger)
+                        continue;
 
-                $nbrbRate = $model->nbrb_rate;
-                $crbRate = $model->cbr_rate;
+                    $nbrbRate = $model->nbrb_rate;
+                    $crbRate = $model->cbr_rate;
 
-                if($model->cbr != 0)
-                {
-                    if(isset($arCurrCBRF[$model->cbr]))
-                        $crbRate = $arCurrCBRF[$model->cbr];
-                }else{
-                    $crbRate = 1;
-                }
-
-                if($model->use_rur_for_byr)
-                {
-                    $code = CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016') ? ExchangeRatesCBRF::BYN_IN_CBR_CODE : ExchangeRatesCBRF::BYR_IN_CBR_CODE;
-
-                    $crb = new ExchangeRatesCBRF($code);
-                    $curr = $crb->getRURcurrencyInBur();
-
-                    $nbrbRate = round($crbRate*$curr,4); //курс по ЦБРФ
-                }else{
-                    if($model->nbrb != 0)
-                    {
-                        if(isset($arCurrNBRB[$model->nbrb]))
-                            $nbrbRate = $arCurrNBRB[$model->nbrb];
-                    }else{
-                        $nbrbRate = 1;
+                    if ($model->cbr != 0) {
+                        if (isset($arCurrCBRF[$model->cbr]))
+                            $crbRate = $arCurrCBRF[$model->cbr];
+                    } else {
+                        $crbRate = 1;
                     }
-                }
 
-                if((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0))
-                {
-                    $model->cbr_rate = $crbRate;
-                    $model->nbrb_rate= $nbrbRate;
-                    if(!$model->save())
-                    {
+                    if ($model->use_rur_for_byr) {
+                        $code = CustomDateHelper::isDateBeforeOrAfterDate('01-07-2016') ? ExchangeRatesCBRF::BYN_IN_CBR_CODE : ExchangeRatesCBRF::BYR_IN_CBR_CODE;
+
+                        $crb = new ExchangeRatesCBRF($code);
+                        $curr = $crb->getRURcurrencyInBur();
+
+                        $nbrbRate = round($crbRate * $curr, 4); //курс по ЦБРФ
+                    } else {
+                        if ($model->nbrb != 0) {
+                            if (isset($arCurrNBRB[$model->nbrb]))
+                                $nbrbRate = $arCurrNBRB[$model->nbrb];
+                        } else {
+                            $nbrbRate = 1;
+                        }
+                    }
+
+                    if ((!empty($nbrbRate) || $model->nbrb == 0) && (!empty($crbRate) || $model->cbr == 0)) {
+                        $model->cbr_rate = $crbRate;
+                        $model->nbrb_rate = $nbrbRate;
+                        if (!$model->save()) {
+                            $bHasError = TRUE;
+                        }
+                    } else {
                         $bHasError = TRUE;
                     }
-                }else{
-                    $bHasError = TRUE;
+
+                    unset($arCurrency[$key]);
                 }
-
-                unset($arCurrency[$key]);
-            }
-            /** @var  ExchangeRates $item*/
-            foreach($arCurrency as $item)
-            {
-                if($item->use_base) //так как основные валюты уже обновили, обновим зависимые валюты
-                {
-                    /** @var ExchangeRates $obBase */
-                    $obBase = ExchangeRates::findOne(['id' => $item->base_id]);
-                    if(empty($obBase))
-                        throw new NotFoundHttpException('Base currency not found');
-
-                    $item->cbr_rate = round($obBase->cbr_rate*$item->factor,4);
-                    $item->nbrb_rate = round($obBase->nbrb_rate*$item->factor,4);
-
-                    if(!$item->save())
+                /** @var  ExchangeRates $item */
+                foreach ($arCurrency as $item) {
+                    if ($item->use_base) //так как основные валюты уже обновили, обновим зависимые валюты
                     {
-                        $bHasError = TRUE;
-                    }
-                }elseif($item->use_exchanger) //обновим фиксированные валюты
-                {
-                    $obExch = new ExchangeRatesObmennikBY();
-                    $obExch ->setBankID($item->bank_id);
+                        /** @var ExchangeRates $obBase */
+                        $obBase = ExchangeRates::findOne(['id' => $item->base_id]);
+                        if (empty($obBase))
+                            throw new NotFoundHttpException('Base currency not found');
 
-                    $data = $obExch ->getCurrencyUSD();
+                        $item->cbr_rate = round($obBase->cbr_rate * $item->factor, 4);
+                        $item->nbrb_rate = round($obBase->nbrb_rate * $item->factor, 4);
 
-                    if(empty($data))
-                        throw new NotFoundHttpException('Cant get currency from obmennik.by');
-
-                    $factor = empty($item->factor) ? 1 : $item->factor;
-
-                    $item->cbr_rate = $data['rur']*$factor;
-                    $item->nbrb_rate = $data['bur']*$factor;
-
-                    if(!$item->save())
+                        if (!$item->save()) {
+                            $bHasError = TRUE;
+                        }
+                    } elseif ($item->use_exchanger) //обновим фиксированные валюты
                     {
-                        $bHasError = TRUE;
+                        $obExch = new ExchangeRatesObmennikBY();
+                        $obExch->setBankID($item->bank_id);
+
+                        $data = $obExch->getCurrencyUSD();
+
+                        if (empty($data)) {
+                            throw new NotFoundHttpException('Cant get currency from obmennik.by ' . $item->name);
+                        }
+
+                        $factor = empty($item->factor) ? 1 : $item->factor;
+
+                        $item->cbr_rate = $data['rur'] * $factor;
+                        $item->nbrb_rate = $data['bur'] * $factor;
+
+                        if (!$item->save()) {
+                            $bHasError = TRUE;
+                        }
+                    } elseif ($item->fix_exchange) {
+                        $item->save();
                     }
                 }
-                elseif($item->fix_exchange){
-                    $item->save();
-                }
-            }
 
-            if($bHasError)
+                if ($bHasError)
+                    $trans->rollBack();
+                else
+                    $trans->commit();
+
+            } catch (\Exception $e) {
                 $trans->rollBack();
-            else
-                $trans->commit();
-
-        }catch (\Exception $e){
-            $trans->rollBack();
-            $bHasError = TRUE;
-            var_dump($e->getCode().' '.$e->getMessage());
-            if($failCount > 0)
-                sleep(30);
-                $this->actionRun($failCount);
-        }
+                $bHasError = TRUE;
+                var_dump($e->getCode() . ' ' . $e->getMessage());
+                if ($failCount > 0) {
+                    sleep(2);
+                    --$failCount;
+                } else {
+                    $bHasError = false;
+                }
+            }
+        } while($bHasError);
 
         return $this->log(!$bHasError);
     }
@@ -308,7 +304,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         }
     }
 
-    private function parseObmennikByDate($date) {
+    private function parseObmennikByDate($date){
         $url = 'http://obmennik.by/archivesbanksofbelarus.php?date='.date('Y-m-d',$date);
         $ch = curl_init();
         $timeout = 5;
@@ -370,7 +366,7 @@ class ExchangeRatesController extends AbstractConsoleController{
             return $this->log(TRUE);
 
         $arCurrencyHistoryTmp = ExchangeCurrencyHistory::find()                        //история обновления валют
-            ->where(['currency_id' => ArrayHelper::getColumn($arCurrency,'id')])
+        ->where(['currency_id' => ArrayHelper::getColumn($arCurrency,'id')])
             ->andWhere(['between', 'date', $beginDate, $endDate])
             ->orderBy(['date' => SORT_ASC])
             ->all();
@@ -381,7 +377,7 @@ class ExchangeRatesController extends AbstractConsoleController{
         {
             $arCurrHist[$currTmp->date][] = $currTmp;
         }
-        
+
 
 
 
