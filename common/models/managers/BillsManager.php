@@ -280,7 +280,7 @@ class BillsManager extends Bills{
 
         $totalSummInWords = number_format($billTotalSumVat,2,',',' ').' ('.CustomHelper::num2str($billTotalSumVat).')';
 
-        $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь';
+        $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно статьи 326 Налогового кодекса Республики Беларусь';
         try{
             if($this->l_person_id == 3 && $this->bill_date>="2017-03-06" && $this->bill_date<="2017-03-31"){
                 $doc = new \PhpOffice\PhpWord\TemplateProcessor(Yii::getAlias("@common/upload/docx_template").'/shlo_bill.docx');
