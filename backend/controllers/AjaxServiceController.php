@@ -10,6 +10,7 @@ namespace backend\controllers;
 
 
 use backend\components\AbstractBaseBackendController;
+use backend\models\BUser;
 use common\components\managers\DialogManager;
 use common\models\ActFieldTemplate;
 use common\models\CrmTask;
@@ -21,6 +22,8 @@ use common\models\managers\ExchangeRatesManager;
 use common\models\managers\PaymentsManager;
 use common\models\Messages;
 use common\models\PartnerPurse;
+use common\models\PaymentRequest;
+use common\models\search\PaymentRequestSearch;
 use common\models\ServiceDefaultContract;
 use yii\base\InvalidParamException;
 use yii\data\ActiveDataProvider;
@@ -541,6 +544,44 @@ class AjaxServiceController extends AbstractBaseBackendController{
         return [
             'content' => $this->renderPartial('_part_payment_for_act',[
                 'arPayments' => $arPayments
+            ])
+        ];
+    }
+
+    public function actionFindRequestPaymentsForActs()
+    {
+        $iCUser = Yii::$app->request->post('iCUser');
+        $iRequestIds = Yii::$app->request->post('iRequestIds');
+
+        $searchModel = new PaymentRequestSearch();
+
+        if(Yii::$app->user->can('only_manager'))
+            $searchModel->managerID = Yii::$app->user->id;
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW, PaymentRequest::tableName().'.cntr_id'=>$iCUser]);
+        if(empty($searchModel->pay_date))
+            $searchModel->pay_date = NULL;
+
+        $arTotal = $searchModel->totalCount(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW]);
+
+        $arRedisPaymentRequest = RedisNotification::getPaymentRequestListForUser(Yii::$app->user->id);
+
+        $cuserDesc = empty($searchModel->cntr_id) ? '' : \common\models\CUser::findOne($searchModel->cntr_id)->getInfoWithSite();
+        $buserDesc = empty($searchModel->owner_id) ? '' : BUser::findOne($searchModel->owner_id)->getFio();
+
+        foreach($arTotal as &$total)
+        {
+            $total = Yii::$app->formatter->asDecimal($total);
+        }
+
+        return [
+            'content' => $this->renderPartial('_part_request_payment_for_act',[
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'arRedisPaymentRequest' => $arRedisPaymentRequest,
+                'cuserDesc' => $cuserDesc,
+                'buserDesc' => $buserDesc,
+                'arTotal' => $arTotal
             ])
         ];
     }

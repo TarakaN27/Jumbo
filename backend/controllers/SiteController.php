@@ -85,6 +85,7 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $this->layout = 'main';
+        #var_dump(Yii::$app->user);
         return $this->render('index');
     }
 
@@ -331,4 +332,5 @@ class SiteController extends Controller
             ['3']
             );
     }
+
 }

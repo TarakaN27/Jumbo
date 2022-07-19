@@ -50,6 +50,10 @@ class PaymentRequest extends AbstractActiveRecord
     public $active=1;
     public $cuserName;
     public $bank;
+    public $condition_id;
+    public $curr_val;
+    public $customProduction;
+    public $condType;
 
     /**
      * @return array

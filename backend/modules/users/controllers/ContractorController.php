@@ -35,11 +35,11 @@ class ContractorController extends AbstractBaseBackendController
                 [
                     'allow' => true,
                     'actions' => ['services-contract'],
-                    'roles' => ['moder','jurist','bookkeeper','admin']
+                    'roles' => ['moder','sale','jurist','bookkeeper','admin']
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['moder','bookkeeper','admin']
+                    'roles' => ['moder','sale','bookkeeper','admin']
                 ]
             ]
         ];

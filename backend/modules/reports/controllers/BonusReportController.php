@@ -26,6 +26,10 @@ class BonusReportController extends AbstractBaseBackendController
 			'class' => AccessControl::className(),
 			'rules' => [
 				[
+					'allow' => false,
+					'roles' => ['teamlead']
+				],
+				[
 					'allow' => true,
 					'roles' => ['user']
 				]

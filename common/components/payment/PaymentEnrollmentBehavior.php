@@ -94,10 +94,20 @@ class PaymentEnrollmentBehavior extends Behavior{
      */
     public function countAmoutForEnrollment(Payments $model,PaymentCondition $obCond,PaymentsCalculations $obCalc, $calcDub = false)
     {
-        if($calcDub)
-            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$obCond->dub_cond_currency);
-        else
-            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$model->pay_date),$obCond->cond_currency);
+        if ($calcDub) {
+            if($obCalc->custom_curr>0){
+                $curr = $obCalc->custom_curr;
+            } else{
+                $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d', $model->pay_date), $obCond->dub_cond_currency);
+            }
+        } else {
+            if($obCalc->custom_curr>0){
+                $curr = $obCalc->custom_curr;
+            } else {
+                $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d', $model->pay_date), $obCond->cond_currency);
+            }
+        }
+
         $amount =  $obCalc->production;
 
         if($obCond->not_use_sale)

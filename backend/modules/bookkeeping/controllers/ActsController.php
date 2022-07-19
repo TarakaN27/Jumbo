@@ -3,15 +3,23 @@
 namespace backend\modules\bookkeeping\controllers;
 
 use backend\modules\bookkeeping\form\ActForm;
+use backend\modules\bookkeeping\form\AddPaymentForm;
 use backend\widgets\Alert;
 use common\components\csda\CSDAUser;
 use common\components\helpers\CustomHelper;
+use common\components\payment\PaymentOperations;
 use common\components\rabbitmq\Rabbit;
+use common\models\AbstractModel;
 use common\models\ActImplicitPayment;
 use common\models\ActToPayments;
 use common\models\CUser;
 use common\models\CuserExternalAccount;
+use common\models\ExchangeCurrencyHistory;
+use common\models\PaymentCondition;
+use common\models\PaymentRequest;
 use common\models\LegalPerson;
+use common\models\Payments;
+use common\models\PaymentsCalculations;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Yii;
 use common\models\Acts;
@@ -45,9 +53,13 @@ class ActsController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'allow' => true,
-                    'roles' => ['superadmin','bookkeeper','moder']
+                    'roles' => ['superadmin','bookkeeper','moder','sale']
                 ]
             ]
         ];
@@ -137,11 +149,44 @@ class ActsController extends AbstractBaseBackendController
         $contractorInitText = '';
         if($model->iCUser)
             $contractorInitText = CUser::getCuserInfoById($model->iCUser);
-        
+
+        $modelEmpty = new PaymentRequest();
+        $modelEmpty->owner_id = Yii::$app->user->id;
+        $modelEmpty->status = PaymentRequest::STATUS_NEW;
+        $modelEmpty->pay_date = date('d.m.Y',time());
+        /*if($modelEmpty->load(Yii::$app->request->post()))
+        {
+            $modelEmpty->bank_id = isset($modelEmpty->bank[$modelEmpty->legal_id])?$modelEmpty->bank[$modelEmpty->legal_id]:null;
+            $modelEmpty->save();
+        }*/
         return $this->render('create',[
             'model' => $model,
+            'modelEmpty'=>$modelEmpty,
             'contractorInitText' => $contractorInitText
         ]);
+    }
+
+    public function actionCreateEmptyPaymentRequest()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $modelP = new PaymentRequest();
+        $modelP->owner_id = Yii::$app->user->id;
+        $modelP->status = PaymentRequest::STATUS_NEW;
+        $modelP->payment_order = "Не указано";
+
+        if($modelP->load(Yii::$app->request->post()))
+        {
+            $modelP->bank_id = isset($modelP->bank[$modelP->legal_id])?$modelP->bank[$modelP->legal_id]:null;
+
+            if($modelP->save()){
+                return ['status'=>1,'msg'=>"Payments add successful!", 'id'=>$modelP->primaryKey];
+            } else {
+                return ['status'=>0,'msg'=>"Can not add payments! ".json_encode($modelP->errors)];
+            }
+
+        }
+        return ['status'=>0,'msg'=>"Model not load!"];
     }
 
     /**

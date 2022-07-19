@@ -87,163 +87,166 @@ var
                 <div class="x_content container-items">
                     <div class="row">
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                             <?php
-                                echo \yii\widgets\DetailView::widget([
-                                     'model' => $modelP,
-                                     'options' => [
-                                         'class' => 'table table-bordered'
-                                     ],
-                                     'attributes' => [
-                                         [
-                                             'attribute' => 'cntr_id',
-                                             'value' => is_object($obCuser = $modelP->cuser) ? $obCuser->getInfo() : 'N/A'
-                                         ],
-                                         [
-                                             'attribute' => 'legal_id',
-                                             'value' => is_object($obLegal = $modelP->legal) ? $obLegal->name : 'N/A'
-                                         ],
-                                         [
-                                              'attribute' => 'pay_summ',
-                                              'value' => Yii::$app->formatter->asDecimal($modelP->pay_summ).' '.$sCurrn
-                                         ],
-                                         [
-                                             'attribute' => 'pay_date',
-                                             'value' => Yii::$app->formatter->asDate($modelP->pay_date)
-                                         ],
-                                         'description:text'
-                                     ]
-                                ])?>
+                            <?php
+                            echo \yii\widgets\DetailView::widget([
+                                'model' => $modelP,
+                                'options' => [
+                                    'class' => 'table table-bordered'
+                                ],
+                                'attributes' => [
+                                    [
+                                        'attribute' => 'cntr_id',
+                                        'value' => is_object($obCuser = $modelP->cuser) ? $obCuser->getInfo() : 'N/A'
+                                    ],
+                                    [
+                                        'attribute' => 'legal_id',
+                                        'value' => is_object($obLegal = $modelP->legal) ? $obLegal->name : 'N/A'
+                                    ],
+                                    [
+                                        'attribute' => 'pay_summ',
+                                        'value' => Yii::$app->formatter->asDecimal($modelP->pay_summ).' '.$sCurrn
+                                    ],
+                                    [
+                                        'attribute' => 'pay_date',
+                                        'value' => Yii::$app->formatter->asDate($modelP->pay_date)
+                                    ],
+                                    'description:text'
+                                ]
+                            ])?>
                         </div>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                             <?php echo Html::hiddenInput('availableSumm',$modelP->pay_summ,['id' => 'aSumm'])?>
                             <h3><?php echo Yii::t('app/book','AvailableSumm');?>: <small id="aSummDispl"><?php echo $modelP->pay_summ; ?></small></h3>
                             <?php if($postPayments){?>
-                                        <table id="post_payment" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Id</th>
-                                                <th>Услуга</th>
-                                                <th>Сумма платежа</th>
-                                                <th>Валюта</th>
-                                                <th>Дата</th>
-                                            </tr>
-                                            </thead>
-                                            <?php foreach($postPayments as $postPayment){?>
-                                                <tr>
-                                                    <td><input type="checkbox" class="postPaymentClass" data-amount = "<?=$postPayment->pay_summ?>" name="postPayment[<?=$postPayment->id?>]"></td>
-                                                    <td><?=$postPayment->id?></td>
-                                                    <td><?=$postPayment->service->name?></td>
-                                                    <td><?=Yii::$app->formatter->asDecimal($postPayment->pay_summ)?></td>
-                                                    <td><?=$postPayment->currency->code?></td>
-                                                    <td><?=Yii::$app->formatter->asDate($postPayment->pay_date)?></td>
-                                                </tr>
-                                            <?php }?>
-                                        </table>
+                                <table id="post_payment" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Id</th>
+                                        <th>Услуга</th>
+                                        <th>Сумма платежа</th>
+                                        <th>Валюта</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                    </thead>
+                                    <?php foreach($postPayments as $postPayment){?>
+                                        <tr>
+                                            <td><input type="checkbox" class="postPaymentClass" data-amount = "<?=$postPayment->pay_summ?>" name="postPayment[<?=$postPayment->id?>]"></td>
+                                            <td><?=$postPayment->id?></td>
+                                            <td><?=$postPayment->service->name?></td>
+                                            <td><?=Yii::$app->formatter->asDecimal($postPayment->pay_summ)?></td>
+                                            <td><?=$postPayment->currency->code?></td>
+                                            <td><?=Yii::$app->formatter->asDate($postPayment->pay_date)?></td>
+                                        </tr>
+                                    <?php }?>
+                                </table>
 
                             <?php };?>
                         </div>
                     </div>
                     <?php
-                            foreach ($model as $i => $m): ?>
-                            <div class="item col-md-6 col-sm-6 col-xs-12">
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2><i class="fa fa-align-left"></i> <?php echo Yii::t('app/book','Payment');?></h2>
-                                        <ul class="nav navbar-right">
-                                            <li>
-                                                <a class="remove-item"><i class="glyphicon glyphicon-remove" style="color:red;cursor: pointer;"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div class="panel-body">
-                                            <?= Html::activeHiddenInput($m, "[{$i}]condType")?>
-                                            <?= $form->field($m, "[{$i}]service")->dropDownList(
-                                                \common\models\Services::getServicesMap(),[
-                                                'prompt' => Yii::t('app/book','Choose service'),
-                                                'onchange' => 'findCondition(this);isSaleCheck(this);',
-                                                'data-service-id' => $i
-                                            ]) ?>
-                                            <?= $form->field($m, "[{$i}]summ")->textInput([
-                                                'maxlength' => true,
-                                                'class' => 'form-control psumm',
-                                                'onchange' => 'boundsCheckingConditions(this);',
-                                            ]) ?>
-                                            <?= $form->field($m,"[{$i}]customProduction")->textInput([
-                                                'disabled' => 'disabled'
-                                            ])?>
-                                            <?= $form->field($m, "[{$i}]comment")->textarea() ?>
-                                            <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date)),[
-                                                'prompt' => Yii::t('app/book','Choose condition'),
-                                                'data-cond-id' => $i,
-                                                'onchange' => 'boundsCheckingConditions(this);',
-                                                'class' => 'form-control cond-class'
-                                            ]) ?>
-                                            <div class="row">
-                                                <div class="col-md-offset-2 pdd-left-5">
-                                                    <div class="col-md-6">
-                                                        <?= $form->field($m,"[{$i}]hide_act_payment")->checkbox()?>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                    </div>
+                    foreach ($model as $i => $m): ?>
+                        <div class="item col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2><i class="fa fa-align-left"></i> <?php echo Yii::t('app/book','Payment');?></h2>
+                                    <ul class="nav navbar-right">
+                                        <li>
+                                            <a class="remove-item"><i class="glyphicon glyphicon-remove" style="color:red;cursor: pointer;"></i></a>
+                                        </li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="panel-body">
+                                        <?= Html::activeHiddenInput($m, "[{$i}]condType")?>
+                                        <?= $form->field($m, "[{$i}]service")->dropDownList(
+                                            \common\models\Services::getServicesMap(),[
+                                            'prompt' => Yii::t('app/book','Choose service'),
+                                            'onchange' => 'findCondition(this);isSaleCheck(this);',
+                                            'data-service-id' => $i
+                                        ]) ?>
+                                        <?= $form->field($m, "[{$i}]summ")->textInput([
+                                            'maxlength' => true,
+                                            'class' => 'form-control psumm',
+                                            'onchange' => 'boundsCheckingConditions(this);',
+                                        ]) ?>
+                                        <?= $form->field($m,"[{$i}]customProduction")->textInput([
+                                            'disabled' => 'disabled'
+                                        ])?>
+                                        <?= $form->field($m, "[{$i}]comment")->textarea() ?>
+                                        <?= $form->field($m, "[{$i}]condID")->dropDownList(\common\models\PaymentCondition::getConditionWithCurrency(date('Y-m-d',$modelP->pay_date)),[
+                                            'prompt' => Yii::t('app/book','Choose condition'),
+                                            'data-cond-id' => $i,
+                                            'onchange' => 'boundsCheckingConditions(this);',
+                                            'class' => 'form-control cond-class'
+                                        ]) ?>
+                                        <? if(in_array(Yii::$app->getUser()->identity->role, [15,25])): ?>
+                                            <?= $form->field($m,"[{$i}]curr_val")->textInput(['type'=>'number', 'step'=>'any'])?>
+                                        <? endif; ?>
+                                        <div class="row">
+                                            <div class="col-md-offset-2 pdd-left-5">
+                                                <div class="col-md-6">
+                                                    <?= $form->field($m,"[{$i}]hide_act_payment")->checkbox()?>
                                                 </div>
-                                                <div class="col-md-offset-2 pdd-left-5">
-                                                    <div class="col-md-6">
-                                                        <?= $form->field($m,"[{$i}]post_payment")->checkbox()?>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                    </div>
+                                                <div class="col-md-6">
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-offset-2 pdd-left-5">
-                                                    <?php if(Yii::$app->user->can('adminRights')):?>
-                                                        <div class="col-md-6">
-                                                            <?= $form->field($m,"[{$i}]showAll",[])->checkbox([
-                                                                'class' => 'showAllBtn'
-                                                            ])?>
-                                                        </div>
-                                                    <?php endif;?>
-                                                    <div class="col-md-6 pdd-top-10">
-                                                        <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
-                                                            'target' => 'blank'
-                                                        ])?>
-                                                    </div>
-
+                                            <div class="col-md-offset-2 pdd-left-5">
+                                                <div class="col-md-6">
+                                                    <?= $form->field($m,"[{$i}]post_payment")->checkbox()?>
+                                                </div>
+                                                <div class="col-md-6">
                                                 </div>
                                             </div>
-                                            <div class="row maybesale <?php if(!$m->isSale)echo 'hide';?>">
-                                                <hr/>
-                                                <div class="col-md-offset-2 pdd-left-15">
-                                                    <span class="warning "><?=Yii::t('app/book','Maybe payment is sale');?></span>
-                                                </div>
-                                                <div>
-                                                    <div id="ap_sale_checkbox" class="col-md-3 col-md-offset-2 pdd-left-15">
-                                                        <?= $form->field($m,"[{$i}]isSale",[])->checkbox([
-                                                            'class' => ''
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-offset-2 pdd-left-5">
+                                                <?php if(Yii::$app->user->can('adminRights')):?>
+                                                    <div class="col-md-6">
+                                                        <?= $form->field($m,"[{$i}]showAll",[])->checkbox([
+                                                            'class' => 'showAllBtn'
                                                         ])?>
                                                     </div>
-                                                    <div id="ap_salers_dropdown" class="col-md-7" >
-                                                        <?=$form->field($m,"[{$i}]saleUser",[
-                                                            'template' => '<div class="col-md-12 col-sm-12 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
-                                                            //'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
-                                                        ])
-                                                            ->dropDownList(\backend\models\BUser::getAllMembersMap(),[
-                                                                'class' => 'selectDrop',
-                                                                'prompt' => Yii::t('app/book','Choose user'),
-                                                                'disabled' => true,
-                                                            ])?>
-                                                    </div>
+                                                <?php endif;?>
+                                                <div class="col-md-6 pdd-top-10">
+                                                    <?= Html::a(Yii::t('app/book','Condition info'),'http://wiki.webmart.by/pages/viewpage.action?pageId=2556180',[
+                                                        'target' => 'blank'
+                                                    ])?>
                                                 </div>
 
                                             </div>
                                         </div>
+                                        <div class="row maybesale <?php if(!$m->isSale)echo 'hide';?>">
+                                            <hr/>
+                                            <div class="col-md-offset-2 pdd-left-15">
+                                                <span class="warning "><?=Yii::t('app/book','Maybe payment is sale');?></span>
+                                            </div>
+                                            <div>
+                                                <div id="ap_sale_checkbox" class="col-md-3 col-md-offset-2 pdd-left-15">
+                                                    <?= $form->field($m,"[{$i}]isSale",[])->checkbox([
+                                                        'class' => ''
+                                                    ])?>
+                                                </div>
+                                                <div id="ap_salers_dropdown" class="col-md-7" >
+                                                    <?=$form->field($m,"[{$i}]saleUser",[
+                                                        'template' => '<div class="col-md-12 col-sm-12 col-xs-12">{input}</div><ul class="parsley-errors-list" >{error}</ul>',
+                                                        //'labelOptions' => ['class' => 'control-label col-md-4 col-sm-4 col-xs-12'],
+                                                    ])
+                                                        ->dropDownList(\backend\models\BUser::getAllMembersMap(),[
+                                                            'class' => 'selectDrop',
+                                                            'prompt' => Yii::t('app/book','Choose user'),
+                                                            'disabled' => true,
+                                                        ])?>
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ class ActForm extends Model
         $actDate,               //Дата акта
         $arPayment,             //Платежи, которые актируются
         $bCustomAct,            //Bool flag кастомный акт, без генерации
-        $fCustomFileAct,        //Файл кастомного акта
+        $fCustomFileAct=0,        //Файл кастомного акта
         $sContractNumber,       //Номер Контракта
         $contractDate,          //Дата контракта
         $arHidePayments,        //Неявные платежи
@@ -140,7 +140,7 @@ class ActForm extends Model
         }
         $contractDate = $this->getContractDate();
         $contractNumber = $this->getContractNumber();
-
+		
         if(empty($contractDate) || empty($contractNumber))
             return false;
 
@@ -170,7 +170,7 @@ class ActForm extends Model
             }
             $obAct->contract_date = date('Y-m-d',strtotime($contractDate));
             $obAct->contract_num = $contractNumber;
-
+			
             if(!$obAct->save())
                 throw new ServerErrorHttpException();
 
@@ -199,6 +199,7 @@ class ActForm extends Model
 
             $this->trigger(BaseActiveRecord::EVENT_AFTER_INSERT);
             $transaction->commit();
+
             return TRUE;
         }catch(Exception $e){
             $transaction->rollBack();
@@ -384,8 +385,9 @@ class ActForm extends Model
             ])
             ->orderBy(['pay_date' => SORT_DESC])
             ->all();
-        if(!$arPayments)
-            throw new NotFoundHttpException();
+        #if(!$arPayments)
+		#	$_SESSION["error2"] = 'Ошибка';
+        #    throw new NotFoundHttpException();
 
         $arImplicit = Payments::find()
             ->where([
@@ -432,14 +434,14 @@ class ActForm extends Model
                             $tmpAmount = (float)$arAmount[$iServId];    //получаем текущее значение суммы по услуге
 
                             if($tmpAmount < $amount)                    //если не хватает суммы у услуги для актирвоания, выкинем ошибку
-                                throw new InvalidParamException();
+								throw new InvalidParamException();
 
                             $obActPay = new ActToPayments();            //сохраняем историю актирвоания по частям
                             $obActPay->act_id = $actId;
                             $obActPay->amount = $amount;
                             $obActPay->payment_id = $obImplicid->id;
                             if(!$obActPay->save())
-                                throw new ServerErrorHttpException();
+								throw new ServerErrorHttpException();
 
                             $arAmount[$iServId]-=(float)$amount;        //уменьшаем сумму по услуге
                         }

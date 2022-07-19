@@ -21,6 +21,7 @@ return [
     'Payments' => 'Платежи',
     'Cuser ID' => 'Контрагент',
     'Pay Date' => 'Дата платежа',
+    'Currency value' => 'Курс валюты',
     'Pay Summ' => 'Сумма платежа',
     'Currency ID' => 'Валюта',
     'Service ID' => 'Услуга',

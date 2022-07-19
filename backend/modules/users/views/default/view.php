@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <?= Html::a(Yii::t('app/users', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                                     <?php endif;?>
                                     <?php if((Yii::$app->user->can('adminRights') &&
-                                            in_array($model->role,[BUser::ROLE_MANAGER,BUser::ROLE_BOOKKEEPER,BUser::ROLE_USER])) ||
+                                            in_array($model->role,[BUser::ROLE_MANAGER,BUser::ROLE_SALE,BUser::ROLE_BOOKKEEPER,BUser::ROLE_USER])) ||
                                         Yii::$app->user->can('superRights')
                                     ): ?>
                                     <?= Html::a(Yii::t('app/users', 'Delete'), ['delete', 'id' => $model->id], [

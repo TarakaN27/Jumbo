@@ -44,6 +44,13 @@ class EnrollsController extends Controller
                     'allow' => true,
                     'roles' => ['@']
                 ],
+				[
+                    'actions' => [
+                        'index'
+                    ],
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'actions' => [
                         'index'

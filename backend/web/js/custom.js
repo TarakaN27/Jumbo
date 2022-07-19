@@ -315,3 +315,36 @@ $(document).ready(function () {
 
 });
 /** ******  /scrollview  *********************** **/
+
+var request_cntr_ids = [];
+
+$(document).ready(function () {
+	
+	$('#emptyForm').on('beforeSubmit', function () {
+		var $yiiform = $(this);    // отправляем данные на сервер
+		$.ajax({
+				type: $yiiform.attr('method'),
+				url: $yiiform.attr('action'),
+				data: $yiiform.serializeArray(),
+				dataType: "json"
+			}
+		)
+		.done(function(data) {
+		  console.log(data);
+		  if(data['status']==1){
+			  $("#modalEmptyForm").modal("hide");
+			  //request_cntr_ids.push(data['id']);
+			  $("#paymentsEmptyBlock").show();
+			  loadRequestPayments($("#actform-icuser").val(), request_cntr_ids);
+		  }
+		})
+		.fail(function () {
+			console.log("не удалось выполнить запрос к серверу");
+			 // не удалось выполнить запрос к серверу
+		})
+	return false; // отменяем отправку данных формы
+
+	})
+
+});
+

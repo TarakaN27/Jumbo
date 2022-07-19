@@ -28,7 +28,7 @@ class UnitsEnrollController extends AbstractBaseBackendController
                 [
                     'actions' => ['index','view'],
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper','moder']
+                    'roles' => ['admin','bookkeeper','moder','sale']
                 ],
                 [
                     'allow' => true,

@@ -43,6 +43,7 @@ class BUser extends AbstractUser
         ROLE_E_MARKETER = 6,
         ROLE_JURIST = 7,
         ROLE_MANAGER = 10,
+        ROLE_SALE = 9,
         ROLE_PARTNER_MANAGER = 11,
         ROLE_BOOKKEEPER = 15,
         ROLE_ADMIN = 20,
@@ -69,6 +70,7 @@ class BUser extends AbstractUser
         return [
             self::ROLE_USER => Yii::t('app/users','USER_role_user'),
             self::ROLE_MANAGER => Yii::t('app/users','USER_role_manager'),
+            self::ROLE_SALE => Yii::t('app/users','USER_role_sale'),
             self::ROLE_BOOKKEEPER => Yii::t('app/users','USER_role_bookkeeper'),
             self::ROLE_ADMIN => Yii::t('app/users','USER_role_admin'),
             self::ROLE_SUPERADMIN => Yii::t('app/users','USER_role_superadmin'),
@@ -261,6 +263,35 @@ class BUser extends AbstractUser
         else
             return ArrayHelper::map($arMng,'id','username');
     }
+	
+	/**
+     * @return mixed
+     */
+    public static function getSalesArr()
+    {
+        $dependency = new TagDependency(['tags' => NamingHelper::getCommonTag(self::className()),]);
+        return self::getDb()->cache(function ($db) {
+            return self::find()
+                ->select(['id','username'])
+                ->where([
+                    'role' => self::ROLE_SALE,
+                    'status' => self::STATUS_ACTIVE
+                ])
+                ->all($db);
+        }, 3600*24, $dependency);
+    }
+	
+	/**
+     * @return array
+     */
+    public static function getListSales()
+    {
+        $arMng = self::getSalesArr();
+        if(empty($arMng))
+            return [];
+        else
+            return ArrayHelper::map($arMng,'id','username');
+    }
 
     /**
      * Get all members. Return full activeRecord Objects.
@@ -376,6 +407,7 @@ class BUser extends AbstractUser
                     unset($arRole[self::ROLE_SUPERADMIN]);
                 break;
             case self::ROLE_MANAGER:
+            case self::ROLE_SALE:
             case self::ROLE_TEAMLEAD:
             case self::ROLE_HR:
             case self::ROLE_BOOKKEEPER:

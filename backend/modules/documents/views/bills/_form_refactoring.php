@@ -6,6 +6,7 @@
  * Time: 17.47
  */
 
+use kartik\date\DatePicker;
 use yii\bootstrap\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
@@ -92,6 +93,20 @@ $arServiceMap = Services::getServicesMap();
     <?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
 
     <?= $form->field($model, 'sBayTarget')->textInput(['maxlength' => true]) ?>
+
+    <? if(in_array(Yii::$app->getUser()->identity->role, [15,25])): ?>
+        <?= $form->field($model, "sPayDate")->widget(DatePicker::className(),[
+            'options' => [
+                'class' => 'form-control'
+            ],
+            'pluginOptions' => [
+                'autoclose' => TRUE,
+                'format' =>'yyyy-mm-dd', //'yyyy-mm-dd',
+                'defaultDate' => date('Y-m-d', time()),
+                'weekStart' => '1',
+            ]
+        ]) ?>
+    <? endif; ?>
 
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Services');?></label>

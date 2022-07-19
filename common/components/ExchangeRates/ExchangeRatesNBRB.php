@@ -29,7 +29,7 @@ class ExchangeRatesNBRB extends AbstractExchangeRates
     {
         $this->time = is_null($time) ? time() : $time; //текущая дата
         $this->codeID = $codeID;
-        $this->url = 'http://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('Y-m-d',  $this->time);
+        $this->url = 'https://www.nbrb.by/Services/XmlExRates.aspx?ondate='.date('Y-m-d',  $this->time);
     }
 
     /**

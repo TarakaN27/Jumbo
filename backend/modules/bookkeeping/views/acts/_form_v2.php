@@ -5,6 +5,8 @@
  * Date: 20.5.16
  * Time: 12.29
  */
+
+use yii\bootstrap\Modal;
 use yii\web\JsExpression;
 use yii\helpers\Json;
 use common\models\LegalPerson;
@@ -61,10 +63,14 @@ var
                 'templateResult' => new JsExpression('function(cmp_id) { return cmp_id.text; }'),
                 'templateSelection' => new JsExpression('function (cmp_id) { return cmp_id.text; }'),
             ],
+            'pluginEvents'=>[
+                "select2:select" => "function() { $('#paymentrequest-cntr_id').val($(this).val()).change(); }",
+            ]
         ]);?>
 
         <?=$form->field($model,'iLegalPerson')->dropDownList(LegalPerson::getLegalPersonMap(),[
-            'prompt' => Yii::t('app/book','Choose legal person')
+            'prompt' => Yii::t('app/book','Choose legal person'),
+            'onChange' => "$('.create-empty-payment').prop('disabled', false); $('#paymentrequest-legal_id').val($(this).val()).change();",
         ])?>
         <?foreach(\common\models\LegalPerson::getLegalPersonForBill() as $legalPerson){?>
             <?$model->bank[$legalPerson->id] = $legalPerson->default_bank_id;?>
@@ -88,9 +94,17 @@ var
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Payments block');?></label>
         <div class="col-md-6 col-sm-6 col-xs-12" >
-            <div class="well" id="paymentsBlock">
-            </div>
+            <div class="well" id="paymentsBlock"></div>
+
+            <div class="well" id="paymentsEmptyBlock"></div>
+            <?= Html::Button('Создать пустой платеж', [
+                'class' => 'btn btn-secondary create-empty-payment',
+                'data-toggle'=>"modal",
+                'data-target'=>"#modalEmptyForm",
+                #'disabled'=>'disabled'
+            ]) ?>
         </div>
+
     </div>
 
     <?=$form->field($model,'iCurr')->dropDownList([],[
@@ -122,8 +136,9 @@ var
             <?=$form->field($model,'bCustomAct')->checkbox();?>
         </div>
     </div>
+	<? if(isset($model->fCustomFileAct)): ?>
     <?=$form->field($model,'fCustomFileAct')->fileInput()?>
-
+	<? endif; ?>
     <div class="form-group">
         <div class = "col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
             <?= Html::submitButton(Yii::t('app/book', 'Create'), ['class' => 'btn btn-success']) ?>

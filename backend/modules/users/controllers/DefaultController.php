@@ -42,7 +42,7 @@ class DefaultController extends AbstractBaseBackendController
                 [
                     'actions' => ['index','view'],
                     'allow' => true,
-                    'roles' => ['moder','bookkeeper']
+                    'roles' => ['moder','sale','bookkeeper']
                 ],
                 [
                     'allow' => true,

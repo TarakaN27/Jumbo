@@ -57,7 +57,7 @@ class BillsController extends AbstractBaseBackendController
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','moder']
+                    'roles' => ['admin','moder','sale']
                 ]
             ]
         ];
@@ -166,6 +166,7 @@ class BillsController extends AbstractBaseBackendController
             $modelForm->sBayTarget = $model->buy_target;
             $modelForm->sOfferContract = $model->offer_contract;
             $modelForm->sDescription = $model->description;
+            $modelForm->sPayDate = $model->bill_date;
 
             $arServices = BillServices::find()->where(['bill_id' => $model->id])->with('service')->all();
             /** @var BillServices $service */

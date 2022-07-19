@@ -61,7 +61,7 @@ class CompanyController extends AbstractBaseBackendController
 				],
 				[
 					'allow' => true,
-					'roles' => ['e_marketer','jurist','moder','bookkeeper','admin']
+					'roles' => ['e_marketer','jurist','moder','sale','bookkeeper','admin']
 				]
 			]
 		];
@@ -156,6 +156,8 @@ class CompanyController extends AbstractBaseBackendController
 
 			if($model->is_resident != CUser::RESIDENT_YES)
 				$modelR->isResident = FALSE;
+
+            $modelR->corp_name = $modelR->getCorpName();
 
 			$modelR->contructor = $model->contractor;
 			$modelR->allow_expense = $model->allow_expense;

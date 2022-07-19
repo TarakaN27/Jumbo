@@ -49,9 +49,13 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper','moder']
+                    'roles' => ['admin','bookkeeper','moder','sale']
                 ]
             ]
         ];
@@ -103,9 +107,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
     public function actionAddPayment($pID)
     {
         $now = strtotime(Date('Y-m-d H:i:s'));
-        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00'))))
+        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:35:00'))))
         {
-            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:00 AM!');
+            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:35 AM!');
         }
 
         /** @var PaymentRequest $modelP */
@@ -173,7 +177,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
                 }
                 */
             }
-             $model = [$formModel];
+            $model = [$formModel];
         }
         else
         {
@@ -195,95 +199,101 @@ class PaymentRequestController extends AbstractBaseBackendController{
             {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    $modelP->manager_id = Yii::$app->user->id;  
+                    $modelP->manager_id = Yii::$app->user->id;
                     $modelP->save();
-                        $bError = FALSE;
+                    $bError = FALSE;
                     /** @var AddPaymentForm $p */
                     foreach($model as $p) // добавляем патежи
+                    {
+                        $obPay = new Payments([
+                            'cuser_id' => $modelP->cntr_id,
+                            'pay_date' => $modelP->pay_date,
+                            'pay_summ' => $p->summ,
+                            'currency_id' => $modelP->currency_id,
+                            'service_id' => $p->service,
+                            'legal_id' => $modelP->legal_id,
+                            'description' => $p->comment,
+                            'prequest_id' => $modelP->id,
+                            'condition_id' => $p->condID,
+                            'payment_order' => $modelP->payment_order,
+                            'isSale' => $p->isSale,
+                            'saleUser' => $p->saleUser,
+                            'hide_act_payment' => $p->hide_act_payment,
+                            'post_payment' => $p->post_payment
+                        ]);
+
+                        if(!$obPay->save())
                         {
-                            $obPay = new Payments([
-                                'cuser_id' => $modelP->cntr_id,
-                                'pay_date' => $modelP->pay_date,
-                                'pay_summ' => $p->summ,
-                                'currency_id' => $modelP->currency_id,
-                                'service_id' => $p->service,
-                                'legal_id' => $modelP->legal_id,
-                                'description' => $p->comment,
-                                'prequest_id' => $modelP->id,
-                                'condition_id' => $p->condID,
-                                'payment_order' => $modelP->payment_order,
-                                'isSale' => $p->isSale,
-                                'saleUser' => $p->saleUser,
-                                'hide_act_payment' => $p->hide_act_payment,
-                                'post_payment' => $p->post_payment
-                            ]);
 
-                            if(!$obPay->save())
-                            {
+                            $bError = TRUE;
+                            break;
+                        }
 
-                                $bError = TRUE;
-                                break;
-                            }
+                        //производим рассчет по каждому платежу исходя из условия
+                        /** @var PaymentCondition $obCond */
+                        $obCond = PaymentCondition::findOne($p->condID);
+                        if(empty($obCond))
+                            throw new NotFoundHttpException("Condition not found");
 
-                            //производим рассчет по каждому платежу исходя из условия
-                            /** @var PaymentCondition $obCond */
-                            $obCond = PaymentCondition::findOne($p->condID);
-                            if(empty($obCond))
-                                throw new NotFoundHttpException("Condition not found");
+                        //курс валюты на дату платежа
+                        $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$modelP->pay_date),$modelP->currency_id);
 
-                            //курс валюты на дату платежа
-                            $nCurr = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$modelP->pay_date),$modelP->currency_id);
-                            if(is_null($nCurr))
-                            {
-                                $bError = TRUE;
-                                break;
-
-                            }
-
-                            //переведем сумму в бел рубли.
-                            $paySumm = (float)$p->summ*(float)$nCurr;
-
-                            $customProd = (float)$p->customProduction*(float)$nCurr;
-
-                            //расчет по бел рублям
-                            $obOp = new PaymentOperations($paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale,$p->condType,$customProd);
-                            $arCount = $obOp->getFullCalculate();
-
-                            $obPayCalc = new PaymentsCalculations([
-                                'payment_id' => $obPay->id,
-                                'pay_cond_id' => $obCond->id,
-                                'tax' => $arCount['tax'],
-                                'profit' => $arCount['profit'],
-                                'production' => $arCount['production'],
-                                'cnd_corr_factor' => $obCond->corr_factor,
-                                'cnd_commission' => $obCond->commission,
-                                'cnd_sale' => $obCond->sale,
-                                'cnd_tax' => $obCond->tax,
-                                'profit_for_manager' => $arCount['profit'] - ($paySumm* PaymentsCalculations::COEF_FOR_PROFIT_MANAGER),
-                            ]);
-
-                            if(!$obPayCalc->save())
-                            {
-                                $bError = TRUE;
-                                break;
-                            }
-                          
-                            $obPay->callSaveDoneEvent();
-                            unset($obPay,$obPayCalc,$obCond,$obOp);
+                        if(is_null($nCurr))
+                        {
+                            $bError = TRUE;
+                            break;
 
                         }
 
-                        if(!$bError)
-                        {
-                            $modelP->status = PaymentRequest::STATUS_FINISHED;
-                            $modelP->manager_id = Yii::$app->user->id;
-                            $modelP->save();
-                            $transaction->commit();
-                            Yii::$app->session->set('success',Yii::t('app/book','Payments added successfully!'));
-                            return $this->redirect(['/bookkeeping/default/index']);
+                        if(!isset($p->curr_val) || empty($p->curr_val)) {
+                            $p->curr_val = 0;
                         }
-                        $transaction->rollBack();
-                        Yii::$app->session->set('error',Yii::t('app/book','Can not add payments!'));
+
+                        //переведем сумму в бел рубли.
+                        $paySumm = (float)$p->summ*(float)$nCurr;
+
+                        $customProd = (float)$p->customProduction*(float)$nCurr;
+
+                        //расчет по бел рублям
+                        $obOp = new PaymentOperations($paySumm,$obCond->tax,$obCond->commission,$obCond->corr_factor,$obCond->sale,$p->condType,$customProd);
+                        $arCount = $obOp->getFullCalculate();
+
+                        $obPayCalc = new PaymentsCalculations([
+                            'payment_id' => $obPay->id,
+                            'pay_cond_id' => $obCond->id,
+                            'tax' => $arCount['tax'],
+                            'profit' => $arCount['profit'],
+                            'production' => $arCount['production'],
+                            'cnd_corr_factor' => $obCond->corr_factor,
+                            'cnd_commission' => $obCond->commission,
+                            'cnd_sale' => $obCond->sale,
+                            'cnd_tax' => $obCond->tax,
+                            'custom_curr'=>$p->curr_val,
+                            'profit_for_manager' => $arCount['profit'] - ($paySumm* PaymentsCalculations::COEF_FOR_PROFIT_MANAGER),
+                        ]);
+
+                        if(!$obPayCalc->save())
+                        {
+                            $bError = TRUE;
+                            break;
+                        }
+
+                        $obPay->callSaveDoneEvent();
+                        unset($obPay,$obPayCalc,$obCond,$obOp);
+
+                    }
+
+                    if(!$bError)
+                    {
+                        $modelP->status = PaymentRequest::STATUS_FINISHED;
+                        $modelP->manager_id = Yii::$app->user->id;
+                        $modelP->save();
+                        $transaction->commit();
+                        Yii::$app->session->set('success',Yii::t('app/book','Payments added successfully!'));
+                        return $this->redirect(['/bookkeeping/default/index']);
+                    }
+                    $transaction->rollBack();
+                    Yii::$app->session->set('error',Yii::t('app/book','Can not add payments!'));
                 }catch(Exception $e){
                     $transaction->rollBack();
                     Yii::$app->session->set('error',Yii::t('app/book','Can not add payments!'));
@@ -436,7 +446,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
         */
 
         $obCond = PaymentCondition::find()  //находим все условия
-            ->select(['id','summ_from','summ_to'])
+        ->select(['id','summ_from','summ_to'])
             ->where([
                 'service_id' => (int)$iServID,
                 'l_person_id' => (int)$lPID,
@@ -449,12 +459,12 @@ class PaymentRequestController extends AbstractBaseBackendController{
             return ['cID' =>  FALSE ];
 
         foreach($obCond as $cond)
+        {
+            if($cond->summ_from <= $amount && $cond->summ_to > $amount)
             {
-                if($cond->summ_from <= $amount && $cond->summ_to > $amount)
-                {
-                    return ['cID' => $cond->id];
-                }
+                return ['cID' => $cond->id];
             }
+        }
 
         return ['cID' => FALSE];
     }
@@ -488,9 +498,9 @@ class PaymentRequestController extends AbstractBaseBackendController{
     public function actionUpdate($id)
     {
         $now = strtotime(Date('Y-m-d H:i:s'));
-        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00'))))
+        if(($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:35:00'))))
         {
-            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:00 AM!');
+            throw new ForbiddenHttpException('Payment request updating is forbidden until 10:35 AM!');
         }
 
         $model = PaymentRequest::findOne(['id' => $id,'status' => PaymentRequest::STATUS_NEW]);
@@ -562,7 +572,7 @@ class PaymentRequestController extends AbstractBaseBackendController{
      * @throws NotFoundHttpException
      */
     public function actionIsSale()
-    { 
+    {
         $iServID = Yii::$app->request->post('iServID');     //Услуга
         $iContrID = Yii::$app->request->post('iContrID');   //контрагент
         $payDate = Yii::$app->request->post('payDate');     //дата платежа

@@ -33,10 +33,15 @@ function loadPayments() {
         success: function (data) {
             container.html(data.content);
             checkDate();
+			
+			$("#paymentsEmptyBlock").show();
+			loadRequestPayments($("#actform-icuser").val(), request_cntr_ids);
+			
         },
         error: function (msg) {
             addErrorNotify('Получение платежей', 'Не удалось выполнить запрос!');
             container.html('Платежи не найдены');
+
             return false;
         }
     });
@@ -101,6 +106,15 @@ function hiddenPaymentCheck(this1)
         $('#pay-id-'+$(this1).val()).remove();
     }
 }
+
+$(document).on('change', '#actform-no-pays', function() {
+    if(this.checked && $('#paymentsBlock .cbPayment:checked').length <= 0) {
+        $("#actform-icurr").append("<option selected value='2'>BYN</option>");
+    } else if(!this.checked && $('#paymentsBlock .cbPayment:checked').length <= 0) {
+        $("#actform-icurr").html("");
+        $("#actform-icurr").append("<option value>Choose exchange currency</option>");
+    }
+});
 
 /**
  * Добвление блока неявного платежа
@@ -208,6 +222,7 @@ function unfillServices() {
     $('#hidePaymentBlock').html('');
     $('#actform-famount').val(0);
 }
+
 /**
  * Заполнение услуг и неявных платежей
  */
@@ -231,9 +246,31 @@ function fillServices() {
             }
         }
     });
+	
+	
+	var
+        fAmountRequest = $('#actform-famount'),
+        currencyIdRequest = parseInt($('#actform-icurr').val()),
+        valAmountRequest = 0,
+        arCbRequest = $('#paymentsEmptyBlock .cbPayment:checked');
 
-    fAmount.val(convertAmountToInvalid(valAmount));
+    $.each(arCbRequest, function (index, value) {
+        if (parseInt($(value).attr('data-curr')) != currencyIdRequest || $(value).attr('data-curr') == '' || currencyIdRequest == 0) {
+            //todo ????
+        } else {
+            if($(value).attr('data-hide') == 1)
+            {
+                addHiddenPaymentBlock(value);
+            }else{
+                processFillService(value);
+                valAmountRequest += parseFloat($(value).attr('data-sum'));
+            }
+        }
+    });
+	
+    fAmountRequest.val(convertAmountToInvalid(valAmountRequest));
 }
+
 /**
  * Создаем услуги, если услуга новая, то для ней необходимо получить информацию по контракту и описание для услуги из шаблона
  * @param value
@@ -626,6 +663,36 @@ function checkDate()
             $(value).removeAttr('disabled');
         }
     });
+	
+	
+	var 
+        actDateRequest = $('#actform-actdate'),
+        containerRequest = $('#paymentsEmptyBlock .cbPayment');
+
+    $.each(containerRequest,function(index,value){
+        if(
+            actDateRequest.val() == undefined ||
+            actDateRequest.val() == '' ||
+            (
+                actDateRequest.val() != undefined &&
+                actDateRequest.val() != '' &&
+                strtotime(actDateRequest.val()) < strtotime($(value).attr('data-date'))
+            )
+        )
+        {
+            if($(value).prop('checked'))
+            {
+                $(value).prop('checked',false);
+                $(value).trigger('change');
+            }
+
+            $(value).attr('disabled','disabled');
+        }else{
+            $(value).removeAttr('disabled');
+        }
+    });
+	
+	
 }
 /**
  * Переасчет полной суммы акта по услугам
@@ -648,11 +715,11 @@ function recalculateActFullActAmount()
  */
 function customValidateForm()
 {
-    if($('#paymentsBlock .cbPayment:checked').length <= 0)                      //check if selected payments
+    /*if($('#paymentsBlock .cbPayment:checked').length <= 0)                      //check if selected payments
     {
         addErrorNotify('Сохрание акта', 'Необходимо выбрать платежи!');
         return false;
-    }
+    }*/
 
     if($('#servicesBlock .serv-amount').length <= 0)                            //check if set services
     {

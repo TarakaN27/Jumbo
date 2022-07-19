@@ -5,6 +5,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Acts */
+use yii\bootstrap\Modal;
 
 $this->title = Yii::t('app/book', 'Create Acts');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/book', 'Acts'), 'url' => ['index']];
@@ -28,5 +29,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]) ?>
             </div>
         </div>
+        <?php
+        Modal::begin([
+            'header' => '<h2>Пустой платеж</h2>',
+            'id'=>'modalEmptyForm',
+        ]); ?>
+        <?= $this->render('_payment_request_form', [
+            'modelEmpty'=>$modelEmpty
+        ]) ?>
+        <? Modal::end(); ?>
     </div>
 </div>

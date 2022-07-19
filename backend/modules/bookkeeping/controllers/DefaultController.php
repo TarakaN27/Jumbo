@@ -57,10 +57,14 @@ class DefaultController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'actions' => ['index','view','create','update','get-conditions','find-condition'],
                     'allow' => true,
-                    'roles' => ['moder']
+                    'roles' => ['moder','sale']
                 ],
                 [
                     'allow' => true,
@@ -130,6 +134,7 @@ class DefaultController extends AbstractBaseBackendController
             if(isset($_FILES['MigrateLoadFileForm']) && $_FILES['MigrateLoadFileForm']['tmp_name']){
                 $models = $this->parseFile($_FILES['MigrateLoadFileForm']['tmp_name']['src']);
                 if($models) {
+					var_dump($models[0]);
                     return $this->render('migrate_form_list', [
                         'models' => $models,
                     ]);
@@ -144,6 +149,28 @@ class DefaultController extends AbstractBaseBackendController
                     $model = new PaymentRequest($item);
                     $model->owner_id = Yii::$app->user->id;
                     $model->status = PaymentRequest::STATUS_NEW;
+					
+					$request = PaymentRequest::find()->where([
+						'cntr_id'=>$model->cntr_id,
+						'pay_summ'=>$model->pay_summ,
+						'status'=>$model->status,
+						'currency_id'=>$model->currency_id,
+						'payment_order'=>$model->payment_order,
+						'legal_id'=>$model->legal_id,
+						'service_id'=>$model->service_id,
+						'bank_id'=>$model->bank_id
+					])->one();
+					
+					#Если существует то заменяем данные, если новый то создаем
+					
+					if(!empty($request)){
+						$request->owner_id = $model->owner_id;
+						$request->status = $model->status;				
+						$request->description = $model->description;				
+						$request->pay_date = $model->pay_date;				
+						$model = $request;
+					}		
+					
                     if($model->active) {
                         if ($model->validate()) {
                             $model->save(false);
@@ -196,7 +223,7 @@ class DefaultController extends AbstractBaseBackendController
         foreach($paymentsXml->QUERY->OUTPUT->DOC as $paymentXml){
             //у основных платежей тип 1, так же платежи от физиков без UNP
             if($paymentXml['Credit']>0 && ($paymentXml->VidDoc=='01' || $paymentXml->UNNRec=="")){
-                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>1, 'pay_date'=>strtotime(strval($paymentXml['DocDate']))])->andWhere(['payment_order'=> strval($paymentXml['Num']).' от '. $paymentXml['DocDate']])->all();
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>1, 'pay_date'=>strtotime(strval($paymentXml['DocDate']))])->andWhere(['payment_order'=> strval($paymentXml['Num']).' от '. $paymentXml['DocDate']])->andWhere(['!=', 'status', '5'])->all();
                 if($existPayment && count($existPayment)==1){
                     continue;
                 }
@@ -262,7 +289,7 @@ class DefaultController extends AbstractBaseBackendController
         foreach($payments as $payment){
             //у основных платежей тип 1, так же платежи от физиков без UNP
             if($payment['Credit']>0){
-                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>$bankDetail->id, 'pay_date'=>strtotime(strval($payment['DocDate']))])->andWhere(['payment_order'=> strval($payment['Num']).' от '. $payment['DocDate']])->all();
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>$bankDetail->id, 'pay_date'=>strtotime(strval($payment['DocDate']))])->andWhere(['payment_order'=> strval($payment['Num']).' от '. $payment['DocDate']])->andWhere(['!=', 'status', '5'])->all();
                 if($existPayment && count($existPayment)==1){
                     continue;
                 }
@@ -307,7 +334,7 @@ class DefaultController extends AbstractBaseBackendController
             //у основных платежей тип 1, так же платежи от физиков без UNP
             $sum = floatval($paymentXml->SUMOPER['ek']);
             if($sum>0) {
-                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>3,'pay_date'=>strtotime($date)])->andWhere(['payment_order'=> strval($paymentXml->DOCN).' от '. $date])->all();
+                $existPayment = PaymentRequest::find()->andWhere(['bank_id'=>3,'pay_date'=>strtotime($date)])->andWhere(['payment_order'=> strval($paymentXml->DOCN).' от '. $date])->andWhere(['!=', 'status', '5'])->all();
                 if($existPayment && count($existPayment)==1){
                     continue;
                 }
@@ -741,7 +768,30 @@ class DefaultController extends AbstractBaseBackendController
         if($model->load(Yii::$app->request->post()))
         {
             $model->bank_id = isset($model->bank[$model->legal_id])?$model->bank[$model->legal_id]:null;
-            if($model->save())
+			
+			$request = PaymentRequest::find()->where([
+				'cntr_id'=>$model->cntr_id,
+				'pay_summ'=>$model->pay_summ,
+				'status'=>$model->status,
+				'currency_id'=>$model->currency_id,
+				'payment_order'=>$model->payment_order,
+				'legal_id'=>$model->legal_id,
+				'service_id'=>$model->service_id,
+				'bank_id'=>$model->bank_id
+			])->one();
+			
+			#Если существует то заменяем данные, если новый то создаем
+			
+			if(!empty($request)){
+				$request->owner_id = $model->owner_id;
+				$request->status = $model->status;
+				$request->pay_date = $model->pay_date;
+				$request->bank_id = $model->bank_id;				
+				$model = $request;
+			}
+			
+			
+			if($model->save())
             {
                 $obDlg = new Dialogs();
                 $obDlg->type = Dialogs::TYPE_REQUEST;

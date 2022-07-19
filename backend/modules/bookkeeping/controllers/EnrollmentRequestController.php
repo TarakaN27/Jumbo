@@ -44,6 +44,10 @@ class EnrollmentRequestController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['sale', 'teamlead']
+                ],
                 [
                     'allow' => true,
                     'roles' => ['admin','bookkeeper','moder']
@@ -116,7 +120,6 @@ class EnrollmentRequestController extends AbstractBaseBackendController
     public function actionCreate()
     {
         $model = new EnrollmentRequest();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -183,6 +186,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
     {
         $model = $this->findModel($id);
         $model->callViewedEvent();              // call viewed event
+
         if($model->status == EnrollmentRequest::STATUS_PROCESSED)       //check if request already processed
         {
             Yii::$app->session->setFlash('error',Yii::t('app/book','Request already processed'));
@@ -280,7 +284,11 @@ class EnrollmentRequestController extends AbstractBaseBackendController
 
             if(!empty($obCond) && !empty($obPayment))
             {
-                $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$obPayment->pay_date),$obCond->cond_currency);
+                if($obCalc->custom_curr>0){
+                    $exchRate = $obCalc->custom_curr;
+                } else {
+                    $exchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d', $obPayment->pay_date), $obCond->cond_currency);
+                }
             }
         }
 
@@ -309,6 +317,7 @@ class EnrollmentRequestController extends AbstractBaseBackendController
                 $dubExchRate = ExchangeCurrencyHistory::getCurrencyInBURForDate(date('Y-m-d',$obPayment->pay_date),$obCond->dub_cond_currency);
             }
         }
+
         return $this->render('process',[
             'model' => $model,
             'obPrPay' => $obPrPay,

@@ -51,6 +51,12 @@ class PartnersController extends AbstractBaseBackendController
                     'allow' => true,
                     'roles' => ['admin','only_manager','partner_manager','bookkeeper']
                 ]
+            ],
+			'rules' => [
+                [
+                    'allow' => false,
+                    'roles' => ['only_sale']
+                ]
             ]
         ];
         return $tmp;

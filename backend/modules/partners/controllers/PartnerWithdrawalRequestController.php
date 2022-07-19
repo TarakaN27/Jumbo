@@ -42,6 +42,15 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                     'allow' => true,
                     'roles' => ['moder']
                 ],
+				[
+                    'actions' => [
+                        'index',
+                        'view',
+                        'create'
+                    ],
+                    'allow' => false,
+                    'roles' => ['only_sale']
+                ],
                 [
                     'actions' => [
                         'index',
@@ -51,7 +60,6 @@ class PartnerWithdrawalRequestController extends AbstractBaseBackendController
                     'allow' => true,
                     'roles' => ['only_manager','partner_manager']
                 ],
-
                 [
                     'allow' => true,
                     'roles' => ['admin','bookkeeper']

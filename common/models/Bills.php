@@ -185,7 +185,7 @@ class Bills extends AbstractActiveRecord
     {
         if($insert)
         {
-            $this->bill_date = date('Y-m-d');
+            #$this->bill_date = date('Y-m-d');
             $iBNmr = (new Query())
                 ->select('MAX(bill_number) as s')
                 ->from(self::tableName())

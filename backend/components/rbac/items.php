@@ -32,6 +32,10 @@ return [
         'type' => 2,
         'description' => 'Только для менеджера по партнерам',
     ],
+	'only_sale' => [
+        'type' => 2,
+        'description' => 'Только для продавца',
+    ],
     'only_teamlead' => [
         'type' => 2,
         'description' => 'Только для тимлида',
@@ -42,7 +46,7 @@ return [
     ],
     'user' => [
         'type' => 1,
-        'description' => 'Пользователь',
+        'description' => 'Специалист',
         'ruleName' => 'userRole',
     ],
     'jurist' => [
@@ -70,6 +74,17 @@ return [
         'description' => 'Модератор',
         'ruleName' => 'userRole',
         'children' => [
+            'user',
+            'only_manager',
+            'forAll',
+        ],
+    ],
+	'sale' => [
+        'type' => 1,
+        'description' => 'Продавец',
+        'ruleName' => 'userRole',
+        'children' => [
+            'only_sale',
             'user',
             'only_manager',
             'forAll',

@@ -119,6 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                     Yii::$app->user->can('adminRights') &&
                                                                     in_array($model->role,[
                                                                         BUser::ROLE_MANAGER,
+                                                                        BUser::ROLE_SALE,
                                                                         BUser::ROLE_BOOKKEEPER,
                                                                         BUser::ROLE_USER]))
                                                                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);

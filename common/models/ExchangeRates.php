@@ -89,8 +89,6 @@ class ExchangeRates extends AbstractActiveRecord
             [['nbrb_rate', 'cbr_rate','factor'], 'number','numberPattern' => '/^\s*[-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['nbrb_rate', 'cbr_rate','factor'],ValidNumber::className()],
             [['name', 'code'], 'string', 'max' => 255],
-            ['factor','number','min' => 0],
-            [['factor'],'default','value' => 1],
             [['base_id', 'factor'],
              'required',
              'when' => function($model) {

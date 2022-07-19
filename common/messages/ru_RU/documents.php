@@ -37,6 +37,7 @@ return [
     'Bill Date' => 'Дата счета',
     'Bill Template' => 'Шаблон счета',
     'Buy Target' => 'Цель приобретения',
+    'Pay Date' => 'Дата счёта',
     'DefaultBuytarget' => 'Для собственных нужд',
     'Choose contractor' => 'Выберите контрагента',
     'Choose bill template' => 'Выберите шаблон счета',

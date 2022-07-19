@@ -52,7 +52,7 @@ use yii\helpers\Html;
         )?>
     <?php endif;?>
     <!---Обещанные платежи-------->
-    <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+    <?php if(Yii::$app->user->can('adminRights') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('only_bookkeeper')):?>
         <?=Html::a(
             '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>ОП',
             ['/bookkeeping/promised-payment/create'],

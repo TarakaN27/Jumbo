@@ -6105,4 +6105,6 @@ ul.fileInComment li a i {
     width: 20px;
 }
 
-
+#paymentsEmptyBlock {
+	display:none;
+}

@@ -25,6 +25,7 @@ class AddPaymentForm extends AbstractModel{
         $showAll,
         $fullSumm,
         $comment,
+        $curr_val,
         $service,
         $condID,
         $hide_act_payment,
@@ -36,8 +37,8 @@ class AddPaymentForm extends AbstractModel{
         return [
             [['summ','condID'],'required'],
             [['summ'],ValidNumber::className()],
-            [['service','condID','condType','isSale','saleUser','hide_act_payment', 'post_payment'], 'integer'],
-            [['summ','fullSumm','customProduction'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
+            [['service','condID','condType','isSale','saleUser','hide_act_payment', 'post_payment', 'showAll'], 'integer'],
+            [['summ','fullSumm','customProduction', 'curr_val'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['comment'], 'string'],
             ['condType','required','when' => function($model) {
                 if($this->condType == PaymentCondition::TYPE_CUSTOM) //если компания не контрагнет, то поля можно не заполнять
@@ -72,7 +73,8 @@ class AddPaymentForm extends AbstractModel{
             'isSale' => Yii::t('app/book','Is sale'),
             'saleUser' => Yii::t('app/book','Sale user'),
             'hide_act_payment' => Yii::t('app/book','Hide payment at act'),
-            'post_payment' => Yii::t('app/book','Post payment')
+            'post_payment' => Yii::t('app/book','Post payment'),
+            'curr_val' => Yii::t('app/book','Currency value'),
         ];
     }
 

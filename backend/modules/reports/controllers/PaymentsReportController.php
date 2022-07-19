@@ -27,9 +27,13 @@ class PaymentsReportController extends AbstractBaseBackendController{
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','moder']
+                    'roles' => ['admin','moder','sale']
                 ]
             ]
         ];

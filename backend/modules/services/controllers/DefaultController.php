@@ -29,10 +29,15 @@ class DefaultController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'actions' => ['index','view'],
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'actions' => ['index','view'],
                     'allow' => true,
-                    'roles' => ['admin','moder']
+                    'roles' => ['admin','moder','sale']
                 ],
                 [
                     'allow' => true,

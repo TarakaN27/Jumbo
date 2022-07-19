@@ -175,7 +175,8 @@ $menuItems[] = [
                                 <?php if(
                                 Yii::$app->user->can('adminRights') ||
                                 Yii::$app->user->can('only_bookkeeper') ||
-                                Yii::$app->user->can('only_manager')
+                                Yii::$app->user->can('only_manager') &&
+								!Yii::$app->user->can('only_teamlead')
                                 ):?>
                                 <li>
                                     <a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
@@ -224,7 +225,8 @@ $menuItems[] = [
                                 <?php if(
                                 Yii::$app->user->can('adminRights') ||
                                 Yii::$app->user->can('only_bookkeeper') ||
-                                Yii::$app->user->can('only_manager')
+                                Yii::$app->user->can('only_manager') &&
+								!Yii::$app->user->can('only_teamlead')
                                 ):?>
                                 <li>
                                     <a><i class = "fa fa-desktop"></i><?php echo Yii::t('app/book', 'BOOK_bookkeeping'); ?>
@@ -250,20 +252,20 @@ $menuItems[] = [
                                             </li>
                                         <?php endif; ?>
                                         <!---Запросы на зачисление ------->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <?=Html::a(Yii::t('app/common','Enrollment request'),['/bookkeeping/enrollment-request/index'])?>
                                                 <?= \common\components\notification\widget\EnrollmentRequestWidget::widget();?>
                                             </li>
                                         <?php endif;?>
                                         <!---Зачисления---------------->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <?=Html::a(Yii::t('app/common','Enrollments'),['/bookkeeping/enrolls/index'])?>
                                             </li>
                                         <?php endif;?>
                                         <!---Обещанные платежи-------->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <a href = "<?= Url::to(['/bookkeeping/promised-payment/index']); ?>"><?php echo Yii::t('app/book', 'BOOK_promised_payment'); ?></a>
                                             </li>
@@ -303,10 +305,12 @@ $menuItems[] = [
                                         <li>
                                             <a href="<?= Url::to(['/reports/timesheet/index']); ?>"><?php echo Yii::t('app/common', 'Timesheet'); ?></a>
                                         </li>
-                                        <li>
-                                            <a href="<?= Url::to(['/reports/bonus-report/index']); ?>"><?php echo Yii::t('app/common', 'Bonus report'); ?></a>
-                                        </li>
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')):?>
+										<?php if(!Yii::$app->user->can('only_teamlead')):?>
+											<li>
+												<a href="<?= Url::to(['/reports/bonus-report/index']); ?>"><?php echo Yii::t('app/common', 'Bonus report'); ?></a>
+											</li>
+										<?php endif; ?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_teamlead')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                             </li>
@@ -315,7 +319,7 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
 
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights')):?>
+                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights') && !Yii::$app->user->can('only_teamlead')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/reports/expense-report/index']); ?>"><?php echo Yii::t('app/common', 'Expense reports'); ?></a>
                                             </li>
@@ -397,7 +401,7 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || Yii::$app->user->can('only_manager')|| Yii::$app->user->can('bookkeeper')):?>
+                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('bookkeeper')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>

@@ -193,7 +193,7 @@ if(Yii::$app->user->can('adminRights'))
                             'buttons' => [
                                 'process' =>function ($url, $model, $key) {
                                     $now = strtotime(Date('Y-m-d H:i:s'));
-                                    if(!($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:00:00')))){
+                                    if(!($now > strtotime(Date('Y-m-d 00:00:00'))&& $now < strtotime(Date('Y-m-d 10:35:00')))){
                                         if(empty($model->manager_id) && $model->is_unknown == PaymentRequest::YES)
                                         {
                                             $options = [

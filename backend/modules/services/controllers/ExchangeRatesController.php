@@ -31,10 +31,15 @@ class ExchangeRatesController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'actions' => ['index','view'],
+                    'allow' => false,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'actions' => ['index','view'],
                     'allow' => true,
-                    'roles' => ['admin','bookkeeper','moder']
+                    'roles' => ['admin','bookkeeper','moder','sale']
                 ],
                 [
                     'allow' => true,

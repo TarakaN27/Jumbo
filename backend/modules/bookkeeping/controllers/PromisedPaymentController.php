@@ -31,6 +31,10 @@ class PromisedPaymentController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => FALSE,
+                    'roles' => ['teamlead']
+                ],
                 [
                     'allow' => TRUE,
                     'roles' => ['admin', 'bookkeeper', 'moder']

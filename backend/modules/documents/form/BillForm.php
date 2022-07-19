@@ -29,6 +29,7 @@ class BillForm extends Model
         $bTaxRate = NULL,
         $billObj = '',
         $sBayTarget = '',
+        $sPayDate = '',
         $sDescription = '',
         $sOfferContract = '',
         $arServices = [],
@@ -46,7 +47,7 @@ class BillForm extends Model
     public function rules()
     {
         return [
-            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sOfferContract','fAmount'],'required'],
+            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sPayDate','sOfferContract','fAmount'],'required'],
             [['fAmount'],ValidNumber::className()],
             ['arServAmount','each','rule' => [ValidNumber::className()]],
             [['bUseTax'],'integer'],
@@ -77,6 +78,7 @@ class BillForm extends Model
             'bTaxRate' => Yii::t('app/documents','Vat Rate'),
             'billObj' => Yii::t('app/documents','Object Text'),
             'sBayTarget' => Yii::t('app/documents','Buy Target'),
+            'sPayDate' => Yii::t('app/documents','Pay Date'),
             'sDescription' => Yii::t('app/documents','Description'),
             'sOfferContract' => Yii::t('app/documents','offer_contract'),
             'fAmount' => Yii::t('app/documents','Amount')
@@ -104,6 +106,7 @@ class BillForm extends Model
         $obBill->amount = $this->fAmount;
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
+        $obBill->bill_date = $this->sPayDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
@@ -182,6 +185,7 @@ class BillForm extends Model
         $obBill->amount = $this->fAmount;
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
+        $obBill->bill_date = $this->sPayDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
@@ -256,6 +260,7 @@ class BillForm extends Model
         $obBill->amount = $this->fAmount;
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
+        $obBill->bill_date = $this->sPayDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;

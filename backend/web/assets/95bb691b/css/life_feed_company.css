@@ -1,0 +1,13 @@
+.btn-load-more{
+    margin-top: 10px;
+}
+.btn-show-hide{
+    cursor: pointer;
+}
+.imgCmpMsg{
+    height: 100%;
+    float: left;
+}
+.bodyCmpMsg{
+    margin-left: 20px;
+}
