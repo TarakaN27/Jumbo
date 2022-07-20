@@ -73,6 +73,10 @@ class CompanyController extends AbstractBaseBackendController
 		//получаем уровень доступа на чтение компаний
 		$iAccessLevel = \Yii::$app->user->getCRMLevelAccess(CUser::getModelName(),BUserCrmRules::READ_ACTION);
 		$dataProvider = NULL;
+		
+		#if(Yii::$app->user->can('teamlead_sale')) {
+		#	$iAccessLevel = 1;
+		#}
 
 		$searchModel = new CUserSearch();
 		switch($iAccessLevel)
@@ -82,7 +86,7 @@ class CompanyController extends AbstractBaseBackendController
 				break;
 
 			case BUserCrmRules::RULE_THEMSELF: //только свои. Ответственный и создал компанию
-                if(Yii::$app->user->can('teamlead')){
+                if(Yii::$app->user->can('teamlead') || Yii::$app->user->can('teamlead_sale') || Yii::$app->user->can('teamlead_acc')){
                     $inUserQuery = implode(',',Yii::$app->user->identity->getUserIdsInGroup());
                     $dataProvider = $searchModel->search(
                         Yii::$app->request->queryParams,

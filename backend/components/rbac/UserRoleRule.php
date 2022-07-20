@@ -26,13 +26,13 @@ class UserRoleRule extends Rule{
                 return $role == User::ROLE_SUPERADMIN;
                 break;
             case 'admin':
-                return $role == User::ROLE_SUPERADMIN || $role == User::ROLE_ADMIN;
+                return $role == User::ROLE_SUPERADMIN || $role == User::ROLE_ADMIN || $role == User::ROLE_TEAMLEAD_ACC;
                 break;
             case 'partner_manager':
                 return $role == User::ROLE_PARTNER_MANAGER;
                 break;
 			case 'sale':
-                return $role == User::ROLE_SALE;
+                return $role == User::ROLE_SALE || $role == User::ROLE_TEAMLEAD_SALE;
                 break;
             case 'moder':
                 return $role == User::ROLE_MANAGER || $role == User::ROLE_PARTNER_MANAGER || $role == User::ROLE_TEAMLEAD;
@@ -45,6 +45,12 @@ class UserRoleRule extends Rule{
                 break;
             case 'teamlead':
                 return $role == User::ROLE_TEAMLEAD;
+                break;
+			case 'teamlead_acc':
+                return $role == User::ROLE_TEAMLEAD_ACC;
+                break;
+			case 'teamlead_sale':
+                return $role == User::ROLE_TEAMLEAD_SALE;
                 break;
             case 'e_marketer':
                 return $role == User::ROLE_E_MARKETER;
@@ -63,6 +69,8 @@ class UserRoleRule extends Rule{
                     $role == User::ROLE_USER ||
                     $role == User::ROLE_JURIST ||
                     $role == User::ROLE_TEAMLEAD ||
+                    $role == User::ROLE_TEAMLEAD_ACC ||
+                    $role == User::ROLE_TEAMLEAD_SALE ||
                     $role == User::ROLE_HR ||
                     $role == User::ROLE_E_MARKETER;
                 break;

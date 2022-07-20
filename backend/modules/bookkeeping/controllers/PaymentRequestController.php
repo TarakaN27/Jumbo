@@ -71,7 +71,13 @@ class PaymentRequestController extends AbstractBaseBackendController{
         $searchModel = new PaymentRequestSearch();
         if(Yii::$app->user->can('only_manager'))
             $searchModel->managerID = Yii::$app->user->id;
-
+		
+		if(Yii::$app->user->can('teamlead_sale')) {
+			$membersMap = BUser::getAllMembersMap();
+			$membersMap = count($membersMap)>0 ? array_keys($membersMap): Yii::$app->user->id;
+			$searchModel->managerID = $membersMap; # тут нужно указать ид людей из группы тимлида
+		}
+		
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW]);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;

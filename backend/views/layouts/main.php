@@ -153,7 +153,7 @@ $menuItems[] = [
                         <div class = "menu_section">
                             <hr>
                             <ul class = "nav side-menu">
-                                <?php if(Yii::$app->user->can('adminRights')):?>
+                                <?php if(Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')):?>
                                     <li>
                                         <a>
                                             <i class = "fa fa-user"></i> <?php echo Yii::t('app/users', 'USER_users'); ?>
@@ -173,11 +173,11 @@ $menuItems[] = [
                                     </li>
                                 <?php endif;?>
                                 <?php if(
-                                Yii::$app->user->can('adminRights') ||
+                                ((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) ||
                                 Yii::$app->user->can('only_bookkeeper') ||
-                                Yii::$app->user->can('only_manager') &&
+                                Yii::$app->user->can('only_manager')) &&
 								!Yii::$app->user->can('only_teamlead')
-                                ):?>
+                                ):?>								
                                 <li>
                                     <a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
                                         <span class = "fa fa-chevron-down"></span></a>
@@ -223,9 +223,9 @@ $menuItems[] = [
                                 </li>
                                 <?php endif;?>
                                 <?php if(
-                                Yii::$app->user->can('adminRights') ||
+                                (Yii::$app->user->can('adminRights') ||
                                 Yii::$app->user->can('only_bookkeeper') ||
-                                Yii::$app->user->can('only_manager') &&
+                                Yii::$app->user->can('only_manager')) &&
 								!Yii::$app->user->can('only_teamlead')
                                 ):?>
                                 <li>
@@ -310,7 +310,7 @@ $menuItems[] = [
 												<a href="<?= Url::to(['/reports/bonus-report/index']); ?>"><?php echo Yii::t('app/common', 'Bonus report'); ?></a>
 											</li>
 										<?php endif; ?>
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_teamlead')):?>
+                                        <?php if((Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_manager')) && !Yii::$app->user->can('only_teamlead')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/reports/payments-report/index']); ?>"><?php echo Yii::t('app/common', 'Payments reports'); ?></a>
                                             </li>
@@ -319,14 +319,14 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
 
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('superRights') && !Yii::$app->user->can('only_teamlead')):?>
+                                        <?php if(((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) || Yii::$app->user->can('superRights')) && !Yii::$app->user->can('only_teamlead')):?>
                                             <li>
                                                 <a href="<?= Url::to(['/reports/expense-report/index']); ?>"><?php echo Yii::t('app/common', 'Expense reports'); ?></a>
                                             </li>
                                         <?php endif;?>
                                     </ul>
                                 </li>
-                                <?php if(Yii::$app->user->can('adminRights')):?>
+                                <?php if(Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-gift"></i><?php echo Yii::t('app/common', 'Remuneration'); ?>
@@ -401,7 +401,7 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_partner_manager') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('bookkeeper')):?>
+                                <?php if((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) || Yii::$app->user->can('only_partner_manager') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('bookkeeper')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>

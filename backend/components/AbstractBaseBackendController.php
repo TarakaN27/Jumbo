@@ -22,7 +22,7 @@ abstract class AbstractBaseBackendController extends Controller{
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['admin', 'teamlead_acc'],
                     ],
                 ],
             ],

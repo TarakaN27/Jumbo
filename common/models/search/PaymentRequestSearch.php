@@ -94,8 +94,14 @@ class PaymentRequestSearch extends PaymentRequest
 
         if(!empty($this->managerID)) {
             $query->joinWith('cuser c');
-            $query->andWhere('('.PaymentRequest::tableName().'.manager_id IS NULL OR '.PaymentRequest::tableName().'.manager_id = :manID OR c.manager_id = :manID )', [':manID' => $this->managerID]);
-        }
+			
+			if(is_array($this->managerID)) {
+				$this->managerID = implode(",", $this->managerID);
+				$query->andWhere('('.PaymentRequest::tableName().'.manager_id IS NULL OR '.PaymentRequest::tableName().'.manager_id IN ( '.$this->managerID.' ) OR c.manager_id IN ( '.$this->managerID.' ) )');
+			} else {
+				$query->andWhere('('.PaymentRequest::tableName().'.manager_id IS NULL OR '.PaymentRequest::tableName().'.manager_id = :manID OR c.manager_id = :manID )', [':manID' => $this->managerID]);
+			}
+		}		
 
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");
@@ -115,7 +121,7 @@ class PaymentRequestSearch extends PaymentRequest
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
-
+		
         $query->andFilterWhere(['like', 'user_name', $this->user_name])
             ->andFilterWhere(['like', 'description', $this->description]);
 

@@ -12,6 +12,7 @@ use common\components\helpers\CustomHelper;
 use common\models\CrmTaskAccomplices;
 use common\models\Dialogs;
 use yii\base\Behavior;
+use backend\models\BUser;
 use common\models\AbstractActiveRecord;
 use common\components\notification\RedisNotification;
 use yii\db\Query;
@@ -49,6 +50,13 @@ class DialogMessagesBehavior extends Behavior
 		$arUsers = $obDialog->getUsersIdsForDialog();   //получаем всех пользователй диалога
 
 		$arUsers = CustomHelper::removeArrayItemByValue($arUsers,\Yii::$app->user->id); //удаляем из пользователй инициализатора действия
+		
+		foreach($arUsers as $primary_id=>$user_id){
+			$role = BUser::findOne($user_id)->role;
+			if($role == 30) { // Отключаем уведомления для тимлидов при обновлении таска
+				unset($arUsers[$primary_id]);
+			}
+		}
 
 		if(!empty($arUsers))
 		{
@@ -83,7 +91,7 @@ class DialogMessagesBehavior extends Behavior
 
 			$obUser = Yii::$app->user->identity->getFio();
 
-			TabledNotification::addMessage(
+			/*TabledNotification::addMessage(
 				Yii::t('app/crm','New message from {user}',[
 					'user' => $obUser
 				]),
@@ -91,7 +99,7 @@ class DialogMessagesBehavior extends Behavior
 				TabledNotification::TYPE_PRIVATE,
 				TabledNotification::NOTIF_TYPE_WARNING,
 				array_values($arUsers)
-			);
+			);*/
 		}
 
 	}

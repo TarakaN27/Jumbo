@@ -354,7 +354,7 @@ $this->registerJs("
 							<ul class="nav navbar-right panel_toolbox">
 								<li>
 									<?php
-									if(Yii::$app->user->can('adminRights') || $model->manager_id == Yii::$app->user->id) {
+									if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('teamlead_sale') || $model->manager_id == Yii::$app->user->id) {
 										\common\components\customComponents\Modal\CustomModal::begin([
 											'header' => '<h2>' . Yii::t('app/crm', 'Change assigned') . '</h2>',
 											'size' => Modal::SIZE_DEFAULT,

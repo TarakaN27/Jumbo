@@ -34,7 +34,7 @@ class ActedPaymentsReportController extends AbstractBaseBackendController{
                 ],
                 [
                     'allow' => true,
-                    'roles' => ['admin','moder','sale']
+                    'roles' => ['admin','moder','sale', 'teamlead_acc']
                 ]
             ]
         ];

@@ -134,13 +134,35 @@ return [
     ],
     'teamlead' => [
         'type' => 1,
-        'description' => 'Тимлид',
+        'description' => 'Тимлид тех. команды',
         'ruleName' => 'userRole',
         'children' => [
             'moder',
             'only_manager',
+			'only_teamlead',
             'forAll',
-            'only_teamlead',
+        ],
+    ],
+	'teamlead_acc' => [
+        'type' => 1,
+        'description' => 'Тим лид аккаунтинга',
+        'ruleName' => 'userRole',
+        'children' => [
+            'adminRights',
+			'admin',
+            'forAll',
+        ],
+    ],
+	'teamlead_sale' => [
+        'type' => 1,
+        'description' => 'Тим лид продаж',
+        'ruleName' => 'userRole',
+        'children' => [
+            'only_sale',
+			'sale',
+			'only_manager',
+            'user',
+            'forAll',
         ],
     ],
     'hr' => [
