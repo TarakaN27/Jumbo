@@ -38,12 +38,15 @@ class ActForm extends Model
         $arServAmount = [],     //Сумма по услугам
         $arServOrder = [],      //Порядок услуги в акте
         $arServQuantity = [],   //Кол-во по кажой услуге в акте
+        $arServCurAmount = [],  //Сумма в валюте
+        $arServCurId = [],   	//Ид валюты
+        $arServCurDate = [],   	//Дата курса валюты
         $arTemplate = [],       //Шаблон по услугам для генерации
         $iActNumber,            //Номер акта
         $actDate,               //Дата акта
         $arPayment,             //Платежи, которые актируются
         $bCustomAct,            //Bool flag кастомный акт, без генерации
-        $fCustomFileAct=0,        //Файл кастомного акта
+        $fCustomFileAct=0,      //Файл кастомного акта
         $sContractNumber,       //Номер Контракта
         $contractDate,          //Дата контракта
         $arHidePayments,        //Неявные платежи
@@ -59,7 +62,7 @@ class ActForm extends Model
     {
         return [
             ['fAmount',ValidNumber::className()],
-            [['arServAmount','arHidePayments'],'each','rule' => [ValidNumber::className()]],
+            [['arServAmount','arServCurAmount','arHidePayments'],'each','rule' => [ValidNumber::className()]],
             [[
                 'iCUser','iLegalPerson','iCurr',
                 'iActNumber','actDate','sContractNumber',
@@ -73,7 +76,7 @@ class ActForm extends Model
                 return $model->bCustomAct;
             }],
             ['fAmount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
-            [['arServAmount','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments'],'safe']
+            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments'],'safe']
         ];
     }
 
@@ -199,7 +202,7 @@ class ActForm extends Model
 
             $this->trigger(BaseActiveRecord::EVENT_AFTER_INSERT);
             $transaction->commit();
-
+			
             return TRUE;
         }catch(Exception $e){
             $transaction->rollBack();
@@ -326,6 +329,13 @@ class ActForm extends Model
             $obActServ->contract_date = strtotime($this->contractDate[$iServId]);
             $obActServ->job_description = $this->arTemplate[$iServId];
             $obActServ->ordering = (int)$this->arServOrder[$iServId];
+			
+			if(isset($this->arServCurAmount[$iServId]) && $this->arServCurAmount[$iServId]>0) {
+				$obActServ->cur_amount = $this->arServCurAmount[$iServId];
+				$obActServ->cur_id = $this->arServCurId[$iServId];
+				$obActServ->cur_date = strtotime($this->arServCurDate[$iServId]);
+			}
+			
             if(!$obActServ->save())
                 throw new ServerErrorHttpException();
         }

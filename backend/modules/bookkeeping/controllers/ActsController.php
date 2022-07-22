@@ -136,9 +136,9 @@ class ActsController extends AbstractBaseBackendController
     {
         $model = new ActForm();
         $model->actDate = Yii::$app->formatter->asDate('NOW');
+		
         if($model->load(Yii::$app->request->post()) && $model->validate())
         {
-
             if($model->makeRequest())
             {
                 Yii::$app->session->addFlash(Alert::TYPE_SUCCESS,Yii::t('app/book','Act successfully created'));
@@ -174,6 +174,7 @@ class ActsController extends AbstractBaseBackendController
         $modelP->owner_id = Yii::$app->user->id;
         $modelP->status = PaymentRequest::STATUS_NEW;
         $modelP->payment_order = "Не указано";
+        $modelP->payed = 0;
 
         if($modelP->load(Yii::$app->request->post()))
         {

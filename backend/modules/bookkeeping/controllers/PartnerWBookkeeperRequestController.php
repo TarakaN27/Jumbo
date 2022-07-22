@@ -25,6 +25,10 @@ class PartnerWBookkeeperRequestController extends AbstractBaseBackendController
         $tmp['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
+				[
+                    'allow' => false,
+                    'roles' => ['teamlead_acc']
+                ],
                 [
                     'allow' => true,
                     'roles' => ['admin','bookkeeper']

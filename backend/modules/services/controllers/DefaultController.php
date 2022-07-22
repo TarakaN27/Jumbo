@@ -32,7 +32,7 @@ class DefaultController extends AbstractBaseBackendController
 				[
                     'actions' => ['index','view'],
                     'allow' => false,
-                    'roles' => ['teamlead']
+                    'roles' => ['teamlead', 'teamlead_sale', 'teamlead_acc']
                 ],
                 [
                     'actions' => ['index','view'],

@@ -48,11 +48,14 @@ if(!Yii::$app->user->isGuest && Yii::$app->user->can('only_bookkeeper'))
     ];
     unset($subItems);
 }
-if(
-Yii::$app->user->can('adminRights') ||
+if(((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) ||
 Yii::$app->user->can('only_bookkeeper') ||
-Yii::$app->user->can('only_manager')
-) {
+Yii::$app->user->can('only_manager')) &&
+!Yii::$app->user->can('only_teamlead') &&
+!Yii::$app->user->can('teamlead_sale')
+)
+
+ {
     $menuItems [] = [
         'label' => '<i class="fa fa-university"></i> ' . Yii::t('app/common', 'Exchange rates'),
         'url' => NULL,
@@ -176,7 +179,8 @@ $menuItems[] = [
                                 ((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) ||
                                 Yii::$app->user->can('only_bookkeeper') ||
                                 Yii::$app->user->can('only_manager')) &&
-								!Yii::$app->user->can('only_teamlead')
+								!Yii::$app->user->can('only_teamlead') &&
+								!Yii::$app->user->can('teamlead_sale')
                                 ):?>								
                                 <li>
                                     <a><i class = "fa fa-edit"></i><?php echo Yii::t('app/services', 'SERVICES_services_and_expense'); ?>
@@ -277,7 +281,7 @@ $menuItems[] = [
                                             </li>
                                         <?php endif;?>
                                         <!-- Запросы на выведение средств-->
-                                        <?php if(Yii::$app->user->can('adminRights') || Yii::$app->user->can('only_bookkeeper')):?>
+                                        <?php if((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) || Yii::$app->user->can('only_bookkeeper')):?>
                                             <li>
                                                 <?=Html::a(Yii::t('app/common', 'BOOK_partner_withdrawal_b_request') .\common\components\notification\widget\PartnerWithdrowalRequestWidget::widget(),['/bookkeeping/partner-w-bookkeeper-request/index'])?>
                                             </li>
@@ -382,7 +386,7 @@ $menuItems[] = [
                                         <?php if(
                                         Yii::$app->user->can('adminRights') ||
                                         Yii::$app->user->can('only_bookkeeper') ||
-                                        Yii::$app->user->can('only_manager') ||
+                                        (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('teamlead')) ||
                                         Yii::$app->user->can('only_e_marketer')
                                         ):?>
                                         <li>
@@ -401,7 +405,7 @@ $menuItems[] = [
 
                                     </ul>
                                 </li>
-                                <?php if((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) || Yii::$app->user->can('only_partner_manager') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale')) || Yii::$app->user->can('bookkeeper')):?>
+                                <?php if((Yii::$app->user->can('adminRights') && !Yii::$app->user->can('teamlead_acc')) || Yii::$app->user->can('only_partner_manager') || (Yii::$app->user->can('only_manager') && !Yii::$app->user->can('only_sale') && !Yii::$app->user->can('teamlead')) || Yii::$app->user->can('bookkeeper')):?>
                                 <li>
                                     <a>
                                         <i class="fa fa-child"></i><?php echo Yii::t('app/common', 'Partners'); ?>

@@ -32,6 +32,7 @@ var
     URL_GET_NEXT_ACT_NUMBER = '".Url::to(['get-next-act-number'])."',
     URL_LOAD_CONTRACT_DETAIL = '".Url::to(['/ajax-service/find-contract-detail'])."';
     URL_LOAD_ACTS_PAYMENTS = '".Url::to(['/ajax-service/find-payments-for-acts'])."';
+    URL_GET_EXCHANGE_CURRENCY_HISTORY = '".Url::to(['/ajax-service/curr-to-bur-history'])."';
 ",View::POS_HEAD);
 ?>
 <div class="act-form-v2">
@@ -100,8 +101,7 @@ var
             <?= Html::Button('Создать пустой платеж', [
                 'class' => 'btn btn-secondary create-empty-payment',
                 'data-toggle'=>"modal",
-                'data-target'=>"#modalEmptyForm",
-                #'disabled'=>'disabled'
+                'data-target'=>"#modalEmptyForm"
             ]) ?>
         </div>
 

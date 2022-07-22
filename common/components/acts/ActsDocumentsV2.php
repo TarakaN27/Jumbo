@@ -71,6 +71,7 @@ class ActsDocumentsV2
         $cNotResident = FALSE,
         $vatRate,
         $contactDetail,
+		$curCustom = '',
         $bankId;
 
     /**
@@ -228,6 +229,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             throw new NotFoundHttpException();
 
         $arResult = [];
+		$arCurCustom = [];
         /**
          * @var integer $key
          * @var ActServices $serv
@@ -253,7 +255,14 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 
             $this->totalAmountWithVat+= $amountWithVat;
             $this->totalFiniteAmount+=$amountWithVat;
+			
+			if($serv->cur_amount>0 && $serv->cur_id>0 && $serv->cur_id!=self::BEL_RUBLE_ID) {
+				$arCurCustom[] = '*'.$this->formatterHelper($serv->cur_amount).' '.$this->getCurrencyById($serv->cur_id).' по курсу НБ РБ на '.date("d.m.Y", $serv->cur_date).'г.';
+			}
+			
         }
+		
+		$this->curCustom = implode("\n",$arCurCustom);
         $this->amountInWordsMode();
         return $this->arServices = $arResult;
     }
@@ -477,7 +486,8 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             'totalFiniteAmount',
             'amountInWords',
             'vatInWords',
-            'contactDetail'
+            'contactDetail',
+			'curCustom'
         ];
 
         try{
@@ -541,6 +551,15 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             $this->n2wUnit[1] = ['российский рубль'   ,'российских рубля'   ,'российских рублей',0];
         }
     }
+	
+	protected function getCurrencyById($currID)
+	{
+		$obCurr = ExchangeRates::find()->where(['id' => $currID])->one();
+		if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+		
+		return $obCurr->code;
+	}
 
     /**
      * @return string

@@ -134,13 +134,21 @@ return [
     ],
     'teamlead' => [
         'type' => 1,
-        'description' => 'Тимлид тех. команды',
+        'description' => 'Тимлид PPC',
         'ruleName' => 'userRole',
         'children' => [
             'moder',
             'only_manager',
 			'only_teamlead',
             'forAll',
+        ],
+    ],
+	'teamlead_seo' => [
+        'type' => 1,
+        'description' => 'Тимлид SEO',
+        'ruleName' => 'userRole',
+        'children' => [
+            'teamlead'
         ],
     ],
 	'teamlead_acc' => [

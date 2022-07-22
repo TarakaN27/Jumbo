@@ -6108,3 +6108,10 @@ ul.fileInComment li a i {
 #paymentsEmptyBlock {
 	display:none;
 }
+
+.mb-0 {
+	margin-bottom:0 !important;
+}
+.d-flex {
+    display: flex !important;
+}

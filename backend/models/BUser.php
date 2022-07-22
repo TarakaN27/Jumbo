@@ -51,6 +51,7 @@ class BUser extends AbstractUser
         ROLE_TEAMLEAD = 30,
         ROLE_TEAMLEAD_ACC = 31,
         ROLE_TEAMLEAD_SALE = 32,
+        ROLE_TEAMLEAD_SEO = 33,
         ROLE_HR = 35,
         SCENARIO_CHANGE_PASSWORD = 'change_password',
         SCENARIO_REGISTER = 'register';
@@ -80,6 +81,7 @@ class BUser extends AbstractUser
             self::ROLE_E_MARKETER => Yii::t('app/users','USER_role_e_marketer'),
             self::ROLE_PARTNER_MANAGER => Yii::t('app/users','USER_role_partner_manager'),
             self::ROLE_TEAMLEAD =>Yii::t('app/users','USER_role_team_lead'),
+			self::ROLE_TEAMLEAD_SEO =>Yii::t('app/users','USER_role_team_lead_seo'),
             self::ROLE_TEAMLEAD_ACC =>Yii::t('app/users','USER_role_team_lead_acc'),
             self::ROLE_TEAMLEAD_SALE =>Yii::t('app/users','USER_role_team_lead_sale'),
             self::ROLE_HR =>Yii::t('app/users','USER_role_hr'),

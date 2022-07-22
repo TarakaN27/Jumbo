@@ -107,14 +107,14 @@ function hiddenPaymentCheck(this1)
     }
 }
 
-$(document).on('change', '#actform-no-pays', function() {
+/*$(document).on('change', '#actform-no-pays', function() {
     if(this.checked && $('#paymentsBlock .cbPayment:checked').length <= 0) {
         $("#actform-icurr").append("<option selected value='2'>BYN</option>");
     } else if(!this.checked && $('#paymentsBlock .cbPayment:checked').length <= 0) {
         $("#actform-icurr").html("");
         $("#actform-icurr").append("<option value>Choose exchange currency</option>");
     }
-});
+});*/
 
 /**
  * Добвление блока неявного платежа
@@ -406,6 +406,7 @@ function sortUpdateFunction(selector) {
  * @returns {jQuery|HTMLElement}
  */
 function createEntityServicesBlock(serviceID, amount) {
+	let today = new Date().toISOString().substr(0, 10);
     var
         inputServices = createElement('input', [
             {name: 'name', value: 'ActForm[arServices][]'},
@@ -431,6 +432,26 @@ function createEntityServicesBlock(serviceID, amount) {
             {name: 'type', value: 'text'},
             {name: 'class', value: 'form-control serv-amount'},
             {name: 'data-serv-id',value:serviceID}
+        ]),
+		inputCurrAmount = createElement('input', [
+            {name: 'name', value: 'ActForm[arServCurAmount][' + serviceID + ']'},
+            {name: 'value', value: amount},
+            {name: 'type', value: 'text'},
+            {name: 'class', value: 'form-control serv-cur-amount'},
+            {name: 'data-serv-id',value:serviceID}
+        ]),
+		inputCurr = createElement('select', [
+            {name: 'name', value: 'ActForm[arServCurId][' + serviceID + ']'},
+            {name: 'type', value: 'text'},
+            {name: 'class', value: 'form-control serv-cur'},
+			{name: 'data-serv-id',value:serviceID}
+        ]),
+		inputCurrDate = createElement('input', [
+            {name: 'name', value: 'ActForm[arServCurDate][' + serviceID + ']'},
+            {name: 'type', value: 'input'},
+            {name: 'id', value: 'serviceCur'},
+            {name: 'class', value: 'pickDate form-control serv-cur-date'},
+			{name: 'data-serv-id',value:serviceID}
         ]),
         inputContractNumber = createElement('input', [
             {name: 'name', value: 'ActForm[sContractNumber][' + serviceID + ']'},
@@ -460,19 +481,52 @@ function createEntityServicesBlock(serviceID, amount) {
         div3 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div4 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div5 = createElement('div', [{name: 'class', value: 'form-group col-md-12 col-sm-12 col-xs-12'}]),
+		div6 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
+		div61 = createElement('div', [{name: 'class', value: 'input-group col-md-12 col-sm-12 col-xs-12 mb-0'}]),
+		div62 = createElement('div', [{name: 'class', value: 'input-group d-flex col-md-12 col-sm-12 col-xs-12 mb-0'}]),
+		div7 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         label1 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label2 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label3 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label4 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label5 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label6 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label7 = createElement('label', [{name: 'class', value: 'control-label'}]),
         clearfix = createElement('div', [{name: 'class', value: 'clearfix'}])
         ;
+		
+		
     h4.html(arServices[serviceID]);
     li.append(h4);
     li.append(inputServices);
     li.append(inputOrder);
-    div2.append(label2.html('Сумма'));
-    div2.append(inputAmount);
+	
+	if(serviceID == 3 || serviceID == 18) {
+		div6.append(div61);
+		div6.append(div62);
+		div61.append(label6.html('Сумма в валюте'));
+		div62.append(inputCurrAmount);
+		div62.append(inputCurr);
+		div7.append(label7.html('Дата курса валюты'));
+		div7.append(inputCurrDate);
+		for (var i = 0; i < arCurrency.length; i++) {
+			var option = document.createElement("option");
+			option.value = arCurrency[i]["id"];
+			option.text = arCurrency[i]["code"];
+			inputCurr.append(option);
+		}
+		
+		var selectedCurr = $("#actform-icurr").val();
+		inputCurr.val(selectedCurr);
+		
+		$(inputCurrDate).datepicker();
+		$(inputCurrDate).datepicker('setDate', 'today');
+		li.append(div6);
+		li.append(div7);
+	}
+	
+	div2.append(label2.html('Сумма'));
+	div2.append(inputAmount);
     li.append(div2);
     div1.append(label1.html('Кол-во'));
     div1.append(inputQuantity);
@@ -488,6 +542,7 @@ function createEntityServicesBlock(serviceID, amount) {
     div5.append(inputTemplateField);
     li.append(div5);
     li.append(clearfix);
+	
     return li;
 }
 
@@ -1074,5 +1129,32 @@ $(function () {
     });
 
     $('#actform-famount').on('change',function(){showByrInfo(this)});
+	
+	$("#servicesBlock").on("change", ".serv-cur, .serv-cur-date, .serv-cur-amount", function(){
+		var servId = $(this).data("serv-id");
+		var curAmount = $(".serv-cur-amount[data-serv-id='"+servId+"']");
+		var curCurrency = $(".serv-cur[data-serv-id='"+servId+"']");
+		var curDate = $(".serv-cur-date[data-serv-id='"+servId+"']");
+		var cAmount = $(".serv-amount[data-serv-id='"+servId+"']");
+		
+		$.ajax({
+            type: "POST",
+            cache: false,
+            url: URL_GET_EXCHANGE_CURRENCY_HISTORY,
+            dataType: "json",
+            data: {amount: curAmount.val(), date: curDate.val(), currID: curCurrency.val()},
+            success: function (data) {
+                cAmount.val(data);
+            },
+            error: function (msg) {
+                addErrorNotify('Курс валюты', 'Не удалось получить курс валюты!');
+				console.log(data);
+                cAmount.val('');
+                return false;
+            }
+        });
+		
+	})
+	
 
 });

@@ -101,7 +101,11 @@ class PaymentRequestSearch extends PaymentRequest
 			} else {
 				$query->andWhere('('.PaymentRequest::tableName().'.manager_id IS NULL OR '.PaymentRequest::tableName().'.manager_id = :manID OR c.manager_id = :manID )', [':manID' => $this->managerID]);
 			}
-		}		
+		}
+
+		if(isset($this->payed)) {
+			$query->andWhere(['payed'=>$this->payed]);
+		}
 
         if(!empty($this->pay_date))
             $query->andWhere("FROM_UNIXTIME(pay_date,'%d-%m-%Y') = '".date('d-m-Y',$this->pay_date)."'");

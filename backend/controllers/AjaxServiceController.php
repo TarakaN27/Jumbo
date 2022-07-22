@@ -460,6 +460,24 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
             return Yii::$app->formatter->asDecimal($amount / $curr);
     }
+	
+	
+	/**
+     * @return float
+     * @throws NotFoundHttpException
+     */
+    public function actionCurrToBurHistory()
+    {
+            $amount = str_replace(",",".",Yii::$app->request->post('amount'));
+            $date = Yii::$app->request->post('date');
+            $currID = Yii::$app->request->post('currID');
+
+            if (empty($amount) || empty($date) || empty($currID))
+				throw new NotFoundHttpException();
+
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date), $currID);
+            return Yii::$app->formatter->asDecimal($amount * $curr);
+    }
 
         /**
          * @return array
@@ -557,7 +575,9 @@ class AjaxServiceController extends AbstractBaseBackendController{
 
         if(Yii::$app->user->can('only_manager'))
             $searchModel->managerID = Yii::$app->user->id;
-
+		
+		$searchModel->payed = 0;
+		
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,[PaymentRequest::tableName().'.status' => PaymentRequest::STATUS_NEW, PaymentRequest::tableName().'.cntr_id'=>$iCUser]);
         if(empty($searchModel->pay_date))
             $searchModel->pay_date = NULL;

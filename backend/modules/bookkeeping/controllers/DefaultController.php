@@ -158,7 +158,8 @@ class DefaultController extends AbstractBaseBackendController
 						'payment_order'=>$model->payment_order,
 						'legal_id'=>$model->legal_id,
 						'service_id'=>$model->service_id,
-						'bank_id'=>$model->bank_id
+						'bank_id'=>$model->bank_id,
+						'payed'=>0
 					])->one();
 					
 					#Если существует то заменяем данные, если новый то создаем
@@ -167,7 +168,8 @@ class DefaultController extends AbstractBaseBackendController
 						$request->owner_id = $model->owner_id;
 						$request->status = $model->status;				
 						$request->description = $model->description;				
-						$request->pay_date = $model->pay_date;				
+						$request->pay_date = $model->pay_date;	
+						$request->payed = 1;		
 						$model = $request;
 					}		
 					
@@ -777,7 +779,8 @@ class DefaultController extends AbstractBaseBackendController
 				'payment_order'=>$model->payment_order,
 				'legal_id'=>$model->legal_id,
 				'service_id'=>$model->service_id,
-				'bank_id'=>$model->bank_id
+				'bank_id'=>$model->bank_id,
+				'payed'=>0
 			])->one();
 			
 			#Если существует то заменяем данные, если новый то создаем
@@ -787,6 +790,7 @@ class DefaultController extends AbstractBaseBackendController
 				$request->status = $model->status;
 				$request->pay_date = $model->pay_date;
 				$request->bank_id = $model->bank_id;				
+				$request->payed = 1;				
 				$model = $request;
 			}
 			

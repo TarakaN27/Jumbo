@@ -49,6 +49,9 @@ if(Yii::$app->user->can('adminRights'))
                           'format' => 'html',
                           'value' => function($model) use ($arRedisPaymentRequest){
                               $postfix = in_array($model->id,$arRedisPaymentRequest) ? ' <span class="label label-primary">New</span>' : '';
+							  if($model->payed == 0){
+								$postfix .= ' <span class="label label-danger">Пустой</span>';
+							  }
                               $paySumm = Yii::$app->formatter->asDecimal($model->pay_summ,Yii::$app->params['decimalRound']);
                               if(!empty($model->manager_id) && in_array($model->status,[PaymentRequest::STATUS_NEW]) && !empty($model->cntr_id)){
                                       $options = [
