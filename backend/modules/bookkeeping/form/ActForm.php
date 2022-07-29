@@ -50,7 +50,8 @@ class ActForm extends Model
         $sContractNumber,       //Номер Контракта
         $contractDate,          //Дата контракта
         $arHidePayments,        //Неявные платежи
-        $bank;
+        $bank,
+		$bTranslateAct;            //Bool flag акт с переводом
 
     protected
         $_customErrors = [];    //кастомные ошибки
@@ -66,7 +67,7 @@ class ActForm extends Model
             [[
                 'iCUser','iLegalPerson','iCurr',
                 'iActNumber','actDate','sContractNumber',
-                'contractDate','bCustomAct'
+                'contractDate','bCustomAct', 'bTranslateAct'
             ],'required'],
             [['bank'], 'safe'],
             [['actDate'],'date','format' => 'php:d.m.Y'],
@@ -76,7 +77,7 @@ class ActForm extends Model
                 return $model->bCustomAct;
             }],
             ['fAmount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
-            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments'],'safe']
+            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments','bTranslateAct'],'safe']
         ];
     }
 
@@ -97,6 +98,7 @@ class ActForm extends Model
             'arTemplate' => Yii::t('app/book','Template act field'),
             'arHidePayments' => Yii::t('app/book','Payment hide block'),
             'bank' => Yii::t('app/book','Bank'),
+			'bTranslateAct' => Yii::t('app/book','Translate act file'),
         ];
     }
 
@@ -186,7 +188,7 @@ class ActForm extends Model
 
             if(!$this->bCustomAct)
             {
-                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id);
+                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id, $this->bTranslateAct);
                 $fileName = $obActDoc->generateDocument();
                 if(!$fileName)
                     throw new Exception();

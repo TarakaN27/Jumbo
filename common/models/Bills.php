@@ -19,6 +19,7 @@ use yii\db\Query;
  * @property integer $amount
  * @property integer $bill_number
  * @property string $bill_date
+ * @property string $period_date
  * @property integer $bill_template
  * @property integer $use_vat
  * @property string $vat_rate
@@ -71,7 +72,7 @@ class Bills extends AbstractActiveRecord
              ], 'integer'],
             ['amount','number','min' => 1],
             ['bsk','unique'],
-            [['bill_date'], 'safe'],
+            [['bill_date', 'period_date'], 'safe'],
             [['vat_rate'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['description', 'object_text','bsk'], 'string'],
             [['buy_target','offer_contract'], 'string', 'max' => 255]
@@ -93,6 +94,7 @@ class Bills extends AbstractActiveRecord
             'amount' => Yii::t('app/documents', 'Amount'),
             'bill_number' => Yii::t('app/documents', 'Bill Number'),
             'bill_date' => Yii::t('app/documents', 'Bill Date'),
+            'period_date' => Yii::t('app/documents', 'Period of Service Provision'),
             'bill_template' => Yii::t('app/documents', 'Bill Template'),
             'use_vat' => Yii::t('app/documents', 'Use Vat'),
             'vat_rate' => Yii::t('app/documents', 'Vat Rate'),

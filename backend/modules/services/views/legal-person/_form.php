@@ -45,6 +45,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model,'docx_id')->dropDownList(\common\models\BillDocxTemplate::getBillDocxMap())?>
 
     <?= $form->field($model, 'act_tpl_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap())?>
+	
+	<?= $form->field($model, 'eng_act_tpl_id')->dropDownList(\common\models\ActsTemplate::getActsTplMap())?>
 
     <?= $form->field($model, 'letter_tpl_type')->dropDownList(\common\models\LegalPerson::getLetterTplTypeMap())?>
 

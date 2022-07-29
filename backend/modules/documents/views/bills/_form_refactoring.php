@@ -107,6 +107,21 @@ $arServiceMap = Services::getServicesMap();
             ]
         ]) ?>
     <? endif; ?>
+	
+	<?= $form->field($model, "sPeriodDate")->widget(DatePicker::className(),[
+			'language' => 'ru',
+            'options' => [
+                'class' => 'form-control'
+            ],
+            'pluginOptions' => [
+				'language' => 'fr',
+                'autoclose' => TRUE,
+                'format' =>'yyyy-mm', //'yyyy-mm',
+                'defaultDate' => date('Y-m', time()),
+                'weekStart' => '1',
+				'minViewMode' => 1,
+            ]
+        ]) ?>
 
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Services');?></label>

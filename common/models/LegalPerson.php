@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $use_vat
  * @property integer $docx_id
  * @property integer $act_tpl_id
+ * @property integer $eng_act_tpl_id
  * @property integer $admin_expense
  * @property integer $partner_cntr
  * @property string $address
@@ -67,7 +68,7 @@ class LegalPerson extends AbstractActiveRecord
             [[
                 'disallow_create_bill', 'status', 'created_at',
                 'updated_at','use_vat', 'default_bank_id',
-                'docx_id','act_tpl_id',
+                'docx_id','act_tpl_id', 'eng_act_tpl_id',
                 'admin_expense','partner_cntr',
                 'letter_tpl_type'
             ], 'integer'],
@@ -95,6 +96,7 @@ class LegalPerson extends AbstractActiveRecord
             'use_vat' => Yii::t('app/services', 'Use vat'),
             'docx_id' => Yii::t('app/services', 'Docx ID'),
             'act_tpl_id' => Yii::t('app/services', 'Act template'),
+            'eng_act_tpl_id' => Yii::t('app/services', 'Translate act template'),
             'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin'),
             'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor'),
             'address' => Yii::t('app/services','Address'),
@@ -184,6 +186,11 @@ class LegalPerson extends AbstractActiveRecord
     public function getActTemplate()
     {
         return $this->hasOne(ActsTemplate::className(),['id' => 'act_tpl_id']);
+    }
+	
+	public function getTranslateActTemplate()
+    {
+        return $this->hasOne(ActsTemplate::className(),['id' => 'eng_act_tpl_id']);
     }
 
     public function getDefaultBank()

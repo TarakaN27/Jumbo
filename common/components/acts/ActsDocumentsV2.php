@@ -72,7 +72,8 @@ class ActsDocumentsV2
         $vatRate,
         $contactDetail,
 		$curCustom = '',
-        $bankId;
+        $bankId,
+		$translateAct = FALSE;
 
     /**
      * ActsDocumentsV2 constructor.
@@ -81,7 +82,7 @@ class ActsDocumentsV2
      * @param $actDate
      * @param $actNumber
      */
-    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId)
+    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId, $translateAct=false)
     {
         if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId)|| empty($bankId))
             throw new InvalidParamException();
@@ -93,6 +94,7 @@ class ActsDocumentsV2
         $this->iActId = $iActId;
         $this->iCurrencyId = $iCurrencyId;
         $this->bankId = $bankId;
+        $this->translateAct = $translateAct;
     }
 
     /**
@@ -149,10 +151,12 @@ class ActsDocumentsV2
 
         $this->vatRate = CustomHelper::getVat();
 
-        if(empty($obLegalPerson->act_tpl_id))
-            throw new NotFoundHttpException('template id not found');
+		$col_act_tpl = $this->translateAct ? $obLegalPerson->eng_act_tpl_id: $obLegalPerson->act_tpl_id;
 
-        $this->obActTpl = ActsTemplate::findOne($obLegalPerson->act_tpl_id);
+        if(empty($col_act_tpl))
+            throw new NotFoundHttpException('template id not found');
+				
+        $this->obActTpl = ActsTemplate::findOne($col_act_tpl);
         if(!$this->obActTpl || ($this->obActTpl && !file_exists($this->obActTpl->getFilePath()))) {
             throw new NotFoundHttpException('Template not found');
         }

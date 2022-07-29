@@ -39,7 +39,8 @@ class BillForm extends Model
         $arServContract = [],
         $arServOrder = [],
         $fAmount = 0,
-        $arServTpl = [];
+        $arServTpl = [],
+		$sPeriodDate = '';
 
     /**
      * @return array
@@ -60,7 +61,7 @@ class BillForm extends Model
                     return $('#billform-busetax').val() == ".AbstractActiveRecord::YES.";
                 }"
             ],
-            [['arServices','arServAmount','arServTitle','arServDesc','arServContract','arServTpl','arServOrder'],'safe'],
+            [['arServices','arServAmount','arServTitle','arServDesc','arServContract','arServTpl','arServOrder','sPeriodDate'],'safe'],
             [['fAmount'],'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
         ];
     }
@@ -79,6 +80,7 @@ class BillForm extends Model
             'billObj' => Yii::t('app/documents','Object Text'),
             'sBayTarget' => Yii::t('app/documents','Buy Target'),
             'sPayDate' => Yii::t('app/documents','Pay Date'),
+            'sPeriodDate' => Yii::t('app/documents','Period of Service Provision'),
             'sDescription' => Yii::t('app/documents','Description'),
             'sOfferContract' => Yii::t('app/documents','offer_contract'),
             'fAmount' => Yii::t('app/documents','Amount')
@@ -107,6 +109,7 @@ class BillForm extends Model
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
         $obBill->bill_date = $this->sPayDate;
+        $obBill->period_date = $this->sPeriodDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
@@ -186,6 +189,7 @@ class BillForm extends Model
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
         $obBill->bill_date = $this->sPayDate;
+        $obBill->period_date = $this->sPeriodDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
@@ -261,6 +265,7 @@ class BillForm extends Model
         $obBill->description = $this->sDescription;
         $obBill->buy_target = $this->sBayTarget;
         $obBill->bill_date = $this->sPayDate;
+        $obBill->period_date = $this->sPeriodDate;
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;

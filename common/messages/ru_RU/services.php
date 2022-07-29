@@ -64,6 +64,7 @@ return [
     'Default Contracts' => 'Договора по-умолчанию',
     'Settings' => 'Настройки',
     'Act template' => 'Шаблон для акта',
+    'Translate act template' => 'Перевод шаблона для акта',
     'Rate' => 'Ставка норма часа',
     'Create expense Categories' => 'Добавить категорию затрат',
     'Use currency rur for count byr' => 'Рассчет курсов по ЦБРФ',

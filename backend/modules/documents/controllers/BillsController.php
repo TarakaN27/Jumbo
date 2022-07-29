@@ -167,6 +167,7 @@ class BillsController extends AbstractBaseBackendController
             $modelForm->sOfferContract = $model->offer_contract;
             $modelForm->sDescription = $model->description;
             $modelForm->sPayDate = $model->bill_date;
+            $modelForm->sPeriodDate = $model->period_date;
 
             $arServices = BillServices::find()->where(['bill_id' => $model->id])->with('service')->all();
             /** @var BillServices $service */

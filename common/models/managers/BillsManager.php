@@ -317,6 +317,7 @@ class BillsManager extends Bills{
             $doc->setValue('totalSummInWords',$totalSummInWords);
             $doc->setValue('description',$this->description);
             $doc->setValue('billTotalVat',empty($billTotalVat) ? '' : $this->formatterHelper($billTotalVat));
+			$doc->setValue('period_date',Yii::$app->formatter->asDate($this->period_date, 'php:F Y'));
             if(!empty($this->offer_contract))
                 $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
 

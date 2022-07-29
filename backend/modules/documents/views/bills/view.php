@@ -82,6 +82,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'object_text:ntext',
                         'offer_contract',
                         'buy_target',
+						[
+							'attribute' => 'period_date',
+							'value' => Yii::$app->formatter->asDate($model->period_date, 'php:F Y')
+						],
                         [
                             'attribute' => 'created_at',
                             'value' => Yii::$app->formatter->asDatetime($model->created_at)
@@ -91,7 +95,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => Yii::$app->formatter->asDatetime($model->updated_at)
                         ],
                     ],
-                ]) ?>
+                ]);
+
+				?>
 
                 <?php
                     echo \yii\grid\GridView::widget([

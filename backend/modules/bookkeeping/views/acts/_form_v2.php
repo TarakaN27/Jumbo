@@ -139,6 +139,13 @@ var
 	<? if(isset($model->fCustomFileAct)): ?>
     <?=$form->field($model,'fCustomFileAct')->fileInput()?>
 	<? endif; ?>
+	
+	<div class="form-group">
+        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3 col-sm-offset-3" >
+            <?=$form->field($model,'bTranslateAct')->checkbox();?>
+        </div>
+    </div>
+	
     <div class="form-group">
         <div class = "col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
             <?= Html::submitButton(Yii::t('app/book', 'Create'), ['class' => 'btn btn-success']) ?>
