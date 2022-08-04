@@ -13,6 +13,7 @@ use yii\caching\TagDependency;
  * @property integer $service_id
  * @property integer $legal_id
  * @property string $job_name
+ * @property string $job_name_eng
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -37,7 +38,7 @@ class ActFieldTemplate extends AbstractActiveRecord
         return [
             [['service_id', 'legal_id'], 'required'],
             [['service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
-            [['job_name'], 'string'],
+            [['job_name','job_name_eng'], 'string'],
             [['legal_id'], 'exist', 'skipOnError' => true, 'targetClass' => LegalPerson::className(), 'targetAttribute' => ['legal_id' => 'id']],
             [['service_id'], 'exist', 'skipOnError' => true, 'targetClass' => Services::className(), 'targetAttribute' => ['service_id' => 'id']],
             [['service_id','legal_id'],'customValidate']
@@ -74,6 +75,7 @@ class ActFieldTemplate extends AbstractActiveRecord
             'service_id' => Yii::t('app/book', 'Service ID'),
             'legal_id' => Yii::t('app/book', 'Legal ID'),
             'job_name' => Yii::t('app/book', 'Job Name'),
+            'job_name_eng' => Yii::t('app/book', 'Job Name Eng'),
             'created_at' => Yii::t('app/book', 'Created At'),
             'updated_at' => Yii::t('app/book', 'Updated At'),
         ];

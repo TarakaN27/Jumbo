@@ -299,6 +299,7 @@ function processFillService(value) {
         if(!customEmpty(contractDetail.bTplFind) && contractDetail.bTplFind)
         {
             $('#servicesBlock #s' + servID + ' .templateField').val(contractDetail.job_description);
+            $('#servicesBlock #s' + servID + ' .templateEngField').val(contractDetail.job_description_eng);
         }else{
             addErrorNotify('Получение шаблона полей для услуги', 'Шаблон не найден!');
         }
@@ -471,6 +472,12 @@ function createEntityServicesBlock(serviceID, amount) {
             //{name: 'type', value: 'textarea'},
             {name: 'class', value: 'form-control templateField'}
         ]),
+		inputTemplateEngField = createElement('textarea', [
+            {name: 'name', value: 'ActForm[arTemplateEng][' + serviceID + ']'},
+            //{name: 'value', value: ''},
+            //{name: 'type', value: 'textarea'},
+            {name: 'class', value: 'form-control templateEngField'}
+        ]),
         li = createElement('li', [
             {name: 'class', value: 'block-sortable'},
             {name: 'id', value: 's' + serviceID}
@@ -481,6 +488,7 @@ function createEntityServicesBlock(serviceID, amount) {
         div3 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div4 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div5 = createElement('div', [{name: 'class', value: 'form-group col-md-12 col-sm-12 col-xs-12'}]),
+		div51 = createElement('div', [{name: 'class', value: 'form-group col-md-12 col-sm-12 col-xs-12'}]),
 		div6 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
 		div61 = createElement('div', [{name: 'class', value: 'input-group col-md-12 col-sm-12 col-xs-12 mb-0'}]),
 		div62 = createElement('div', [{name: 'class', value: 'input-group d-flex col-md-12 col-sm-12 col-xs-12 mb-0'}]),
@@ -490,6 +498,7 @@ function createEntityServicesBlock(serviceID, amount) {
         label3 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label4 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label5 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label51 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label6 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label7 = createElement('label', [{name: 'class', value: 'control-label'}]),
         clearfix = createElement('div', [{name: 'class', value: 'clearfix'}])
@@ -541,6 +550,9 @@ function createEntityServicesBlock(serviceID, amount) {
     div5.append(label5.html('Наименование работы (услуги)'));
     div5.append(inputTemplateField);
     li.append(div5);
+	div51.append(label51.html('Наименование работы (услуги) Англ.'));
+    div51.append(inputTemplateEngField);
+    li.append(div51);
     li.append(clearfix);
 	
     return li;
@@ -799,6 +811,7 @@ function customValidateForm()
     var
         bContractValid = true,
         arTemplate = $('#servicesBlock .templateField'),
+        arTemplateEng = $('#servicesBlock .templateEngField'),
         arDates = $('#servicesBlock .contractDate'),
         arNumbers = $('#servicesBlock .contractNumber');
 
@@ -878,6 +891,16 @@ function customValidateForm()
             tmpT = $(value).text();
 
         if(tmpT == undefined || tmpT == '')
+        {
+            bContractValid = false;
+        }
+    });
+	
+	$.each(arTemplateEng,function(index,value){
+        let
+            tmpTEng = $(value).text();
+
+        if(tmpTEng == undefined || tmpTEng == '')
         {
             bContractValid = false;
         }

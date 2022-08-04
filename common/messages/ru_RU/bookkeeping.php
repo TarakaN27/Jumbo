@@ -232,6 +232,7 @@ return [
     'Preview' => 'Предпросмотр',
     'Act Field Templates' => 'Акт. Шаблоны полей',
     'Job Name' => 'Наименование работы (услуги)',
+    'Job Name Eng' => 'Наименование работы (услуги) Англ',
     'Create Act Field Template' => 'Добавить шаблон',
     'This template already exist' => 'Шаблон уже существует',
     'Update act field template' => 'Обновить шаблон',
@@ -272,4 +273,9 @@ return [
     'Bank id' => 'Банк',
     'Bank' => 'Банковские реквизиты',
     'Post payment' => 'Постоплата'
+	
+	'Публичный договор о платных услугах в сфере образования' => 'Public agreement on paid services in the field of education',
+	'Публичный договор возмездного оказания услуг' => 'Public contract for the provision of services',
+	'Публичный договор возмездного оказания рекламных услуг в Яндекс.Директ, Яндекс.Маркет, Google Реклама, Facebook, Instagram, Вконтакте и myTarget' => 'Public contract for the provision of paid advertising services in Yandex.Direct, Yandex.Market, Google Ads, Facebook, Instagram, Vkontakte and myTarget'
+	
 ];

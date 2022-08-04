@@ -10,6 +10,7 @@ use yii\bootstrap\Modal;
 use yii\web\JsExpression;
 use yii\helpers\Json;
 use common\models\LegalPerson;
+use common\models\Acts;
 use yii\helpers\Url;
 use yii\web\View;
 use common\models\ExchangeRates;
@@ -89,6 +90,10 @@ var
                 'class' => 'form-control'
             ]
         ]);?>
+		
+		<?= $form->field($model,'bUseTax')->dropDownList(Acts::getYesNo())?>
+
+		<?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
 
         <?=$form->field($model,'fAmount')->textInput();?>
 

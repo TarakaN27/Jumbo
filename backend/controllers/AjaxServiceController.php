@@ -640,7 +640,8 @@ class AjaxServiceController extends AbstractBaseBackendController{
             'contractDate' => $contractDate,
             'contractNumber' => $contractNumber,
             'bTplFind' => !empty($obActFieldTpl),
-            'job_description' => $obActFieldTpl ? $obActFieldTpl->job_name : ''
+            'job_description' => $obActFieldTpl ? $obActFieldTpl->job_name : '',
+            'job_description_eng' => $obActFieldTpl ? $obActFieldTpl->job_name_eng : '',
         ];
     }
 

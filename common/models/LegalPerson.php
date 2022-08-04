@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property integer $id
  * @property string $name
+ * @property string $name_eng
  * @property string $description
  * @property integer $status
  * @property integer $created_at
@@ -26,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $admin_expense
  * @property integer $partner_cntr
  * @property string $address
+ * @property string $address_eng
  * @property string $telephone_number
  * @property string $ynp
  * @property string $mailing_address
@@ -72,12 +74,13 @@ class LegalPerson extends AbstractActiveRecord
                 'admin_expense','partner_cntr',
                 'letter_tpl_type'
             ], 'integer'],
-            [['name'], 'string', 'max' => 255],
-            [['name'],'unique','targetClass' => self::className(),
+            [['name', 'name_eng'], 'string', 'max' => 255],
+            [['name', 'name_eng'],'unique','targetClass' => self::className(),
              'message' => Yii::t('app/services','This name has already been taken.')],
             [['doc_site'],'url'],
             [['doc_email'],'email'],
-            ['address','string']
+            ['address','string'],
+            ['address_eng','string'],
         ];
     }
 
@@ -89,6 +92,7 @@ class LegalPerson extends AbstractActiveRecord
         return [
             'id' => Yii::t('app/services', 'ID'),
             'name' => Yii::t('app/services', 'Name'),
+            'name_eng' => Yii::t('app/services', 'Name Eng'),
             'description' => Yii::t('app/services', 'Description'),
             'status' => Yii::t('app/services', 'Status'),
             'created_at' => Yii::t('app/services', 'Created At'),
@@ -100,6 +104,7 @@ class LegalPerson extends AbstractActiveRecord
             'admin_expense' => Yii::t('app/services','Show expense only for admin and superadmin'),
             'partner_cntr' => Yii::t('app/services','Allow withdrawal partner percent only for contractor'),
             'address' => Yii::t('app/services','Address'),
+            'address_eng' => Yii::t('app/services','Address Eng'),
             'ynp' => Yii::t('app/services','Ynp'),
             'mailing_address' => Yii::t('app/services','Mailing address'),
             'telephone_number' => Yii::t('app/services','Telephone number'),

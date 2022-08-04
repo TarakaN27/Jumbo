@@ -43,6 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'value' => ArrayHelper::getValue($model,'legal.name')
                                 ],
                                 'job_name:ntext',
+								'job_name_eng:ntext',
                                 'created_at:datetime',
                                 'updated_at:datetime',
                             ],

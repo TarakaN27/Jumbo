@@ -47,6 +47,7 @@ class ActsDocumentsV2
         $legalPersonName,
         $legalPersonBankDetail,
         $legalPersonAddress,
+        $legalPersonAddressEng,
         $legalPersonYnp,
         $legalPersonMailingAddress,
         $legalPersonTelephoneNumber,
@@ -66,6 +67,7 @@ class ActsDocumentsV2
         $totalAmountWithVat=0,
         $totalFiniteAmount=0,
         $amountInWords,
+        $amountInWordsEng,
         $vatInWords,
         $bUseVat = FALSE,
         $cNotResident = FALSE,
@@ -82,7 +84,7 @@ class ActsDocumentsV2
      * @param $actDate
      * @param $actNumber
      */
-    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId, $translateAct=false)
+    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId, $translateAct=false, $use_vat=false, $vat_rate=false)
     {
         if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId)|| empty($bankId))
             throw new InvalidParamException();
@@ -95,6 +97,9 @@ class ActsDocumentsV2
         $this->iCurrencyId = $iCurrencyId;
         $this->bankId = $bankId;
         $this->translateAct = $translateAct;
+        $this->bUseVat = $use_vat;
+        $this->vatRate = $vat_rate;
+		
     }
 
     /**
@@ -122,9 +127,9 @@ class ActsDocumentsV2
         /** @var LegalPerson $obLegalPerson */
         $obLegalPerson = LegalPerson::find()
             ->select([
-                'id','name',
-                'use_vat','docx_id','act_tpl_id',
-                'address','use_vat','ynp',
+                'id','name','name_eng',
+                'use_vat','docx_id','act_tpl_id','eng_act_tpl_id',
+                'address','address_eng','use_vat','ynp',
                 'mailing_address','telephone_number',
                 'doc_email','doc_site'
             ])
@@ -135,22 +140,25 @@ class ActsDocumentsV2
             throw new NotFoundHttpException();
 
         $this->legalPersonName = $obLegalPerson->name;
+        $this->legalPersonNameEng = $obLegalPerson->name_eng;
         $bank = BankDetails::findOne($this->bankId);
         if($bank)
             $this->legalPersonBankDetail = $bank->bank_details_act;
         else
             $this->legalPersonBankDetail = "";
         $this->legalPersonAddress = $obLegalPerson->address;
+        $this->legalPersonAddressEng = $obLegalPerson->address_eng;
         $this->legalPersonYnp = $obLegalPerson->ynp;
         $this->legalPersonMailingAddress = $obLegalPerson->mailing_address;
         $this->legalPersonTelephoneNumber = $obLegalPerson->telephone_number;
         $this->legalPersonEmail = $obLegalPerson->doc_email;
         $this->legalPersonSite = $obLegalPerson->doc_site;
-
-        $this->bUseVat = $obLegalPerson->use_vat;
-
-        $this->vatRate = CustomHelper::getVat();
-
+		
+		if($this->bUseVat === false && $this->vatRate === false){
+			$this->bUseVat = $obLegalPerson->use_vat; #Показывать ли НДС
+			$this->vatRate = CustomHelper::getVat();
+		}
+		
 		$col_act_tpl = $this->translateAct ? $obLegalPerson->eng_act_tpl_id: $obLegalPerson->act_tpl_id;
 
         if(empty($col_act_tpl))
@@ -181,8 +189,9 @@ class ActsDocumentsV2
             $obAct = Acts::findOne($this->iActId);
             if (!$obAct)
                 throw new NotFoundHttpException();
-
+			
             $cuserContractDetail = $obAct->contract_num . ' от ' . \Yii::$app->formatter->asDate($obAct->contract_date);
+            $cuserContractDetailEng = str_replace("Договор ","Agreement ",Yii::t('app/book',$obAct->contract_num)) . ' of ' . \Yii::$app->formatter->asDate($obAct->contract_date);
             if($obCUser->is_resident == 0){
                 $this->cNotResident = true;
             }
@@ -195,10 +204,14 @@ class ActsDocumentsV2
 
                 $passportAuth = $obCUser->requisites->pasp_auth;
                 $cuserContractDetail = $obAct->contract_num . ' от ' . \Yii::$app->formatter->asDate($obAct->contract_date);
+                $cuserContractDetailEng = str_replace("Договор ","Agreement ",Yii::t('app/book',$obAct->contract_num)) . ' of ' . \Yii::$app->formatter->asDate($obAct->contract_date);
                 $template = "Заказчик: $cuserName<w:br/>
 Адрес: $adsress<w:br/>
 Паспортные данные: Номер $passportNumber выдан $passportDate, $passportAuth <w:br/>
 Основание: договор $cuserContractDetail";
+
+				$this->cuserAddress = $adsress;
+
             } else {
                 $cuserName = !empty($obR->corp_name) ? $obR->corp_name : $obCUser->getInfo();
                 $cuserBankDetail = $obR->new_ch_account . ' в ' . $obR->b_name . ' ' . $obR->bank_address . ' БИК ' . $obR->bik;
@@ -207,17 +220,20 @@ class ActsDocumentsV2
                 $cuserWebsite = $obR->site;
                 $cuserYnp = $obR->ynp;
 
-
-
                 $template = "Заказчик: $cuserName, УНП: $cuserYnp<w:br/>
 Р/сч: $cuserBankDetail<w:br/>
 Основание: договор $cuserContractDetail<w:br/>
 Юр. адрес: $cuserAddress<w:br/>
 E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
+
+				$this->cuserAddress = $cuserAddress;
             }
             $this->cuserName =$cuserName;
             $this->cuserYnp = $cuserYnp;
             $this->contactDetail = $template;
+            $this->cuserContractDetail = $cuserContractDetail;
+            $this->cuserContractDetailEng = $cuserContractDetailEng;
+			
         }
         return $obCUser;
     }
@@ -248,7 +264,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             $price = round($amount/$serv->quantity, 2);
 
             $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
-            if($this->cNotResident){
+            if($this->bUseVat == 0 && $this->cNotResident){
                 $vatRate = "-*";
                 $vatAmount = "-*";
             }
@@ -341,7 +357,11 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                     break;
             }
         else {
-            $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit);
+			
+			$code = $this->getCurrencyById($this->iCurrencyId);
+			
+            $this->amountInWords = CustomHelper::num2str($this->totalFiniteAmount,$this->n2wUnit)." ".$code;
+            $this->amountInWordsEng = CustomHelper::num2strEng($this->totalFiniteAmount, $code)." ".$code;
 
             $strVatAmount = '';
             if($this->bUseVat)
@@ -383,6 +403,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
         $arResult = [
             'colNum' => $colNum,
             'jobName' => $serv->job_description,
+            'jobNameEng' => $serv->job_description_eng,
             'quantity' => $serv->quantity
         ];
 
@@ -468,8 +489,10 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
         $realPath = $this->generateRealPath($fileName.'.docx');
         $arItems = [
             'legalPersonName',
+            'legalPersonNameEng',
             'legalPersonBankDetail',
             'legalPersonAddress',
+            'legalPersonAddressEng',
             'legalPersonYnp',
             'legalPersonMailingAddress',
             'legalPersonTelephoneNumber',
@@ -480,6 +503,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             'cuserName',
             'cuserBankDetail',
             'cuserContractDetail',
+            'cuserContractDetailEng',
             'cuserAddress',
             'cuserEmail',
             'cuserWebsite',
@@ -489,6 +513,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             'totalAmountWithVat',
             'totalFiniteAmount',
             'amountInWords',
+            'amountInWordsEng',
             'vatInWords',
             'contactDetail',
 			'curCustom'
@@ -575,7 +600,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
         $obAct = Acts::findOne($this->iActId);
         if(!$obAct)
             throw new NotFoundHttpException();
-
+		
         return $this->cuserContractDetail = $obAct->contract_num.' от '.\Yii::$app->formatter->asDate($obAct->contract_date);
     }
 
@@ -610,6 +635,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             $serviceVatRate = $dom->createElement("СтавкаНДС",$service['vatRate']);
             $serviceVatAmount = $dom->createElement("СтоимостьСНДС",$service['amountWithVat']);
             $serviceNode->appendChild($serviceName);
+            $serviceNode->appendChild($serviceNameEng);
             $serviceNode->appendChild($serviceQuantity);
             $serviceNode->appendChild($servicePrice);
             $serviceNode->appendChild($serviceAmount);

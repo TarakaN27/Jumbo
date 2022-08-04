@@ -31,6 +31,8 @@ use common\models\LegalPerson;
     ]) ?>
 
     <?= $form->field($model, 'job_name')->textarea(['rows' => 6]) ?>
+	
+	<?= $form->field($model, 'job_name_eng')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">

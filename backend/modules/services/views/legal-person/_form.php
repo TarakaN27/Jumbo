@@ -21,6 +21,8 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+	
+    <?= $form->field($model, 'name_eng')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
     <?
@@ -31,6 +33,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'ynp')->textInput(['maxlength' => true])?>
 
     <?= $form->field($model,'address')->textarea(['row' => 6])?>
+	
+    <?= $form->field($model,'address_eng')->textarea(['row' => 6])?>
 
     <?=$form->field($model,'mailing_address')->textarea(['row' => 6])?>
 

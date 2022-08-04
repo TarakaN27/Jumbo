@@ -19,7 +19,7 @@ class ActFieldTemplateSearch extends ActFieldTemplate
     {
         return [
             [['id', 'service_id', 'legal_id', 'created_at', 'updated_at'], 'integer'],
-            [['job_name'], 'safe'],
+            [['job_name', 'job_name_eng'], 'safe'],
         ];
     }
 

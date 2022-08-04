@@ -57,7 +57,7 @@ class DefaultController extends AbstractBaseBackendController
     {
         $searchModel = new ServicesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+		
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

@@ -14,6 +14,7 @@ use common\components\behavior\UploadBehavior;
 use common\components\customComponents\validation\ValidNumber;
 use common\components\helpers\CustomHelper;
 use common\models\ActImplicitPayment;
+use common\models\AbstractActiveRecord;
 use common\models\Acts;
 use common\models\ActServices;
 use common\models\ActToPayments;
@@ -42,6 +43,7 @@ class ActForm extends Model
         $arServCurId = [],   	//Ид валюты
         $arServCurDate = [],   	//Дата курса валюты
         $arTemplate = [],       //Шаблон по услугам для генерации
+        $arTemplateEng = [],       //Шаблон по услугам для генерации
         $iActNumber,            //Номер акта
         $actDate,               //Дата акта
         $arPayment,             //Платежи, которые актируются
@@ -51,6 +53,8 @@ class ActForm extends Model
         $contractDate,          //Дата контракта
         $arHidePayments,        //Неявные платежи
         $bank,
+		$bUseTax = 0,
+        $bTaxRate = NULL,
 		$bTranslateAct;            //Bool flag акт с переводом
 
     protected
@@ -69,6 +73,15 @@ class ActForm extends Model
                 'iActNumber','actDate','sContractNumber',
                 'contractDate','bCustomAct', 'bTranslateAct'
             ],'required'],
+			[['bUseTax'],'integer'],
+			[['bTaxRate'],'required',
+                'when' => function(){
+                    return $this->bUseTax == 1;
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#billform-busetax').val() == ".AbstractActiveRecord::YES.";
+                }"
+            ],
             [['bank'], 'safe'],
             [['actDate'],'date','format' => 'php:d.m.Y'],
             [['arServices'],'each','rule' => ['integer']],
@@ -77,7 +90,7 @@ class ActForm extends Model
                 return $model->bCustomAct;
             }],
             ['fAmount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
-            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arHidePayments','bTranslateAct'],'safe']
+            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arTemplateEng','arHidePayments','bTranslateAct'],'safe']
         ];
     }
 
@@ -96,9 +109,12 @@ class ActForm extends Model
             'bCustomAct' => Yii::t('app/book','Custom act file'),
             'fCustomFileAct' => Yii::t('app/book','Custom file act'),
             'arTemplate' => Yii::t('app/book','Template act field'),
+            'arTemplateEng' => Yii::t('app/book','Template act field'),
             'arHidePayments' => Yii::t('app/book','Payment hide block'),
             'bank' => Yii::t('app/book','Bank'),
 			'bTranslateAct' => Yii::t('app/book','Translate act file'),
+			'bUseTax' => Yii::t('app/documents','Use Vat'),
+            'bTaxRate' => Yii::t('app/documents','Vat Rate'),
         ];
     }
 
@@ -164,6 +180,8 @@ class ActForm extends Model
             $obAct->sent = Acts::NO;
             $obAct->lp_id = $this->iLegalPerson;
             $obAct->currency_id = $this->iCurr;
+			$obAct->use_vat = $this->bUseTax;
+			$obAct->vat_rate = $this->bTaxRate;
             if($this->bank && isset($this->bank[$obAct->lp_id])) {
                 $obAct->bank_id = $this->bank[$obAct->lp_id];
             }
@@ -188,7 +206,7 @@ class ActForm extends Model
 
             if(!$this->bCustomAct)
             {
-                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id, $this->bTranslateAct);
+                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id, $this->bTranslateAct, $obAct->use_vat, $obAct->vat_rate);
                 $fileName = $obActDoc->generateDocument();
                 if(!$fileName)
                     throw new Exception();
@@ -317,6 +335,7 @@ class ActForm extends Model
                 !isset($this->sContractNumber[$iServId]) ||
                 !isset($this->contractDate[$iServId]) ||
                 !isset($this->arTemplate[$iServId]) ||
+                !isset($this->arTemplateEng[$iServId]) ||
                 !isset($this->arServOrder[$iServId])
             )
             {
@@ -330,6 +349,7 @@ class ActForm extends Model
             $obActServ->contract_number = $this->sContractNumber[$iServId];
             $obActServ->contract_date = strtotime($this->contractDate[$iServId]);
             $obActServ->job_description = $this->arTemplate[$iServId];
+            $obActServ->job_description_eng = $this->arTemplateEng[$iServId];
             $obActServ->ordering = (int)$this->arServOrder[$iServId];
 			
 			if(isset($this->arServCurAmount[$iServId]) && $this->arServCurAmount[$iServId]>0) {
