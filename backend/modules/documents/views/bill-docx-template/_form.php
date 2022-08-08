@@ -40,6 +40,24 @@ use yii\widgets\ActiveForm;
         </div>
     <?php endif;?>
     <?= $form->field($model, 'src')->fileInput()?>
+	
+	<?php if(!$model->isNewRecord):?>
+        <div class="form-group field-billdocxtemplate-src-eng">
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="billdocxtemplate-src-eng"><?=Yii::t('app/documents','Current file eng')?>:</label>
+                <div class="col-md-6 col-sm-6 col-xs-12" style="padding-top: 8px;">
+                    <?=Html::a(
+                        $model->src_eng,
+                        ['download','id' => $model->id],
+                        [
+                            'target' => '_blank'
+                        ]
+                        )?>
+                </div>
+            </div>
+        </div>
+    <?php endif;?>
+    <?= $form->field($model, 'src_eng')->fileInput()?>
 
     <?= $form->field($model, 'is_default')->dropDownList(\common\models\BillDocxTemplate::getYesNo())?>
 

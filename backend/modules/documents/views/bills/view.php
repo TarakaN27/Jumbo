@@ -9,6 +9,12 @@ use common\components\helpers\CustomHelper;
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app/documents', 'Bills'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+if(isset($model->bank_id)) {
+	$bank = common\models\BankDetails::findOne($model->bank_id);
+	$bank_req = $bank ? $bank->bank_details_act: 'N/A';
+}
+
 ?>
 <div class = "row">
     <div class = "col-md-12 col-sm-12 col-xs-12">
@@ -20,6 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::a('<i class="fa fa-file-pdf-o"></i> '.Yii::t('app/documents', 'Get bill'),[
                         'get-bill',
                         'type' => \common\models\Bills::TYPE_DOC_PDF,
+						'lang' => 0,
+                        'id' => $model->id
+                    ],
+                        [
+                            'target' => '_blank',
+                            'class' => 'btn btn-warning'
+                        ]); ?>
+					<?= Html::a('<i class="fa fa-file-pdf-o"></i> '.Yii::t('app/documents', 'Get bill Eng'),[
+                        'get-bill',
+                        'type' => \common\models\Bills::TYPE_DOC_PDF,
+                        'lang' => 1,
                         'id' => $model->id
                     ],
                         [
@@ -53,6 +70,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'l_person_id',
                             'value' => is_object($obLP = $model->lPerson) ? $obLP -> name : 'N/A'
                         ],
+						[
+                            'attribute' => 'bank_id',
+                            'value' => $bank_req
+                        ],
                         [
                             'attribute' => 'service_id',
                             'value' => is_object($obServ = $model->service) ? $obServ->name : 'N/A'
@@ -64,8 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'attribute' => 'amount',
                             'value' => Yii::$app->formatter->asDecimal($model->amount).' ( '.
-                                CustomHelper::numPropis((int)$model->amount).' '.
-                                CustomHelper::ciRub((int)$model->amount).' )'
+                                CustomHelper::numPropis((int)$model->amount).' ) ' .\common\models\Bills::getCurrencyById($model->curr_id)
                         ],
                         'bill_number',
                         'bill_date:date',

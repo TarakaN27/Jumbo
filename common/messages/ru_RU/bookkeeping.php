@@ -272,7 +272,7 @@ return [
     '{count} payments success saved' =>'{count}запросов на платёж успешно создано',
     'Bank id' => 'Банк',
     'Bank' => 'Банковские реквизиты',
-    'Post payment' => 'Постоплата'
+    'Post payment' => 'Постоплата',
 	
 	'Публичный договор о платных услугах в сфере образования' => 'Public agreement on paid services in the field of education',
 	'Публичный договор возмездного оказания услуг' => 'Public contract for the provision of services',

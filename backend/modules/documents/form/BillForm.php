@@ -23,6 +23,7 @@ class BillForm extends Model
 {
     public
         $iCuserId = NULL,
+        $curr_id = 2,
         $iLegalPerson = NULL,
         $iDocxTpl = NULL,
         $bUseTax = 0,
@@ -35,11 +36,14 @@ class BillForm extends Model
         $arServices = [],
         $arServAmount = [],
         $arServTitle = [],
+        $arServTitleEng = [],
         $arServDesc = [],
         $arServContract = [],
         $arServOrder = [],
         $fAmount = 0,
         $arServTpl = [],
+        $bTranslate = 0,
+		$bank,
 		$sPeriodDate = '';
 
     /**
@@ -48,10 +52,10 @@ class BillForm extends Model
     public function rules()
     {
         return [
-            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sPayDate','sOfferContract','fAmount'],'required'],
+            [['iCuserId','iLegalPerson','iDocxTpl','sBayTarget','sPayDate','sOfferContract','fAmount', 'curr_id'],'required'],
             [['fAmount'],ValidNumber::className()],
             ['arServAmount','each','rule' => [ValidNumber::className()]],
-            [['bUseTax'],'integer'],
+            [['bUseTax','bTranslate', 'curr_id'],'integer'],
             ['sDescription','trim'],
             [['bTaxRate'],'required',
                 'when' => function(){
@@ -61,7 +65,7 @@ class BillForm extends Model
                     return $('#billform-busetax').val() == ".AbstractActiveRecord::YES.";
                 }"
             ],
-            [['arServices','arServAmount','arServTitle','arServDesc','arServContract','arServTpl','arServOrder','sPeriodDate'],'safe'],
+            [['arServices','arServAmount','arServTitle','arServTitleEng','arServDesc','arServContract','arServTpl','arServOrder','sPeriodDate', 'bank'],'safe'],
             [['fAmount'],'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/']
         ];
     }
@@ -73,6 +77,7 @@ class BillForm extends Model
     {
         return [
             'iCuserId' => Yii::t('app/documents','Cuser ID'),
+			'curr_id' => Yii::t('app/book','Currency ID'),
             'iLegalPerson' => Yii::t('app/documents','Legal person'),
             'iDocxTpl' => Yii::t('app/documents','Docx Tmpl ID'),
             'bUseTax' => Yii::t('app/documents','Use Vat'),
@@ -83,7 +88,8 @@ class BillForm extends Model
             'sPeriodDate' => Yii::t('app/documents','Period of Service Provision'),
             'sDescription' => Yii::t('app/documents','Description'),
             'sOfferContract' => Yii::t('app/documents','offer_contract'),
-            'fAmount' => Yii::t('app/documents','Amount')
+            'fAmount' => Yii::t('app/documents','Amount'),
+			'bank' => Yii::t('app/book','Bank'),
         ];
     }
 
@@ -113,7 +119,11 @@ class BillForm extends Model
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
-        $obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
+        $obBill->curr_id = $this->curr_id;
+        #$obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
+		if($this->bank && isset($this->bank[$this->iLegalPerson])) {
+			$obBill->bank_id = $this->bank[$this->iLegalPerson];
+		}
         if(!$obBill->save()) {
             $tr->rollBack();
             return FALSE;
@@ -126,6 +136,7 @@ class BillForm extends Model
                 $this->arServAmount[$serv],
                 $this->arServTpl[$serv],
                 $this->arServTitle[$serv],
+                $this->arServTitleEng[$serv],
                 $this->arServDesc[$serv],
                 $this->arServContract[$serv],
                 $this->arServOrder[$serv]
@@ -138,6 +149,7 @@ class BillForm extends Model
             $amount = $this->arServAmount[$serv];
             $tpl = $this->arServTpl[$serv];
             $title = $this->arServTitle[$serv];
+            $title_eng = $this->arServTitleEng[$serv];
             $description = $this->arServDesc[$serv];
             $offer = $this->arServContract[$serv];
             $order = $this->arServOrder[$serv];
@@ -149,6 +161,7 @@ class BillForm extends Model
                 $tpl,
                 $amount,
                 $title,
+                $title_eng,
                 $description,
                 $offer,
                 time(),
@@ -193,6 +206,7 @@ class BillForm extends Model
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
+		$obBill->curr_id = $this->curr_id;
         if(!$obBill->save()) {
             $tr->rollBack();
             return FALSE;
@@ -205,6 +219,7 @@ class BillForm extends Model
                 $this->arServAmount[$serv],
                 $this->arServTpl[$serv],
                 $this->arServTitle[$serv],
+                $this->arServTitleEng[$serv],
                 $this->arServDesc[$serv],
                 $this->arServContract[$serv],
                 $this->arServOrder[$serv]
@@ -217,6 +232,7 @@ class BillForm extends Model
             $amount = $this->arServAmount[$serv];
             $tpl = $this->arServTpl[$serv];
             $title = $this->arServTitle[$serv];
+            $title_eng = $this->arServTitleEng[$serv];
             $description = $this->arServDesc[$serv];
             $offer = $this->arServContract[$serv];
             $order = $this->arServOrder[$serv];
@@ -228,6 +244,7 @@ class BillForm extends Model
                 $tpl,
                 $amount,
                 $title,
+                $title_eng,
                 $description,
                 $offer,
                 time(),
@@ -269,8 +286,12 @@ class BillForm extends Model
         $obBill->offer_contract = $this->sOfferContract;
         $obBill->use_vat = $this->bUseTax;
         $obBill->vat_rate = $this->bTaxRate;
-        $obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
-        if(!$obBill->save()) {
+		$obBill->curr_id = $this->curr_id;
+        #$obBill->bank_id = LegalPerson::getBankDetailsByCUsers($this->iLegalPerson, $this->iCuserId);
+        if($this->bank && isset($this->bank[$this->iLegalPerson])) {
+			$obBill->bank_id = $this->bank[$this->iLegalPerson];
+		}
+		if(!$obBill->save()) {
             $tr->rollBack();
             return FALSE;
         }
@@ -284,6 +305,7 @@ class BillForm extends Model
                 $this->arServAmount[$serv],
                 $this->arServTpl[$serv],
                 $this->arServTitle[$serv],
+                $this->arServTitleEng[$serv],
                 $this->arServDesc[$serv],
                 $this->arServContract[$serv],
                 $this->arServOrder[$serv]
@@ -296,6 +318,7 @@ class BillForm extends Model
             $amount = $this->arServAmount[$serv];
             $tpl = $this->arServTpl[$serv];
             $title = $this->arServTitle[$serv];
+            $title_eng = $this->arServTitleEng[$serv];
             $description = $this->arServDesc[$serv];
             $offer = $this->arServContract[$serv];
             $order = $this->arServOrder[$serv];
@@ -307,6 +330,7 @@ class BillForm extends Model
                 $tpl,
                 $amount,
                 $title,
+                $title_eng,
                 $description,
                 $offer,
                 time(),

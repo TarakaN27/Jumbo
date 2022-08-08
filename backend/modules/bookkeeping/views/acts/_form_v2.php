@@ -111,7 +111,7 @@ var
         </div>
 
     </div>
-
+	
     <?=$form->field($model,'iCurr')->dropDownList([],[
         'prompt' => Yii::t('app/book','Choose exchange currency')
     ])?>

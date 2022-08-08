@@ -16,6 +16,7 @@ use common\models\Bills;
 use common\models\BillServices;
 use common\models\BillTemplate;
 use common\models\CuserServiceContract;
+use common\models\ExchangeRates;
 use Yii;
 use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
@@ -31,6 +32,9 @@ class BillsManager extends Bills{
 
     protected
         $_manError = [];
+
+	public $lang = 0;
+	public $n2wUnit = NULL;
 
     public function getDocument($type)
     {
@@ -108,12 +112,12 @@ class BillsManager extends Bills{
 
     protected function generateDocument($name,$tryPath)
     {
-
+		
         /** @var BillDocxTemplate $docxTpl */
         $docxTpl = BillDocxTemplate::findOneByIDCached($this->docx_tmpl_id);    //находим шаблон для формирования счета
-        if(empty($docxTpl) || !file_exists($docxTpl->getFilePath()))
+        if(empty($docxTpl) || !file_exists($docxTpl->getFilePath($this->lang)))
             throw new NotFoundHttpException('Docx template not found');
-
+		
         $jPerson = '';
         $jPersonDetail = '';
         $jPersonSite = '';
@@ -142,12 +146,20 @@ class BillsManager extends Bills{
             $jPersonEmail = $lPerson->doc_email;
             $jPersonSite = $lPerson->doc_site;
         }
+		
+		$this->getCurrencyUnits();
 
         $contractor = '';
         $payer = '';
         $bankDetail = '';
         $contractorEmail = '';
         $contractorSite = '';
+		$cYnp = '';
+		$cAddress = '';
+		$bAddress = '';
+		$bSwift = '';
+		$bName = '';
+		$bRoutingNumber = '';
 
         /** @var CUser $obCUser */
         $obCUser = CUser::find()->with('requisites')->where(['id' => $this->cuser_id])->one();
@@ -163,22 +175,41 @@ class BillsManager extends Bills{
             $bankDetail = 'Р/сч: '.$obR->new_ch_account.' в '.$obR->b_name.' '.$obR->bank_address.' БИК '.$obR->bik.', УНП:'.$obR->ynp;
             $contractorEmail = $obR->c_email;
             $contractorSite = $obR->site;
+			$cYnp = $obR->ynp;
+			$cAddress = $obR->p_address;
+			$bAddress = $obR->bank_address;
+			$bRoutingNumber = $obR->new_ch_account;
+			$bSwift = $obR->bik;
+			$bName = $obR->b_name;
         }
         $arFields = [];
-        $billVatRate  =  "Без НДС";
-        $billVatSumm  =  "Без НДС";
+        $billVatRate  =  "-*";
+        $billVatSumm  =  "-*";
         $billTotalSumVat = 0;
         $billTotalVat = '';
         $totalSummVat = 0;
         $totalSumm = 0;
         $tplId = false;
+		$vatInWords = "";
+		$notify_text = "";
+		
+		if($this->use_vat == 0) {
+			$vatInWords = "Сумма НДС*: Согласно п. 2 ст. 72 Договор о ЕАЭС от 29.05.2014;<w:br/>
+Подп. 2 П. 28, Подп. 4 П. 29 Раздел IV Протокола о порядке взимания косвенных налогов и механизме контроля за их уплатой при экспорте и импорте товаров, выполнении работ, оказании услуг (приложение 18 к Договору о ЕАЭС от 29.05.2014)";
+		}
+		
+		if($obCUser->is_resident == 0) {
+			$notify_text = "Указанная в Счете стоимость услуг перечисляется Заказчиком в полном объеме, без удержания каких-либо налогов, сборов и прочих платежей в соответствии с законодательством страны Заказчика, уплату таких налогов, сборов и пр. Заказчик осуществляет за свой счет.";
+		}
+		
         if(empty($this->service_id))
         {
             $arServices = BillServices::find()->where(['bill_id' => $this->id])->orderBy(['ordering' => SORT_ASC])->all();
             if(!$arServices)
                 throw new NotFoundHttpException();
             $keyCounter = 1;
-            if($this->use_vat)
+			
+            if($this->use_vat == 1)
             {
                 $billTotalVat = 0;
                 /** @var BillServices $service */
@@ -191,6 +222,7 @@ class BillsManager extends Bills{
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
+                        'billSubjectEng' => $service->serv_title_eng,
                         'billPrice' => $this->amountHelperFormat($price),
                         'billSumm' => $this->amountHelperFormat($price),
                         'billVatSumm' => $this->amountHelperFormat($vatAmount),
@@ -212,11 +244,12 @@ class BillsManager extends Bills{
                     $arFields [] = [
                         'colNum' => $keyCounter,
                         'billSubject' => $service->serv_title,
+                        'billSubjectEng' => $service->serv_title_eng,
                         'billPrice' => $this->amountHelperFormat($service->amount),
                         'billSumm' => $this->amountHelperFormat($service->amount),
-                        'billVatSumm' => '',
+                        'billVatSumm' => '-*',
                         'totalSummVat' => $this->amountHelperFormat($service->amount),
-                        'billVatRate' => '',
+                        'billVatRate' => '-*',
                         'billTotalSumVat' => $this->amountHelperFormat($service->amount)
                     ];
                     $totalSummVat+=$service->amount;
@@ -227,7 +260,7 @@ class BillsManager extends Bills{
             }
         }else{
             $this->amount = round((float)$this->amount,2);
-            if($this->use_vat)
+            if($this->use_vat==1)
             {
                 $totalSum = $billTotalSumVat = $this->amount;
                 $vatAmount = round($this->amount*CustomHelper::getVat()/(100+CustomHelper::getVat()),2);
@@ -236,6 +269,7 @@ class BillsManager extends Bills{
                 $arFields [] = [
                     'colNum' => 1,
                     'billSubject' => $this->object_text,
+                    'billSubjectEng' => $this->object_text_eng,
                     'billPrice' => $this->amountHelperFormat($price),
                     'billSumm' => $this->amountHelperFormat($sum),
                     'billVatSumm' => $this->amountHelperFormat($vatAmount),
@@ -254,15 +288,17 @@ class BillsManager extends Bills{
                 $arFields [] = [
                     'colNum' => 1,
                     'billSubject' => $this->object_text,
+                    'billSubjectEng' => $this->object_text_eng,
                     'billPrice' => $this->amountHelperFormat($this->amount),
                     'billSumm' => $this->amountHelperFormat($this->amount),
-                    'billVatSumm' => '',
+                    'billVatSumm' => '-*',
                     'totalSummVat' => $this->amountHelperFormat($this->amount),
-                    'billVatRate' => '',
+                    'billVatRate' => '-*',
                     'billTotalSumVat' => $this->amountHelperFormat($this->amount)
                 ];
             }
         }
+		
         if($tplId) {
             $obBillTpl = BillTemplate::findOne($tplId);
         }else
@@ -277,16 +313,19 @@ class BillsManager extends Bills{
                 CustomHelper::ciRub((int)$billTotalSumVat) .' без НДС согласно статьи 286 Налогового кодекса Республики Беларусь' ;
         }
         */
+		$code = $this->getCurrencyById($this->curr_id);
 
-        $totalSummInWords = number_format($billTotalSumVat,2,',',' ').' ('.CustomHelper::num2str($billTotalSumVat).')';
+        $totalSummInWords = number_format($billTotalSumVat,2,',',' ').' ('.CustomHelper::num2str($billTotalSumVat, $this->n2wUnit).')';
+        $totalSummInWordsEng = number_format($billTotalSumVat,2,',',' ').' ('.CustomHelper::num2strEng($billTotalSumVat, $code).' )';
 
-        $totalSummInWords.= $this->use_vat ? ' c НДС ' : ' без НДС согласно подп.1 п.1 ст. 113 Налогового кодекса Республики Беларусь (Особенная часть).';
+        $totalSummInWords.= $this->use_vat==1 ? ' c НДС ' : ' без НДС согласно подп.1 п.1 ст. 113 Налогового кодекса Республики Беларусь (Особенная часть).';
         try{
             if($this->l_person_id == 3 && $this->bill_date>="2017-03-06" && $this->bill_date<="2017-03-31"){
                 $doc = new \PhpOffice\PhpWord\TemplateProcessor(Yii::getAlias("@common/upload/docx_template").'/shlo_bill.docx');
             }else {
-                $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath());
+                $doc = new \PhpOffice\PhpWord\TemplateProcessor($docxTpl->getFilePath($this->lang));
             }
+			
             $doc->setValue('jPerson',Html::encode($jPerson));
             $doc->setValue('jPersonDetail',$jPersonDetail);
             $doc->setValue('jPersonSite',$jPersonSite);
@@ -301,6 +340,15 @@ class BillsManager extends Bills{
             $doc->setValue('contractorEmail',$contractorEmail);
             $doc->setValue('contractorSite',$contractorSite);
             $doc->setValue('payTarget',$this->buy_target);
+            $doc->setValue('vatInWords',$vatInWords);
+            $doc->setValue('notify_text',$notify_text);
+            $doc->setValue('cAddress',$cAddress);
+            $doc->setValue('cYnp',$cYnp);
+            $doc->setValue('bRoutingNumber',$bRoutingNumber);
+            $doc->setValue('bSwift',$bSwift);
+            $doc->setValue('bName',$bName);
+			$doc->setValue('bAddress',$bAddress);
+            $doc->setValue('code',$code);			
 
             $doc->cloneRow('colNum',count($arFields));                  //размножаем таблицу
             $iCounter = 1;
@@ -311,18 +359,24 @@ class BillsManager extends Bills{
 
                 $iCounter++;
             }
-
+			
             $doc->setValue('totalSumm',$this->formatterHelper($totalSumm));
             $doc->setValue('totalSummVat',$this->amountHelperFormat($totalSummVat));
             $doc->setValue('totalSummInWords',$totalSummInWords);
+            $doc->setValue('totalSummInWordsEng',$totalSummInWordsEng);
             $doc->setValue('description',$this->description);
             $doc->setValue('billTotalVat',empty($billTotalVat) ? '' : $this->formatterHelper($billTotalVat));
 			$doc->setValue('period_date',Yii::$app->formatter->asDate($this->period_date, 'php:F Y'));
             if(!empty($this->offer_contract))
-                $doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
+				if($this->lang >=1) {
+					$doc->setValue('billOfferta', $this->offer_contract);
+				} else {
+					$doc->setValue('billOfferta','Оплата счета производится '.$this->offer_contract);
+				}
+				$doc->setValue('billOffertaEng',str_replace("от","of",$this->offer_contract));
 
             $doc->saveAs($tryPath);
-
+			
             if(file_exists($tryPath))
                 return TRUE;
             else
@@ -334,6 +388,7 @@ class BillsManager extends Bills{
         }catch (\Exception $e)
         {
             $this->_manError [] = 'Ошибка формирования .docx файла';
+			var_dump($e->getMessage());
             return FALSE;
         }
     }
@@ -374,5 +429,31 @@ class BillsManager extends Bills{
     {
         return is_array($this->_manError) ? implode(';',$this->_manError) : $this->_manError;
     }
+	
+	/**
+     * @throws NotFoundHttpException
+     */
+    protected function getCurrencyUnits()
+    {
+        /** @var ExchangeRates $obCurr */
+        $obCurr = ExchangeRates::find()->where(['id' => $this->curr_id])->one();
+
+        if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $this->n2wUnit = $obCurr->getUnitsForN2W();
+        if($obCurr->id ==3) {
+            $this->n2wUnit[1] = ['российский рубль'   ,'российских рубля'   ,'российских рублей',0];
+        }
+    }
+	
+	protected function getCurrencyById($currID)
+	{
+		$obCurr = ExchangeRates::find()->where(['id' => $currID])->one();
+		if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+		
+		return $obCurr->code;
+	}
 
 }

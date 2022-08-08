@@ -261,12 +261,13 @@ class CustomHelper {
         return $num;
     }
 	
-	public static function num2strEng($num, $code)
+	public static function num2strEng($num, $code='byn')
 	{
 		$currStr = [
-			"usd"=>["dollar", "dollars"],
-			"eur"=>["euro", "euro"],
-			"rub"=>["ruble", "rubles"],
+			"usd"=>["dollar", "dollars", "cent", "cents"],
+			"eur"=>["euro", "euro", "cent", "cents"],
+			"rub"=>["ruble", "rubles", "penny", "pennies"],
+			"byn"=>["ruble", "rubles", "penny", "pennies"],
 		];		
 		$curr = ["",""];
 		
@@ -289,7 +290,7 @@ class CustomHelper {
 		$cent_str = $cent==0 ? "zero": self::num2strEngFn($cent);
 
 		$num_str = $num==1 ? $num_str." ".$curr[0]: $num_str." ".$curr[1];
-		$cent_str = $cent==1 ? $cent_str." cent": $cent_str." cents";
+		$cent_str = $cent==1 ? $cent_str." ".$curr[2]: $cent_str." ".$curr[3];
 		return str_replace("  "," ",$num_str." and ".$cent_str);
 	}
 	

@@ -168,6 +168,8 @@ class BillsController extends AbstractBaseBackendController
             $modelForm->sDescription = $model->description;
             $modelForm->sPayDate = $model->bill_date;
             $modelForm->sPeriodDate = $model->period_date;
+            $modelForm->curr_id = $model->curr_id;
+            $modelForm->bank[$model->l_person_id] = $model->bank_id;
 
             $arServices = BillServices::find()->where(['bill_id' => $model->id])->with('service')->all();
             /** @var BillServices $service */
@@ -179,6 +181,7 @@ class BillsController extends AbstractBaseBackendController
                 $modelForm->arServContract[$service->service_id] = $service->offer;
                 $modelForm->arServOrder[$service->service_id] = $key;
                 $modelForm->arServTitle[$service->service_id] = $service->serv_title;
+                $modelForm->arServTitleEng[$service->service_id] = $service->serv_title_eng;
                 $modelForm->arServTpl[$service->service_id] = $service->serv_tpl_id;
             }
             
@@ -291,10 +294,11 @@ class BillsController extends AbstractBaseBackendController
      * @param $id
      * @param $type
      */
-    public function actionGetBill($id,$type)
+    public function actionGetBill($id,$type,$lang)
     {
         /** @var BillsManager $model */
         $model = BillsManager::findOne($id);
+		$model->lang = $lang;
         $model->getDocument($type);
         Yii::$app->end();
     }

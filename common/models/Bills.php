@@ -68,11 +68,11 @@ class Bills extends AbstractActiveRecord
                  'manager_id', 'cuser_id', 'l_person_id',
                  'service_id', 'docx_tmpl_id',
                  'bill_number', 'bill_template', 'use_vat',
-                 'created_at', 'updated_at','external' , 'bank_id'
+                 'created_at', 'updated_at','external' , 'bank_id', 'curr_id'
              ], 'integer'],
             ['amount','number','min' => 1],
             ['bsk','unique'],
-            [['bill_date', 'period_date'], 'safe'],
+            [['bill_date', 'period_date', 'curr_id'], 'safe'],
             [['vat_rate'], 'number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
             [['description', 'object_text','bsk'], 'string'],
             [['buy_target','offer_contract'], 'string', 'max' => 255]
@@ -88,6 +88,8 @@ class Bills extends AbstractActiveRecord
             'id' => Yii::t('app/documents', 'ID'),
             'manager_id' => Yii::t('app/documents', 'Manager ID'),
             'cuser_id' => Yii::t('app/documents', 'Cuser ID'),
+			'curr_id' => Yii::t('app/book','Currency ID'),
+			'bank_id' => Yii::t('app/book','Bank'),
             'l_person_id' => Yii::t('app/documents', 'L Person ID'),
             'service_id' => Yii::t('app/documents', 'Service ID'),
             'docx_tmpl_id' => Yii::t('app/documents', 'Docx Tmpl ID'),
@@ -223,5 +225,14 @@ class Bills extends AbstractActiveRecord
         $this->setBillNumberAndDate();
         $this->getBSK();
     }
+	
+	public function getCurrencyById($currID)
+	{
+		$obCurr = ExchangeRates::find()->where(['id' => $currID])->one();
+		if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+		
+		return $obCurr->code;
+	}
 
 }

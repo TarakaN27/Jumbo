@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $id
  * @property string $name
  * @property string $src
+ * @property string $src_eng
  * @property integer $is_default
  * @property integer $created_at
  * @property integer $updated_at
@@ -44,9 +45,10 @@ class BillDocxTemplate extends AbstractActiveRecord
             [['name'], 'required'],
             [['is_default', 'created_at', 'updated_at'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['src'],'required','on' => ['insert']],
-            [['src'],'file', 'on' => ['insert', 'update']],
+            [['src', 'src_eng'],'required','on' => ['insert']],
+            [['src', 'src_eng'],'file', 'on' => ['insert', 'update']],
             ['src', 'file', 'extensions' => ['docx'], 'maxSize' => 5*1024*1024,'checkExtensionByMimeType' => false,'on' => ['insert', 'update']],
+            ['src_eng', 'file', 'extensions' => ['docx'], 'maxSize' => 5*1024*1024,'checkExtensionByMimeType' => false,'on' => ['insert', 'update']],
         ];
     }
 
@@ -59,6 +61,7 @@ class BillDocxTemplate extends AbstractActiveRecord
             'id' => Yii::t('app/documents', 'ID'),
             'name' => Yii::t('app/documents', 'Name'),
             'src' => Yii::t('app/documents', 'Src'),
+            'src_eng' => Yii::t('app/documents', 'Src Eng'),
             'is_default' => Yii::t('app/documents', 'Is Default'),
             'created_at' => Yii::t('app/documents', 'Created At'),
             'updated_at' => Yii::t('app/documents', 'Updated At'),
@@ -81,6 +84,13 @@ class BillDocxTemplate extends AbstractActiveRecord
                     'path' => self::FILE_PATH.'/',
                     'url' => '',
                 ],
+				[
+                    'class' => UploadBehavior::className(),
+                    'attribute' => 'src_eng',
+                    'scenarios' => ['insert', 'update'],
+                    'path' => self::FILE_PATH.'/',
+                    'url' => '',
+                ],
             ]);
     }
 
@@ -96,18 +106,26 @@ class BillDocxTemplate extends AbstractActiveRecord
     /**
      * @return string
      */
-    public function getFilePath()
+    public function getFilePath($lang = false)
     {
-        return Yii::getAlias(self::FILE_PATH).'/'.$this->src;
+		if($lang >= 1) {
+			return Yii::getAlias(self::FILE_PATH).'/'.$this->src_eng;
+		} else {
+			return Yii::getAlias(self::FILE_PATH).'/'.$this->src;
+		}
     }
 
     /**
      *
      */
-    public function downloadFile()
+    public function downloadFile($lang = false)
     {
-        $ext = CustomHelper::getExtension($this->src);
-        CustomHelper::getDocument($this->getFilePath(),$this->name.'.'.$ext);
+		if($lang >= 1) {
+			$ext = CustomHelper::getExtension($this->src_eng);
+		} else {
+			$ext = CustomHelper::getExtension($this->src);
+		}
+        CustomHelper::getDocument($this->getFilePath($lang),$this->name.'.'.$ext);
     }
 
     /**

@@ -65,6 +65,18 @@ function  createElement(serviceId,serviceName,iOrder) {
             value: 0,
             class: 'form-control serv-title'
         }).attr('data-serv-id',serviceId)
+        ).append(
+        $('<label></label>',{
+            text:'Предмет счета',
+            class:'control-label'
+        })
+        ).append(
+        $('<textarea />',{
+            name:'BillForm[arServTitleEng]['+serviceId+']',
+            type: 'text',
+            value: 0,
+            class: 'form-control serv-title-eng'
+        }).attr('data-serv-id',serviceId)
         )
     );
 
@@ -292,7 +304,10 @@ function removeService()
 function getBillTpl() {
     var
         iLegalId = $('#billform-ilegalperson').val();
-
+	
+	$(".legal_banks").hide();
+	$("#bank"+iLegalId).show();
+	
     if(customEmpty(iLegalId))
     {
         $('#billform-busetax').val(0);
@@ -308,13 +323,13 @@ function getBillTpl() {
         dataType: "json",
         data: {iLegalId: iLegalId},
         success: function (data) {
-            $('#billform-idocxtpl').val(data.docx_id);
+            /*$('#billform-idocxtpl').val(data.docx_id);
             $('#billform-busetax').val(data.use_vate);
             if (data.use_vate == 1) {
                 $('#billform-btaxrate').val(data.vat_rate);
             } else {
                 $('#billform-btaxrate').val('');
-            }
+            }*/
             $('.servPreloader').addClass('hide');
             $('#servicesBlock').removeClass('hide');
         },
@@ -357,6 +372,7 @@ function getServbiceTplParams(serviceIds)
             $.each(data,function(ind,value){
                 $('#sel'+value.service_id).val(value.id);
                 $('#s'+value.service_id+' .serv-title').val(value.object_text);
+                $('#s'+value.service_id+' .serv-title-eng').val(value.object_text_eng);
                 $('#s'+value.service_id+' .serv-desc').val($.trim(value.description));
                 $('#s'+value.service_id+' .serv-contract').val($.trim(value.offer_contract));
                 chooseDescriptionAndContract();
@@ -444,6 +460,7 @@ function changeServiceTpl()
         data: {iBTpl:tplId,iCntr:iCtrId},
         success: function (data) {
             $('#s'+iServId+' .serv-title').val(data.object_text);
+            $('#s'+iServId+' .serv-title-eng').val(data.object_text_eng);
             $('#s'+iServId+' .serv-desc').val(data.description);
             $('#s'+iServId+' .serv-contract').val(data.offer_contract);
 
@@ -544,6 +561,7 @@ function showByrInfo(this1)
 
 //document ready
 $(function(){
+	
     $('#addServId').on('click',addService);
     $('#activity-modal .btn').on('click',addServClickAction);
     var
@@ -563,12 +581,12 @@ $(function(){
 
     $('#form-bill').on('change','#billform-famount,#servicesBlock .serv-amount',function(idx,item){
         amountFormatter(this,2);
-        showByrInfo(this);
+        //showByrInfo(this);
     });
 
-    showByrInfo('#billform-famount');
+    //showByrInfo('#billform-famount');
     $.each($('#servicesBlock .serv-amount'),function(idx,item){
         amountFormatter(item,2);
-        showByrInfo(item);
+        //showByrInfo(item);
     });
 });

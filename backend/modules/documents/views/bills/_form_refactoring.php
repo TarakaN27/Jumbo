@@ -86,8 +86,14 @@ $arServiceMap = Services::getServicesMap();
         'placeholder' => Yii::t('app/documents','Choose legal person')
     ]);?>
 
-    <?= $form->field($model, 'iDocxTpl')->dropDownList(BillDocxTemplate::getBillDocxMap()) ; ?>
+	<?foreach(\common\models\LegalPerson::getLegalPersonForBill() as $legalPerson){?>
+		<div class="legal_banks" style="display:none" id = "bank<?=$legalPerson->id?>">
+			<?= $form->field($model, "bank[$legalPerson->id]")->dropDownList($legalPerson->getDefaultBankDetailsMap());?>
+		</div>
+	<?}?>
 
+    <?= $form->field($model, 'iDocxTpl')->dropDownList(BillDocxTemplate::getBillDocxMap()) ; ?>
+	
     <?= $form->field($model,'bUseTax')->dropDownList(Bills::getYesNo())?>
 
     <?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
@@ -168,6 +174,13 @@ $arServiceMap = Services::getServicesMap();
                                     'data-serv-id' => $serviceId
                                 ])?>
                             </div>
+							<div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                <label class="control-label">Предмет счета Англ</label>
+                                <?=Html::textarea('BillForm[arServTitleEng]['.$serviceId.']',$model->arServTitleEng[$serviceId],[
+                                    'class' => 'form-control serv-title-eng',
+                                    'data-serv-id' => $serviceId
+                                ])?>
+                            </div>
                             <div class="form-group col-md-6 col-sm-6 col-xs-12">
                                 <label class="control-label">Описание</label>
                                 <?=Html::textarea('BillForm[arServDesc]['.$serviceId.']',$model->arServDesc[$serviceId],[
@@ -189,13 +202,17 @@ $arServiceMap = Services::getServicesMap();
             </div>
         </div>
     </div>
-
+	
+	<?=$form->field($model,'curr_id')->dropDownList(\common\models\ExchangeRates::getAllRatesArray(),[
+        'prompt' => Yii::t('app/book','Choose exchange currency')
+    ])?>
+	
     <?= $form->field($model,'fAmount')->textInput(['maxlength' => true])?>
 
     <?= $form->field($model, 'sDescription')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model,'sOfferContract')->textInput();?>
-    
+	
     <div class="form-group">
         <div class = "col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
             <?= $form->errorSummary($model); ?>

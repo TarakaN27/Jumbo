@@ -31,3 +31,5 @@ phpunit.phar
 
 /backend/web/nodejs/pid
 /backend/web/nodejs/log
+/common/upload/docx_acts
+/common/upload/docx_bills

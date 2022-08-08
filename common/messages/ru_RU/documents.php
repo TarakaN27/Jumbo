@@ -72,6 +72,7 @@ return [
     'Act Date' => 'Дата акта',
     'Buser ID' => 'Добавил акт',
     'Current file' => 'Текущий файл',
+    'Current file eng' => 'Текущий файл Англ.',
     'Template field description' => 'Описание полей шаблона',
     'offer_contract' => 'Договор',
     'Get bill' => 'Получить счет',
@@ -84,5 +85,6 @@ return [
     'Ordering' => 'Порядок',
     'Validity' => 'Срок действия счета',
     'Bank id' => "Банк. реквизиты",
-    'Period of Service Provision' => "Период предоставления услуги"
+    'Period of Service Provision' => "Период предоставления услуги",
+    'Get bill Eng' => "Получить счет(англ)",
 ];
