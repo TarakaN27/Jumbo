@@ -472,11 +472,24 @@ class AjaxServiceController extends AbstractBaseBackendController{
             $date = Yii::$app->request->post('date');
             $currID = Yii::$app->request->post('currID');
 
-            if (empty($amount) || empty($date) || empty($currID))
+            if ((empty($amount) && $amount!=0) || empty($date) || empty($currID))
 				throw new NotFoundHttpException();
 
             $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date), $currID);
             return Yii::$app->formatter->asDecimal($amount * $curr);
+    }
+	
+	public function actionCurrFromBurHistory()
+    {
+            $amount = str_replace(",",".",Yii::$app->request->post('amount'));
+            $date = Yii::$app->request->post('date');
+            $currID = Yii::$app->request->post('currID');
+
+            if ((empty($amount) && $amount!=0) || empty($date) || empty($currID))
+				throw new NotFoundHttpException();
+
+            $curr = ExchangeCurrencyHistory::getCurrencyInBURForDate(strtotime($date), $currID);
+            return Yii::$app->formatter->asDecimal($amount / $curr);
     }
 
         /**

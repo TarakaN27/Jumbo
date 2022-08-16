@@ -21,6 +21,11 @@ use common\models\CUserRequisites;
 use common\models\ExchangeRates;
 use common\models\LegalPerson;
 use PhpOffice\PhpWord\TemplateProcessor;
+
+
+use PhpOffice\PhpWord\PhpWord;
+
+
 use yii\base\InvalidParamException;
 use yii\web\NotFoundHttpException;
 use common\models\Acts;
@@ -42,6 +47,7 @@ class ActsDocumentsV2
         $iCUserId,
         $iActId,
         $n2wUnit = NULL,
+        $n2wUnitCustom = NULL,
         $obActTpl = NULL,
         $arServices = [],
         $legalPersonName,
@@ -63,8 +69,10 @@ class ActsDocumentsV2
         $cuserWebsite,
         $cuserYnp,
         $totalAmount=0,
+        $totalAmountEqu=0,
         $totalVatAmount,
         $totalAmountWithVat=0,
+        $totalAmountEquWithVat=0,
         $totalFiniteAmount=0,
         $amountInWords,
         $amountInWordsEng,
@@ -75,6 +83,11 @@ class ActsDocumentsV2
         $contactDetail,
 		$curCustom = '',
         $bankId,
+        $use_comission = 0,
+		$equ_text = "",
+		$equ_text_2 = "",
+		$cur_amount_equ,
+		$cur_id_equ,
 		$translateAct = FALSE;
 
     /**
@@ -84,7 +97,7 @@ class ActsDocumentsV2
      * @param $actDate
      * @param $actNumber
      */
-    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId, $translateAct=false, $use_vat=false, $vat_rate=false)
+    public function __construct($iActId,$iLegalPerson,$iCUser,$actDate,$actNumber,$iCurrencyId, $bankId, $translateAct=false, $use_vat=false, $vat_rate=false, $use_comission=false)
     {
         if(empty($iActId) || empty($iLegalPerson)||empty($iCUser) || empty($actDate) || empty($actNumber) || empty($iCurrencyId)|| empty($bankId))
             throw new InvalidParamException();
@@ -99,6 +112,7 @@ class ActsDocumentsV2
         $this->translateAct = $translateAct;
         $this->bUseVat = $use_vat;
         $this->vatRate = $vat_rate;
+        $this->use_comission = $use_comission;
 		
     }
 
@@ -256,24 +270,33 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
          */
         foreach ($arServices as $key => $serv)
         {
+			$serv->amount = str_replace([","," "],[".",""],$serv->amount);
+			$serv->cur_amount_equ = str_replace([","," "],[".",""],$serv->cur_amount_equ);
             $amountWithVat = $serv->amount;
+            $amountEquWithVat = $serv->cur_amount_equ;
             $vatRate = $this->bUseVat ? $this->vatRate : '';
 
             $amount = ($this->bUseVat && !$this->cNotResident) ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
             $amount = round($amount,2);
             $price = round($amount/$serv->quantity, 2);
-
+			
+			$amount_equ = $serv->cur_amount_equ;
+			$this->cur_id_equ = $serv->cur_id_equ;
+			$this->getCurrencyUnitsCustom($this->cur_id_equ);
             $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
             if($this->bUseVat == 0 && $this->cNotResident){
                 $vatRate = "-*";
                 $vatAmount = "-*";
             }
-            $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat);
+            $arResult[] = $this->rubleModeCounting((int)$key+1,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat,$amount_equ,$amountEquWithVat);
             $this->totalAmount+= $amount;
+            $this->totalAmountEqu+= $amount_equ;
+			
             if($this->bUseVat && !$this->cNotResident)
                 $this->totalVatAmount = (float)$this->totalVatAmount + $vatAmount;
 
             $this->totalAmountWithVat+= $amountWithVat;
+            $this->totalAmountEquWithVat+= $amountEquWithVat;
             $this->totalFiniteAmount+=$amountWithVat;
 			
 			if($serv->cur_amount>0 && $serv->cur_id>0 && $serv->cur_id!=self::BEL_RUBLE_ID) {
@@ -284,6 +307,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 		
 		$this->curCustom = implode("\n",$arCurCustom);
         $this->amountInWordsMode();
+		$_SESSION["doc"] = $arResult;
         return $this->arServices = $arResult;
     }
 
@@ -356,6 +380,17 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                 default:
                     break;
             }
+			
+			if($this->use_comission == 1 && $this->iCurrencyId == 2){
+				$this->getCurrencyUnitsCustom($this->cur_id_equ);
+				$totalAmountEqu = $this->formatterHelper($this->totalAmountEquWithVat);
+				$totalAmountEquWords = CustomHelper::num2str(str_replace([","," "],[".",""],$totalAmountEqu),$this->n2wUnitCustom);
+				$codeEqu = $this->getCurrencyById($this->cur_id_equ);
+				
+				$this->equ_text = "Стоимость услуг составляет сумму в белорусских рублях, эквивалентную ".$totalAmountEqu." (".$totalAmountEquWords.") ".$codeEqu.".";
+				$this->equ_text_2 = "Оплата производится в белорусских рублях с пересчетом по курсу ".$codeEqu.", установленному НБРБ на дату платежа с увеличением на 5(пять) процентов к данному курсу ".$codeEqu.".";
+			}
+			
         else {
 			
 			$code = $this->getCurrencyById($this->iCurrencyId);
@@ -378,13 +413,13 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 Сумма НДС*: Согласно п. 2 ст. 72 Договор о ЕАЭС от 29.05.2014;<w:br/>
 Подп. 2 П. 28, Подп. 4 П. 29 Раздел IV Протокола о порядке взимания косвенных налогов и механизме контроля за их уплатой при экспорте и импорте товаров, выполнении работ, оказании услуг (приложение 18 к Договору о ЕАЭС от 29.05.2014)";
 
-            $this->totalAmount = $this->formatterHelper($this->totalAmount);
+            $this->totalAmount = $this->formatterHelper(str_replace([",", " "],[".", ""],$this->totalAmount));
 
-            $this->totalFiniteAmount = $this->formatterHelper($this->totalFiniteAmount);
+            $this->totalFiniteAmount = $this->formatterHelper(str_replace([",", " "],[".", ""],$this->totalFiniteAmount));
             if($this->bUseVat)
-                $this->totalVatAmount = $this->formatterHelper($this->totalVatAmount);
+                $this->totalVatAmount = $this->formatterHelper(str_replace([",", " "],[".", ""],$this->totalVatAmount));
 
-            $this->totalAmountWithVat = $this->formatterHelper($this->totalAmountWithVat);
+            $this->totalAmountWithVat = $this->formatterHelper(str_replace([",", " "],[".", ""],$this->totalAmountWithVat));
         }
     }
 
@@ -398,7 +433,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
      * @param $amountWithVat
      * @return array
      */
-    protected function rubleModeCounting($colNum,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat)
+    protected function rubleModeCounting($colNum,$serv,$price,$amount,$vatRate,$vatAmount,$amountWithVat,$amount_equ=0,$amountEquWithVat=0)
     {
         $arResult = [
             'colNum' => $colNum,
@@ -415,7 +450,10 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                 $arResult['vatRate'] = $vatRate;
                 $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->formatterHelper($vatAmount);
                 $arResult['amountWithVat'] =  $this->formatterHelper($amountWithVat);
-                break;
+                $arResult['amountEquWithVat'] =  $this->formatterHelper($amountEquWithVat);
+                $arResult['amountEquWithVatWord'] = CustomHelper::num2str(str_replace([","," "],[".",""],$this->formatterHelper($amountEquWithVat)),$this->n2wUnitCustom);
+                $arResult['equ'] = $this->formatterHelper($amount_equ);
+				break;
             case 1:
 
                 if($this->iCurrencyId == self::BEL_RUBLE_ID)
@@ -424,6 +462,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                     $amount =round($amount,0);
                     $vatAmount = empty($vatAmount) ? $vatAmount : round($vatAmount);
                     $amountWithVat = round($amountWithVat,0);
+                    $amountEquWithVat = round($amountEquWithVat,0);
                 }
 
                 $arResult['price'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($price).'  ('.$this->getNewByr($price).') ' :  $this->formatterHelper($price);
@@ -431,13 +470,19 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                 $arResult['vatRate'] = $vatRate;
                 $arResult['vatAmount'] = empty($vatAmount) ? '' : $this->iCurrencyId == 2 ?  $this->formatterHelper($vatAmount).'  ('.$this->getNewByr($vatAmount).') ' :  $this->formatterHelper($vatAmount);
                 $arResult['amountWithVat'] = $this->iCurrencyId == 2 ?  $this->formatterHelper($amountWithVat).'  ('.$this->getNewByr($amountWithVat).') ' :  $this->formatterHelper($amountWithVat);
-                break;
+                $arResult['amountEquWithVat'] = $this->formatterHelper($amountEquWithVat);
+                $arResult['amountEquWithVatWord'] = CustomHelper::num2str(str_replace([","," "],[".",""],$this->formatterHelper($amountEquWithVat)),$this->n2wUnitCustom);
+				$arResult['equ'] = $this->formatterHelper($amount_equ);
+				break;
             case 2:
                 $arResult['price'] = $this->formatterHelper($price);
                 $arResult['amount'] = $this->formatterHelper($amount);
                 $arResult['vatRate'] = $vatRate;
                 $arResult['vatAmount'] = empty($vatAmount) || $vatAmount == "-*"  ? $vatAmount : $this->formatterHelper($vatAmount);
                 $arResult['amountWithVat'] = $this->formatterHelper($amountWithVat);
+                $arResult['amountEquWithVat'] = $this->formatterHelper($amountEquWithVat);
+                $arResult['amountEquWithVatWord'] = CustomHelper::num2str(str_replace([","," "],[".",""],$this->formatterHelper($amountEquWithVat)),$this->n2wUnitCustom);
+				$arResult['equ'] = $this->formatterHelper($amount_equ);
                 break;
             default:
                 break;
@@ -516,7 +561,9 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
             'amountInWordsEng',
             'vatInWords',
             'contactDetail',
-			'curCustom'
+			'curCustom',
+			'equ_text',
+			'equ_text_2',
         ];
 
         try{
@@ -526,10 +573,85 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                 $obDoc =  new TemplateProcessor($this->obActTpl->getFilePath());
             }
 
-            foreach ($arItems as $item) {
+			$document_with_table = new PhpWord();
+			
+			$tableStyle = array('borderSize' => 6,'borderColor' => '000000');
+			$cellColSpan2 = array('gridSpan' => 2, 'valign' => 'center');
+			$cellColSpan8 = array('gridSpan' => 8, 'valign' => 'center');
+			$cellRowContinue = array('vMerge' => 'continue');
+			$cellHCentered = array('align' => 'center');
+			$cellHRight = array('align' => 'right');
+			$cellVCentered = array('valign' => 'center');
+			$fontStyle = ["name"=>"Arial", "size"=>"9"];
+			$fontStyleBold = ["name"=>"Arial", "size"=>"9", "bold"=>true];
+					
+			$section = $document_with_table->addSection();
+			
+			$table = $section->addTable($tableStyle);
+			
+			$table->addRow(null, array('tblHeader' => true));
+			$table->addCell(400, $cellVCentered)->addText("№", $fontStyle, $cellHCentered);
+			$table->addCell(2600, $cellVCentered)->addText("Наименование работы (услуги)", $fontStyle, $cellHCentered);
+			$table->addCell(700, $cellVCentered)->addText("Ед. изм.", $fontStyle, $cellHCentered);
+			$table->addCell(600, $cellVCentered)->addText("Кол-во", $fontStyle, $cellHCentered);
+			$table->addCell(1000, $cellVCentered)->addText("Цена", $fontStyle, $cellHCentered);
+			$table->addCell(1000, $cellVCentered)->addText("Сумма", $fontStyle, $cellHCentered);
+			$table->addCell(900, $cellVCentered)->addText("Ставка НДС,%", $fontStyle, $cellHCentered);
+			$table->addCell(1000, $cellVCentered)->addText("Сумма НДС", $fontStyle, $cellHCentered);
+			$table->addCell(1200, $cellVCentered)->addText('Стоимость всего с НДС по курсу НБ РБ на '.date("d.m.Y", strtotime($this->actDate)), $fontStyle, $cellHCentered);
+			
+			if($this->use_comission == 1){
+				$table->addCell(1400, $cellVCentered)->addText("Справочно: сумма с НДС", $fontStyle, $cellHCentered);
+			}
+			
+			$table->addRow();
+			$table->addCell(null, $cellVCentered)->addText('${colNum}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${jobName}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('Усл.', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${quantity}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${price}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${amount}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${vatRate}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${vatAmount}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${amountWithVat}', $fontStyle, $cellHCentered);
+			
+			if($this->use_comission == 1){
+				$table->addCell(null, $cellVCentered)->addText('${amountEquWithVat} (${amountEquWithVatWord})', $fontStyle, $cellHCentered);
+			}			
+			
+			$table->addRow();
+			$table->addCell(null, $cellColSpan2)->addText("ИТОГО", $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered);
+			$table->addCell(null, $cellVCentered);
+			$table->addCell(null, $cellVCentered);
+			$table->addCell(null, $cellVCentered)->addText('${totalAmount}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered);
+			$table->addCell(null, $cellVCentered)->addText('${totalVatAmount}', $fontStyle, $cellHCentered);
+			$table->addCell(null, $cellVCentered)->addText('${totalAmountWithVat}', $fontStyle, $cellHCentered);
+			
+			if($this->use_comission == 1){
+				$table->addCell(null, $cellVCentered);
+			}
+			
+			$table->addRow();
+			$table->addCell(null, $cellColSpan8)->addText("Всего (с учетом НДС):", $fontStyleBold, $cellHRight);
+			$table->addCell(null, $cellVCentered)->addText('${totalFiniteAmount}', $fontStyle, $cellHCentered);
+			
+			if($this->use_comission == 1){
+				$table->addCell(null, $cellRowContinue);
+			}
+
+			$objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($document_with_table, 'Word2007');
+			$fullxml = $objWriter->getWriterPart('Document')->write();
+			$tablexml = preg_replace('/^[\s\S]*(<w:tbl\b.*<\/w:tbl>).*/', '$1', $fullxml);
+			$obDoc->setValue('table', $tablexml);
+			
+			
+			foreach ($arItems as $item) {
                 $obDoc->setValue($item, $this->$item);
             }
             $obDoc->cloneRow('colNum',count($this->arServices));
+
             $iCounter = 1;
             foreach ($this->arServices as  $value)
             {
@@ -537,6 +659,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
                     $obDoc->setValue($keyItem.'#'.$iCounter,$val);
                 $iCounter++;
             }
+			
             $obDoc->saveAs($realPath);
         }catch (Exception $e)
         {
@@ -578,6 +701,19 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
         $this->n2wUnit = $obCurr->getUnitsForN2W();
         if($obCurr->id ==3) {
             $this->n2wUnit[1] = ['российский рубль'   ,'российских рубля'   ,'российских рублей',0];
+        }
+    }
+	
+	protected function getCurrencyUnitsCustom($currId)
+    {
+        /** @var ExchangeRates $obCurr */
+        $obCurr = ExchangeRates::find()->where(['id' => $currId])->one();
+        if(!$obCurr)
+            throw new NotFoundHttpException('Currency not found');
+
+        $this->n2wUnitCustom = $obCurr->getUnitsForN2W();
+        if($obCurr->id ==3) {
+            $this->n2wUnitCustom[1] = ['российский рубль'   ,'российских рубля'   ,'российских рублей',0];
         }
     }
 	

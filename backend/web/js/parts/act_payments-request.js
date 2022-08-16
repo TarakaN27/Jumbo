@@ -83,7 +83,7 @@ function fillServicesRequest() {
         }
     });
 	
-    fAmount.val(convertAmountToInvalid(valAmount));
+    fAmount.val(convertAmountToValid(valAmount));
 }
 
 $(document).on('change', '#actform-no-pays', function() {

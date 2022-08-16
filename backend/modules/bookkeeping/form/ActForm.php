@@ -54,7 +54,10 @@ class ActForm extends Model
         $arHidePayments,        //Неявные платежи
         $bank,
 		$bUseTax = 0,
+		$bUseComission = 0,
         $bTaxRate = NULL,
+		$arServAmountEqu = [],     //Сумма по услугам эквивалентная
+		$arServCurIdEqu = [],   	//Ид валюты эквивалентная
 		$bTranslateAct;            //Bool flag акт с переводом
 
     protected
@@ -67,13 +70,13 @@ class ActForm extends Model
     {
         return [
             ['fAmount',ValidNumber::className()],
-            [['arServAmount','arServCurAmount','arHidePayments'],'each','rule' => [ValidNumber::className()]],
+            [['arServAmount','arServCurAmount','arHidePayments','arServAmountEqu'],'each','rule' => [ValidNumber::className()]],
             [[
                 'iCUser','iLegalPerson','iCurr',
                 'iActNumber','actDate','sContractNumber',
-                'contractDate','bCustomAct', 'bTranslateAct'
+                'contractDate','bCustomAct', 'bTranslateAct', 'bUseComission'
             ],'required'],
-			[['bUseTax'],'integer'],
+			[['bUseTax','bUseComission'],'integer'],
 			[['bTaxRate'],'required',
                 'when' => function(){
                     return $this->bUseTax == 1;
@@ -90,7 +93,7 @@ class ActForm extends Model
                 return $model->bCustomAct;
             }],
             ['fAmount','number','numberPattern' => '/^\s*[-+]?[0-9\s]*[\.,\s]?[0-9]+([eE][-+]?[0-9]+)?\s*$/'],
-            [['arServAmount','arServCurAmount','arServCurDate','arServCurId','arServOrder','arServQuantity','arPayment','arTemplate','arTemplateEng','arHidePayments','bTranslateAct'],'safe']
+            [['arServAmount','arServAmountEqu','arServCurAmount','arServCurDate','arServCurId','arServCurIdEqu','arServOrder','arServQuantity','arPayment','arTemplate','arTemplateEng','arHidePayments','bTranslateAct'],'safe']
         ];
     }
 
@@ -115,6 +118,7 @@ class ActForm extends Model
 			'bTranslateAct' => Yii::t('app/book','Translate act file'),
 			'bUseTax' => Yii::t('app/documents','Use Vat'),
             'bTaxRate' => Yii::t('app/documents','Vat Rate'),
+            'bUseComission' => Yii::t('app/documents','Use comissions'),
         ];
     }
 
@@ -182,6 +186,7 @@ class ActForm extends Model
             $obAct->currency_id = $this->iCurr;
 			$obAct->use_vat = $this->bUseTax;
 			$obAct->vat_rate = $this->bTaxRate;
+			$obAct->use_comission = $this->bUseComission;
             if($this->bank && isset($this->bank[$obAct->lp_id])) {
                 $obAct->bank_id = $this->bank[$obAct->lp_id];
             }
@@ -206,7 +211,7 @@ class ActForm extends Model
 
             if(!$this->bCustomAct)
             {
-                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id, $this->bTranslateAct, $obAct->use_vat, $obAct->vat_rate);
+                $obActDoc = new ActsDocumentsV2($obAct->id,$this->iLegalPerson,$this->iCUser,$this->actDate,$this->iActNumber,$this->iCurr, $obAct->bank_id, $this->bTranslateAct, $obAct->use_vat, $obAct->vat_rate, $obAct->use_comission);
                 $fileName = $obActDoc->generateDocument();
                 if(!$fileName)
                     throw new Exception();
@@ -225,6 +230,7 @@ class ActForm extends Model
 			
             return TRUE;
         }catch(Exception $e){
+			$_SESSION["error"] = $e->getMessage();
             $transaction->rollBack();
             return FALSE;
         }
@@ -344,7 +350,7 @@ class ActForm extends Model
             $obActServ = new ActServices();
             $obActServ->act_id = $iActId;
             $obActServ->service_id = $iServId;
-            $obActServ->amount = $this->arServAmount[$iServId];
+            $obActServ->amount = str_replace(",",".",$this->arServAmount[$iServId]);
             $obActServ->quantity = $this->arServQuantity[$iServId];
             $obActServ->contract_number = $this->sContractNumber[$iServId];
             $obActServ->contract_date = strtotime($this->contractDate[$iServId]);
@@ -353,11 +359,16 @@ class ActForm extends Model
             $obActServ->ordering = (int)$this->arServOrder[$iServId];
 			
 			if(isset($this->arServCurAmount[$iServId]) && $this->arServCurAmount[$iServId]>0) {
-				$obActServ->cur_amount = $this->arServCurAmount[$iServId];
+				$obActServ->cur_amount = str_replace(",",".",$this->arServCurAmount[$iServId]);
 				$obActServ->cur_id = $this->arServCurId[$iServId];
 				$obActServ->cur_date = strtotime($this->arServCurDate[$iServId]);
 			}
 			
+			if(isset($this->arServAmountEqu[$iServId]) && $this->arServAmountEqu[$iServId]>=0 && $obActServ->cur_id_equ!=2) {
+				$obActServ->cur_amount_equ = str_replace(",",".",$this->arServAmountEqu[$iServId]);
+				$obActServ->cur_id_equ = $this->arServCurIdEqu[$iServId];
+			}
+
             if(!$obActServ->save())
                 throw new ServerErrorHttpException();
         }

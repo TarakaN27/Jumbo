@@ -34,6 +34,7 @@ var
     URL_LOAD_CONTRACT_DETAIL = '".Url::to(['/ajax-service/find-contract-detail'])."';
     URL_LOAD_ACTS_PAYMENTS = '".Url::to(['/ajax-service/find-payments-for-acts'])."';
     URL_GET_EXCHANGE_CURRENCY_HISTORY = '".Url::to(['/ajax-service/curr-to-bur-history'])."';
+	URL_GET_EXCHANGE_CURRENCY_HISTORY_FROM = '".Url::to(['/ajax-service/curr-from-bur-history'])."';
 ",View::POS_HEAD);
 ?>
 <div class="act-form-v2">
@@ -96,6 +97,8 @@ var
 		<?= $form->field($model,'bTaxRate')->textInput(['maxlength' => true])?>
 
         <?=$form->field($model,'fAmount')->textInput();?>
+		
+		<?= $form->field($model,'bUseComission')->dropDownList(Acts::getYesNo())?>
 
     <div class="form-group">
         <label class="control-label col-md-3 col-sm-3 col-xs-12"><?=Yii::t('app/book','Payments block');?></label>

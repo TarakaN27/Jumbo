@@ -87,4 +87,5 @@ return [
     'Bank id' => "Банк. реквизиты",
     'Period of Service Provision' => "Период предоставления услуги",
     'Get bill Eng' => "Получить счет(англ)",
+    'Use comissions' => "Использовать комиссию",
 ];

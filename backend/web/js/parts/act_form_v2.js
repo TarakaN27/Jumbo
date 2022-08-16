@@ -268,7 +268,7 @@ function fillServices() {
         }
     });
 	
-    fAmountRequest.val(convertAmountToInvalid(valAmountRequest));
+    fAmountRequest.val(convertAmountToValid(valAmountRequest));
 }
 
 /**
@@ -283,13 +283,13 @@ function processFillService(value) {
         let
             currAmount = convertAmountToValid(containter.find('.serv-amount').val());
         currAmount += convertAmountToValid($(value).attr('data-sum'));
-        containter.find('.serv-amount').val(convertAmountToInvalid(currAmount));
+        containter.find('.serv-amount').val(convertAmountToValid(currAmount));
     } else {
         let
             contractDetail = $.parseJSON(getContractDateAndContractNumber(servID)),
             servBlock = createEntityServicesBlock(servID, $(value).attr('data-sum'));
         $('#servicesBlock').append(servBlock);
-
+		
         addServiceToHiddenPayment(servID);          //add input to hidden payment
 
         if (contractDetail.contractDate != undefined && contractDetail.contractNumber != undefined) {
@@ -331,7 +331,7 @@ function processUnfillService(value) {
             currAmount = convertAmountToValid(containter.find('.serv-amount').val());
         currAmount -= convertAmountToValid($(value).attr('data-sum'));
         if (currAmount > 0) {
-            containter.find('.serv-amount').val(convertAmountToInvalid(currAmount));
+            containter.find('.serv-amount').val(convertAmountToValid(currAmount));
         } else {
             removeServiceInputFromHiddenPayment(servID);    //remove service block from hidden payment and recalculate available amount
             containter.remove();
@@ -434,6 +434,19 @@ function createEntityServicesBlock(serviceID, amount) {
             {name: 'class', value: 'form-control serv-amount'},
             {name: 'data-serv-id',value:serviceID}
         ]),
+		inputAmountEqu = createElement('input', [
+            {name: 'name', value: 'ActForm[arServAmountEqu][' + serviceID + ']'},
+            {name: 'value', value: amount},
+            {name: 'type', value: 'text'},
+            {name: 'class', value: 'form-control serv-amount-equ'},
+            {name: 'data-serv-id',value:serviceID}
+        ]),
+		inputCurrEqu = createElement('select', [
+            {name: 'name', value: 'ActForm[arServCurIdEqu][' + serviceID + ']'},
+            {name: 'type', value: 'text'},
+            {name: 'class', value: 'form-control serv-cur-equ'},
+			{name: 'data-serv-id',value:serviceID}
+        ]),
 		inputCurrAmount = createElement('input', [
             {name: 'name', value: 'ActForm[arServCurAmount][' + serviceID + ']'},
             {name: 'value', value: amount},
@@ -483,8 +496,7 @@ function createEntityServicesBlock(serviceID, amount) {
             {name: 'id', value: 's' + serviceID}
         ]),
         h4 = createElement('h4', []),
-        div1 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
-        div2 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
+		
         div3 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div4 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         div5 = createElement('div', [{name: 'class', value: 'form-group col-md-12 col-sm-12 col-xs-12'}]),
@@ -494,6 +506,8 @@ function createEntityServicesBlock(serviceID, amount) {
 		div62 = createElement('div', [{name: 'class', value: 'input-group d-flex col-md-12 col-sm-12 col-xs-12 mb-0'}]),
 		div7 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]),
         label1 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label11 = createElement('label', [{name: 'class', value: 'control-label'}]),
+        label12 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label2 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label3 = createElement('label', [{name: 'class', value: 'control-label'}]),
         label4 = createElement('label', [{name: 'class', value: 'control-label'}]),
@@ -504,6 +518,18 @@ function createEntityServicesBlock(serviceID, amount) {
         clearfix = createElement('div', [{name: 'class', value: 'clearfix'}])
         ;
 		
+	var currId = $('#actform-icurr').val();
+	var use_comission = $('#actform-busecomission').val();
+	
+	if(currId == 2 && use_comission == 1) {
+        var div1 = createElement('div', [{name: 'class', value: 'form-group col-md-3 col-sm-3 col-xs-12'}]);
+        var div2 = createElement('div', [{name: 'class', value: 'form-group col-md-3 col-sm-3 col-xs-12'}]);
+        var div11 = createElement('div', [{name: 'class', value: 'form-group col-md-3 col-sm-3 col-xs-12'}]);
+        var div12 = createElement('div', [{name: 'class', value: 'form-group col-md-3 col-sm-3 col-xs-12'}]);
+	} else {
+		var div1 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]);
+        var div2 = createElement('div', [{name: 'class', value: 'form-group col-md-6 col-sm-6 col-xs-12'}]);
+	}
 		
     h4.html(arServices[serviceID]);
     li.append(h4);
@@ -540,6 +566,21 @@ function createEntityServicesBlock(serviceID, amount) {
     div1.append(label1.html('Кол-во'));
     div1.append(inputQuantity);
     li.append(div1);
+	
+	if(currId == 2 && use_comission == 1) {
+		div11.append(label11.html('Эквивалент'));
+		div11.append(inputAmountEqu);
+		li.append(div11);
+		div12.append(label12.html('Валюта Экв.'));
+		div12.append(inputCurrEqu);
+		for (var i = 0; i < arCurrency.length; i++) {
+			var option = document.createElement("option");
+			option.value = arCurrency[i]["id"];
+			option.text = arCurrency[i]["code"];
+			inputCurrEqu.append(option);
+		}
+		li.append(div12);
+	}
     div3.append(label3.html('Номер контракта'));
     div3.append(inputContractNumber);
     li.append(div3);
@@ -774,7 +815,7 @@ function recalculateActFullActAmount()
         fAmount+=convertAmountToValid($(value).val());
     });
 
-    $('#actform-famount').val(convertAmountToInvalid(fAmount));
+    $('#actform-famount').val(convertAmountToValid(fAmount));
 }
 /**
  * Валидация формы перед сохранением
@@ -1123,6 +1164,7 @@ function checkboxPaymentProcessedAll()
     fillServices();
     showByrInfo('#actform-famount');
 }
+
 /**
  * Вешаем обработчики событий в document.ready
  */
@@ -1132,7 +1174,11 @@ $(function () {
     $('#paymentsBlock').on('change', '.select-on-check-all', checkboxPaymentProcessedAll);
 
     var
-        sortList = $('#servicesBlock');
+        sortList = $('#servicesBlock'),
+		currId = $("#actform-icurr").val(),
+		currIdEqu = $(".serv-cur-equ").val(),
+		amount = $(".serv-amount").val();
+		
     sortList.sortable();
     sortList.sortable().bind('sortupdate', function (e, ui) {
         sortUpdateFunction(sortList);
@@ -1145,9 +1191,36 @@ $(function () {
     $('#actform-actdate').on('change',getActsNumber);
     $('#actform-icuser').on('change',checkContactor);
     $('#hidePaymentBlock').on('change','.inputHidePayment',hideAmountProcess);      //действие при изменении суммы у неявных платежей
-
+	
+	$('#act-form').on('change','.serv-amount, .serv-cur-equ',function(){
+		var use_comission = $("#actform-busecomission").val();
+		if(use_comission == 1){
+			var servId = $(this).data("serv-id");
+			var cAmount = $(".serv-amount[data-serv-id='"+servId+"']");
+			var cAmountEqu = $(".serv-amount-equ[data-serv-id='"+servId+"']");
+			var currIdEqu = $(".serv-cur-equ[data-serv-id='"+servId+"']");
+			var curDate = $("#actform-actdate");
+			$.ajax({
+				type: "POST",
+				cache: false,
+				url: URL_GET_EXCHANGE_CURRENCY_HISTORY_FROM,
+				dataType: "json",
+				data: {amount: cAmount.val(), date: curDate.val(), currID: currIdEqu.val()},
+				success: function (data) {
+					cAmountEqu.val(convertAmountToValid(data));
+				},
+				error: function (msg) {
+					addErrorNotify('Курс валюты', 'Не удалось получить курс валюты!');
+					console.log(data);
+					cAmount.val('');
+					return false;
+				}
+			});
+		}
+		
+    });
+	
     $('#act-form').on('change','#actform-famount,.serv-amount,.inputHidePayment',function(){
-        amountFormatter(this);
         showByrInfo('#actform-famount');
     });
 
