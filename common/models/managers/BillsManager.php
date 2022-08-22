@@ -143,6 +143,8 @@ class BillsManager extends Bills{
             $jPersonDetail = $bankDetails.",\nУНП:".$lPerson->ynp.".\nЮр.адрес:".$lPerson->address.
                 ".\nПочт. адрес:".$lPerson->mailing_address.
                 ".\nтел.:".$lPerson->telephone_number;
+				
+			$jPersonDetail = str_replace("\n", "</w:t><w:br/><w:t>", $jPersonDetail);
             $jPersonEmail = $lPerson->doc_email;
             $jPersonSite = $lPerson->doc_site;
         }
@@ -447,7 +449,7 @@ class BillsManager extends Bills{
         }
     }
 	
-	protected function getCurrencyById($currID)
+	public function getCurrencyById($currID)
 	{
 		$obCurr = ExchangeRates::find()->where(['id' => $currID])->one();
 		if(!$obCurr)

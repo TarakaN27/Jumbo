@@ -55,6 +55,7 @@ class ActForm extends Model
         $bank,
 		$bUseTax = 0,
 		$bUseComission = 0,
+		$bUpProcents = 0,
         $bTaxRate = NULL,
 		$arServAmountEqu = [],     //Сумма по услугам эквивалентная
 		$arServCurIdEqu = [],   	//Ид валюты эквивалентная
@@ -74,9 +75,9 @@ class ActForm extends Model
             [[
                 'iCUser','iLegalPerson','iCurr',
                 'iActNumber','actDate','sContractNumber',
-                'contractDate','bCustomAct', 'bTranslateAct', 'bUseComission'
+                'contractDate','bCustomAct', 'bTranslateAct', 'bUseComission','bUpProcents'
             ],'required'],
-			[['bUseTax','bUseComission'],'integer'],
+			[['bUseTax','bUseComission','bUpProcents'],'integer'],
 			[['bTaxRate'],'required',
                 'when' => function(){
                     return $this->bUseTax == 1;
@@ -85,7 +86,7 @@ class ActForm extends Model
                     return $('#billform-busetax').val() == ".AbstractActiveRecord::YES.";
                 }"
             ],
-            [['bank'], 'safe'],
+            [['bank', 'fCustomFileAct'], 'safe'],
             [['actDate'],'date','format' => 'php:d.m.Y'],
             [['arServices'],'each','rule' => ['integer']],
             [['contractDate'],'each','rule' => ['date','format' => 'php:d.m.Y']],
@@ -119,6 +120,7 @@ class ActForm extends Model
 			'bUseTax' => Yii::t('app/documents','Use Vat'),
             'bTaxRate' => Yii::t('app/documents','Vat Rate'),
             'bUseComission' => Yii::t('app/documents','Use comissions'),
+            'bUpProcents' => Yii::t('app/documents','Up procents'),
         ];
     }
 
@@ -187,6 +189,7 @@ class ActForm extends Model
 			$obAct->use_vat = $this->bUseTax;
 			$obAct->vat_rate = $this->bTaxRate;
 			$obAct->use_comission = $this->bUseComission;
+			$obAct->up_procents = $this->bUpProcents;
             if($this->bank && isset($this->bank[$obAct->lp_id])) {
                 $obAct->bank_id = $this->bank[$obAct->lp_id];
             }

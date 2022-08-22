@@ -84,6 +84,7 @@ class ActsDocumentsV2
 		$curCustom = '',
         $bankId,
         $use_comission = 0,
+        $up_procents = 0,
 		$equ_text = "",
 		$equ_text_2 = "",
 		$cur_amount_equ,
@@ -204,6 +205,8 @@ class ActsDocumentsV2
             if (!$obAct)
                 throw new NotFoundHttpException();
 			
+			$this->up_procents = $obAct->up_procents;
+			
             $cuserContractDetail = $obAct->contract_num . ' от ' . \Yii::$app->formatter->asDate($obAct->contract_date);
             $cuserContractDetailEng = str_replace("Договор ","Agreement ",Yii::t('app/book',$obAct->contract_num)) . ' of ' . \Yii::$app->formatter->asDate($obAct->contract_date);
             if($obCUser->is_resident == 0){
@@ -222,7 +225,7 @@ class ActsDocumentsV2
                 $template = "Заказчик: $cuserName<w:br/>
 Адрес: $adsress<w:br/>
 Паспортные данные: Номер $passportNumber выдан $passportDate, $passportAuth <w:br/>
-Основание: договор $cuserContractDetail";
+Основание: $cuserContractDetail";
 
 				$this->cuserAddress = $adsress;
 
@@ -236,7 +239,7 @@ class ActsDocumentsV2
 
                 $template = "Заказчик: $cuserName, УНП: $cuserYnp<w:br/>
 Р/сч: $cuserBankDetail<w:br/>
-Основание: договор $cuserContractDetail<w:br/>
+Основание: $cuserContractDetail<w:br/>
 Юр. адрес: $cuserAddress<w:br/>
 E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 
@@ -274,7 +277,7 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 			$serv->cur_amount_equ = str_replace([","," "],[".",""],$serv->cur_amount_equ);
             $amountWithVat = $serv->amount;
             $amountEquWithVat = $serv->cur_amount_equ;
-            $vatRate = $this->bUseVat ? $this->vatRate : '';
+            $vatRate = $this->bUseVat ? $this->vatRate : '-*';
 
             $amount = ($this->bUseVat && !$this->cNotResident) ? ($serv->amount/(1+$this->vatRate/100)) : $serv->amount;
             $amount = round($amount,2);
@@ -282,7 +285,9 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 			
 			$amount_equ = $serv->cur_amount_equ;
 			$this->cur_id_equ = $serv->cur_id_equ;
-			$this->getCurrencyUnitsCustom($this->cur_id_equ);
+			if($serv->cur_id_equ>0){
+				$this->getCurrencyUnitsCustom($this->cur_id_equ);
+			}
             $vatAmount = $this->bUseVat ? round($serv->amount-$amount,2): '';
             if($this->bUseVat == 0 && $this->cNotResident){
                 $vatRate = "-*";
@@ -307,7 +312,6 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 		
 		$this->curCustom = implode("\n",$arCurCustom);
         $this->amountInWordsMode();
-		$_SESSION["doc"] = $arResult;
         return $this->arServices = $arResult;
     }
 
@@ -388,7 +392,11 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 				$codeEqu = $this->getCurrencyById($this->cur_id_equ);
 				
 				$this->equ_text = "Стоимость услуг составляет сумму в белорусских рублях, эквивалентную ".$totalAmountEqu." (".$totalAmountEquWords.") ".$codeEqu.".";
-				$this->equ_text_2 = "Оплата производится в белорусских рублях с пересчетом по курсу ".$codeEqu.", установленному НБРБ на дату платежа с увеличением на 5(пять) процентов к данному курсу ".$codeEqu.".";
+				$this->equ_text_2 = "Оплата производится в белорусских рублях с пересчетом по курсу ".$codeEqu.", установленному НБРБ на дату платежа";
+				
+				if($this->up_procents == 1) {
+					$this->equ_text_2 .= " с увеличением на 5(пять) процентов к данному курсу ".$codeEqu.".";
+				}
 			}
 			
         else {
@@ -598,10 +606,13 @@ E-mail: $cuserEmail, Веб-сайт: $cuserWebsite";
 			$table->addCell(1000, $cellVCentered)->addText("Сумма", $fontStyle, $cellHCentered);
 			$table->addCell(900, $cellVCentered)->addText("Ставка НДС,%", $fontStyle, $cellHCentered);
 			$table->addCell(1000, $cellVCentered)->addText("Сумма НДС", $fontStyle, $cellHCentered);
-			$table->addCell(1200, $cellVCentered)->addText('Стоимость всего с НДС по курсу НБ РБ на '.date("d.m.Y", strtotime($this->actDate)), $fontStyle, $cellHCentered);
+			
 			
 			if($this->use_comission == 1){
+				$table->addCell(1200, $cellVCentered)->addText('Стоимость всего с НДС по курсу НБ РБ на '.date("d.m.Y", strtotime($this->actDate)), $fontStyle, $cellHCentered);
 				$table->addCell(1400, $cellVCentered)->addText("Справочно: сумма с НДС", $fontStyle, $cellHCentered);
+			} else {
+				$table->addCell(1200, $cellVCentered)->addText('Стоимость всего с НДС', $fontStyle, $cellHCentered);
 			}
 			
 			$table->addRow();
